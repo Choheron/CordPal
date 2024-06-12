@@ -12,7 +12,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
     return cookies().get(name)?.value ?? '';
   }
   const sessionCookie = await getCookie('sessionid')
-
   // Call to Discord API
   const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/userData`, {
     method: "GET",

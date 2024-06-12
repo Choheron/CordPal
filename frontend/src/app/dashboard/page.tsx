@@ -31,7 +31,6 @@ export default async function Page() {
         Discriminator: {userData['discriminator']}<br/>
         Public Flags: {userData['public_flags']}<br/>
         Flags: {userData['flags']}<br/>
-        Banner: {userData['banner']}<br/>
         Accent Color: {userData['accent_color']}<br/>
         Global Name: {userData['global_name']}<br/>
         Banner Color: {userData['banner_color']}<br/>
