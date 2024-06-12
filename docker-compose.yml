@@ -1,17 +1,24 @@
 version: '3'
 services:
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     ports: 
       - "8000:8000"
     environment:
       - APP_ENV=PROD
+    networks:
+      - internal
+
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    depends_on:
-      - backend
+    networks:
+      - internal
 
 networks:
   internal: {}
