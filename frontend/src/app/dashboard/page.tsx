@@ -1,21 +1,24 @@
-'use client'
+import { cookies } from "next/headers";
 
-import { useState, useEffect } from "react";
+export default async function Page() {
 
-export default function Page() {
-  const [userData, setUserData] = useState({})
+  // Below Code allows for serverside computing of cookie stuff!
+  const getCookie = async (name: string) => {
+    return cookies().get(name)?.value ?? '';
+  }
+  const sessionCookie = await getCookie('sessionid')
 
-  useEffect(() => {
-    const getDiscordUserData = async () => {
-      const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/userData`, {
-        method: "GET",
-        credentials: "include",
-        cache: 'force-cache',
-      });
-      setUserData(await userDataResponse.json());
+  // Call to Discord API
+  const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/userData`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
     }
-    getDiscordUserData()
-  }, []);
+  });
+  const userData = await userDataResponse.json()
+
   
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">

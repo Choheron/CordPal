@@ -1,26 +1,28 @@
-'use client'
-
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import TopBar from "../ui/dashboard/top_bar";
-import { useEffect, useState } from "react";
+import { cookies } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  const [userData, setUserData] = useState({})
+export default async function Layout({ children }: { children: React.ReactNode }) {
 
-  useEffect(() => {
-    const getDiscordUserData = async () => {
-      const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/userData`, {
-        method: "GET",
-        credentials: "include",
-        cache: 'force-cache',
-      });
-      setUserData(await userDataResponse.json());
+  // Below Code allows for serverside computing of cookie stuff!
+  const getCookie = async (name: string) => {
+    return cookies().get(name)?.value ?? '';
+  }
+  const sessionCookie = await getCookie('sessionid')
+
+  // Call to Discord API
+  const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/userData`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
     }
-    getDiscordUserData()
-  }, []);
+  });
+  const userData = await userDataResponse.json()
 
   return (
     <html lang="en">
