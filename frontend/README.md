@@ -2,7 +2,7 @@
 
 Gitignore will ignore the following critical files and paths:
 - public/photoshops
-- .env file
+- .env files (ignores `.env.local` and `.env.production`)
 
 Expected Volumes:
 | Description | Host Path (Planned) | Container Path |

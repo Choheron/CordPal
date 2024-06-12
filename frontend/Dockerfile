@@ -10,6 +10,8 @@ RUN npm run build
 # ==== RUNTIME STAGE ===================================================================
 FROM node:18-alpine AS runtime
 
+ENV NODE_ENV=production
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production

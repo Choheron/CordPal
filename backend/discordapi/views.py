@@ -12,7 +12,10 @@ from dotenv import load_dotenv
 import os
 import json
 
-load_dotenv('.env')
+# Determine runtime enviornment
+APP_ENV = os.getenv('APP_ENV') or 'DEV'
+
+load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 
 
 def getDiscordToken(request: HttpRequest):
