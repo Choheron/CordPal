@@ -1,5 +1,6 @@
 import { getFilesInDir } from "@/app/lib/utils";
 import { ReactNode } from "react";
+import Image from "next/image";
 
 export default function Page() {
 
@@ -7,22 +8,15 @@ export default function Page() {
     const fileList = getFilesInDir(imageDir);
     return (
       fileList.map((path: string) => (
-        <div className="flex flex-col w-4/5 items-center relative p-6">
-          <img 
-            src={"/photoshops/" + path}
-            alt={path}
-            width="auto"
-            height="auto"
-          />
-          { /* Below is old Image code that uses the Image from NextJs... proved annoying */ }
-          {/* <Image 
+        <div key={path} className="flex flex-col w-4/5 items-center relative p-6">
+          <Image 
             src={"/photoshops/" + path}
             width={0}
             height={0}
             sizes="100vw"
             alt="The one true god"
-            style={{ width: '75%', height: 'auto' }}
-          /> */}
+            style={{ width: 'auto', height: 'auto' }}
+          />
           <p>{path}</p>
         </div>
       ))
