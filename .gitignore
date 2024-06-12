@@ -11,7 +11,7 @@
 **/photoshops/**
 
 # Ignore ENV var files
-.env
+.env*
 env.bat
 
 # testing
