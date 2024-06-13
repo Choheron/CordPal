@@ -20,7 +20,7 @@ export default async function Auth({ searchParams, }: { searchParams: { [key: st
       'code': code,
       'redirect_uri': process.env.NEXT_PUBLIC_REDIRECT_URI,
       }
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/token`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL_CLIENT}/discordapi/token`, {
         method: "POST",
         body: JSON.stringify(reqData),
         credentials: "include",

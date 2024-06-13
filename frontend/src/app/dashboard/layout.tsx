@@ -6,7 +6,6 @@ import { cookies } from "next/headers";
 const inter = Inter({ subsets: ["latin"] });
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
-
   // Below Code allows for serverside computing of cookie stuff!
   const getCookie = async (name: string) => {
     return cookies().get(name)?.value ?? '';

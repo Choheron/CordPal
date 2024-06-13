@@ -6,6 +6,5 @@ from . import views
 urlpatterns = [
     path('token', views.getDiscordToken),
     path('userData', views.getDiscordUserData),
-    path('test1', views.testSessionStart),
-    path('test2', views.testSessionEnd),
+    path('validateMember', views.validateServerMember)
 ]
