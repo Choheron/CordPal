@@ -37,6 +37,8 @@ export default async function Page() {
         MFA Enabled: {userData['mfa_enabled']}<br/>
         Locale: {userData['locale']}<br/>
         Premium Type: {userData['premium_type']}<br/>
+        <br/>
+        EMAIL: {userData['email']}<br/>
       </p>
       <Conditional showWhen={!(await isMember())}>
         <br/>
