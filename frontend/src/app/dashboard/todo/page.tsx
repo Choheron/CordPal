@@ -12,6 +12,7 @@ export default function todo() {
         <li>Quote of the day</li>
         <li>Multiple discord support</li>
         <li>Allow users to submit images</li>
+        <li>Route user directly to content if they have the session cookie</li>
       </ul>
     </main>
   );
