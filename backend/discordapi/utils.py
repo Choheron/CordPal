@@ -4,21 +4,30 @@ import requests
 import datetime 
 import os
 import json
+import logging
+
+# Declare logging
+logger = logging.getLogger(__name__)
 
 def storeDiscordTokenInSession(request: HttpRequest, discordResponseJSON: json):
+  logger.debug(discordResponseJSON)
+  logger.debug("Attempting to store discord token data in session object...")
   # Store discord data in session data
   request.session["discord_access_token"] = discordResponseJSON['access_token']
-  request.session["discord_token_type"] =discordResponseJSON['token_type']
+  request.session["discord_token_type"] = discordResponseJSON['token_type']
   # Calculate Expiry time then store as string
   expiryTime = datetime.datetime.now() + datetime.timedelta(seconds=discordResponseJSON['expires_in'])
   request.session["discord_expiry_date"] = expiryTime.strftime("%d-%m-%Y %H:%M:%S")
   request.session["discord_refresh_token"] = discordResponseJSON['refresh_token']
   request.session["discord_scope"] = discordResponseJSON['scope']
+  logger.info("Discord token data stored in session object!")
   # Return True
   return True
 
 
 def isDiscordTokenExpired(request: HttpRequest):
+  logger.debug("Checking if discord token is expired...")
+  logger.debug("Cookies in request: " + str(request.COOKIES))
   # Get current time
   curTime = datetime.datetime.now()
   # Get session Expiry time

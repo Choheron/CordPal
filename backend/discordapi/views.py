@@ -73,6 +73,7 @@ def getDiscordToken(request: HttpRequest):
 ###
 def getDiscordUserData(request: HttpRequest):
   logger.debug("getDiscordUserData called...")
+  logger.debug("Cookies in request: " + str(request.COOKIES))
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getDiscordUserData called with a non-GET method, returning 405.")
