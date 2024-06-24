@@ -9,13 +9,15 @@ const albertSans = Albert_Sans({
 export default async function QuoteItem(props) {
 
   return (
-    <div className="rounded-xl bg-neutral-900/75 z-10 w-4/5 max-w-5xl flex justify-around">
-      <div className="p-2">
-        <p className={`${albertSans.className} text-2xl`} >
+    <div className="w-full flex justify-around max-w-5xl rounded-x bg-gradient-to-r from-neutral-900/0 via-neutral-900/75 to-neutral-900/0 mt-2 mb-2">
+      <div className="flex flex-col z-10 justify-around w-fit">
+        <p className={`${albertSans.className} antialiased text-3xl p-2 pb-0 text-center`} >
           "{props.quoteObject['text']}"
         </p>
+        <div className="flex justify-end pl-10 pr-10">
+          <p>Submitted by: <i>{props.quoteObject['addedBy'].split('/')[0]} on {props.quoteObject['timestamp']}</i></p>
+        </div>
       </div>
-      
     </div>
   );
 }

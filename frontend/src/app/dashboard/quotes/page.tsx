@@ -22,9 +22,11 @@ export default async function quotes() {
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
       <h1 className="text-4xl underline antialiased">Quotes:</h1>
-      <br/>
-      <br/>
-      <QuoteItem quoteObject={quotesJson['143849159747698689']['quoteList'][0]} speaker={quotesJson['143849159747698689']['nickname']} />
+      <div className="flex flex-col justify-around mt-10 mb-10">
+        <QuoteItem quoteObject={quotesJson['143849159747698689']['quoteList'][3]} speaker={quotesJson['143849159747698689']['nickname']} />
+        <QuoteItem quoteObject={quotesJson['143849159747698689']['quoteList'][1]} speaker={quotesJson['143849159747698689']['nickname']} />
+        <QuoteItem quoteObject={quotesJson['145291709289332737']['quoteList'][2]} speaker={quotesJson['143849159747698689']['nickname']} />
+      </div>
     </main>
   );
 }
