@@ -9,6 +9,9 @@
 # Ignore photoshop images
 **/photoshops
 **/photoshops/**
+# Ignore Bot Data Files
+**/botData/
+**/botData/**
 
 # Ignore ENV var files
 .env*

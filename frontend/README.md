@@ -7,7 +7,7 @@ Gitignore will ignore the following critical files and paths:
 Expected Volumes:
 | Description | Host Path (Planned) | Container Path |
 |---|---|---|
-| Photoshops Directory | /appdata/photoshops | `/app/public/photoshops` |
+| Photoshops Directory | /<appdata dir>/photoshops | `/app/public/photoshops` |
 
 ## NextJS Provided README
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).

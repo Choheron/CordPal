@@ -2,6 +2,9 @@
 
 import { cookies } from "next/headers";
 
+// 
+// Determine if a user is a member of the required server, and return boolean.
+//
 export async function isMember() {
   // Below Code allows for serverside computing of cookie stuff!
   const getCookie = async (name: string) => {

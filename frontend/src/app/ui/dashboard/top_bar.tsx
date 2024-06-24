@@ -26,6 +26,7 @@ export default async function TopBar(props) {
       <div className="z-10 w-full max-w-5xl items-center justify-around font-mono text-sm lg:flex pt-5">
         <Link href="/dashboard">Home</Link>
         <Conditional showWhen={await isMember()}><Link href="/dashboard/photos">Photoshops</Link></Conditional>
+        <Conditional showWhen={await isMember()}><Link href="/dashboard/quotes">Quotes</Link></Conditional>
         <Conditional showWhen={await isMember()}><Link href="/dashboard/todo">Todo List</Link></Conditional>
       </div>
     </div>
