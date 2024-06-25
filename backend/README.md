@@ -8,3 +8,8 @@ Expected Volumes:
 | Description | Host Path (Planned) | Container Path |
 |---|---|---|
 | Bot Data Directory | /<discord-bot dir>/data | `/app/botData/<bot name>` |
+
+Expected Environment Vars:
+| Description | Key | Value |
+|---|---|---|
+| App Operating Environment  | APP_ENV | `PROD` |
