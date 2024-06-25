@@ -15,7 +15,7 @@ export default async function QuoteItem(props) {
           <p>{props.speaker}:</p>
         </div>
         <p className={`${albertSans.className} antialiased text-3xl p-1 pb-0 text-center`} >
-          "{props.quoteObject['text']}"
+          &quot;{props.quoteObject['text']}&quot;
         </p>
         <div className="flex justify-end pl-10 pr-10">
           <p>Submitted by: <i>{props.quoteObject['addedBy'].split('/')[0]} on {props.quoteObject['timestamp']}</i></p>
