@@ -7,7 +7,7 @@ Gitignore will ignore the following critical files and paths:
 Expected Volumes:
 | Description | Host Path (Planned) | Container Path |
 |---|---|---|
-| Bot Data Directory | /<discord-bot dir>/data | `/app/botData/<bot name>` |
+| Bot Data Directory | /\(discord-bot dir\)/data | `/app/botData/<bot name>` |
 
 Expected Environment Vars:
 | Description | Key | Value |
