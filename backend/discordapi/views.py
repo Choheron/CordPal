@@ -4,6 +4,7 @@ from .utils import (
   isDiscordTokenExpired, 
   refreshDiscordToken, 
   storeDiscordTokenInSession,
+  checkPreviousAuthorization,
 )
 
 import datetime
@@ -145,4 +146,32 @@ def validateServerMember(request: HttpRequest):
   logger.debug("Returning member status...")
   out = {}
   out['member'] = member
+  return JsonResponse(out)
+
+
+###
+# Validate that the user is a member of the discord server (TODO: Improve this flow, make it dynamic)
+###
+def checkIfPrevAuth(request: HttpRequest):
+  logger.debug("checkIfPrevAuth called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("checkIfPrevAuth called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Check if user sessionid token is valid
+  logger.debug("Ensuring sessionid is valid...")
+  # Set output var
+  validSession = checkPreviousAuthorization(request)
+  logger.debug(f"Previous Authorization Status: {validSession}")
+  # Ensure user is logged in
+  logger.debug("Ensuring discord token is not expired...")
+  if(isDiscordTokenExpired(request) and validSession):
+    refreshDiscordToken(request)
+  # 
+  # Return JsonResponse containing true or false in body
+  logger.debug("Returning member status...")
+  out = {}
+  out['valid'] = validSession
   return JsonResponse(out)

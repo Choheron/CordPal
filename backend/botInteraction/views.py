@@ -33,6 +33,6 @@ def getAllQuotes(request: HttpRequest):
   quotes = json.loads(quotes_file.read())
   quotes_file.close()
   # Debug log quotes
-  logger.debug(quotes)
+  # logger.debug(quotes) # COMMENTED OUT FOR MY CONSOLE SANITY
   # Return quote data for all users
   return HttpResponse(content=json.dumps(quotes), content_type='text/json', status=200)

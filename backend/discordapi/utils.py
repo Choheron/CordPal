@@ -10,7 +10,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 def storeDiscordTokenInSession(request: HttpRequest, discordResponseJSON: json):
-  logger.debug(discordResponseJSON)
   logger.debug("Attempting to store discord token data in session object...")
   # Store discord data in session data
   request.session["discord_access_token"] = discordResponseJSON['access_token']
@@ -59,3 +58,12 @@ def refreshDiscordToken(request: HttpRequest):
   storeDiscordTokenInSession(request, discordResJSON)
   # Return True if Successful
   return True
+
+
+def checkPreviousAuthorization(request: HttpRequest):
+  # Check if session is stored in data
+  logger.debug("Checking if sessionid exists...")
+  if('discord_access_token' in request.session):
+    return True
+  # Return false if not found
+  return False
