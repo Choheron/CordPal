@@ -10,6 +10,9 @@ export default function todo() {
     {'work_item': "Allow users to submit images", 'status': 'BACKLOG'},
     {'work_item': "Logout Button", 'status': 'BACKLOG'},
     {'work_item': "Implement Versioning for BE and FE", 'status': 'BACKLOG'},
+    {'work_item': "Create demo user for external access", 'status': 'BACKLOG'},
+    {'work_item': "Add an 'about' page to the default screen", 'status': 'BACKLOG'},
+    {'work_item': "Add a 'stats' page to default and user dashboards", 'status': 'BACKLOG'},
   ]
 
   const genTodoList: ReactNode = todoList.sort((a, b) => a['status'] < b['status'] ? 1 : -1).map((work_obj) => {
