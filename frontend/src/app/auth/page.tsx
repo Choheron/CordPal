@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation'
 
 
-export default async function Auth({ searchParams, }: { searchParams: { [key: string]: string | string[] | undefined }; }) {
+export default async function Page({ searchParams, }: { searchParams: { [key: string]: string | string[] | undefined }; }) {
   const router = useRouter();
   const code = searchParams["code"] ?? "NO CODE";
   // Redirect user to login page if code is bad
