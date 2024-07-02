@@ -4,22 +4,24 @@ import Image from "next/image";
 
 export default function todo() {
   const todoList = [
-    {'work_item': "Quote of the Day", 'status': 'BACKLOG'},
-    {'work_item': "Multiple discord support", 'status': 'BACKLOG'},
-    {'work_item': "Route user directly to content if they have the session cookie", 'status': 'DONE'},
-    {'work_item': "Allow users to submit images", 'status': 'BACKLOG'},
-    {'work_item': "Logout Button", 'status': 'BACKLOG'},
-    {'work_item': "Implement Versioning for BE and FE", 'status': 'BACKLOG'},
-    {'work_item': "Create demo user for external access", 'status': 'BACKLOG'},
-    {'work_item': "Add an 'about' page to the default screen", 'status': 'BACKLOG'},
-    {'work_item': "Add a 'stats' page to default and user dashboards", 'status': 'BACKLOG'},
+    {'work_item': "Quote of the Day", 'category': "Functionality", 'status': 'BACKLOG'},
+    {'work_item': "Multiple discord support", 'category': "Functionality", 'status': 'BACKLOG'},
+    {'work_item': "Route user directly to content if they have the session cookie", 'category': "UI/UX", 'status': 'DONE'},
+    {'work_item': "Allow users to submit images", 'category': "Functionality", 'status': 'BACKLOG'},
+    {'work_item': "Logout Button", 'category': "Functionality", 'status': 'IN PROGRESS'},
+    {'work_item': "Implement Versioning for BE and FE", 'category': "CI/CD", 'status': 'BACKLOG'},
+    {'work_item': "Create demo user for external access",'category': "Functionality", 'status': 'BACKLOG'},
+    {'work_item': "Add an 'about' page to the default screen",'category': "Functionality", 'status': 'BACKLOG'},
+    {'work_item': "Add a 'stats' page to default and user dashboards",'category': "Functionality", 'status': 'BACKLOG'},
+    {'work_item': "Underline current page in nav links",'category': "UI/UX", 'status': 'DONE'},
   ]
 
-  const genTodoList: ReactNode = todoList.sort((a, b) => a['status'] < b['status'] ? 1 : -1).map((work_obj) => {
+  const genTodoList: ReactNode = todoList.sort((a, b) => (a['status'] < b['status'])||(a['category'] < b['category']) ? 1 : -1).map((work_obj) => {
     return (
-      <tr key={work_obj['status']}>
-        <td className="text-center py-1 px-3">{work_obj['work_item']}</td>
-        <td className="text-left border-gray-500 border-l py-1 pl-2">{work_obj['status']}</td>
+      <tr key={work_obj['status']} className="text-center">
+        <td className="py-1 px-3">{work_obj['work_item']}</td>
+        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['status']}</td>
+        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['category']}</td>
       </tr> 
     );
   });
@@ -38,6 +40,9 @@ export default function todo() {
               </th>
               <th className="text-xl border-gray-500 border-l py-1 px-3">
                 Completion Status
+              </th>
+              <th className="text-xl border-gray-500 border-l py-1 px-3">
+                Category
               </th>
             </tr>
           </thead>
