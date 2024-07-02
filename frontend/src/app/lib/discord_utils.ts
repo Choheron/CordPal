@@ -9,6 +9,7 @@ const getCookie = async (name: string) => {
 
 // 
 // Determine if a user is a member of the required server, and return boolean.
+// - RETURN: Boolen indicating member status
 //
 export async function isMember() {
   // Check for sessionid in cookies
@@ -28,6 +29,7 @@ export async function isMember() {
 
 //
 // Verify session cookie is in storage, to skip login page
+// - RETURN: Boolean indication login/auth status
 //
 export async function verifyAuth() {
   // Check for sessionid in cookies
@@ -47,4 +49,26 @@ export async function verifyAuth() {
   });
   const isAuthorized: boolean = (await prevAuthResponse.json())['valid'];
   return isAuthorized;
+}
+
+//
+// Retrieve discord user data using session info
+// - RETURN: Json containing discord basic user data
+//
+export async function getDiscordUserData() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/userData`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  return await userDataResponse.json();
 }
