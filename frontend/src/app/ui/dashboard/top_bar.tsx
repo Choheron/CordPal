@@ -47,7 +47,10 @@ export default function TopBar(props) {
       <div className="z-10 w-full max-w-5xl items-center justify-around font-mono text-sm lg:flex pt-5">
         {links.map((link, index) => {
             return(
-              <Conditional showWhen={link.conditional}>
+              <Conditional 
+                key={index}
+                showWhen={link.conditional}
+              >
                 <Link 
                   key={index}
                   href={link.href}
