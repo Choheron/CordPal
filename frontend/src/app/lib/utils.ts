@@ -1,4 +1,3 @@
-
 export const getFilesInDir = (dir: string) => {
   const fs = require('fs');
   const out: string[] =[]

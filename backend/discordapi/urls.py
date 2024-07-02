@@ -8,4 +8,5 @@ urlpatterns = [
     path('userData', views.getDiscordUserData),
     path('validateMember', views.validateServerMember),
     path('checkToken', views.checkIfPrevAuth),
+    path('logout', views.revokeDiscordToken),
 ]

@@ -26,7 +26,6 @@ def storeDiscordTokenInSession(request: HttpRequest, discordResponseJSON: json):
 
 def isDiscordTokenExpired(request: HttpRequest):
   logger.debug("Checking if discord token is expired...")
-  logger.debug("Cookies in request: " + str(request.COOKIES))
   # Get current time
   curTime = datetime.datetime.now()
   # Get session Expiry time
@@ -63,7 +62,4 @@ def refreshDiscordToken(request: HttpRequest):
 def checkPreviousAuthorization(request: HttpRequest):
   # Check if session is stored in data
   logger.debug("Checking if sessionid exists...")
-  if('discord_access_token' in request.session):
-    return True
-  # Return false if not found
-  return False
+  return 'discord_access_token' in request.session

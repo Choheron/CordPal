@@ -72,3 +72,25 @@ export async function getDiscordUserData() {
   });
   return await userDataResponse.json();
 }
+
+//
+// Revoke user token and clear session data from backend
+// - RETURN: Boolean on success
+//
+export async function discordLogout() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const tokenRevokeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/logout`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  return true;
+}
