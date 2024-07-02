@@ -164,14 +164,57 @@ def checkIfPrevAuth(request: HttpRequest):
   logger.debug("Ensuring sessionid is valid...")
   # Set output var
   validSession = checkPreviousAuthorization(request)
-  logger.debug(f"Previous Authorization Status: {validSession}")
   # Ensure user is logged in
   logger.debug("Ensuring discord token is not expired...")
-  if(isDiscordTokenExpired(request) and validSession):
+  if(validSession and isDiscordTokenExpired(request)):
     refreshDiscordToken(request)
   # 
   # Return JsonResponse containing true or false in body
-  logger.debug("Returning member status...")
+  logger.debug(f"Returning prevAuth status of: {validSession}...")
   out = {}
   out['valid'] = validSession
   return JsonResponse(out)
+
+
+###
+# Revoke discord token and clear session data for user
+###
+def revokeDiscordToken(request: HttpRequest):
+  logger.debug("revokeDiscordToken called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("revokeDiscordToken called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Ensure user is logged in
+  logger.debug("Ensuring discord token is not expired...")
+  if(isDiscordTokenExpired(request)):
+    refreshDiscordToken(request)
+  # Prep request data and headers to discord api
+  reqHeaders = { 
+    'Content-Type': 'application/x-www-form-urlencoded',
+  }
+  reqData = {
+    'client_id': os.getenv('DISCORD_CLIENT_ID'),
+    'client_secret': os.getenv('DISCORD_CLIENT_SECRET'),
+    'token': request.session['discord_access_token']
+  }
+  # Make API request to discord to revoke user token
+  logger.debug("Making token revoke request to discord api...")
+  try:
+    discordRes = requests.post(f"{os.getenv('DISCORD_API_ENDPOINT')}/oauth2/token/revoke", headers=reqHeaders, data=reqData)
+    if(discordRes.status_code != 200):
+      print("Error in request:\n" + str(discordRes.json()))
+      discordRes.raise_for_status()
+  except:
+    return HttpResponse(status=500)
+  # Clear session data
+  logger.debug("Flushing session...")
+  request.session.flush()
+  request.session.modified = True
+  # Return JsonResponse containing true or false in body
+  logger.debug("Returning revoked status...")
+  out = {}
+  out['status'] = True
+  return JsonResponse(out) 
