@@ -6,6 +6,11 @@
 .pnp.js
 .yarn/install-state.gz
 
+# Ignore python mess
+__pycache__
+**/__pycache__
+**/__pycache__/**
+
 # Ignore photoshop images
 **/photoshops
 **/photoshops/**
