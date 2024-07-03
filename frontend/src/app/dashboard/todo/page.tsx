@@ -8,7 +8,7 @@ export default function todo() {
     {'work_item': "Multiple discord support", 'category': "Functionality", 'status': 'BACKLOG'},
     {'work_item': "Route user directly to content if they have the session cookie", 'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Allow users to submit images", 'category': "Functionality", 'status': 'BACKLOG'},
-    {'work_item': "Logout Button", 'category': "Functionality", 'status': 'IN PROGRESS'},
+    {'work_item': "Logout Button", 'category': "Functionality", 'status': 'DONE'},
     {'work_item': "Implement Versioning for BE and FE", 'category': "CI/CD", 'status': 'BACKLOG'},
     {'work_item': "Create demo user for external access",'category': "Functionality", 'status': 'BACKLOG'},
     {'work_item': "Add an 'about' page to the default screen",'category': "Functionality", 'status': 'BACKLOG'},
