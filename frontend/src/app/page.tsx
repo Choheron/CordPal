@@ -49,7 +49,7 @@ export default async function Home() {
 					</h3>
 					<p className="pl-2">
 						This website serves as a frontend for a collection of data on a discord server with a group of my friends. It also serves as a form of a frontend for a discord bot that also runs on this homelab. I created that discord bot as a way to track user quotes and 
-						create other fun commands to play with. Users of certian servers (<i>Currently just the one</i>) can click "Login with Discord" and access data from the discord bot, as well as see other related information. If you click on this link and are not a member of the server, you will
+						create other fun commands to play with. Users of certian servers (<i>Currently just the one</i>) can click &quot;Login with Discord&quot; and access data from the discord bot, as well as see other related information. If you click on this link and are not a member of the server, you will
 						just be greeted with some user data and a little message that asks you why you are here.
 					</p>
 					<h3 className="text-2xl italic pt-1">
