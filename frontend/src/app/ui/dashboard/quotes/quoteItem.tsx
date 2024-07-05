@@ -15,7 +15,6 @@ export default async function QuoteItem(props) {
 
     const inputBold = str.replace(boldRegex, '<b>$1</b>');
     const inputItalics = inputBold.replace(italicRegex, '<i>$1</i>');
-    console.log("After Replace: " + inputItalics);
     return inputItalics;
   }
 

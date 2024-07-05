@@ -8,6 +8,7 @@ export async function middleware(request: NextRequest) {
   if(!(await verifyAuth())) {
     return NextResponse.redirect(new URL('/', request.url));
   }
+  return;
 }
  
 // See "Matching Paths" below to learn more

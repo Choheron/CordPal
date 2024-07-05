@@ -1,6 +1,5 @@
-import { getFilesInDir } from "@/app/lib/utils";
 import { ReactNode } from "react";
-import Image from "next/image";
+import clsx from "clsx";
 
 export default function todo() {
   const todoList = [
@@ -11,16 +10,22 @@ export default function todo() {
     {'work_item': "Logout Button", 'category': "Functionality", 'status': 'DONE'},
     {'work_item': "Implement Versioning for BE and FE", 'category': "CI/CD", 'status': 'BACKLOG'},
     {'work_item': "Create demo user for external access",'category': "Functionality", 'status': 'BACKLOG'},
-    {'work_item': "Add an 'about' page to the default screen",'category': "Functionality", 'status': 'BACKLOG'},
-    {'work_item': "Add a 'stats' page to default and user dashboards",'category': "Functionality", 'status': 'BACKLOG'},
+    {'work_item': "Add an 'about' page to the default screen",'category': "Functionality", 'status': 'IN PROGRESS'},
+    {'work_item': "Add a 'stats' page to default and user dashboards",'category': "Functionality", 'status': 'DONE'},
     {'work_item': "Underline current page in nav links",'category': "UI/UX", 'status': 'DONE'},
-    {'work_item': "Show quote counts in quotes page",'category': "UI/UX", 'status': 'BACKLOG'},
+    {'work_item': "Show quote counts in quotes page",'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Replace '*' with correct text decoration in quotes",'category': "UI/UX", 'status': 'DONE'},
   ]
 
-  const genTodoList: ReactNode = todoList.sort((a, b) => (a['status'] < b['status'])||(a['category'] < b['category']) ? 1 : -1).map((work_obj) => {
+  const genTodoList: ReactNode = todoList.sort((a, b) => a['status'] < b['status'] ? 1 : -1).map((work_obj) => {
     return (
-      <tr key={work_obj['status']} className="text-center">
+      <tr key={work_obj['status']} className={clsx(
+        "text-center",
+        {
+          "bg-green-900": work_obj['status'] === "DONE",
+          "bg-yellow-700": work_obj['status'] === "IN PROGRESS"
+        },
+        )}>
         <td className="py-1 px-3">{work_obj['work_item']}</td>
         <td className="border-gray-500 border-l py-1 pl-2">{work_obj['status']}</td>
         <td className="border-gray-500 border-l py-1 pl-2">{work_obj['category']}</td>
