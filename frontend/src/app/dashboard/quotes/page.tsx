@@ -12,7 +12,7 @@ export default async function quotes() {
   // Return counts for all users quotes in formatted list
   const quoteCountRender: ReactNode = Object.keys(quotesJson).sort((a, b) => a['nickname'] > b['nickname'] ? 1 : -1).map((key) => {
     return (
-      <div className="flex justify-between w-full min-w-64" >
+      <div key={key} className="flex justify-between w-full min-w-64">
         <p>{quotesJson[key]['nickname'].charAt(0).toUpperCase() + quotesJson[key]['nickname'].slice(1)}</p>
         <p>{quotesJson[key]['quoteList'].length}</p>
       </div>
