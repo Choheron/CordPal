@@ -15,6 +15,7 @@ export default function todo() {
     {'work_item': "Add a 'stats' page to default and user dashboards",'category': "Functionality", 'status': 'BACKLOG'},
     {'work_item': "Underline current page in nav links",'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Show quote counts in quotes page",'category': "UI/UX", 'status': 'BACKLOG'},
+    {'work_item': "Replace '*' with correct text decoration in quotes",'category': "UI/UX", 'status': 'IN PROGRESS'},
   ]
 
   const genTodoList: ReactNode = todoList.sort((a, b) => (a['status'] < b['status'])||(a['category'] < b['category']) ? 1 : -1).map((work_obj) => {
