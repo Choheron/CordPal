@@ -15,6 +15,8 @@ export default function todo() {
     {'work_item': "Underline current page in nav links",'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Show quote counts in quotes page",'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Replace '*' with correct text decoration in quotes",'category': "UI/UX", 'status': 'DONE'},
+    {'work_item': "Migrate Todo to backend and allow users to submit functionality requests",'category': "Functionality", 'status': 'BACKLOG'},
+    {'work_item': "Migrate backend storage to database",'category': "Functionality", 'status': 'BACKLOG'},
   ]
 
   const genTodoList: ReactNode = todoList.sort((a, b) => a['status'] < b['status'] ? 1 : -1).map((work_obj) => {
