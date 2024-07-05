@@ -1,8 +1,10 @@
 import { Conditional } from "../ui/dashboard/conditional";
 import { isMember, getDiscordUserData } from "../lib/discord_utils";
+import { boolToString } from "../lib/utils";
 
 export default async function Page() {
   const userData = await getDiscordUserData();
+  console.log(userData);
   
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
@@ -18,11 +20,14 @@ export default async function Page() {
         Accent Color: {userData['accent_color']}<br/>
         Global Name: {userData['global_name']}<br/>
         Banner Color: {userData['banner_color']}<br/>
-        MFA Enabled: {userData['mfa_enabled']}<br/>
+        Verified: {boolToString(userData['verified'])}<br/>
+        MFA Enabled: {boolToString(userData['mfa_enabled'])}<br/>
         Locale: {userData['locale']}<br/>
         Premium Type: {userData['premium_type']}<br/>
         <br/>
         EMAIL: {userData['email']}<br/>
+        <br/>
+        Click <a href="https://discord.com/developers/docs/resources/user" target="_blank" className="underline italic"><b>here</b></a> for more info on what all of this means!
       </p>
       <Conditional showWhen={!(await isMember())}>
         <br/>

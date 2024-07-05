@@ -13,3 +13,8 @@ export const getFilesInDir = (dir: string) => {
   // Return
   return out;
 };
+
+// Convert boolean value to string
+export const boolToString = (input: boolean) => {
+  return String(input);
+};
