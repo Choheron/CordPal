@@ -6,7 +6,7 @@ export default function todo() {
   const todoList = [
     {'work_item': "Quote of the Day", 'category': "Functionality", 'status': 'BACKLOG'},
     {'work_item': "Multiple discord support", 'category': "Functionality", 'status': 'BACKLOG'},
-    {'work_item': "Route user directly to content if they have the session cookie", 'category': "UI/UX", 'status': 'DONE'},
+    {'work_item': "Route user directly to content if they have a valid session cookie", 'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Allow users to submit images", 'category': "Functionality", 'status': 'BACKLOG'},
     {'work_item': "Logout Button", 'category': "Functionality", 'status': 'DONE'},
     {'work_item': "Implement Versioning for BE and FE", 'category': "CI/CD", 'status': 'BACKLOG'},
@@ -15,7 +15,7 @@ export default function todo() {
     {'work_item': "Add a 'stats' page to default and user dashboards",'category': "Functionality", 'status': 'BACKLOG'},
     {'work_item': "Underline current page in nav links",'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Show quote counts in quotes page",'category': "UI/UX", 'status': 'BACKLOG'},
-    {'work_item': "Replace '*' with correct text decoration in quotes",'category': "UI/UX", 'status': 'IN PROGRESS'},
+    {'work_item': "Replace '*' with correct text decoration in quotes",'category': "UI/UX", 'status': 'DONE'},
   ]
 
   const genTodoList: ReactNode = todoList.sort((a, b) => (a['status'] < b['status'])||(a['category'] < b['category']) ? 1 : -1).map((work_obj) => {
