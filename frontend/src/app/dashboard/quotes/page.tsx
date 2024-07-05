@@ -1,28 +1,23 @@
-import { cookies } from "next/headers";
 import QuoteItem from "@/app/ui/dashboard/quotes/quoteItem";
 import { ReactNode } from "react";
+import { getAllBotQuotes } from "@/app/lib/discord_bot_utils";
 
 export default async function quotes() {
-  
-  // Below Code allows for serverside computing of cookie stuff!
-  const getCookie = async (name: string) => {
-    return cookies().get(name)?.value ?? '';
-  }
-  const sessionCookie = await getCookie('sessionid');
-  // Query quotes endpoint for bot interaction
-  const quoteListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/botInteraction/getAllQuotes`, {
-    method: "GET",
-    credentials: "include",
-    cache: 'no-cache',
-    headers: {
-      Cookie: `sessionid=${sessionCookie};`
-    }
-  });
-  const quotesJson = JSON.parse(await quoteListResponse.text());
+  // Retrieve quote data
+  const quotesJson = await getAllBotQuotes();
   // Store last updated time then remove it
   const quotesUpdateTimestamp = quotesJson['last_updated'];
   delete quotesJson['last_updated'];
-  // console.log(quotesJson);
+  
+  // Return counts for all users quotes in formatted list
+  const quoteCountRender: ReactNode = Object.keys(quotesJson).sort((a, b) => a['nickname'] > b['nickname'] ? 1 : -1).map((key) => {
+    return (
+      <div className="flex justify-between w-full min-w-64" >
+        <p>{quotesJson[key]['nickname'].charAt(0).toUpperCase() + quotesJson[key]['nickname'].slice(1)}</p>
+        <p>{quotesJson[key]['quoteList'].length}</p>
+      </div>
+    )
+  });
 
   // Map Quote Json Data to List of Objects
   // Nested Map Statements
@@ -46,6 +41,10 @@ export default async function quotes() {
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
       <h1 className="text-4xl underline antialiased">Quotes:</h1>
+      <div className="static w-auto mt-5 p-5 pt-2 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b from-zinc-200 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit border bg-gray-200  lg:dark:bg-zinc-800/30">
+        <p className="w-full text-center">Quote Counts:</p>
+        {quoteCountRender}
+      </div>
       <div className="flex flex-col justify-around mt-10 mb-10">
         {quoteListRender}
       </div>
