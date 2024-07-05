@@ -7,7 +7,6 @@ import clsx from 'clsx';
 
 // Expected props:
 //  - isMember:         Boolean indicating if the current session user is a member of the desired server
-//  - logoutCallback:   Callback function to log the user out and reroute to login/welcome page
 export default function TopBar(props) {
   const pathname = usePathname();
 
