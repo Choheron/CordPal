@@ -14,7 +14,7 @@ export default function photos() {
             width={0}
             height={0}
             sizes="100vw"
-            alt="The one true god"
+            alt={path}
             style={{ width: 'auto', height: 'auto' }}
           />
           <p>{path}</p>
