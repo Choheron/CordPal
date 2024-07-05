@@ -10,7 +10,7 @@ export default async function quotes() {
   delete quotesJson['last_updated'];
   
   // Return counts for all users quotes in formatted list
-  const quoteCountRender: ReactNode = Object.keys(quotesJson).sort((a, b) => a['nickname'] > b['nickname'] ? 1 : -1).map((key) => {
+  const quoteCountRender: ReactNode = Object.keys(quotesJson).sort((a, b) => quotesJson[a]['quoteList'].length < quotesJson[b]['quoteList'].length ? 1 : -1).map((key) => {
     return (
       <div key={key} className="flex justify-between w-full min-w-64">
         <p>{quotesJson[key]['nickname'].charAt(0).toUpperCase() + quotesJson[key]['nickname'].slice(1)}</p>
