@@ -32,7 +32,7 @@ export default async function quotes() {
   //     ],
   //     "nickname": "nickname"
   //   }
-  const quoteListRender: ReactNode = Object.keys(quotesJson).sort((a, b) => a['nickname'] > b['nickname'] ? 1 : -1).map((key) => {
+  const quoteListRender: ReactNode = Object.keys(quotesJson).sort((a, b) => quotesJson[a]['quoteList'].length < quotesJson[b]['quoteList'].length ? 1 : -1).map((key) => {
     return quotesJson[key]['quoteList'].map((quoteObj) => {
       return <QuoteItem key={quoteObj['timestamp']} quoteObject={quoteObj} speaker={(quotesJson[key]['nickname'].charAt(0).toUpperCase() + quotesJson[key]['nickname'].slice(1))} />
     })
