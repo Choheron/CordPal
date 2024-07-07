@@ -7,6 +7,7 @@ export default async function quotes() {
   const quotesJson = await getAllBotQuotes();
   // Store last updated time then remove it
   const quotesUpdateTimestamp = quotesJson['last_updated'];
+  console.log(quotesUpdateTimestamp);
   delete quotesJson['last_updated'];
   
   // Return counts for all users quotes in formatted list
@@ -44,6 +45,11 @@ export default async function quotes() {
       <div className="static w-auto mt-5 p-5 pt-2 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b from-zinc-200 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit border bg-gray-200  lg:dark:bg-zinc-800/30">
         <p className="w-full text-center">Quote Counts:</p>
         {quoteCountRender}
+        <hr/>
+        <div className="flex justify-between w-full min-w-72">
+          <p>Last Updated:</p>
+          <p>{quotesUpdateTimestamp}</p>
+        </div>
       </div>
       <div className="flex flex-col justify-around mt-10 mb-10">
         {quoteListRender}
