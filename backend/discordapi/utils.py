@@ -49,7 +49,8 @@ def refreshDiscordToken(request: HttpRequest):
   # Make request to discord api
   discordRes = requests.post(f"{os.getenv('DISCORD_API_ENDPOINT')}/oauth2/token", headers=reqHeaders, data=reqData, auth=(os.getenv('DISCORD_CLIENT_ID'), os.getenv('DISCORD_CLIENT_SECRET')))
   if(discordRes.status_code != 200):
-    print("Error in request:\n" + discordRes.reason)
+    logger.error("Error in request:\n" + discordRes.reason)
+    logger.debug("More Info: \n" + json.dumps(discordRes.json()))
     discordRes.raise_for_status()
   # Convert response to Json
   discordResJSON = discordRes.json()
