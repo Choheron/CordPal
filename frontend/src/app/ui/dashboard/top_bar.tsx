@@ -53,8 +53,8 @@ export default function TopBar(props) {
                 <Link 
                   key={index}
                   href={link.href}
-                  className={clsx("px-8 text-center",
-                    {'text-decoration-line: underline bg-gradient-to-r from-neutral-900/0 via-neutral-900/75 to-neutral-900/0': pathname === link.href})}
+                  className={clsx("px-8 py-1 text-center",
+                    {'text-decoration-line: underline bg-gradient-to-r from-neutral-900/0 via-neutral-900 to-neutral-900/0': pathname === link.href})}
                 >
                   {link.name}
                 </Link>
