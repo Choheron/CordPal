@@ -102,7 +102,7 @@ def getDiscordUserData(request: HttpRequest):
   # Convert response to Json
   discordResJSON = discordRes.json()
   # Alert Discord Webhook
-  postToDiscordWebhook(discordResJSON, "User data retrieved!")
+  postToDiscordWebhook(discordResJSON, f"User data retrieved for user: **{discordResJSON['username']}**!")
   # Return JsonResponse containing user data
   return JsonResponse(discordResJSON)
 
@@ -163,10 +163,13 @@ def checkIfPrevAuth(request: HttpRequest):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  # Check if session is still valid
+  validSession = request.session.get_expiry_age() != 0
   # Check if user sessionid token is valid
   logger.debug("Ensuring sessionid is valid...")
-  # Set output var
-  validSession = checkPreviousAuthorization(request)
+  # Set output var if session exists
+  if(validSession):
+    validSession = checkPreviousAuthorization(request)
   # Ensure user is logged in
   logger.debug("Ensuring discord token is not expired...")
   if(validSession and isDiscordTokenExpired(request)):
