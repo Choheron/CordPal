@@ -5,6 +5,7 @@ from .utils import (
   refreshDiscordToken, 
   storeDiscordTokenInSession,
   checkPreviousAuthorization,
+  postToDiscordWebhook
 )
 
 import datetime
@@ -100,6 +101,8 @@ def getDiscordUserData(request: HttpRequest):
     return HttpResponse(status=500)
   # Convert response to Json
   discordResJSON = discordRes.json()
+  # Alert Discord Webhook
+  postToDiscordWebhook(discordResJSON, "User data retrieved!")
   # Return JsonResponse containing user data
   return JsonResponse(discordResJSON)
 
