@@ -67,6 +67,8 @@ def checkPreviousAuthorization(request: HttpRequest):
 
 ##
 # Send data contained in contentJson to webhook, makes the assumtion that the data is all content data.
+# Reference for webhooks: 
+#   https://gist.github.com/Birdie0/78ee79402a4301b1faf412ab5f1cdcf9 
 # Example:
 # {
 #     "username": "Webhook",
