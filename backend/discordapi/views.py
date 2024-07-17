@@ -16,8 +16,7 @@ import os
 import json
 
 # Declare logging
-logger = logging.getLogger(__name__)
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
+logger = logging.getLogger('django')
 
 # Determine runtime enviornment
 APP_ENV = os.getenv('APP_ENV') or 'DEV'
@@ -29,7 +28,7 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 # Exchange discord auth code for discord api token (part of the login flow)
 ###
 def getDiscordToken(request: HttpRequest):
-  logger.debug("getDiscordToken called...")
+  logger.info("getDiscordToken called...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("getDiscordToken called with a non-POST method, returning 405.")
@@ -53,20 +52,20 @@ def getDiscordToken(request: HttpRequest):
     'client_secret': os.getenv('DISCORD_CLIENT_SECRET')
   }
   # Make request to discord api
-  logger.debug("Making request to discord api...")
+  logger.info("Making request to discord api...")
   discordRes = requests.post(f"{os.getenv('DISCORD_API_ENDPOINT')}/oauth2/token", headers=reqHeaders, data=reqData, auth=(os.getenv('DISCORD_CLIENT_ID'), os.getenv('DISCORD_CLIENT_SECRET')))
   if(discordRes.status_code != 200):
     print("Error in request:\n" + str(discordRes.json()))
     discordRes.raise_for_status()
   # Convert response to Json
-  logger.debug("Discord api returned, converting to json...")
+  logger.info("Discord api returned, converting to json...")
   discordResJSON = discordRes.json()
   # Store discord data in session data
   storeDiscordTokenInSession(request, discordResJSON)
   # Write success message
   messageOut = { 'message': "Success" }
   # Return Code
-  logger.debug("Returning HTTP 200 Response...")
+  logger.info("Returning HTTP 200 Response...")
   return HttpResponse(content=messageOut, content_type='text/json', status=200)
 
 
@@ -74,8 +73,8 @@ def getDiscordToken(request: HttpRequest):
 # Retrieve basic info about the user
 ###
 def getDiscordUserData(request: HttpRequest):
-  logger.debug("getDiscordUserData called...")
-  logger.debug("Cookies in request: " + str(request.COOKIES))
+  logger.info("getDiscordUserData called...")
+  logger.info("Cookies in request: " + str(request.COOKIES))
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getDiscordUserData called with a non-GET method, returning 405.")
@@ -83,7 +82,6 @@ def getDiscordUserData(request: HttpRequest):
     res.status_code = 405
     return res
   # Ensure user is logged in
-  logger.debug("Ensuring discord token is not expired...")
   if(isDiscordTokenExpired(request)):
     refreshDiscordToken(request)
   # Prep request data and headers to discord api
@@ -91,7 +89,7 @@ def getDiscordUserData(request: HttpRequest):
     'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
   }
   # Send Request to API
-  logger.debug("Making request to discord api...")
+  logger.info("Making request to discord api...")
   try:
     discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
     if(discordRes.status_code != 200):
@@ -111,7 +109,6 @@ def getDiscordUserData(request: HttpRequest):
 # Validate that the user is a member of the discord server (TODO: Improve this flow, make it dynamic)
 ###
 def validateServerMember(request: HttpRequest):
-  logger.debug("validateServerMember called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("validateServerMember called with a non-GET method, returning 405.")
@@ -119,7 +116,6 @@ def validateServerMember(request: HttpRequest):
     res.status_code = 405
     return res
   # Ensure user is logged in
-  logger.debug("Ensuring discord token is not expired...")
   if(isDiscordTokenExpired(request)):
     refreshDiscordToken(request)
   # Prep headers to discord api
@@ -127,7 +123,7 @@ def validateServerMember(request: HttpRequest):
     'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
   }
   # Send Request to API
-  logger.debug("Making request to discord api for server member validation...")
+  logger.info("Making request to discord api for server member validation...")
   try:
     discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me/guilds", headers=reqHeaders)
     if(discordRes.status_code != 200):
@@ -138,15 +134,15 @@ def validateServerMember(request: HttpRequest):
   # Convert response to List
   discordResList = discordRes.json()
   # Loop through servers and check if member of correct server
-  logger.debug("Checking if user is in server...")
+  logger.info("Checking if user is in server...")
   member = False
   for server in discordResList:
     if(server['id'] == os.getenv('CORD_SERVER_ID')):
-      logger.debug("User is in server!")
+      logger.info("User is in server!")
       member = True
       break
   # Return JsonResponse containing true or false in body
-  logger.debug("Returning member status...")
+  logger.info("Returning member status...")
   out = {}
   out['member'] = member
   return JsonResponse(out)
@@ -156,7 +152,7 @@ def validateServerMember(request: HttpRequest):
 # Validate that the user has previously approved login
 ###
 def checkIfPrevAuth(request: HttpRequest):
-  logger.debug("checkIfPrevAuth called...")
+  logger.info("checkIfPrevAuth called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("checkIfPrevAuth called with a non-GET method, returning 405.")
@@ -164,19 +160,19 @@ def checkIfPrevAuth(request: HttpRequest):
     res.status_code = 405
     return res
   # Check if session is still valid
-  validSession = request.session.get_expiry_age() != 0
+  validSession = (request.session.get_expiry_age() != 0)
+  logger.info(f"Valid Session After Expiry Check: {validSession}")
   # Check if user sessionid token is valid
-  logger.debug("Ensuring sessionid is valid...")
+  logger.info("Ensuring sessionid is valid...")
   # Set output var if session exists
   if(validSession):
     validSession = checkPreviousAuthorization(request)
   # Ensure user is logged in
-  logger.debug("Ensuring discord token is not expired...")
   if(validSession and isDiscordTokenExpired(request)):
     refreshDiscordToken(request)
   # 
   # Return JsonResponse containing true or false in body
-  logger.debug(f"Returning prevAuth status of: {validSession}...")
+  logger.info(f"Returning prevAuth status of: {validSession}...")
   out = {}
   out['valid'] = validSession
   return JsonResponse(out)
@@ -186,7 +182,7 @@ def checkIfPrevAuth(request: HttpRequest):
 # Revoke discord token and clear session data for user
 ###
 def revokeDiscordToken(request: HttpRequest):
-  logger.debug("revokeDiscordToken called...")
+  logger.info("revokeDiscordToken called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("revokeDiscordToken called with a non-GET method, returning 405.")
@@ -194,7 +190,6 @@ def revokeDiscordToken(request: HttpRequest):
     res.status_code = 405
     return res
   # Ensure user is logged in
-  logger.debug("Ensuring discord token is not expired...")
   if(isDiscordTokenExpired(request)):
     refreshDiscordToken(request)
   # Prep request data and headers to discord api
@@ -207,7 +202,7 @@ def revokeDiscordToken(request: HttpRequest):
     'token': request.session['discord_access_token']
   }
   # Make API request to discord to revoke user token
-  logger.debug("Making token revoke request to discord api...")
+  logger.info("Making token revoke request to discord api...")
   try:
     discordRes = requests.post(f"{os.getenv('DISCORD_API_ENDPOINT')}/oauth2/token/revoke", headers=reqHeaders, data=reqData)
     if(discordRes.status_code != 200):
@@ -216,11 +211,11 @@ def revokeDiscordToken(request: HttpRequest):
   except:
     return HttpResponse(status=500)
   # Clear session data
-  logger.debug("Flushing session...")
+  logger.info("Flushing session...")
   request.session.flush()
   request.session.modified = True
   # Return JsonResponse containing true or false in body
-  logger.debug("Returning revoked status...")
+  logger.info("Returning revoked status...")
   out = {}
   out['status'] = True
   return JsonResponse(out) 

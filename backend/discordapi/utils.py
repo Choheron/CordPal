@@ -7,10 +7,11 @@ import json
 import logging
 
 # Declare logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('django')
+
 
 def storeDiscordTokenInSession(request: HttpRequest, discordResponseJSON: json):
-  logger.debug("Attempting to store discord token data in session object...")
+  logger.info("Attempting to store discord token data in session object...")
   # Store discord data in session data
   request.session["discord_access_token"] = discordResponseJSON['access_token']
   request.session["discord_token_type"] = discordResponseJSON['token_type']
@@ -25,19 +26,21 @@ def storeDiscordTokenInSession(request: HttpRequest, discordResponseJSON: json):
 
 
 def isDiscordTokenExpired(request: HttpRequest):
-  logger.debug("Checking if discord token is expired...")
+  logger.info("Checking if discord token is expired...")
   # Get current time
   curTime = datetime.datetime.now()
   # Get session Expiry time
   tokenExpireTime = datetime.datetime.strptime(request.session['discord_expiry_date'], "%d-%m-%Y %H:%M:%S")
   # Check if request session's discord token is out of date
   if(curTime > tokenExpireTime):
+    logger.info("Token IS expired...")
     return True
   # Return false if not expired
   return False
 
 
 def refreshDiscordToken(request: HttpRequest):
+  logger.info("Refreshing Discord Token...")
   # Retrieve session data
   refreshToken = request.session['discord_refresh_token']
   # Prep request data and headers to discord api
@@ -50,7 +53,7 @@ def refreshDiscordToken(request: HttpRequest):
   discordRes = requests.post(f"{os.getenv('DISCORD_API_ENDPOINT')}/oauth2/token", headers=reqHeaders, data=reqData, auth=(os.getenv('DISCORD_CLIENT_ID'), os.getenv('DISCORD_CLIENT_SECRET')))
   if(discordRes.status_code != 200):
     logger.error("Error in request:\n" + discordRes.reason)
-    logger.debug("More Info: \n" + json.dumps(discordRes.json()))
+    logger.info("More Info: \n" + json.dumps(discordRes.json()))
     discordRes.raise_for_status()
   # Convert response to Json
   discordResJSON = discordRes.json()
@@ -62,7 +65,7 @@ def refreshDiscordToken(request: HttpRequest):
 
 def checkPreviousAuthorization(request: HttpRequest):
   # Check if session is stored in data
-  logger.debug("Checking if sessionid exists...")
+  logger.info("Checking if sessionid exists...")
   return 'discord_access_token' in request.session
 
 ##

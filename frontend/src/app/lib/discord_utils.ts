@@ -15,6 +15,7 @@ export async function isMember() {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Validate that user is member of server
+  console.log("isMember: Sending request to backend '/discordapi/validateMember'")
   const memberResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/validateMember`, {
     method: "GET",
     credentials: "include",
@@ -39,6 +40,7 @@ export async function verifyAuth() {
     return false;
   }
   // Validate that user is previously authorized and has valid discord token
+  console.log("verifyAuth: Sending request to backend '/discordapi/checkToken'")
   const prevAuthResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/checkToken`, {
     method: "GET",
     credentials: "include",

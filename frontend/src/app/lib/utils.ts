@@ -7,9 +7,8 @@ export const getFilesInDir = (dir: string) => {
   fs.readdirSync(dir, { withFileTypes: true }).forEach((file: { name: string, path: string}) => {
     out.push(file.name); 
   });
-  // Debug Log
-  console.log(out);
 
+  console.log("Image files successfully read...")
   // Return
   return out;
 };

@@ -7,7 +7,6 @@ export default async function quotes() {
   const quotesJson = await getAllBotQuotes();
   // Store last updated time then remove it
   const quotesUpdateTimestamp = quotesJson['last_updated'];
-  console.log(quotesUpdateTimestamp);
   delete quotesJson['last_updated'];
   
   // Return counts for all users quotes in formatted list
