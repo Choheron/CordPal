@@ -18,3 +18,8 @@ export const getFilesInDir = (dir: string) => {
 export const boolToString = (input: boolean) => {
   return String(input);
 };
+
+// Capitalize first letter in string
+export function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}

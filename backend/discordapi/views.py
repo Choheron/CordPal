@@ -127,7 +127,7 @@ def validateServerMember(request: HttpRequest):
     'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
   }
   # Send Request to API
-  logger.debug("Making request to discord api...")
+  logger.debug("Making request to discord api for server member validation...")
   try:
     discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me/guilds", headers=reqHeaders)
     if(discordRes.status_code != 200):
@@ -153,7 +153,7 @@ def validateServerMember(request: HttpRequest):
 
 
 ###
-# Validate that the user is a member of the discord server (TODO: Improve this flow, make it dynamic)
+# Validate that the user has previously approved login
 ###
 def checkIfPrevAuth(request: HttpRequest):
   logger.debug("checkIfPrevAuth called...")

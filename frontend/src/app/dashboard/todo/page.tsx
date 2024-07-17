@@ -10,7 +10,7 @@ export default function todo() {
     {'work_item': "Logout Button", 'category': "Functionality", 'status': 'DONE'},
     {'work_item': "Implement Versioning for BE and FE", 'category': "CI/CD", 'status': 'BACKLOG'},
     {'work_item': "Create demo user for external access",'category': "Functionality", 'status': 'BACKLOG'},
-    {'work_item': "Add an 'about' page to the default screen",'category': "Functionality", 'status': 'IN PROGRESS'},
+    {'work_item': "Add an 'about' page to the default screen",'category': "Functionality", 'status': 'DONE'},
     {'work_item': "Add a 'stats' page to default and user dashboards",'category': "Functionality", 'status': 'DONE'},
     {'work_item': "Underline current page in nav links",'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Show quote counts in quotes page",'category': "UI/UX", 'status': 'DONE'},
