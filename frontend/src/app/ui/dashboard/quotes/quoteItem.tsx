@@ -1,4 +1,5 @@
-import { Albert_Sans } from "next/font/google"
+import { Albert_Sans, Great_Vibes } from "next/font/google"
+import { dancing } from "../../fonts";
 
 const albertSans = Albert_Sans({
   weight: ["300", "400", "500", "600", "700", "800", "900"],
@@ -6,7 +7,13 @@ const albertSans = Albert_Sans({
   subsets: ['latin'],
 })
 
+const vibes = Great_Vibes ({
+  subsets: ['latin'],
+  weight: ["400"],
+})
+
 export default async function QuoteItem(props) {
+  const textStyle = props['cursive'] ? `${dancing.className}` : `${albertSans.className}`;
 
   // Apply Regex on markdown style quotes
   function applyQuoteRegex(str) {
@@ -24,7 +31,7 @@ export default async function QuoteItem(props) {
         <div className="flex justify-start pl-0">
           <p>{props.speaker}:</p>
         </div>
-        <div className={`${albertSans.className} antialiased text-3xl p-1 pb-0 text-center`} >
+        <div className={`${textStyle} antialiased text-3xl p-1 pb-0 text-center`} >
           <p dangerouslySetInnerHTML={{__html: applyQuoteRegex("&quot;" + props.quoteObject['text'] + "&quot;")}}/>
         </div>
         <div className="flex justify-end pl-10 pr-10">

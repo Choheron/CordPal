@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import clsx from "clsx";
+import PageTitle from "@/app/ui/dashboard/page_title";
 
 export default function todo() {
   const todoList = [
@@ -18,6 +19,7 @@ export default function todo() {
     {'work_item': "Migrate Todo to backend and allow users to submit functionality requests",'category': "Functionality", 'status': 'BACKLOG'},
     {'work_item': "Migrate backend storage to database",'category': "Functionality", 'status': 'BACKLOG'},
     {'work_item': "Add 'Last Updated' Timestamp to Quotes Page",'category': "UI/UX", 'status': 'DONE'},
+    {'work_item': "Add Toggle for Quote Text Font",'category': "UI/UX", 'status': 'WIP'},
   ]
 
   const genTodoList: ReactNode = todoList.sort((a, b) => a['status'] < b['status'] ? 1 : -1).map((work_obj) => {
@@ -26,7 +28,7 @@ export default function todo() {
         "text-center",
         {
           "bg-green-900": work_obj['status'] === "DONE",
-          "bg-yellow-700": work_obj['status'] === "IN PROGRESS"
+          "bg-yellow-700": work_obj['status'] === "IN PROGRESS" || work_obj['status'] === "WIP",
         },
         )}>
         <td className="py-1 px-3">{work_obj['work_item']}</td>
@@ -38,10 +40,8 @@ export default function todo() {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
-      <h1 className="text-4xl underline antialiased">
-        ToDo List:
-      </h1>
-      <div className="w-fit p-5 pl-10 rounded-xl">
+      <PageTitle text="Todo" />
+      <div className="w-fit p-5 pt-0 pl-10 rounded-xl">
         <table className="table-auto w-full rounded-xl bg-gray-700">
           <thead>
             <tr className="border-gray-500 border-b">

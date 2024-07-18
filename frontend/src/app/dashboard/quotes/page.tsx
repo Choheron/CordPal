@@ -1,6 +1,7 @@
 import QuoteItem from "@/app/ui/dashboard/quotes/quoteItem";
 import { ReactNode } from "react";
 import { getAllBotQuotes } from "@/app/lib/discord_bot_utils";
+import PageTitle from "@/app/ui/dashboard/page_title";
 
 export default async function quotes() {
   // Retrieve quote data
@@ -32,16 +33,17 @@ export default async function quotes() {
   //     ],
   //     "nickname": "nickname"
   //   }
+  // TODO: Implement toggle for cursive text in quotes
   const quoteListRender: ReactNode = Object.keys(quotesJson).sort((a, b) => quotesJson[a]['quoteList'].length < quotesJson[b]['quoteList'].length ? 1 : -1).map((key) => {
     return quotesJson[key]['quoteList'].map((quoteObj) => {
-      return <QuoteItem key={quoteObj['timestamp']} quoteObject={quoteObj} speaker={(quotesJson[key]['nickname'].charAt(0).toUpperCase() + quotesJson[key]['nickname'].slice(1))} />
+      return <QuoteItem key={quoteObj['timestamp']} cursive={false} quoteObject={quoteObj} speaker={(quotesJson[key]['nickname'].charAt(0).toUpperCase() + quotesJson[key]['nickname'].slice(1))} />
     })
   });
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
-      <h1 className="text-4xl underline antialiased">Quotes:</h1>
-      <div className="static w-auto mt-5 p-5 pt-2 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b from-zinc-200 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit border bg-gray-200  lg:dark:bg-zinc-800/30">
+      <PageTitle text="Quotes" />
+      <div className="static w-auto p-5 pt-2 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b from-zinc-200 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit border bg-gray-200  lg:dark:bg-zinc-800/30">
         <p className="w-full text-center">Quote Counts:</p>
         {quoteCountRender}
         <hr/>

@@ -1,6 +1,7 @@
 import { getFilesInDir } from "@/app/lib/utils";
 import { ReactNode } from "react";
 import Image from "next/image";
+import PageTitle from "@/app/ui/dashboard/page_title";
 
 export default function photos() {
 
@@ -8,7 +9,7 @@ export default function photos() {
     const fileList = getFilesInDir(imageDir);
     return (
       fileList.map((path: string) => (
-        <div key={path} className="flex flex-col w-4/5 items-center relative p-6 md:w-full">
+        <div key={path} className="flex flex-col w-4/5 items-center relative p-6 pt-3 md:w-full">
           <Image 
             src={"/photoshops/" + path}
             width={0}
@@ -26,7 +27,7 @@ export default function photos() {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
-      <h1 className="text-4xl underline antialiased">Photoshops</h1>
+      <PageTitle text="Photoshops" />
       {loadImages("./public/photoshops")}
     </main>
   );
