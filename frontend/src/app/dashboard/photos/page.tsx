@@ -13,11 +13,12 @@ export default function photos() {
             src={"/photoshops/" + path}
             width={0}
             height={0}
+            // layout="responsive"
             sizes="100vw"
             alt={path}
             style={{ width: 'auto', height: 'auto' }}
+            className="rounded-lg"
           />
-          <p>{path}</p>
         </div>
       ))
     );
