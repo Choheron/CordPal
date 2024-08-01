@@ -1,7 +1,9 @@
 "use client";
 
 import {Select, SelectItem} from "@nextui-org/select";
+import {Checkbox} from "@nextui-org/checkbox";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 // 
 // Expected Props:
@@ -11,6 +13,9 @@ import { useRouter } from "next/navigation";
 export default function QuoteSortBlock(props) {
   // Get Router
   const router = useRouter();
+  // Set some states for quote sorting
+  const [sortMethod, setSortMethod] = useState(props['sortMethod']);
+  const [cursive, setCursive] = useState((props['cursive'] == 'true'));
   // Default Sorting Options
   const sortOptions = [
     {key: "count", label: "Count", description: "Sort by number of quotes (High to Low)"},
@@ -20,8 +25,17 @@ export default function QuoteSortBlock(props) {
   ];
 
   const changeSortMethod = (event) => {
-    router.push("?sortMethod=" + event.currentKey);
+    setSortMethod(event.currentKey);
   };
+
+  const changeCursiveStatus = (event) => {
+    setCursive(!cursive);
+  }
+
+  // Push new filtering params to react router
+  useEffect(() => {
+    router.push("?sortMethod=" + sortMethod + "&cursive=" + cursive);
+  }, [sortMethod, cursive]);
 
   return (
     <div className="flex justify-around mt-3 w-1/2">
@@ -41,6 +55,9 @@ export default function QuoteSortBlock(props) {
           </SelectItem>
         ))}
       </Select>
+      <Checkbox isSelected={cursive} onValueChange={changeCursiveStatus} >
+        Cursive
+      </Checkbox>
     </div>
   );
 }

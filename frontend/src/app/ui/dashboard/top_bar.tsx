@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Conditional } from "./conditional";
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import {Divider} from "@nextui-org/divider";
 
 // Expected props:
 //  - isMember: Boolean indicating if the current session user is a member of the desired server
@@ -15,13 +16,13 @@ export default function TopBar(props) {
   const links = [
     { name: 'Home', href: '/dashboard', conditional: true },
     { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'] },
-    { name: 'Quotes', href: '/dashboard/quotes?sortMethod=count', conditional: props['isMember'] },
+    { name: 'Quotes', href: '/dashboard/quotes?sortMethod=count&cursive=false', conditional: props['isMember'] },
     { name: 'Todo List', href: '/dashboard/todo', conditional: props['isMember'] },
     { name: 'About', href: '/dashboard/about', conditional: true },
   ];
 
   return (
-    <div className="flex flex-col items-center justify-between p-24 pb-10">
+    <div className="flex flex-col items-center justify-between p-24 pb-0">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed lg:static left-0 top-0 flex w-full justify-center pb-6 pt-8 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:w-auto lg:rounded-xl lg:border lg:p-4">
           Welcome {props.userInfo['global_name']}!
@@ -64,6 +65,7 @@ export default function TopBar(props) {
           })
         }
       </div>
+      <Divider className='mt-2 w-3/4' />
     </div>
   );
 }

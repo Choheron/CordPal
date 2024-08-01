@@ -19,8 +19,8 @@ export default function todo() {
     {'work_item': "Migrate Todo to backend and allow users to submit functionality requests",'category': "Functionality", 'status': 'BACKLOG'},
     {'work_item': "Migrate backend storage to database",'category': "Functionality", 'status': 'BACKLOG'},
     {'work_item': "Add 'Last Updated' Timestamp to Quotes Page",'category': "UI/UX", 'status': 'DONE'},
-    {'work_item': "Add Toggle for Quote Text Font",'category': "UI/UX", 'status': 'WIP'},
-    {'work_item': "Allow Quote Sorting",'category': "UI/UX", 'status': 'WIP'},
+    {'work_item': "Add Toggle for Quote Text Font",'category': "UI/UX", 'status': 'DONE'},
+    {'work_item': "Allow Quote Sorting",'category': "UI/UX", 'status': 'DONE'},
   ]
 
   const genTodoList: ReactNode = todoList.filter((todoItem) => todoItem['status'] != "DONE").sort((a, b) => a['status'] < b['status'] ? 1 : -1).map((work_obj, index) => {
@@ -75,7 +75,7 @@ export default function todo() {
           <thead>
             <tr className="border-gray-500 border-b">
               <th className="text-xl py-1 px-3">
-                Work Item
+                Completed Items
               </th>
               <th className="text-xl border-gray-500 border-l py-1 px-3">
                 Category

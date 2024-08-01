@@ -1,6 +1,8 @@
 import { getFilesInDir } from "@/app/lib/utils";
 import { ReactNode } from "react";
-import Image from "next/image";
+// Note: By using NextUI's image, I have moved the image rendering to the client, this could be an issue in larger systems
+import { Image } from "@nextui-org/image";
+import NextImage from "next/image";
 import PageTitle from "@/app/ui/dashboard/page_title";
 
 export default function photos() {
@@ -11,6 +13,8 @@ export default function photos() {
       fileList.map((path: string) => (
         <div key={path} className="flex flex-col w-4/5 items-center relative p-6 pt-3 md:w-full">
           <Image 
+            isBlurred
+            as={NextImage}
             src={"/photoshops/" + path}
             width={0}
             height={0}

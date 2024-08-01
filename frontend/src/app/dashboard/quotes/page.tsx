@@ -1,5 +1,6 @@
 import QuoteItem from "@/app/ui/dashboard/quotes/quoteItem";
 import { ReactNode } from "react";
+import { redirect } from 'next/navigation'
 import { getAllBotQuotes } from "@/app/lib/discord_bot_utils";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import QuoteCounts from "@/app/ui/dashboard/quotes/quote_counts";
@@ -9,7 +10,12 @@ import { capitalizeFirstLetter } from "@/app/lib/utils";
 // TODO: Implement toggle for cursive text in quotes
 export default async function quotes({searchParams}) {
   // Get url params
-  const {sortMethod} = searchParams;
+  const {sortMethod, cursive} = searchParams;
+  console.log("Cursive setting on quotes page: " + cursive)
+  // Redirect if any of the search params are undefined
+  if(sortMethod == 'undefined' || cursive == 'undefined') {
+    redirect("/dashboard/quotes?sortMethod=count&cursive=false");
+  }
   // Retrieve quote data
   const quotesJson = await getAllBotQuotes();
   // Store last updated time then remove it
@@ -77,7 +83,7 @@ export default async function quotes({searchParams}) {
   // Map quote objects through top level info
   const quoteListRenderTopLevel: ReactNode = Object.keys(quotesJson).sort(sortHandlerTopLevel(sortMethod)).map((key) => {
     return quotesJson[key]['quoteList'].map((quoteObj) => {
-      return <QuoteItem key={quoteObj['timestamp']} cursive={false} quoteObject={quoteObj} speaker={capitalizeFirstLetter(quotesJson[key]['nickname'])} />
+      return <QuoteItem key={quoteObj['timestamp']} cursive={cursive} quoteObject={quoteObj} speaker={capitalizeFirstLetter(quotesJson[key]['nickname'])} />
     })
   });
 
@@ -86,14 +92,14 @@ export default async function quotes({searchParams}) {
     // Convert quote back to expected format
     let quoteObj = {"timestamp": quoteListItem['quote_timestamp'], "text": quoteListItem['quote_text'], "addedBy": quoteListItem['quote_addedBy']};
     // Return the object
-    return <QuoteItem key={quoteListItem['quote_timestamp']} cursive={false} quoteObject={quoteObj} speaker={capitalizeFirstLetter(quoteListItem['userNickname'])} />
+    return <QuoteItem key={quoteListItem['quote_timestamp']} cursive={cursive} quoteObject={quoteObj} speaker={capitalizeFirstLetter(quoteListItem['userNickname'])} />
   });
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
       <PageTitle text="Quotes" />
       <QuoteCounts quotesJson={quotesJson} updateTimestamp={quotesUpdateTimestamp} />
-      <QuoteSortBlock sortMethod={sortMethod} />
+      <QuoteSortBlock sortMethod={sortMethod} cursive={cursive} />
       <div className="flex flex-col justify-around mt-10 mb-10">
         {(sortMethod == "count" || sortMethod == "name") ? (quoteListRenderTopLevel) : (quoteListRenderQuoteLevel) }
       </div>
