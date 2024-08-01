@@ -20,11 +20,12 @@ export default function todo() {
     {'work_item': "Migrate backend storage to database",'category': "Functionality", 'status': 'BACKLOG'},
     {'work_item': "Add 'Last Updated' Timestamp to Quotes Page",'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Add Toggle for Quote Text Font",'category': "UI/UX", 'status': 'WIP'},
+    {'work_item': "Allow Quote Sorting",'category': "UI/UX", 'status': 'WIP'},
   ]
 
-  const genTodoList: ReactNode = todoList.sort((a, b) => a['status'] < b['status'] ? 1 : -1).map((work_obj) => {
+  const genTodoList: ReactNode = todoList.filter((todoItem) => todoItem['status'] != "DONE").sort((a, b) => a['status'] < b['status'] ? 1 : -1).map((work_obj, index) => {
     return (
-      <tr key={work_obj['status']} className={clsx(
+      <tr key={work_obj['status'] + index} className={clsx(
         "text-center",
         {
           "bg-green-900": work_obj['status'] === "DONE",
@@ -38,10 +39,19 @@ export default function todo() {
     );
   });
 
+  const genDoneList: ReactNode = todoList.filter((todoItem) => todoItem['status'] == "DONE").sort((a, b) => a['category'] < b['category'] ? 1 : -1).map((work_obj, index) => {
+    return (
+      <tr key={index} className="text-center bg-green-900">
+        <td className="py-1 px-3">{work_obj['work_item']}</td>
+        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['category']}</td>
+      </tr> 
+    );
+  });
+
   return (
-    <main className="flex min-h-screen flex-col items-center p-24 pt-10">
+    <main className="flex flex-col items-center px-24 pt-10">
       <PageTitle text="Todo" />
-      <div className="w-fit p-5 pt-0 pl-10 rounded-xl">
+      <div className="w-fit p-5 pt-0 pl-10">
         <table className="table-auto w-full rounded-xl bg-gray-700">
           <thead>
             <tr className="border-gray-500 border-b">
@@ -58,6 +68,22 @@ export default function todo() {
           </thead>
           <tbody>
             {genTodoList}
+          </tbody>
+        </table>
+        <br/>
+        <table className="table-auto w-full rounded-xl bg-gray-700">
+          <thead>
+            <tr className="border-gray-500 border-b">
+              <th className="text-xl py-1 px-3">
+                Work Item
+              </th>
+              <th className="text-xl border-gray-500 border-l py-1 px-3">
+                Category
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {genDoneList}
           </tbody>
         </table>
       </div>

@@ -1,11 +1,9 @@
-
-// Display an about page
-// Expected Props:
-
 import { getDiscordUserData } from "@/app/lib/discord_utils";
 import { Conditional } from "../dashboard/conditional";
 import { capitalizeFirstLetter } from "@/app/lib/utils";
 
+// Display an about page
+// Expected Props:
 //  - loggedIn: Boolean -> Is the user logged in or not
 export default async function AboutBlock(props) {
   const loggedIn: boolean = props["loggedIn"];
