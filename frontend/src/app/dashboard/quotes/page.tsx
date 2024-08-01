@@ -11,7 +11,6 @@ import { capitalizeFirstLetter } from "@/app/lib/utils";
 export default async function quotes({searchParams}) {
   // Get url params
   const {sortMethod, cursive} = searchParams;
-  console.log("Cursive setting on quotes page: " + cursive)
   // Redirect if any of the search params are undefined
   if(sortMethod == 'undefined' || cursive == 'undefined') {
     redirect("/dashboard/quotes?sortMethod=count&cursive=false");
