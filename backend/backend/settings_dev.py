@@ -54,7 +54,6 @@ MIDDLEWARE = [
 
 # Session Data
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
-SESSION_COOKIE_DOMAIN=".nanophage.win" # COMMENT OUT FOR LOCAL DEV
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
