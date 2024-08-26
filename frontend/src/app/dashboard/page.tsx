@@ -7,6 +7,7 @@ import PageTitle from "../ui/dashboard/page_title";
 
 export default async function Page() {
   const userData = await getDiscordUserData();
+  const memberStatus = await isMember();
   console.log(userData);
   
   return (
@@ -32,7 +33,7 @@ export default async function Page() {
         <br/>
         Click <a href="https://discord.com/developers/docs/resources/user" target="_blank" className="underline italic"><b>here</b></a> for more info on what all of this means!
       </p>
-      <Conditional showWhen={!(await isMember())}>
+      <Conditional showWhen={!(memberStatus)}>
         <br/>
         <p className="b pt-10 bg-gradient-to-b from-red-200 pb-6 backdrop-blur-2xl dark:border-red-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
           <div className="flex w-full justify-center">
