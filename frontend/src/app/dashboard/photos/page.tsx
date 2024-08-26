@@ -13,7 +13,6 @@ export default function photos() {
       fileList.map((path: string) => (
         <div key={path} className="flex flex-col w-4/5 items-center relative p-6 pt-3 md:w-full">
           <Image 
-            isBlurred
             as={NextImage}
             src={"/photoshops/" + path}
             width={0}
