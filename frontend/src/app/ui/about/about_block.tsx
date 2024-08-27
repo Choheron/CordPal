@@ -1,6 +1,7 @@
 import { getDiscordUserData } from "@/app/lib/discord_utils";
 import { Conditional } from "../dashboard/conditional";
-import { capitalizeFirstLetter } from "@/app/lib/utils";
+import Image from 'next/image';
+
 
 // Display an about page
 // Expected Props:
@@ -53,12 +54,24 @@ export default async function AboutBlock(props) {
           <ol className="list-decimal pl-10">
             <li>A Frontend running on <a href="https://nextjs.org/" className="text-blue-600 dark:text-blue-500 hover:underline">NextJS</a></li>
             <li>A Backend running on <a href="https://www.djangoproject.com/" className="text-blue-600 dark:text-blue-500 hover:underline">Django</a></li>
+            <li>A <a href="https://www.postgresql.org/" className="text-blue-600 dark:text-blue-500 hover:underline">Postgresql</a> Database</li>
             <li>A Discord Bot written in <a href="https://www.python.org/" className="text-blue-600 dark:text-blue-500 hover:underline">Python</a></li>
           </ol>
           <p>
             The two main instances handle the serving of the frontend and the handling/tranforming/retrieval of data from a (currently) in memory database on the backend, via an api layer. The third compute instance runs the discord bot that users can interact with, within the server. All of these
-            instances are containerized and self-hosted so that I can have full control over the process and learn as much as possible.
+            instances are containerized and self-hosted so that I can have full control over the process and learn as much as possible. Below is a simplified infra diagram:
           </p>
+          <Conditional showWhen={loggedIn}>
+            <div className="w-full flex justify-center">
+              <Image
+                src="/InfraDiagram.Aug2024.svg"
+                width={500}
+                height={500}
+                alt="Picture of the author"
+                className="rounded-lg"
+              />
+            </div>
+          </Conditional>
         </div>
         <h3 className="text-2xl italic pt-1">
           Who am I?
