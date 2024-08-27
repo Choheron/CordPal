@@ -7,6 +7,8 @@ import sys
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings_dev')
+    os.environ.setdefault('PGSERVICEFILE', os.getcwd() + "/backend/.pg_service.conf")
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

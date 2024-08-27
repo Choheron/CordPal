@@ -51,7 +51,6 @@ MIDDLEWARE = [
 ]
 
 # Session Data
-SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_COOKIE_DOMAIN=".nanophage.win"
 
 CORS_ALLOW_CREDENTIALS = True
@@ -110,8 +109,10 @@ LOGGING = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        "OPTIONS": {
+            "service": "discordsite_prod",
+        },
     }
 }
 

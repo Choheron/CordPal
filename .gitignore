@@ -22,6 +22,9 @@ __pycache__
 .env*
 env.bat
 
+# Ignore Database Configuration Files
+**/.pg_service.conf
+
 # Ignore windows scripts for build and deploy
 build_tag_push_*.bat
 

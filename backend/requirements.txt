@@ -2,3 +2,6 @@ django
 django-cors-headers
 python-dotenv
 requests
+# DB Connection Libraries
+psycopg
+psycopg2
