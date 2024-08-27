@@ -8,9 +8,9 @@ COPY . .
 # Delete nonprod settings file to ensure it is not accidentally used
 RUN rm /app/backend/settings_dev.py
 # Set new settings file
-ENV PGSERVICEFILE="backend.settings_prod"
+ENV PGSERVICEFILE="/app/backend/.pg_service.conf"
 # Set ENV for Postgres connection
-ENV DJANGO_SETTINGS_MODULE="/app/backend/.pg_service.conf"
+ENV DJANGO_SETTINGS_MODULE="backend.settings_prod"
 
 EXPOSE 8000
 
