@@ -17,7 +17,7 @@ export default function todo() {
     {'work_item': "Show quote counts in quotes page",'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Replace '*' with correct text decoration in quotes",'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Migrate Todo to backend and allow users to submit functionality requests",'category': "Functionality", 'status': 'BACKLOG'},
-    {'work_item': "Migrate backend storage to database",'category': "Functionality", 'status': 'BACKLOG'},
+    {'work_item': "Migrate backend storage to database",'category': "Functionality", 'status': 'WIP'},
     {'work_item': "Add 'Last Updated' Timestamp to Quotes Page",'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Add Toggle for Quote Text Font",'category': "UI/UX", 'status': 'DONE'},
     {'work_item': "Allow Quote Sorting",'category': "UI/UX", 'status': 'DONE'},
