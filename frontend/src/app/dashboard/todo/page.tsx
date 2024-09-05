@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import clsx from "clsx";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { getAllTodoItems } from "@/app/lib/todo_uils";
+import TodoItem from "@/app/ui/dashboard/todo/todo_item";
 
 export default async function todo() {
   const todoList = await getAllTodoItems();
@@ -16,26 +17,13 @@ export default async function todo() {
 
   const genTodoList: ReactNode = todoList.filter((todoItem) => todoItem['todo_status'] != "Done").sort((a, b) => a['todo_status'] < b['todo_status'] ? 1 : -1).map((work_obj, index) => {
     return (
-      <tr key={work_obj['todo_status'] + index} className={clsx(
-        "text-center",
-        {
-          "bg-green-900": work_obj['todo_status'] === "Done",
-          "bg-yellow-700": work_obj['todo_status'] === "Work In Progress",
-        },
-        )}>
-        <td className="py-1 px-3">{work_obj['todo_title']}</td>
-        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['todo_status']}</td>
-        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['todo_category']}</td>
-      </tr> 
+      <TodoItem key={work_obj['todo_status'] + index} todo_object={work_obj} index={index} />
     );
   });
 
   const genDoneList: ReactNode = todoList.filter((todoItem) => todoItem['todo_status'] == "Done").sort((a, b) => a['todo_category'] < b['todo_category'] ? 1 : -1).map((work_obj, index) => {
     return (
-      <tr key={index} className="text-center bg-green-900">
-        <td className="py-1 px-3">{work_obj['todo_title']}</td>
-        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['todo_category']}</td>
-      </tr> 
+      <TodoItem key={work_obj['todo_status'] + index} todo_object={work_obj} index={index} />
     );
   });
 
