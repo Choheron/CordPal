@@ -1,49 +1,40 @@
 import { ReactNode } from "react";
 import clsx from "clsx";
 import PageTitle from "@/app/ui/dashboard/page_title";
+import { getAllTodoItems } from "@/app/lib/todo_uils";
 
-export default function todo() {
-  const todoList = [
-    {'work_item': "Quote of the Day", 'category': "Functionality", 'status': 'BACKLOG'},
-    {'work_item': "Multiple discord support", 'category': "Functionality", 'status': 'BACKLOG'},
-    {'work_item': "Route user directly to content if they have a valid session cookie", 'category': "UI/UX", 'status': 'DONE'},
-    {'work_item': "Allow users to submit images", 'category': "Functionality", 'status': 'BACKLOG'},
-    {'work_item': "Logout Button", 'category': "Functionality", 'status': 'DONE'},
-    {'work_item': "Implement Versioning for BE and FE", 'category': "CI/CD", 'status': 'BACKLOG'},
-    {'work_item': "Create demo user for external access",'category': "Functionality", 'status': 'BACKLOG'},
-    {'work_item': "Add an 'about' page to the default screen",'category': "Functionality", 'status': 'DONE'},
-    {'work_item': "Add a 'stats' page to default and user dashboards",'category': "Functionality", 'status': 'DONE'},
-    {'work_item': "Underline current page in nav links",'category': "UI/UX", 'status': 'DONE'},
-    {'work_item': "Show quote counts in quotes page",'category': "UI/UX", 'status': 'DONE'},
-    {'work_item': "Replace '*' with correct text decoration in quotes",'category': "UI/UX", 'status': 'DONE'},
-    {'work_item': "Migrate Todo to backend and allow users to submit functionality requests",'category': "Functionality", 'status': 'BACKLOG'},
-    {'work_item': "Migrate backend storage to database",'category': "Functionality", 'status': 'WIP'},
-    {'work_item': "Add 'Last Updated' Timestamp to Quotes Page",'category': "UI/UX", 'status': 'DONE'},
-    {'work_item': "Add Toggle for Quote Text Font",'category': "UI/UX", 'status': 'DONE'},
-    {'work_item': "Allow Quote Sorting",'category': "UI/UX", 'status': 'DONE'},
-  ]
+export default async function todo() {
+  const todoList = await getAllTodoItems();
+  // Todo Item Example
+  // {
+  //   id: 37,
+  //   todo_title: 'Add Toggle for Quote Text Font',
+  //   todo_description: 'No Description Provided',
+  //   todo_status: 'Done',
+  //   todo_category: 'User Interface/User Experience'
+  // },
 
-  const genTodoList: ReactNode = todoList.filter((todoItem) => todoItem['status'] != "DONE").sort((a, b) => a['status'] < b['status'] ? 1 : -1).map((work_obj, index) => {
+  const genTodoList: ReactNode = todoList.filter((todoItem) => todoItem['todo_status'] != "Done").sort((a, b) => a['todo_status'] < b['todo_status'] ? 1 : -1).map((work_obj, index) => {
     return (
-      <tr key={work_obj['status'] + index} className={clsx(
+      <tr key={work_obj['todo_status'] + index} className={clsx(
         "text-center",
         {
-          "bg-green-900": work_obj['status'] === "DONE",
-          "bg-yellow-700": work_obj['status'] === "IN PROGRESS" || work_obj['status'] === "WIP",
+          "bg-green-900": work_obj['todo_status'] === "Done",
+          "bg-yellow-700": work_obj['todo_status'] === "Work In Progress",
         },
         )}>
-        <td className="py-1 px-3">{work_obj['work_item']}</td>
-        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['status']}</td>
-        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['category']}</td>
+        <td className="py-1 px-3">{work_obj['todo_title']}</td>
+        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['todo_status']}</td>
+        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['todo_category']}</td>
       </tr> 
     );
   });
 
-  const genDoneList: ReactNode = todoList.filter((todoItem) => todoItem['status'] == "DONE").sort((a, b) => a['category'] < b['category'] ? 1 : -1).map((work_obj, index) => {
+  const genDoneList: ReactNode = todoList.filter((todoItem) => todoItem['todo_status'] == "Done").sort((a, b) => a['todo_category'] < b['todo_category'] ? 1 : -1).map((work_obj, index) => {
     return (
       <tr key={index} className="text-center bg-green-900">
-        <td className="py-1 px-3">{work_obj['work_item']}</td>
-        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['category']}</td>
+        <td className="py-1 px-3">{work_obj['todo_title']}</td>
+        <td className="border-gray-500 border-l py-1 pl-2">{work_obj['todo_category']}</td>
       </tr> 
     );
   });
