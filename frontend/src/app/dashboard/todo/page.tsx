@@ -30,17 +30,17 @@ export default async function todo() {
   return (
     <main className="flex flex-col items-center px-24 pt-10">
       <PageTitle text="Todo" />
-      <div className="w-fit p-5 pt-0 pl-10">
-        <table className="table-auto w-full rounded-xl bg-gray-700">
+      <div className="w-1/2 p-5 pt-0 pl-10">
+        <table className="table-fixed w-full rounded-xl bg-gray-700">
           <thead>
             <tr className="border-gray-500 border-b">
-              <th className="text-xl py-1 px-3">
+              <th className=" text-xl py-1 px-3">
                 Work Item
               </th>
-              <th className="text-xl border-gray-500 border-l py-1 px-3">
+              <th className="w-1/5 text-xl border-gray-500 border-l py-1 px-3">
                 Completion Status
               </th>
-              <th className="text-xl border-gray-500 border-l py-1 px-3">
+              <th className="w-2/12 text-xl border-gray-500 border-l py-1 px-3">
                 Category
               </th>
             </tr>
@@ -50,13 +50,13 @@ export default async function todo() {
           </tbody>
         </table>
         <br/>
-        <table className="table-auto w-full rounded-xl bg-gray-700">
+        <table className="table-fixed w-full rounded-xl bg-gray-700">
           <thead>
             <tr className="border-gray-500 border-b">
               <th className="text-xl py-1 px-3">
                 Completed Items
               </th>
-              <th className="text-xl border-gray-500 border-l py-1 px-3">
+              <th className="w-2/12 text-xl border-gray-500 border-l py-1 px-3">
                 Category
               </th>
             </tr>

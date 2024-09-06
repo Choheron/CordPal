@@ -5,8 +5,7 @@ class TodoItem(models.Model):
   # Title text for todo item
   todo_title = models.CharField(max_length=100) 
   # Description of todo item (optional)
-  todo_description = models.CharField(
-    max_length=2000,
+  todo_description = models.TextField(
     default="No Description Provided",
   )
   # Status Choices
