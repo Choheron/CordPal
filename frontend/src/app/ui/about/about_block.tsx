@@ -39,7 +39,7 @@ export default async function AboutBlock(props) {
         </h3>
         <p className="pl-2">
           This website currently does lots of inside joke-y things. It displays quote data from users in the discord, it has a page showing photoshops we have done, and it has a todo page. I plan on expanding and adding new functionality as I come up with it! Eventually I would like to 
-          expand the functionality to allow for use across multiple discords and perhaps allow mutli-user sign up, if I ever reached that point.
+          expand the functionality to allow for use across multiple discords and perhaps allow multi-user sign up, if I ever reached that point.
         </p>
         <p className="w-full text-center italic">
           But until then, its just a fun side project!

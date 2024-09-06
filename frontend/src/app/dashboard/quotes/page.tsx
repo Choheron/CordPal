@@ -97,8 +97,10 @@ export default async function quotes({searchParams}) {
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
       <PageTitle text="Quotes" />
-      <QuoteCounts quotesJson={quotesJson} updateTimestamp={quotesUpdateTimestamp} />
-      <QuoteSortBlock sortMethod={sortMethod} cursive={cursive} />
+      <div className="flex flex-row justify-center w-1/2">
+        <QuoteCounts className="w-1/2 mr-5" quotesJson={quotesJson} updateTimestamp={quotesUpdateTimestamp} />
+        <QuoteSortBlock className="w-1/4 ml-5" sortMethod={sortMethod} cursive={cursive} />
+      </div>
       <div className="flex flex-col justify-around mt-10 mb-10">
         {(sortMethod == "count" || sortMethod == "name") ? (quoteListRenderTopLevel) : (quoteListRenderQuoteLevel) }
       </div>

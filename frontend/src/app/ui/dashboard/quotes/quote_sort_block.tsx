@@ -38,12 +38,12 @@ export default function QuoteSortBlock(props) {
   }, [sortMethod, cursive]);
 
   return (
-    <div className="flex justify-around mt-3 w-1/2">
+    <div className={`flex flex-col justify-around ${props["className"]}`}>
       <Select
         label="Sort By:"
         labelPlacement="outside"
         defaultSelectedKeys={[props['sortMethod']]}
-        className="dark max-w-xs"
+        className="dark min-w-m max-w-m"
         onSelectionChange={changeSortMethod}
       >
         {sortOptions.map((sortOpt) => (
