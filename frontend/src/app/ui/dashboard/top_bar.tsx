@@ -3,8 +3,14 @@
 import Link from "next/link";
 import { Conditional } from "./conditional";
 import { usePathname } from 'next/navigation';
-import clsx from 'clsx';
 import {Divider} from "@nextui-org/divider";
+import {User} from "@nextui-org/user";
+import { useDisclosure } from "@nextui-org/modal";
+
+import clsx from 'clsx';
+
+import SettingsModal from "./settings_modal";
+import { Button } from "@nextui-org/react";
 
 // Expected props:
 //  - isMember: Boolean indicating if the current session user is a member of the desired server
@@ -26,9 +32,19 @@ export default function TopBar(props) {
   return (
     <div className="flex flex-col items-center justify-between p-24 pb-0">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed lg:static left-0 top-0 flex w-full justify-center items-center pb-6 pt-8 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:w-auto lg:rounded-xl lg:border lg:p-4">
-          Welcome {props.userInfo['nickname']}! <img src={props.avatarURL} className="rounded-lg ml-2 w-8" />
-        </p>
+        <User
+          className="w-auto ml-5 py-2 px-2 backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800"
+          name={props.userInfo['nickname']}
+          description={(
+            <SettingsModal 
+              userInfo={props.userInfo}
+              avatarURL={props.avatarURL}
+            />
+          )}
+          avatarProps={{
+            src: props.avatarURL
+          }}
+        />
         <div className="fixed bottom-0 left-0 flex-col h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
           <Link 
             href="/logout"

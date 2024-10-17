@@ -7,4 +7,5 @@ urlpatterns = [
     path('getUserCount', views.getUserCount),
     path('getUserData', views.getUserData),
     path('getUserAvatarURL', views.getUserAvatarURL),
+    path('updateUserData', views.updateUserData),
 ]

@@ -21,7 +21,7 @@ from users.models import User
 ###
 def getUserCount(request: HttpRequest):
   logger.info("getUserCount called...")
-  # Make sure request is a post request
+  # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getUserCount called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
@@ -39,7 +39,7 @@ def getUserCount(request: HttpRequest):
 ###
 def getUserData(request: HttpRequest):
   logger.info("getUserData called...")
-  # Make sure request is a post request
+  # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getUserData called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
@@ -81,3 +81,22 @@ def getUserAvatarURL(request: HttpRequest):
   userDataURLJson = json.dumps({"url": userData.get_avatar_url()})
   # Return user data json
   return HttpResponse(userDataURLJson, content_type='text/json', status=200)
+
+###
+# Update user data changing the fields provided in the request
+###
+def updateUserData(request: HttpRequest):
+  logger.info("updateUserData called...")
+  # Make sure request is a post request
+  if(request.method != "POST"):
+    logger.warning("updateUserData called with a non-POST method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Body data
+  reqBody = json.loads(request.body)
+  # Retrieve user data via session storage
+  # Update user data
+  User.objects.filter(discord_id=request.session['discord_id']).update(**reqBody)
+  # Return success code
+  return HttpResponse(200)
