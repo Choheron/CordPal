@@ -27,7 +27,7 @@ export default async function Page({ searchParams, }: { searchParams: { [key: st
         cache: 'no-store',
       });
       console.log("Auth completed, redirecting...");
-      router.push("/dashboard");
+      router.push("/");
     }
     doDiscordHandshake()
   }, []);

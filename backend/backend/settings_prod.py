@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Custom Apps
     'todo.apps.TodoConfig',
+    'users.apps.UsersConfig',
     # Outside Apps
     "corsheaders",
 ]

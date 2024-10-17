@@ -1,11 +1,19 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 
+from backend.utils import (
+  postToDiscordWebhook,
+)
+
+from users.utils import (
+  doesUserExist,
+  createUserFromDiscordJSON,
+)
+
 from .utils import (
   isDiscordTokenExpired, 
   refreshDiscordToken, 
   storeDiscordTokenInSession,
   checkPreviousAuthorization,
-  postToDiscordWebhook
 )
 
 import datetime
@@ -62,6 +70,26 @@ def getDiscordToken(request: HttpRequest):
   discordResJSON = discordRes.json()
   # Store discord data in session data
   storeDiscordTokenInSession(request, discordResJSON)
+  # Retrieving discord data to create a user account
+  reqHeaders = { 
+    'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
+  }
+  # Send Request to API
+  logger.info("Making request to discord api...")
+  try:
+    discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
+    if(discordRes.status_code != 200):
+      print("Error in request:\n" + str(discordRes.json()))
+      discordRes.raise_for_status()
+  except:
+    return HttpResponse(status=500)
+  # Convert response to Json
+  discordResJSON = discordRes.json()
+  # Store discord ID in session for user data retrieval
+  request.session['discord_id'] = discordResJSON['id']
+  # Check if user's data exists as a user in the database
+  if(not(doesUserExist(discordResJSON['id']))):
+    createUserFromDiscordJSON(discordResJSON)
   # Write success message
   messageOut = { 'message': "Success" }
   # Return Code
@@ -70,7 +98,7 @@ def getDiscordToken(request: HttpRequest):
 
 
 ###
-# Retrieve basic info about the user
+# Retrieve basic info about the user and create a user instance
 ###
 def getDiscordUserData(request: HttpRequest):
   logger.info("getDiscordUserData called...")
@@ -99,8 +127,11 @@ def getDiscordUserData(request: HttpRequest):
     return HttpResponse(status=500)
   # Convert response to Json
   discordResJSON = discordRes.json()
-  # Alert Discord Webhook
-  postToDiscordWebhook(discordResJSON, f"User data retrieved for user: **{discordResJSON['username']}**!")
+  # Store discord ID in session for user data retrieval
+  request.session['discord_id'] = discordResJSON['id']
+  # Check if user's data exists as a user in the database
+  if(not(doesUserExist(discordResJSON['id']))):
+    createUserFromDiscordJSON(discordResJSON)
   # Return JsonResponse containing user data
   return JsonResponse(discordResJSON)
 

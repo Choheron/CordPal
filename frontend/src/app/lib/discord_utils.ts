@@ -74,3 +74,25 @@ export async function getDiscordUserData() {
   });
   return await userDataResponse.json();
 }
+
+//
+// Retrieve discord user Avatar URL
+// - RETURN: Json containing url
+//
+export async function getUserAvatarURL() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const avatarURLResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserAvatarURL`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  return await avatarURLResponse.json();
+}

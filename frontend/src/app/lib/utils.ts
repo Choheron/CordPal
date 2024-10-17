@@ -15,7 +15,7 @@ export const getFilesInDir = (dir: string) => {
 
 // Convert boolean value to string
 export const boolToString = (input: boolean) => {
-  return String(input);
+  return String(input).toUpperCase();
 };
 
 // Capitalize first letter in string
