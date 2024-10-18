@@ -1,6 +1,6 @@
 export const getFilesInDir = (dir: string) => {
   const fs = require('fs');
-  const out: string[] =[]
+  const out: string[] = []
   // Debug Log
   console.log("Attempting to read files in: " + dir);
 

@@ -5,12 +5,10 @@ import { Conditional } from "./conditional";
 import { usePathname } from 'next/navigation';
 import {Divider} from "@nextui-org/divider";
 import {User} from "@nextui-org/user";
-import { useDisclosure } from "@nextui-org/modal";
 
 import clsx from 'clsx';
 
 import SettingsModal from "./settings_modal";
-import { Button } from "@nextui-org/react";
 
 // Expected props:
 //  - isMember: Boolean indicating if the current session user is a member of the desired server
@@ -54,15 +52,17 @@ export default function TopBar(props) {
           </Link>
         </div>
       </div>
-      <a
-        className="pointer-events-none flex w-full max-w-5xl place-items-center gap-2 p-8 ml-16 font-mono text-sm lg:pointer-events-auto lg:p-0"
-        href="https://homelab.nanophage.win"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        By{" "}
-        Nanophage
-      </a>
+      <div className="flex w-full max-w-5xl">
+        <a
+          className="pointer-events-none w-fit place-items-center gap-2 p-8 ml-6 font-mono text-sm lg:pointer-events-auto lg:p-0"
+          href="https://homelab.nanophage.win"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          By{" "}
+          Nanophage
+        </a>
+      </div>
       <div className="z-10 w-full max-w-5xl items-center justify-around font-mono text-sm lg:flex pt-5">
         {links.map((link, index) => {
             return(
