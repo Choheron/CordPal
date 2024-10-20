@@ -1,6 +1,6 @@
 'use client'
 
-import {Card} from "@nextui-org/card";
+import { Card } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
 import {
   Modal, 
@@ -9,7 +9,9 @@ import {
   ModalBody, 
   ModalFooter,
 } from "@nextui-org/modal";
+import { Button } from "@nextui-org/button";
 import { useDisclosure } from "@nextui-org/react";
+import Link from "next/link";
 
 // Expected props:
 //  - imageSrc: Source path of the picture
@@ -39,19 +41,22 @@ export default function PhotoModal(props) {
       </Card>
       <Modal 
         size="5xl" 
-        // hideCloseButton
         isOpen={isOpen} 
         onOpenChange={onOpenChange} 
         onClose={onClose}
         backdrop='blur'
         classNames={{
-          closeButton: "position:relative z-50 hover:bg-white/5 active:bg-white/10",
+          base: "group transition-property: all;",
+          closeButton: "position:relative z-50 group-hover:text-white duration-1000 hover:bg-white/5 active:bg-white/10",
         }}
       >
         <ModalContent className="bg-transparent w-fit">
           {() => (
             <>
-              <ModalBody className="p-0">
+              <ModalHeader className="opacity-0 -mb-16 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
+                {props.nameString}
+              </ModalHeader>
+              <ModalBody className="p-0 group-hover:blur-md duration-1000 ease-in-out">
                 <Image
                   alt={props.nameString}
                   className="object-cover"
@@ -61,6 +66,18 @@ export default function PhotoModal(props) {
                   style={{ width: 'auto', height: 'auto' }}
                 />
               </ModalBody>
+              <ModalFooter className="opacity-0 -mt-20 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
+                <Button 
+                  as={Link}
+                  href={props.imageSrc}
+                  target="_blank"
+                  radius="lg"
+                  className="z-40 text-white border-white bg-white hover:underline bg-opacity-0 hover:bg-opacity-40 duration-1000 ease-in-out" 
+                  variant="bordered"
+                >
+                  Download
+                </Button> 
+              </ModalFooter>
             </>
           )}
         </ModalContent>
