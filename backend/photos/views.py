@@ -69,7 +69,7 @@ def uploadImage(request: HttpRequest):
   # Create new image object
   imageDB_entry = Image(
     title = img_title,
-    description = img_description,
+    description = img_description if img_description != "" else "No description provided.",
     uploader = img_uploader,
     artist = img_creator,
     filename = img_filename,
@@ -124,9 +124,13 @@ def getImageInfo(request: HttpRequest, imageID: int):
   imageData['title'] = image.title
   imageData['description'] = image.description
   imageData['upload_timestamp'] = image.upload_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
-  imageData['description'] = image.description
   imageData['uploader'] = image.uploader.discord_id
-  imageData['tagged_users'] = image.tagged_users
+  imageData['creator'] = image.artist.discord_id
+  imageData['filename'] = image.filename[(image.filename.index("_") + 1):] # Remove hex in front for readability
+  imageData['tagged_users'] = []
+  # Get list of discord IDs
+  for user in image.tagged_users.all():
+    imageData['tagged_users'].append(user.discord_id)
   # Return json
   return JsonResponse(imageData)
 

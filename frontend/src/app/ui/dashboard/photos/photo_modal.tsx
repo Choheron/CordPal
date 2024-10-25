@@ -12,14 +12,47 @@ import {
 import { Button } from "@nextui-org/button";
 import { useDisclosure } from "@nextui-org/react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { getImageData } from "@/app/lib/photos_utils";
+import {User} from "@nextui-org/user";
+import { getUserData } from "@/app/lib/user_utils";
 
 // Expected props:
 //  - imageSrc: Source path of the picture
-//  - nameString: String name of the image
-//  - creator: String of creator information
-//  - uploader: String of who uploaded the image
+//  - imageID: Database GUID of image
 export default function PhotoModal(props) {
+  const [imgData, setImgData] = useState({})
+  const [uploaderData, setUploaderData] = useState({})
+  /* 
+  imgData object should have the following format:
+    {
+      "image_id": X,
+      "title": "TITLE",
+      "description": "DESCRIPTION",
+      "upload_timestamp": "STRING OF TIME",
+      "uploader": "DISCORD ID",
+      "creator": "DISCORD ID",
+      "tagged_users": [
+          "DISCORD ID",
+          "DISCORD ID"
+      ]
+    }
+  */
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
+
+  useEffect(() => {
+    const setImageDataFunc = async () => {
+      setImgData(await getImageData(props.imageID))
+    }
+    setImageDataFunc()
+  }, [isOpen]);
+
+  useEffect(() => {
+    const setSecondaryDataFunc = async () => {
+      setUploaderData(await getUserData(imgData['uploader']))
+    }
+    setSecondaryDataFunc()
+  }, [imgData]);
 
   return (
     <>
@@ -31,7 +64,7 @@ export default function PhotoModal(props) {
         className="border-none hover:scale-105 bg-transparent"
       >
         <Image
-          alt={props.nameString}
+          alt={imgData['title']}
           className="object-cover"
           width={0}
           height={0}
@@ -53,12 +86,23 @@ export default function PhotoModal(props) {
         <ModalContent className="bg-transparent w-fit">
           {() => (
             <>
-              <ModalHeader className="opacity-0 -mb-16 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
-                {props.nameString}
+              <ModalHeader className="flex flex-col gap-2 opacity-0 -mb-36 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
+                <b>{imgData['title']}</b>
+                {imgData['description']}
+                <div className="flex gap-3 ">
+                  <p className="my-auto">Uploaded By: </p>
+                  <User
+                    className=""
+                    name={uploaderData['nickname']}
+                    avatarProps={{
+                      src: `${uploaderData['avatar_url']}`
+                    }}
+                  />
+                </div>
               </ModalHeader>
               <ModalBody className="p-0 group-hover:blur-md duration-1000 ease-in-out">
                 <Image
-                  alt={props.nameString}
+                  alt={imgData['title']}
                   className="object-cover"
                   width={0}
                   height={0}
@@ -66,7 +110,8 @@ export default function PhotoModal(props) {
                   style={{ width: 'auto', height: 'auto' }}
                 />
               </ModalBody>
-              <ModalFooter className="opacity-0 -mt-20 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
+              <ModalFooter className="flex flex-col max-w-full opacity-0 -mt-28 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
+                {imgData['filename']}
                 <Button 
                   as={Link}
                   href={props.imageSrc}

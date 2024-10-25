@@ -86,6 +86,8 @@ def getUserData(request: HttpRequest, user_discord_id: str = ""):
   # Convert to json
   out = userData.__dict__
   del out["_state"]
+  # Append Avatar URL to userData response
+  out['avatar_url'] = userData.get_avatar_url()
   # Return user data json
   return JsonResponse(out, status=200)
 

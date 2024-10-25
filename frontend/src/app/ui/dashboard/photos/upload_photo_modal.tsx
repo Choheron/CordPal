@@ -45,7 +45,7 @@ export default function UploadPhotoModal(props) {
     // Check and add image data to form
     if(fileRef.current != null) {
       // Add image data to form
-      uploadFormData.set("attached_image", fileRef.current.files[0])
+      uploadFormData.set("attached_image", fileRef.current.files![0])
       uploadFormData.set('filename', fileName)
       uploadFormData.set('filetype', fileType)
     } else {
@@ -82,8 +82,8 @@ export default function UploadPhotoModal(props) {
     // Check and add image data to form
     if(fileRef.current != null) {
       setFileChosen(true)
-      setFileName(fileRef.current.files[0].name)
-      setFileType(fileRef.current.files[0].type)
+      setFileName(fileRef.current.files![0].name)
+      setFileType(fileRef.current.files![0].type)
     } else {
       setFileChosen(false)
       setFileName("")
@@ -149,7 +149,7 @@ export default function UploadPhotoModal(props) {
                   isDisabled={!((titleValue !== "") && fileChosen)}
                   onPress={uploadPress}
                 >
-                  Update
+                  Upload
                 </Button>
               </ModalFooter>
             </>

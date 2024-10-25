@@ -6,5 +6,6 @@ from . import views
 urlpatterns = [
   path('getAllImages/', views.getAllImages),
   path('image/<int:imageID>/', views.getImage),
-  path('uploadImage/', views.uploadImage)
+  path('uploadImage/', views.uploadImage),
+  path('getImageInfo/<int:imageID>/', views.getImageInfo)
 ]

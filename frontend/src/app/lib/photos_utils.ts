@@ -30,6 +30,29 @@ export async function getAllPhotoshops() {
 }
 
 //
+// Request image data from the backend
+//
+export async function getImageData(image_id) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  console.log("Attempting to get image data for image: " + image_id)
+  const photosDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/photos/getImageInfo/${image_id}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  let response: Object = await photosDataResponse.json();
+  return response
+}
+
+//
 // Post image to backend using formdata
 //
 export async function uploadImageToBackend(formData) {

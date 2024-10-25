@@ -8,7 +8,7 @@ Expected Volumes:
 | Description | Host Path (Planned) | Container Path |
 |---|---|---|
 | Bot Data Directory | /\(discord-bot dir\)/data | `/app/botData/<bot name>` |
-| Media Directory | /\(discord-bot dir\)/media | `/srv/media` |
+| Media Directory | /\(discord-site dir\)/media | `/srv/media` |
 
 Expected Environment Vars:
 | Description | Key | Value |
