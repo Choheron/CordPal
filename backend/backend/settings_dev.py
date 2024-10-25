@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # Custom Apps
     'todo.apps.TodoConfig',
     'users.apps.UsersConfig',
+    'photos.apps.PhotosConfig',
     # Outside Apps
     "corsheaders",
 ]

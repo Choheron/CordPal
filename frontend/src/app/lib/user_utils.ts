@@ -8,17 +8,67 @@ const getCookie = async (name: string) => {
 }
 
 //
-// Retrieve user data using session info
+// Retrieve a list of user IDs
 // - RETURN: Json containing user data from DB
 //
-export async function getUserData() {
+export async function getUserList() {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Reurn false if cookie is missing
   if(sessionCookie === "") {
     return false;
   }
-  const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserData`, {
+  const userListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserList`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const userListJSON = await userListResponse.json()
+  return Object.values(userListJSON);
+}
+
+//
+// Retrieve discord user Avatar URL
+// Params:
+// - Discord ID String (Conditional on if we are searching for a different user)
+// RETURN: Json containing url
+//
+export async function getUserAvatarURL(discord_id = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const avatarURLResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserAvatarURL${(discord_id === "") ? '' : '/' + discord_id}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const avatarUrlJSON = await avatarURLResponse.json()
+  return avatarUrlJSON['url'];
+}
+
+//
+// Retrieve user data using session info
+// Params:
+// - Discord ID String (Conditional on if we are searching for a different user)
+// RETURN: Json containing user data from DB
+//
+export async function getUserData(discord_id = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserData${(discord_id === "") ? '' : '/' + discord_id}`, {
     method: "GET",
     credentials: "include",
     cache: 'no-cache',

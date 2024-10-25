@@ -35,9 +35,34 @@ def getUserCount(request: HttpRequest):
   return HttpResponse(usersCountData, content_type='text/json', status=200)
 
 ###
-# Get user data for the current session's user
+# Get a list of all users in json form, list includes each users ID, avatar URL, and Nickname
 ###
-def getUserData(request: HttpRequest):
+def getUserList(request: HttpRequest):
+  logger.info("getUserList called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getUserList called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Iterate and retrieve User IDs
+  userList = User.objects.all()
+  # Declare and populate out dict
+  out = {}
+  for user in userList:
+    tempDict = {}
+    tempDict['discord_id'] = user.discord_id
+    tempDict['avatar_url'] = user.get_avatar_url()
+    tempDict['nickname'] = user.nickname
+    # Store tempDict in out json
+    out[user.guid] = tempDict
+  # Return dict response
+  return JsonResponse(out)
+
+###
+# Get user data for the current session's user or the passed in ID
+###
+def getUserData(request: HttpRequest, user_discord_id: str = ""):
   logger.info("getUserData called...")
   # Make sure request is a get request
   if(request.method != "GET"):
@@ -45,9 +70,15 @@ def getUserData(request: HttpRequest):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  # Determine if this call is to use session or passed in value
+  if(user_discord_id != ""):
+    request_id = user_discord_id
+  else:
+    request_id = str(request.session['discord_id'])
   # Retrieve user data from database, if its not there create one.
   try:
-    userData = User.objects.get(discord_id = str(request.session['discord_id']))
+    logger.info(f"Attempting to retreive user data for user id: {user_discord_id}...")
+    userData = User.objects.get(discord_id = request_id)
   except:
     res = HttpResponse("User Not Found")
     res.status_code = 404
@@ -55,14 +86,13 @@ def getUserData(request: HttpRequest):
   # Convert to json
   out = userData.__dict__
   del out["_state"]
-  userDataJson = json.dumps(out, cls=DjangoJSONEncoder)
   # Return user data json
-  return HttpResponse(userDataJson, content_type='text/json', status=200)
+  return JsonResponse(out, status=200)
 
 ###
-# Get user avatar url for the current session's user
+# Get user avatar url for the current session's user or the passed in ID
 ###
-def getUserAvatarURL(request: HttpRequest):
+def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
   logger.info("getUserAvatarURL called...")
   # Make sure request is a post request
   if(request.method != "GET"):
@@ -70,9 +100,14 @@ def getUserAvatarURL(request: HttpRequest):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  # Determine if this call is to use session or passed in value
+  if(user_discord_id != ""):
+    request_id = user_discord_id
+  else:
+    request_id = str(request.session['discord_id'])
   # Retrieve user data from database
   try:
-    userData = User.objects.get(discord_id = request.session['discord_id'])
+    userData = User.objects.get(discord_id = request_id)
   except:
     res = HttpResponse("User Not Found")
     res.status_code(404)

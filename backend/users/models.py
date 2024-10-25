@@ -34,4 +34,4 @@ class User(models.Model):
 
   # toString Method
   def __str__(self):
-    return self.username
+    return self.discord_id

@@ -22,5 +22,6 @@ urlpatterns = [
     path('botInteraction/', include('botInteraction.urls')),
     path("todo/", include('todo.urls')),
     path("users/", include('users.urls')),
+    path("photos/", include('photos.urls')),
     path('admin/', admin.site.urls),
 ]

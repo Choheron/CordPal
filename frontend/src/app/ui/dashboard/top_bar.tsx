@@ -21,6 +21,7 @@ export default function TopBar(props) {
   // This should be moved to a database once it reaches a certian size
   const links = [
     { name: 'Home', href: '/dashboard', conditional: true },
+    { name: 'Clips', href: '/dashboard/clips', conditional: props['isMember'] },
     { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'] },
     { name: 'Quotes', href: '/dashboard/quotes', conditional: props['isMember'] },
     { name: 'Todo List', href: '/dashboard/todo', conditional: props['isMember'] },
