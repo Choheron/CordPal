@@ -43,7 +43,7 @@ export async function getImageData(image_id) {
   const photosDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/photos/getImageInfo/${image_id}`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'force-cache',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
