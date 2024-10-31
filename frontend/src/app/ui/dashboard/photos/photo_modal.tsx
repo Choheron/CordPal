@@ -48,8 +48,10 @@ export default function PhotoModal(props) {
     const setImageDataFunc = async () => {
       setImgData(await getImageData(props.imageID))
     }
-    setLoading(true)
-    setImageDataFunc()
+    if(isOpen) {
+      setLoading(true)
+      setImageDataFunc()
+    }
   }, [isOpen]);
 
   useEffect(() => {
