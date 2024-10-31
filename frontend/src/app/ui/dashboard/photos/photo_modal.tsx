@@ -93,13 +93,15 @@ export default function PhotoModal(props) {
         isOpen={isOpen} 
         onOpenChange={onOpenChange} 
         onClose={handleOnClose}
+        placement="center"
+        scrollBehavior="outside"
         backdrop='blur'
         classNames={{
           base: "group transition-property: all;",
           closeButton: "position:relative z-50 group-hover:text-white duration-1000 hover:bg-white/5 active:bg-white/10",
         }}
       >
-        <ModalContent className="bg-transparent w-fit">
+        <ModalContent className="bg-transparent w-fit h-fit max-h-full">
           {() => (
             <>
               <ModalHeader className={`flex flex-col gap-2 opacity-0 ${(imgData['uploader'] !== imgData['creator'] ? "-mb-48" : "-mb-36")} z-40 group-hover:opacity-100 duration-1000 ease-in-out`}>
