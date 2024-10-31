@@ -17,6 +17,7 @@ import { getImageData } from "@/app/lib/photos_utils";
 import {User} from "@nextui-org/user";
 import { getUserData } from "@/app/lib/user_utils";
 import { Conditional } from "../conditional";
+import {Spinner} from "@nextui-org/spinner";
 
 // Expected props:
 //  - imageSrc: Source path of the picture
@@ -25,6 +26,7 @@ export default function PhotoModal(props) {
   const [imgData, setImgData] = useState({})
   const [uploaderData, setUploaderData] = useState({})
   const [creatorData, setCreatorData] = useState({})
+  const [loading, setLoading] = useState(false)
   /* 
   imgData object should have the following format:
     {
@@ -46,6 +48,7 @@ export default function PhotoModal(props) {
     const setImageDataFunc = async () => {
       setImgData(await getImageData(props.imageID))
     }
+    setLoading(true)
     setImageDataFunc()
   }, [isOpen]);
 
@@ -55,6 +58,7 @@ export default function PhotoModal(props) {
       setCreatorData(await getUserData(imgData['creator']))
     }
     setSecondaryDataFunc()
+    setLoading(false)
   }, [imgData]);
 
   return (
@@ -90,32 +94,37 @@ export default function PhotoModal(props) {
           {() => (
             <>
               <ModalHeader className="flex flex-col gap-2 opacity-0 -mb-48 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
-                <b>{imgData['title']}</b>
-                {imgData['description']}
-                <div className="flex gap-3 ">
-                  <p className="my-auto">{(imgData['uploader'] !== imgData['creator'] ? "Uploader:" : "Mastermind:")} </p>
-                  <User
-                    className=""
-                    name={uploaderData['nickname']}
-                    avatarProps={{
-                      src: `${uploaderData['avatar_url']}`
-                    }}
-                  />
-                </div>
-                <Conditional showWhen={imgData['uploader'] !== imgData['creator']} >
+                <Conditional showWhen={loading}>
+                  <Spinner size="lg" />
+                </Conditional>
+                <Conditional showWhen={!loading}>
+                  <b>{imgData['title']}</b>
+                  {imgData['description']}
                   <div className="flex gap-3 ">
-                    <p className="my-auto">Creator: </p>
+                    <p className="my-auto">{(imgData['uploader'] !== imgData['creator'] ? "Uploader:" : "Mastermind:")} </p>
                     <User
                       className=""
-                      name={creatorData['nickname']}
+                      name={uploaderData['nickname']}
                       avatarProps={{
-                        src: `${creatorData['avatar_url']}`
+                        src: `${uploaderData['avatar_url']}`
                       }}
                     />
                   </div>
+                  <Conditional showWhen={imgData['uploader'] !== imgData['creator']} >
+                    <div className="flex gap-3 ">
+                      <p className="my-auto">Creator: </p>
+                      <User
+                        className=""
+                        name={creatorData['nickname']}
+                        avatarProps={{
+                          src: `${creatorData['avatar_url']}`
+                        }}
+                      />
+                    </div>
+                  </Conditional>
                 </Conditional>
               </ModalHeader>
-              <ModalBody className="p-0 filter group-hover:brightness-50 group-hover:blur-md duration-1000 ease-in-out">
+              <ModalBody className="p-0 filter h-fit group-hover:brightness-50 group-hover:blur-md duration-1000 ease-in-out">
                 <Image
                   alt={imgData['title']}
                   className="object-cover"
@@ -126,17 +135,19 @@ export default function PhotoModal(props) {
                 />
               </ModalBody>
               <ModalFooter className="flex flex-col max-w-full opacity-0 -mt-28 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
-                {imgData['filename']}
-                <Button 
-                  as={Link}
-                  href={props.imageSrc}
-                  target="_blank"
-                  radius="lg"
-                  className="z-40 text-white border-white bg-white hover:underline bg-opacity-0 hover:bg-opacity-40 duration-1000 ease-in-out" 
-                  variant="bordered"
-                >
-                  Download
-                </Button> 
+                <Conditional showWhen={!loading}>
+                  {imgData['filename']}
+                  <Button 
+                    as={Link}
+                    href={props.imageSrc}
+                    target="_blank"
+                    radius="lg"
+                    className="z-40 text-white border-white bg-white hover:underline bg-opacity-0 hover:bg-opacity-40 duration-1000 ease-in-out" 
+                    variant="bordered"
+                  >
+                    Download
+                  </Button> 
+                </Conditional>
               </ModalFooter>
             </>
           )}
