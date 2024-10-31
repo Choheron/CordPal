@@ -84,7 +84,6 @@ def createTodo(request: HttpRequest):
     return res
   # Body data
   reqBody = json.loads(request.body)
-  print(reqBody)
   # Create todo item object and add the required objects
   item = TodoItem()
   item.todo_title = reqBody['title']
