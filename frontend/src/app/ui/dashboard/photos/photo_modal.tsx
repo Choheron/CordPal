@@ -61,6 +61,15 @@ export default function PhotoModal(props) {
     setLoading(false)
   }, [imgData]);
 
+  const handleOnClose = () => {
+    setImgData({})
+    setUploaderData({})
+    setCreatorData({})
+    setLoading(false)
+    // do normal onclose
+    onClose()
+  }
+
   return (
     <>
       <Card
@@ -83,7 +92,7 @@ export default function PhotoModal(props) {
         size="5xl" 
         isOpen={isOpen} 
         onOpenChange={onOpenChange} 
-        onClose={onClose}
+        onClose={handleOnClose}
         backdrop='blur'
         classNames={{
           base: "group transition-property: all;",
