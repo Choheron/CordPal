@@ -56,6 +56,31 @@ export async function getUserAvatarURL(discord_id = "") {
 }
 
 //
+// Retrieve boolean on if a user is an admin
+// Params:
+// - Discord ID String (Conditional on if we are searching for a different user)
+// RETURN: boolean
+//
+export async function isUserAdmin(discord_id = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const isUserAdminResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/isUserAdmin${(discord_id === "") ? '' : '/' + discord_id}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const avatarUrlJSON = await isUserAdminResponse.json()
+  return avatarUrlJSON['admin_status'];
+}
+
+//
 // Retrieve user data using session info
 // Params:
 // - Discord ID String (Conditional on if we are searching for a different user)

@@ -120,6 +120,37 @@ def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
   return HttpResponse(userDataURLJson, content_type='text/json', status=200)
 
 ###
+# Get a boolean if a user is an admin or not
+###
+def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
+  logger.info("isUserAdmin called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("isUserAdmin called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Determine if this call is to use session or passed in value
+  if(user_discord_id != ""):
+    request_id = user_discord_id
+  else:
+    request_id = str(request.session['discord_id'])
+  # Retrieve user data from database, if its not there create one.
+  try:
+    logger.info(f"Attempting to retreive user data for user id: {user_discord_id}...")
+    userData = User.objects.get(discord_id = request_id)
+  except:
+    res = HttpResponse("User Not Found")
+    res.status_code = 404
+    return res
+  # Convert to json
+  out = {}
+  out["id"] = request_id
+  out["admin_status"] = userData.is_staff
+  # Return user admin status json
+  return JsonResponse(out, status=200)
+
+###
 # Update user data changing the fields provided in the request
 ###
 def updateUserData(request: HttpRequest):

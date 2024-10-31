@@ -19,7 +19,7 @@ export default async function QuoteCounts(props) {
   });
 
   return (
-    <div className={`static w-auto p-5 pt-2 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit border bg-gray-200  lg:dark:bg-zinc-800/30 ${props["className"]}`}>
+    <div className={`static w-auto p-5 pt-2 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit border bg-gray-200  lg:bg-zinc-800/30 ${props["className"]}`}>
       <p className="w-full text-center">Quote Counts:</p>
       {quoteCountRender}
       <hr/>

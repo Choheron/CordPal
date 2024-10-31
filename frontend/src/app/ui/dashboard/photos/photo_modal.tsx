@@ -100,7 +100,7 @@ export default function PhotoModal(props) {
                   />
                 </div>
               </ModalHeader>
-              <ModalBody className="p-0 group-hover:blur-md duration-1000 ease-in-out">
+              <ModalBody className="p-0 filter group-hover:brightness-50 group-hover:blur-md duration-1000 ease-in-out">
                 <Image
                   alt={imgData['title']}
                   className="object-cover"

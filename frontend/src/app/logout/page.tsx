@@ -24,7 +24,7 @@ export default async function Page() {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
-      <p className="static w-auto p-5 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b from-zinc-200 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit border bg-gray-200  lg:dark:bg-zinc-800/30">
+      <p className="static w-auto p-5 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit border bg-gray-200  lg:bg-zinc-800/30">
         Logging out... Please hold...
       </p>
     </main>

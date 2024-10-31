@@ -30,7 +30,7 @@ export default function TopBar(props) {
 
   return (
     <div className="flex flex-col items-center justify-between p-24 pb-0">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex">
         <User
           className="w-auto ml-5 py-2 px-2 backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800"
           name={props.userInfo['nickname']}
@@ -44,7 +44,7 @@ export default function TopBar(props) {
             src: props.avatarURL
           }}
         />
-        <div className="fixed bottom-0 left-0 flex-col h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
+        <div className="fixed bottom-0 left-0 flex-col h-48 w-full items-end justify-center bg-gradient-to-t from-black via-black lg:static lg:size-auto lg:bg-none">
           <Link 
             href="/logout"
             className="fixed lg:static left-0 top-0 flex w-full justify-center pb-6 pt-8 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:w-auto lg:rounded-xl lg:border lg:p-4 hover:underline"
@@ -64,7 +64,7 @@ export default function TopBar(props) {
           Nanophage
         </a>
       </div>
-      <div className="z-10 w-full max-w-5xl items-center justify-around font-mono text-sm lg:flex pt-5">
+      <div className="z-10 w-full max-w-5xl items-center justify-around font-mono text-sm flex pt-5">
         {links.map((link, index) => {
             return(
               <Conditional 

@@ -13,6 +13,10 @@ APP_ENV = os.getenv('APP_ENV') or 'DEV'
 # Import Models
 from todo.models import TodoItem
 
+# Define options for category based 
+STATUS_CHOICES = TodoItem.TODO_STATUS_CHOICES
+CATEGORY_CHOICES = TodoItem.TODO_CATEGORY_CHOICES
+
 ###
 # Get all todo list items in database
 ###
@@ -28,7 +32,6 @@ def getAllToDo(request: HttpRequest):
   todoItemsQuerySet = TodoItem.objects.values()
   # Convert into a dict
   todoItems = list(todoItemsQuerySet)
-  print(todoItems)
   # Get Options for DB to Human Readable conversion
   statusDict = dict(TodoItem.todo_status.field.choices)
   categoryDict = dict(TodoItem.todo_category.field.choices)
@@ -40,6 +43,33 @@ def getAllToDo(request: HttpRequest):
   todoItems = json.dumps(todoItems)
   # Return list of all todo items
   return HttpResponse(todoItems, content_type='text/json', status=200)
+
+###
+# Get all todo item options for dropdowns
+###
+def getAllToDoChoices(request: HttpRequest):
+  logger.info("getAllToDoChoices called...")
+  # Make sure request is a post request
+  if(request.method != "GET"):
+    logger.warning("getAllToDoChoices called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Return todo choice data
+  todoChoices = {}
+  todoChoices['status'] = []
+  for elem in STATUS_CHOICES:
+    temp = {}
+    temp['key'] = elem
+    temp['label'] = STATUS_CHOICES[elem]
+    todoChoices['status'].append(temp)
+  todoChoices['category'] = []
+  for elem in CATEGORY_CHOICES:
+    temp = {}
+    temp['key'] = elem
+    temp['label'] = CATEGORY_CHOICES[elem]
+    todoChoices['category'].append(temp)
+  return JsonResponse(todoChoices)
 
 ###
 # Add a new todo item to the database
@@ -54,13 +84,16 @@ def createTodo(request: HttpRequest):
     return res
   # Body data
   reqBody = json.loads(request.body)
+  print(reqBody)
   # Create todo item object and add the required objects
   item = TodoItem()
   item.todo_title = reqBody['title']
   if(('description' in reqBody.keys()) and (len(reqBody['description']) > 0)):
     item.todo_description = reqBody['description']
   if('category' in reqBody.keys()):
-    item.todo_category = reqBody['category']
+    item.todo_category = stringConvert(reqBody['category'])
+  if('status' in reqBody.keys()):
+    item.todo_status = stringConvert(reqBody['status'])
   # Save Item
   item.save()
   # Return list of all todo items
@@ -95,20 +128,24 @@ def bulkCreateTodo(request: HttpRequest):
   # Return list of all todo items
   return HttpResponse(status=200)
 
-def stringConvert(inString):
-  match inString:
+def stringConvert(inString: str):
+  match inString.upper():
     case "UI/UX":
       return "UI"
-    case "Functionality":
+    case "USER INTERFACE/USER EXPERIENCE":
+      return "UI"
+    case "FUNCTIONALITY":
       return "FN"
     case "CI/CD":
       return "CI"
-    case "Data Engineering":
+    case "DATA ENGINEERING":
       return "DE"
     # Conversions for Status
     case "BACKLOG":
       return "BK"
     case "WIP":
+      return "IP"
+    case "WORK IN PROGRESS":
       return "IP"
     case "DONE":
       return "DN"

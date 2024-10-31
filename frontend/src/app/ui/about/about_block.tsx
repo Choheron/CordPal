@@ -10,7 +10,7 @@ export default async function AboutBlock(props) {
   const loggedIn: boolean = props["loggedIn"];
   
   return (
-    <div className="max-w-7xl w-auto md:w-full p-5 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b from-zinc-200 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit border bg-gray-200  lg:dark:bg-zinc-800/30">
+    <div className="max-w-7xl w-auto md:w-full p-5 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit border bg-gray-200  lg:bg-zinc-800/30">
       <h2 className="text-3xl italic">
         Welcome, to the Nanophage Discord Site!
       </h2>
@@ -20,9 +20,9 @@ export default async function AboutBlock(props) {
           This site runs on my homelab! For more information around homelabs and self-hosting, check out the following:
         </p>
         <ul className="list-disc pl-10 text-sm">
-          <li><a href="https://www.reddit.com/r/homelab/" className="text-blue-600 dark:text-blue-500 hover:underline">Homelab Subreddit</a></li>
-          <li><a href="https://www.reddit.com/r/selfhosted/" className="text-blue-600 dark:text-blue-500 hover:underline">SelfHosted Subreddit</a></li>
-          <li><a href="https://github.com/awesome-selfhosted/awesome-selfhosted" className="text-blue-600 dark:text-blue-500 hover:underline">Awesome Selfhosted</a></li>
+          <li><a href="https://www.reddit.com/r/homelab/" className="text-blue-500 hover:underline">Homelab Subreddit</a></li>
+          <li><a href="https://www.reddit.com/r/selfhosted/" className="text-blue-500 hover:underline">SelfHosted Subreddit</a></li>
+          <li><a href="https://github.com/awesome-selfhosted/awesome-selfhosted" className="text-blue-500 hover:underline">Awesome Selfhosted</a></li>
         </ul>
         <Conditional showWhen={!loggedIn}>
           <h3 className="text-2xl italic pt-1">
@@ -52,10 +52,10 @@ export default async function AboutBlock(props) {
             Currently, this site consists of two main compute instances and one side instance (Hard to give it a label). 
           </p>
           <ol className="list-decimal pl-10">
-            <li>A Frontend running on <a href="https://nextjs.org/" className="text-blue-600 dark:text-blue-500 hover:underline">NextJS</a></li>
-            <li>A Backend running on <a href="https://www.djangoproject.com/" className="text-blue-600 dark:text-blue-500 hover:underline">Django</a></li>
-            <li>A <a href="https://www.postgresql.org/" className="text-blue-600 dark:text-blue-500 hover:underline">Postgresql</a> Database</li>
-            <li>A Discord Bot written in <a href="https://www.python.org/" className="text-blue-600 dark:text-blue-500 hover:underline">Python</a></li>
+            <li>A Frontend running on <a href="https://nextjs.org/" className="text-blue-500 hover:underline">NextJS</a></li>
+            <li>A Backend running on <a href="https://www.djangoproject.com/" className="text-blue-500 hover:underline">Django</a></li>
+            <li>A <a href="https://www.postgresql.org/" className="text-blue-500 hover:underline">Postgresql</a> Database</li>
+            <li>A Discord Bot written in <a href="https://www.python.org/" className="text-blue-500 hover:underline">Python</a></li>
           </ol>
           <p>
             The two main instances handle the serving of the frontend and the handling/tranforming/retrieval of data from a (currently) in memory database on the backend, via an api layer. The third compute instance runs the discord bot that users can interact with, within the server. All of these
@@ -77,7 +77,7 @@ export default async function AboutBlock(props) {
           Who am I?
         </h3>
         <p className="pl-2">
-          My name is <a href="https://thomascampbell.dev/" className="text-blue-600 dark:text-blue-500 hover:underline">Thomas Campbell</a>! I am a DevOps Engineer with a passion for coding and creating things.
+          My name is <a href="https://thomascampbell.dev/" className="text-blue-500 hover:underline">Thomas Campbell</a>! I am a DevOps Engineer with a passion for coding and creating things.
         </p>
       </div>
     </div>
