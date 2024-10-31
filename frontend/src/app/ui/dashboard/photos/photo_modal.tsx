@@ -16,6 +16,7 @@ import { useState, useEffect } from "react";
 import { getImageData } from "@/app/lib/photos_utils";
 import {User} from "@nextui-org/user";
 import { getUserData } from "@/app/lib/user_utils";
+import { Conditional } from "../conditional";
 
 // Expected props:
 //  - imageSrc: Source path of the picture
@@ -92,7 +93,7 @@ export default function PhotoModal(props) {
                 <b>{imgData['title']}</b>
                 {imgData['description']}
                 <div className="flex gap-3 ">
-                  <p className="my-auto">Uploaded By: </p>
+                  <p className="my-auto">{(imgData['uploader'] !== imgData['creator'] ? "Uploader:" : "Mastermind:")} </p>
                   <User
                     className=""
                     name={uploaderData['nickname']}
@@ -101,16 +102,18 @@ export default function PhotoModal(props) {
                     }}
                   />
                 </div>
-                <div className="flex gap-3 ">
-                  <p className="my-auto">Created By: </p>
-                  <User
-                    className=""
-                    name={creatorData['nickname']}
-                    avatarProps={{
-                      src: `${creatorData['avatar_url']}`
-                    }}
-                  />
-                </div>
+                <Conditional showWhen={imgData['uploader'] !== imgData['creator']} >
+                  <div className="flex gap-3 ">
+                    <p className="my-auto">Creator: </p>
+                    <User
+                      className=""
+                      name={creatorData['nickname']}
+                      avatarProps={{
+                        src: `${creatorData['avatar_url']}`
+                      }}
+                    />
+                  </div>
+                </Conditional>
               </ModalHeader>
               <ModalBody className="p-0 filter group-hover:brightness-50 group-hover:blur-md duration-1000 ease-in-out">
                 <Image
