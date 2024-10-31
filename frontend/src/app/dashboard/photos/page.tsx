@@ -27,7 +27,7 @@ export default async function photos() {
           <div key={listIndex} className="w-full flex flex-col gap-6 items-center pt-3">
             { list.map((id: string, index: number) => (
               <PhotoModal
-                key={id}
+                key={Math.floor(Math.random()*fileList.length)}
                 imageSrc={`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/photos/image/${id}`}
                 imageID={id}
               />

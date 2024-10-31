@@ -23,6 +23,7 @@ import { getUserData } from "@/app/lib/user_utils";
 export default function PhotoModal(props) {
   const [imgData, setImgData] = useState({})
   const [uploaderData, setUploaderData] = useState({})
+  const [creatorData, setCreatorData] = useState({})
   /* 
   imgData object should have the following format:
     {
@@ -50,6 +51,7 @@ export default function PhotoModal(props) {
   useEffect(() => {
     const setSecondaryDataFunc = async () => {
       setUploaderData(await getUserData(imgData['uploader']))
+      setCreatorData(await getUserData(imgData['creator']))
     }
     setSecondaryDataFunc()
   }, [imgData]);
@@ -86,7 +88,7 @@ export default function PhotoModal(props) {
         <ModalContent className="bg-transparent w-fit">
           {() => (
             <>
-              <ModalHeader className="flex flex-col gap-2 opacity-0 -mb-36 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
+              <ModalHeader className="flex flex-col gap-2 opacity-0 -mb-48 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
                 <b>{imgData['title']}</b>
                 {imgData['description']}
                 <div className="flex gap-3 ">
@@ -96,6 +98,16 @@ export default function PhotoModal(props) {
                     name={uploaderData['nickname']}
                     avatarProps={{
                       src: `${uploaderData['avatar_url']}`
+                    }}
+                  />
+                </div>
+                <div className="flex gap-3 ">
+                  <p className="my-auto">Created By: </p>
+                  <User
+                    className=""
+                    name={creatorData['nickname']}
+                    avatarProps={{
+                      src: `${creatorData['avatar_url']}`
                     }}
                   />
                 </div>
