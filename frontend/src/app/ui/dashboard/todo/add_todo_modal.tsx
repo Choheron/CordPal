@@ -58,7 +58,6 @@ export default function AddTodoModal(props) {
     // Reload page
     router.refresh()
   }
-
   
   return (
     <>
