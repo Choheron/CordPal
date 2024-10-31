@@ -96,7 +96,7 @@ export async function getUserData(discord_id = "") {
   const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserData${(discord_id === "") ? '' : '/' + discord_id}`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'force-cache',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
