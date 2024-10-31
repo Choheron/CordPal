@@ -102,7 +102,7 @@ export default function PhotoModal(props) {
         <ModalContent className="bg-transparent w-fit">
           {() => (
             <>
-              <ModalHeader className="flex flex-col gap-2 opacity-0 -mb-48 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
+              <ModalHeader className={`flex flex-col gap-2 opacity-0 ${(imgData['uploader'] !== imgData['creator'] ? "-mb-48" : "-mb-36")} z-40 group-hover:opacity-100 duration-1000 ease-in-out`}>
                 <Conditional showWhen={loading}>
                   <Spinner size="lg" />
                 </Conditional>
