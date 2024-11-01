@@ -147,9 +147,10 @@ export default function PhotoModal(props) {
                   style={{ width: 'auto', height: 'auto' }}
                 />
               </ModalBody>
-              <ModalFooter className="flex flex-col max-w-full opacity-0 -mt-28 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
+              <ModalFooter className="flex flex-col max-w-full opacity-0 -mt-32 pb-2 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
                 <Conditional showWhen={!loading}>
-                  {imgData['filename']}
+                  <p>Uploaded: {imgData['upload_timestamp']}</p>
+                  <p>Filename: {imgData['filename']}</p>
                   <Button 
                     as={Link}
                     href={props.imageSrc}
