@@ -18,6 +18,7 @@ import {User} from "@nextui-org/user";
 import { getUserData } from "@/app/lib/user_utils";
 import { Conditional } from "../conditional";
 import {Spinner} from "@nextui-org/spinner";
+import { convertToLocalTZString } from "@/app/lib/utils";
 
 // Expected props:
 //  - imageSrc: Source path of the picture
@@ -27,6 +28,19 @@ export default function PhotoModal(props) {
   const [uploaderData, setUploaderData] = useState({})
   const [creatorData, setCreatorData] = useState({})
   const [loading, setLoading] = useState(false)
+  const [uploadTimestamp, setUploadTimestamp] = useState<Date>(new Date())
+  const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
+
+  useEffect(() => {
+    const setImageDataFunc = async () => {
+      setImgData(await getImageData(props.imageID))
+    }
+    if(isOpen) {
+      setLoading(true)
+      setImageDataFunc()
+    }
+  }, [isOpen]);
+
   /* 
   imgData object should have the following format:
     {
@@ -42,22 +56,11 @@ export default function PhotoModal(props) {
       ]
     }
   */
-  const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
-
-  useEffect(() => {
-    const setImageDataFunc = async () => {
-      setImgData(await getImageData(props.imageID))
-    }
-    if(isOpen) {
-      setLoading(true)
-      setImageDataFunc()
-    }
-  }, [isOpen]);
-
   useEffect(() => {
     const setSecondaryDataFunc = async () => {
       setUploaderData(await getUserData(imgData['uploader']))
       setCreatorData(await getUserData(imgData['creator']))
+      setUploadTimestamp(new Date(Date.parse(imgData['upload_timestamp'])))
     }
     setSecondaryDataFunc()
     setLoading(false)
@@ -149,7 +152,7 @@ export default function PhotoModal(props) {
               </ModalBody>
               <ModalFooter className="flex flex-col max-w-full opacity-0 -mt-32 pb-2 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
                 <Conditional showWhen={!loading}>
-                  <p>Uploaded: {imgData['upload_timestamp']}</p>
+                  <p>Uploaded: {convertToLocalTZString(uploadTimestamp)}</p>
                   <p>Filename: {imgData['filename']}</p>
                   <Button 
                     as={Link}
