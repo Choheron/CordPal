@@ -133,6 +133,7 @@ export default function UploadPhotoModal(props) {
                 />
                 <UserDropdown 
                   label="Creator"
+                  isRequired
                   placeholder="Who created this image?"
                   isMultipleChoice={false} 
                   setSelectionCallback={setCreator} 
@@ -146,7 +147,7 @@ export default function UploadPhotoModal(props) {
                 </Button>
                 <Button 
                   color="primary" 
-                  isDisabled={!((titleValue !== "") && fileChosen)}
+                  isDisabled={!((titleValue !== "") && fileChosen && (creator !== ""))}
                   onPress={uploadPress}
                 >
                   Upload
