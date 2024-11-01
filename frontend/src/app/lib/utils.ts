@@ -19,5 +19,5 @@ export function convertToLocalTZString(date: Date) {
   let splitString = adjDateString.split(" ")
   // Delete not required string elements
   splitString = splitString.slice(1, 4+1)
-  return `${splitString[0]} ${splitString[1]} ${splitString[2]}, ${splitString[3]}`
+  return `${splitString[0]} ${splitString[1]} ${splitString[2]}`
 }
