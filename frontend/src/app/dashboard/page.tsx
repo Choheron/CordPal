@@ -14,7 +14,7 @@ export default async function Page() {
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
       <PageTitle text="Homepage" />
-      <div className="flex flex-col w-full lg:w-1/2 lg:justify-around lg:flex-row" >
+      <div className="flex flex-col w-full lg:w-10/12 lg:justify-around lg:flex-row" >
         <div className="flex flex-col items-center mx-auto">
           <p>Here is your discord user data:</p>
           <p className="b pt-10 pb-6 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
