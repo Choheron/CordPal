@@ -14,7 +14,10 @@ export default async function QuoteCounts(props) {
     return (
       <div key={key} className="flex justify-between w-full min-w-64">
         <div>
-          <UserCard userDiscordID={key}/>
+          <UserCard 
+            userDiscordID={key} 
+            fallbackName={quotesJson[key]['nickname'].charAt(0).toUpperCase() + quotesJson[key]['nickname'].slice(1)} 
+          />
         </div>
         <p className="my-auto">{quotesJson[key]['quoteList'].length}</p>
       </div>
