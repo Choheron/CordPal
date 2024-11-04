@@ -11,17 +11,20 @@ export default async function QuoteCounts(props) {
 
   // Return counts for all users quotes in formatted list
   const quoteCountRender: ReactNode = Object.keys(quotesJson).sort((a, b) => quotesJson[a]['quoteList'].length < quotesJson[b]['quoteList'].length ? 1 : -1).map((key) => {
-    return (
-      <div key={key} className="flex justify-between w-full min-w-64">
-        <div>
-          <UserCard 
-            userDiscordID={key} 
-            fallbackName={quotesJson[key]['nickname'].charAt(0).toUpperCase() + quotesJson[key]['nickname'].slice(1)} 
-          />
+    // Conditionally render in case there exists a user with no quotes, in which case they should not be shown in the count
+    if(quotesJson[key]['quoteList'].length != 0) {
+      return (
+        <div key={key} className="flex justify-between w-full min-w-64">
+          <div>
+            <UserCard 
+              userDiscordID={key} 
+              fallbackName={quotesJson[key]['nickname'].charAt(0).toUpperCase() + quotesJson[key]['nickname'].slice(1)} 
+            />
+          </div>
+          <p className="my-auto">{quotesJson[key]['quoteList'].length}</p>
         </div>
-        <p className="my-auto">{quotesJson[key]['quoteList'].length}</p>
-      </div>
-    )
+      )
+    }
   });
 
   return (
