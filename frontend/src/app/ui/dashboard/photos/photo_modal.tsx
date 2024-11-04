@@ -143,6 +143,7 @@ export default function PhotoModal(props) {
               <ModalBody className="p-0 filter h-fit group-hover:brightness-50 group-hover:blur-md duration-1000 ease-in-out">
                 <Image
                   alt={imgData['title']}
+                  loading="lazy"
                   className="object-cover"
                   width={0}
                   height={0}
