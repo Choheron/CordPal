@@ -14,7 +14,7 @@ export default function AboutAccordion(props) {
         This feature is currently a Work In Progress. However, the end goal is to allow users of the site to upload video clips and tag users who are included in them. This has the main function of being for video game clips.
       </AccordionItem>
       <AccordionItem key="2" aria-label="Photoshops" title="Photoshops">
-        This is a page that allows users to upload images from their devices that they can then provide titles, descriptions, tagged users, and creator/artist. This is mainly used for photoshops of user's friends and other inside jokes. 
+        This is a page that allows users to upload images from their devices that they can then provide titles, descriptions, tagged users, and creator/artist. This is mainly used for photoshops of user&apos;s friends and other inside jokes. 
       </AccordionItem>
       <AccordionItem key="3" aria-label="Quotes" title="Quotes">
         This page and functionality is the one that started it all! This website has integrations with a discord bot I maintain for the users in our discord server. That bot allows you to record quotes that a member of the server has said and
