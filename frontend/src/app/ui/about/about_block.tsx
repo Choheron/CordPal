@@ -1,6 +1,6 @@
-import { getDiscordUserData } from "@/app/lib/discord_utils";
 import { Conditional } from "../dashboard/conditional";
 import Image from 'next/image';
+import AboutAccordion from "./about_accordion";
 
 
 // Display an about page
@@ -38,9 +38,9 @@ export default async function AboutBlock(props) {
           What can the website do? Do you have further plans?
         </h3>
         <p className="pl-2">
-          This website currently does lots of inside joke-y things. It displays quote data from users in the discord, it has a page showing photoshops we have done, and it has a todo page. I plan on expanding and adding new functionality as I come up with it! Eventually I would like to 
-          expand the functionality to allow for use across multiple discords and perhaps allow multi-user sign up, if I ever reached that point.
+          This website currently does lots of inside joke-y things.
         </p>
+        <AboutAccordion />
         <p className="w-full text-center italic">
           But until then, its just a fun side project!
         </p>
@@ -77,7 +77,7 @@ export default async function AboutBlock(props) {
           Who am I?
         </h3>
         <p className="pl-2">
-          My name is <a href="https://thomascampbell.dev/" className="text-blue-500 hover:underline">Thomas Campbell</a>! I am a DevOps Engineer with a passion for coding and creating things.
+          My name is <a href="https://thomascampbell.dev/" className="text-blue-500 hover:underline">Thomas Campbell</a>! I am passionate about creating things and learning as much as I can!
         </p>
       </div>
     </div>
