@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import clsx from "clsx";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { getAllTodoItems, getTodoOptions } from "@/app/lib/todo_uils";
 import TodoItem from "@/app/ui/dashboard/todo/todo_item";
@@ -33,19 +32,19 @@ export default async function todo() {
   });
 
   return (
-    <main className="flex flex-col items-center px-24 pt-10">
+    <main className="flex flex-col items-center lg:px-24 pt-10">
       <PageTitle text="Todo" />
       <Conditional showWhen={adminStatus}>
         <AddTodoModal todoOptions={todoCreateOptions}/>
       </Conditional>
-      <div className="w-1/2 p-5 pt-0 pl-10">
+      <div className="w-11/12 lg:w-3/4 lg:p-5 pt-0 lg:pl-10">
         <table className="table-fixed w-full rounded-xl bg-gray-700">
           <thead>
             <tr className="border-gray-500 border-b">
-              <th className=" text-xl py-1 px-3">
+              <th className="text-xl py-1 px-3">
                 Work Item
               </th>
-              <th className="w-1/5 text-xl border-gray-500 border-l py-1 px-3">
+              <th className={`w-1/5 text-xl border-gray-500 border-l py-1 px-3`}>
                 Completion Status
               </th>
               <th className="w-2/12 text-xl border-gray-500 border-l py-1 px-3">

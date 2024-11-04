@@ -22,7 +22,7 @@ export default async function photos() {
     }
 
     return (
-      <div className="flex gap-6 w-3/4">
+      <div className="flex flex-col lg:flex-row gap-6 w-11/12 lg:w-3/4">
         { fileListList.map((list: string[], listIndex: number) => (
           <div key={listIndex} className="w-full flex flex-col gap-6 items-center pt-3">
             { list.map((id: string, index: number) => (
@@ -39,7 +39,7 @@ export default async function photos() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24 pt-10">
+    <main className="flex min-h-screen flex-col items-center lg:p-24 pt-10">
       <PageTitle text="Photoshops" />
       <UploadPhotoModal />
       {loadImages()}

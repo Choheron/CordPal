@@ -14,8 +14,8 @@ export default async function Page() {
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
       <PageTitle text="Homepage" />
-      <div className="flex" >
-        <div className="flex flex-col items-center mr-10">
+      <div className="flex flex-col w-full lg:w-1/2 lg:justify-around lg:flex-row" >
+        <div className="flex flex-col items-center mx-auto">
           <p>Here is your discord user data:</p>
           <p className="b pt-10 pb-6 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
             ID: {discordUserData['id']}<br/>
@@ -37,7 +37,7 @@ export default async function Page() {
             Click <a href="https://discord.com/developers/docs/resources/user" target="_blank" className="underline italic"><b>here</b></a> for more info on what all of this means!
           </p>
         </div>
-        <div className="flex flex-col items-center ml-10">
+        <div className="flex flex-col items-center mx-auto">
           <p>Here is the data this site has stored in the DB:</p>
           <p className="b pt-10 pb-6 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
             Discord ID: {userData['discord_id']}<br/>

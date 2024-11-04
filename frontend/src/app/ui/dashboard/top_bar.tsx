@@ -30,7 +30,7 @@ export default function TopBar(props) {
 
   return (
     <div className="flex flex-col items-center justify-between p-24 pb-0">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex">
+      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex flex-col lg:flex-row">
         <User
           className="w-auto ml-5 py-2 px-2 backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800"
           name={props.userInfo['nickname']}
@@ -64,7 +64,7 @@ export default function TopBar(props) {
           Nanophage
         </a>
       </div>
-      <div className="z-10 w-full max-w-5xl items-center justify-around font-mono text-sm flex pt-5">
+      <div className="z-10 w-full max-w-5xl items-center justify-around font-mono text-sm flex flex-col lg:flex-row pt-5">
         {links.map((link, index) => {
             return(
               <Conditional 
