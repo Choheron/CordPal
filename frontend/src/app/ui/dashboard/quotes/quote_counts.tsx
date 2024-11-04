@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import UserCard from "../../general/userUiItems/user_card";
 
 // Display Counts of user quotes
 // Expected Props:
@@ -12,8 +13,10 @@ export default async function QuoteCounts(props) {
   const quoteCountRender: ReactNode = Object.keys(quotesJson).sort((a, b) => quotesJson[a]['quoteList'].length < quotesJson[b]['quoteList'].length ? 1 : -1).map((key) => {
     return (
       <div key={key} className="flex justify-between w-full min-w-64">
-        <p>{quotesJson[key]['nickname'].charAt(0).toUpperCase() + quotesJson[key]['nickname'].slice(1)}</p>
-        <p>{quotesJson[key]['quoteList'].length}</p>
+        <div>
+          <UserCard userDiscordID={key}/>
+        </div>
+        <p className="my-auto">{quotesJson[key]['quoteList'].length}</p>
       </div>
     )
   });
