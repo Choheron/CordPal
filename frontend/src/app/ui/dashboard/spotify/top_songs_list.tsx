@@ -1,5 +1,3 @@
-'use client'
-
 import {Avatar} from "@nextui-org/react";
 
 // Gui Column mapping passed in song data and displaying the passed in title
@@ -7,9 +5,6 @@ import {Avatar} from "@nextui-org/react";
 //  - title: Title of the list
 //  - trackData: List of objects to be shown
 export default function TopSongsBox(props) {
-
-  console.log(props.trackData)
-
   const mapSongList = props.trackData['items'].map((song_obj, index) => {
     // Extract data from massive JSON
     const album_img_src = song_obj['album']['images'][0]['url']
