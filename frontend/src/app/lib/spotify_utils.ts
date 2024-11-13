@@ -19,7 +19,7 @@ export async function isSpotifyLinked() {
   const spotLinkedResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/connected`, {
     method: "GET",
     credentials: "include",
-    cache: 'force-cache',
+    cache: 'no-cache',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
@@ -40,10 +40,30 @@ export async function getSpotifyData() {
   const spotifyUserData = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getSpotifyData`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'force-cache',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
   });
   return await spotifyUserData.json();
+}
+
+// 
+// Retrieve top items from passed in params.
+// - RETURN: JSON Objects 
+//
+export async function getSpotifyTopItems(type, time_range, limit, offset) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log("getSpotifyData: Sending request to backend '/spotifyapi/getTopItems'")
+  const spotifyTopItemsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getTopItems/${type}/${time_range}/${limit}/${offset}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  return await spotifyTopItemsResponse.json();
 }

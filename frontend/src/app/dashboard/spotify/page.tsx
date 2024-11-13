@@ -1,11 +1,16 @@
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { Conditional } from "@/app/ui/dashboard/conditional";
 import SpotifyLoginBox from "@/app/ui/dashboard/spotify/spotify_login_box";
-import { getSpotifyData, isSpotifyLinked } from "@/app/lib/spotify_utils";
+import { getSpotifyData, getSpotifyTopItems, isSpotifyLinked } from "@/app/lib/spotify_utils";
+import TopSongsBox from "@/app/ui/dashboard/spotify/top_songs_list";
 
 export default async function music() {
   const spot_authenticated = await isSpotifyLinked();
   const spotifyUserData = await getSpotifyData();
+  // Collect data on tracks for all three timeframes
+  const shortTerm = await getSpotifyTopItems("tracks", "short_term", "50", 0)
+  const mediumTerm = await getSpotifyTopItems("tracks", "medium_term", "50", 0)
+  const longTerm = await getSpotifyTopItems("tracks", "long_term", "50", 0)
 
   return (
     <div className="flex min-h-screen flex-col items-center p-24 pt-10">
@@ -14,7 +19,20 @@ export default async function music() {
         <SpotifyLoginBox />
       </Conditional>
       <Conditional showWhen={spot_authenticated}>
-        <p>You have authenticated with spotify!</p>
+        <div className="flex flex-row w-4/5 gap-5">
+          <TopSongsBox 
+            title={"Top Songs (4 Weeks)"}
+            trackData={shortTerm}
+          />
+          <TopSongsBox 
+            title={"Top Songs (6 Months)"}
+            trackData={mediumTerm}
+          />
+          <TopSongsBox 
+            title={"Top Songs (1 Year)"}
+            trackData={longTerm}
+          />
+        </div>
       </Conditional>
     </div>
   );

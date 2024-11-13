@@ -7,4 +7,5 @@ urlpatterns = [
   path('token', views.doSpotifyTokenSwap),
   path('connected', views.isSpotifyConnected),
   path('getSpotifyData', views.getSpotifyData),
+  path('getTopItems/<str:item_type>/<str:time_range>/<str:limit>/<str:offset>', views.getTopItems),
 ]

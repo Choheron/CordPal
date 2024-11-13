@@ -30,10 +30,11 @@ export default function SettingsModal(props) {
       return (
         <User   
           name={integrationObject['branding_name']}
-          description={(integrationObject['data'] == null) ? "Not Connected" : ("Connected to Account: " + integrationObject['data']['display_name'])}
+          key={integrationObject['branding_name']}
+          description={(Object.keys(integrationObject['data']).length == 0) ? "Not Connected" : ("Connected to Account: " + integrationObject['data']['display_name'])}
           avatarProps={{
             src: integrationObject['branding_avatar_path'],
-            isDisabled: (integrationObject['data'] == null)
+            isDisabled: (Object.keys(integrationObject['data']).length == 0)
           }}
         />
       )

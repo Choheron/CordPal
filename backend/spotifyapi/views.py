@@ -6,6 +6,7 @@ from .utils import (
   storeSpotDataInSession,
   createSpotifyUserFromResponse,
   isSpotifyTokenExpired,
+  refreshSpotifyToken,
   isUserSpotifyConnected,
 )
 
@@ -27,6 +28,7 @@ logger = logging.getLogger('django')
 APP_ENV = os.getenv('APP_ENV') or 'DEV'
 load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 
+
 ###
 # Check if a user has connected spotify to their account
 ###
@@ -40,6 +42,7 @@ def isSpotifyConnected(request: HttpRequest):
     return res
   # return jsonResponse containing status
   return JsonResponse({'connected': isUserSpotifyConnected(request)})
+
 
 ###
 # Exchange spotify auth code for spotify api token. This will create a spotify user data entry, which has a one-to-one relationship with a user.
@@ -82,7 +85,7 @@ def doSpotifyTokenSwap(request: HttpRequest):
   storeSpotDataInSession(request, spotifyResJSON)
   # Retrieve spotify user data to set up an account
   reqHeaders = {
-    'Authorization': f"Authorization: Bearer {request.session['access_token']}"
+    'Authorization': f"Authorization: Bearer {request.session['spotify_access_token']}"
   }
   try:
     logger.info("Making request to spotify api for User Data to create spotify user entry...")
@@ -102,6 +105,7 @@ def doSpotifyTokenSwap(request: HttpRequest):
   logger.info("Returning HTTP 200 Response...")
   return HttpResponse(content=messageOut, content_type='text/json', status=200)
   
+
 ###
 # Retrieve spotify Data from databse for current user
 ###
@@ -123,4 +127,36 @@ def getSpotifyData(request: HttpRequest):
     dir_response['user_discord_id'] = userSpotObj.user.discord_id
     return JsonResponse(dir_response)
   else:
-    return JsonResponse(None)
+    return JsonResponse({})
+  
+
+###
+# Get Top Items for User, expects body items of type, time_range, limit, and offset...
+###
+def getTopItems(request: HttpRequest, item_type, time_range, limit, offset):
+  logger.info("getTopItems called...")
+  # Check for expired token
+  if(isSpotifyTokenExpired(request)):
+    refreshSpotifyToken(request)
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getSpotifyToken called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Prepare Header Data
+  reqHeaders = { 
+    'Authorization': f"Authorization: Bearer {request.session.get('spotify_access_token')}"
+  }
+  # Make request to spotify api
+  logger.info(f"Making request to spotify for top items with following requests: type={item_type}, time_range={time_range}, limit={limit}, offset={offset} USER: {request.session.get('discord_id')}...")
+  spotifyRes = requests.get(f"https://api.spotify.com/v1/me/top/{item_type}?time_range={time_range}&limit={limit}&offset={offset}", headers=reqHeaders)
+  if(spotifyRes.status_code != 200):
+    print("Error in request:\n" + str(spotifyRes.json()))
+    spotifyRes.raise_for_status()
+  # Convert response to Json
+  logger.info("Spotify api returned, converting to json...")
+  spotifyResJSON = spotifyRes.json()
+  # TODO: Add logic here to store this data (massive data) to allow users to view other user's data
+  # Return Spotify Response
+  return JsonResponse(spotifyResJSON)

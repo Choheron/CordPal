@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 
 import Image from "next/image";
 
-export default function callback({ searchParams, }: { searchParams: { [key: string]: string | string[] | undefined }; }) {
+export default function Callback({ searchParams, }: { searchParams: { [key: string]: string | string[] | undefined }; }) {
   const router = useRouter();
   const code = searchParams["code"] ?? "NO CODE";
   // Redirect user to login page if code is bad

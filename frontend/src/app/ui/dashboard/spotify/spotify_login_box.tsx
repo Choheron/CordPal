@@ -7,7 +7,7 @@ export default async function SpotifyLoginBox(props) {
   const spot_scope = 'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-follow-read user-follow-modify user-read-playback-position user-top-read user-read-recently-played user-library-modify user-library-read user-read-email user-read-private'
   const params = new URLSearchParams({
     response_type: 'code',
-    client_id: String(process.env.SPOTIFY_CLIENT_ID),
+    client_id: String(process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID),
     scope: spot_scope,
     redirect_uri: String(process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI),
   });
