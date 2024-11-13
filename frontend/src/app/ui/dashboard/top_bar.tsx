@@ -14,22 +14,24 @@ import SettingsModal from "./settings_modal";
 //  - isMember: Boolean indicating if the current session user is a member of the desired server
 //  - userInfo: JSON Containing user information
 //  - avatarURL: String URL of Discord User's Avatar
+//  - linkedAccounts: List containing data surrounding linked accounts
 export default function TopBar(props) {
   const pathname = usePathname();
 
   // Map of links to display in the side navigation.
   // This should be moved to a database once it reaches a certian size
   const links = [
-    { name: 'Home', href: '/dashboard', conditional: true },
-    { name: 'Clips', href: '/dashboard/clips', conditional: props['isMember'] },
-    { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'] },
-    { name: 'Quotes', href: '/dashboard/quotes', conditional: props['isMember'] },
-    { name: 'Todo List', href: '/dashboard/todo', conditional: props['isMember'] },
-    { name: 'About', href: '/dashboard/about', conditional: true },
+    { name: 'Home', href: '/dashboard', conditional: true, disabled: false },
+    { name: 'Clips', href: '/dashboard/clips', conditional: props['isMember'], disabled: false },
+    { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'], disabled: false },
+    { name: 'Quotes', href: '/dashboard/quotes', conditional: props['isMember'], disabled: false },
+    { name: 'Spotify', href: '/dashboard/spotify', conditional: props['isMember'], disabled: false },
+    { name: 'Todo List', href: '/dashboard/todo', conditional: props['isMember'], disabled: false },
+    { name: 'About', href: '/dashboard/about', conditional: true, disabled: false },
   ];
 
   return (
-    <div className="flex flex-col items-center justify-between p-24 pb-0">
+    <div className="flex flex-col items-center justify-between px-24 pt-10 pb-0">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex flex-col lg:flex-row">
         <User
           className="w-auto ml-5 py-2 px-2 backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800"
@@ -38,6 +40,7 @@ export default function TopBar(props) {
             <SettingsModal 
               userInfo={props.userInfo}
               avatarURL={props.avatarURL}
+              linkedAccounts={props.linkedAccounts}
             />
           )}
           avatarProps={{
@@ -69,7 +72,7 @@ export default function TopBar(props) {
             return(
               <Conditional 
                 key={index}
-                showWhen={link.conditional}
+                showWhen={link.conditional && !link.disabled}
               >
                 <Link 
                   key={index}

@@ -1,9 +1,5 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 
-from backend.utils import (
-  postToDiscordWebhook,
-)
-
 from users.utils import (
   doesUserExist,
   createUserFromDiscordJSON,
@@ -28,9 +24,7 @@ logger = logging.getLogger('django')
 
 # Determine runtime enviornment
 APP_ENV = os.getenv('APP_ENV') or 'DEV'
-
 load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
-
 
 ###
 # Exchange discord auth code for discord api token (part of the login flow)

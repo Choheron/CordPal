@@ -43,3 +43,13 @@ def doesUserExist(id):
     return True
   except ObjectDoesNotExist:
     return False
+  
+
+###
+# Return User Object corresponding to discord id
+###
+def getSpotifyUser(discord_id):
+  try:
+    return User.objects.filter(discord_id=discord_id).first()
+  except ObjectDoesNotExist:
+    return None

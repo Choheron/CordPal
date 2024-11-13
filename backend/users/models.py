@@ -21,6 +21,8 @@ class User(models.Model):
   discord_discriminator = models.CharField(max_length=4, null=True, blank=True)  # 4-digit tag from Discord
   discord_is_verified = models.BooleanField(default=False)  # Discord account email verification status
   discord_avatar = models.CharField(max_length=255, null=True, blank=True)  # Avatar hash
+  # Spotify Integration Flag
+  spotify_connected = models.BooleanField(default=False)
   # User Permissions Fields
   is_active = models.BooleanField(default=True)
   is_staff = models.BooleanField(default=False)

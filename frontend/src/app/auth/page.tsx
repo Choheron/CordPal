@@ -18,7 +18,7 @@ export default async function Page({ searchParams, }: { searchParams: { [key: st
       // Do Auth Handshake...
       const reqData = {
       'code': code,
-      'redirect_uri': process.env.NEXT_PUBLIC_REDIRECT_URI,
+      'redirect_uri': process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI,
       }
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL_CLIENT}/discordapi/token`, {
         method: "POST",

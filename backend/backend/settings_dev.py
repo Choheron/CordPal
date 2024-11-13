@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'todo.apps.TodoConfig',
     'users.apps.UsersConfig',
     'photos.apps.PhotosConfig',
+    'spotifyapi.apps.SpotifyapiConfig',
     # Outside Apps
     "corsheaders",
 ]

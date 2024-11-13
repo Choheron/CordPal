@@ -6,6 +6,7 @@ import {
   ModalFooter,
   useDisclosure
 } from "@nextui-org/modal";
+import {User} from "@nextui-org/user";
 import { Button } from "@nextui-org/react";
 import {Input} from "@nextui-org/react";
 import React from "react";
@@ -17,11 +18,27 @@ import { updateUserData } from "@/app/lib/user_utils";
 // Expected props:
 //  - userInfo: JSON Containing user information
 //  - avatarURL: String URL of Discord User's Avatar
+//  - linkedAccounts: List containing connected account data 
 export default function SettingsModal(props) {
   const [emailValue, setEmailValue] = React.useState(props.userInfo['email']);
   const [nicknameValue, setNicknameValue] = React.useState(props.userInfo['nickname']);
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
+
+  function linkedAccountsBlock() {
+    return props.linkedAccounts.map((integrationObject) => {
+      return (
+        <User   
+          name={integrationObject['branding_name']}
+          description={(integrationObject['data'] == null) ? "Not Connected" : ("Connected to Account: " + integrationObject['data']['display_name'])}
+          avatarProps={{
+            src: integrationObject['branding_avatar_path'],
+            isDisabled: (integrationObject['data'] == null)
+          }}
+        />
+      )
+    })
+  }
 
   function inputsGUI() {
     return (
@@ -98,12 +115,16 @@ export default function SettingsModal(props) {
                 <p> 
                   This page allows you to view and update the data stored in the database and shown on the webpages.
                 </p>
+                <p>Linked Accounts:</p>
+                <div>
+                  {linkedAccountsBlock()}
+                </div>
                 <p>The below fields can be changed:</p>
                 {inputsGUI()}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={cancelPress}>
-                  Cancel
+                  Close
                 </Button>
                 <Button color="primary" onPress={updatePress}>
                   Update
