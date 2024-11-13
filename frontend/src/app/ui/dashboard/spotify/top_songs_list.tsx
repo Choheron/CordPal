@@ -17,7 +17,7 @@ export default function TopSongsBox(props) {
 
     // Return Data
     return (
-      <div className="flex">
+      <div className="flex" key={index + 1}>
         <h1 className="text-lg my-auto mr-2">{index + 1}.</h1>
         <div className="flex flex-row w-full">
           <Avatar src={album_img_src} className="w-16 h-16 text-large" />

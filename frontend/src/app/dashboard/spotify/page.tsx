@@ -13,13 +13,13 @@ export default async function music() {
   const longTerm = await getSpotifyTopItems("tracks", "long_term", "50", 0)
 
   return (
-    <div className="flex min-h-screen flex-col items-center p-24 pt-10">
+    <div className="flex min-h-screen flex-col items-center p-3 md:p-24 pt-10">
       <PageTitle text="Spotify" />
       <Conditional showWhen={!spot_authenticated}>
         <SpotifyLoginBox />
       </Conditional>
       <Conditional showWhen={spot_authenticated}>
-        <div className="flex flex-row w-4/5 gap-5">
+        <div className="flex flex-col pb-36 sm:flex-row w-4/5 gap-5">
           <TopSongsBox 
             title={"Top Songs (4 Weeks)"}
             trackData={shortTerm}
