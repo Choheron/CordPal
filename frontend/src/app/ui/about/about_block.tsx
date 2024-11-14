@@ -1,6 +1,7 @@
 import { Conditional } from "../dashboard/conditional";
 import Image from 'next/image';
 import AboutAccordion from "./about_accordion";
+import { Divider } from "@nextui-org/divider";
 
 
 // Display an about page
@@ -58,7 +59,8 @@ export default async function AboutBlock(props) {
             <li>A Discord Bot written in <a href="https://www.python.org/" className="text-blue-500 hover:underline">Python</a></li>
           </ol>
           <p>
-            The two main instances handle the serving of the frontend and the handling/tranforming/retrieval of data from a (currently) in memory database on the backend, via an api layer. The third compute instance runs the discord bot that users can interact with, within the server. All of these
+            The two main instances handle the serving of the frontend and the handling/tranforming/retrieval of data from a (currently) in memory database on the backend, 
+            via an api layer. The third compute instance runs the discord bot that users can interact with, within the server. All of these
             instances are containerized and self-hosted so that I can have full control over the process and learn as much as possible. Below is a simplified infra diagram:
           </p>
           <Conditional showWhen={loggedIn}>
@@ -77,8 +79,25 @@ export default async function AboutBlock(props) {
           Who am I?
         </h3>
         <p className="pl-2">
-          My name is <a href="https://thomascampbell.dev/" className="text-blue-500 hover:underline">Thomas Campbell</a>! I am passionate about creating things and learning as much as I can!
+          My name is <a href="https://thomascampbell.dev/" className="text-blue-500 hover:underline">Thomas Campbell</a>! I am passionate about creating 
+          things and learning as much as I can!
         </p>
+        <Divider className="mt-2 mb-1"/>
+        <h3 className="text-2xl italic pt-1">
+          3rd Party Attributions:
+        </h3>
+        <p className="pl-2">
+          A special thanks to all 3rd party libraries and APIs that make this website possible as a passion project. Libraries and APIs listed below:
+        </p>
+        <ul className="list-disc pl-10 text-sm">
+          <li><a href="https://nextjs.org/" className="text-blue-500 hover:underline">NextJS</a> - Frontend</li>
+          <li><a href="https://nextui.org/" className="text-blue-500 hover:underline">NextUI</a> - Frontend UI library to make my life as a DevOps guy easier</li>
+          <li>
+            <a href="https://developer.spotify.com/documentation/web-api" className="text-blue-500 hover:underline">Spotify API</a> - All songs and artist related 
+            media is property of spotify and/or the respective artist.
+          </li>
+          <li><a href="https://discord.com/developers/docs/intro" className="text-blue-500 hover:underline">Discord API</a> - The start of the whole project.</li>
+        </ul>
       </div>
     </div>
   );

@@ -31,7 +31,7 @@ export default function TopBar(props) {
   ];
 
   return (
-    <div className="flex flex-col items-center justify-between px-24 pt-10 pb-0">
+    <div className="flex flex-col items-center justify-between px-24 pt-20 lg:pt-10 pb-0">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex flex-col lg:flex-row">
         <User
           className="w-auto ml-5 py-2 px-2 backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800"

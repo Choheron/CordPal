@@ -65,7 +65,6 @@ export default function TopSongsBox(props) {
       }
     }
     mapData()
-    console.log(trackData)
     setLoading(false)
   }, [trackData]);
 

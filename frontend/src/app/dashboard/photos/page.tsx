@@ -39,7 +39,7 @@ export default async function photos() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center lg:p-24 pt-10">
+    <main className="flex min-h-screen flex-col items-center lg:px-24 pt-10">
       <PageTitle text="Photoshops" />
       <UploadPhotoModal />
       {loadImages()}

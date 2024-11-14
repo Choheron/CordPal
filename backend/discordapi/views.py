@@ -148,28 +148,29 @@ def validateServerMember(request: HttpRequest):
     'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
   }
   # Send Request to API
-  logger.info("Making request to discord api for server member validation...")
+  logger.info("Making request to discord api for server member object to check member and role...")
   try:
-    discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me/guilds", headers=reqHeaders)
-    if(discordRes.status_code != 200):
-      print("Error in request:\n" + str(discordRes.json()))
-      discordRes.raise_for_status()
+    discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me/guilds/{os.getenv('CORD_SERVER_ID')}/member", headers=reqHeaders)
+    # NOTE: Not handling error code response here due to the nature of how im handling validation
   except:
     return HttpResponse(status=500)
   # Convert response to List
-  discordResList = discordRes.json()
-  # Loop through servers and check if member of correct server
+  discordResList: dict = discordRes.json()
+  # Determine if user has been given an error response, meaning they are not a member of the guild
   logger.info("Checking if user is in server...")
-  member = False
-  for server in discordResList:
-    if(server['id'] == os.getenv('CORD_SERVER_ID')):
-      logger.info("User is in server!")
-      member = True
-      break
+  member = not('message' in discordResList.keys())
+  # print message
+  if(not member):
+    logger.info(discordResList)
+  # If user IS a member of the server, check that they have the required role
+  hasRole = False
+  if(member):
+    hasRole = os.getenv('CORD_ROLE_ID') in discordResList['roles']
   # Return JsonResponse containing true or false in body
   logger.info("Returning member status...")
   out = {}
   out['member'] = member
+  out['role'] = hasRole
   return JsonResponse(out)
 
 

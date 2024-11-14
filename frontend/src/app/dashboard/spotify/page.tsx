@@ -9,7 +9,7 @@ export default async function music() {
   const spotifyUserData = await getSpotifyData();
 
   return (
-    <div className="flex min-h-screen flex-col items-center p-3 md:p-24 pt-10">
+    <div className="flex min-h-screen flex-col items-center p-3 md:px-24 pt-10">
       <PageTitle text="Spotify" />
       <Conditional showWhen={!spot_authenticated}>
         <SpotifyLoginBox />

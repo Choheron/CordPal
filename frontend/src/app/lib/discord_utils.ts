@@ -24,7 +24,8 @@ export async function isMember() {
       Cookie: `sessionid=${sessionCookie};`
     }
   });
-  const isMemberOfServer: boolean = (await memberResponse.json())['member'];
+  const responseObj = await memberResponse.json()
+  const isMemberOfServer: boolean = responseObj['member'] && responseObj['role'];
   return isMemberOfServer;
 }
 

@@ -1,6 +1,7 @@
 'use server'
 
 import Image from "next/image"
+import {Divider} from "@nextui-org/divider";
 
 export default async function SpotifyLoginBox(props) {
 
@@ -14,8 +15,8 @@ export default async function SpotifyLoginBox(props) {
   const spotifyLoginUrl = "https://accounts.spotify.com/authorize?" + params.toString();
 
   return (
-    <div className="flex flex-col w-11/12 sm:w-2/5 rounded-xl ml-5 py-2 px-2 backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800">
-      <p className="mx-auto text-center">In order to view your spotify data and participate in album of the day:</p>
+    <div className="flex flex-col w-11/12 sm:w-2/5 rounded-xl mb-3 py-2 px-2  backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800">
+      <p className="mx-auto text-center">In order to view your personalized spotify data:</p>
       <div className="flex flex-col md:flex-row justify-center mx-auto">
         <p className="my-auto text-center">Login with &nbsp;</p>
         <a href={spotifyLoginUrl} className="w-full md:w-1/5">
@@ -28,6 +29,11 @@ export default async function SpotifyLoginBox(props) {
           />
         </a>
       </div>
+      <Divider className="my-2" />
+      <p className="mx-auto text-center text-sm">
+        Note: Please contact site owner &#40;Thomas Campbell&#41; to have your full name and email added to the Spotify api.
+        This is required because spotify has my app in &quot;Developer Mode&quot; which forces me to manually enter user data to allow api usage. 
+      </p>
     </div>
   )
 }
