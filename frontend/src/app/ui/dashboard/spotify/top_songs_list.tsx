@@ -48,6 +48,7 @@ export default function TopSongsBox(props) {
 
             return (
               <Badge 
+                key={index + 1}
                 content={(index + 1) + "."} 
                 size="lg" 
                 color="primary" 
@@ -58,7 +59,6 @@ export default function TopSongsBox(props) {
                 className="-ml-4"
               >
                 <Card 
-                  key={index + 1}
                   className="h-28 w-full"
                 >
                   <CardHeader className="absolute my-auto z-10 top-1 flex !items-start">
