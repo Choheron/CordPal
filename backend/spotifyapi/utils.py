@@ -40,6 +40,7 @@ def storeSpotDataInSession(request: HttpRequest, spotifyResJSON: json):
   expiryTime = datetime.datetime.now() + datetime.timedelta(seconds=spotifyResJSON['expires_in'])
   request.session["spotify_expiry_date"] = expiryTime.strftime("%d-%m-%Y %H:%M:%S")
   request.session['spotify_refresh_token'] = spotifyResJSON['refresh_token']
+  request.session.modified = True
   # Return True
   return True
 
@@ -86,6 +87,7 @@ def refreshSpotifyToken(request: HttpRequest):
 
 
 def createSpotifyUserFromResponse(request: HttpRequest, spotifyResJSON: json):
+  logger.info("createSpotifyUserFromResponse starting...")
   # Retrieve users discord_id from session
   discord_id = request.session.get("discord_id")
   # Get user object from DB
@@ -110,8 +112,6 @@ def createSpotifyUserFromResponse(request: HttpRequest, spotifyResJSON: json):
   # If user data for image exists, set it
   if(len(spotifyResJSON['images']) > 0):
     spotifyUser.user_pfp_url = spotifyResJSON['images'][0]['url'],
-    spotifyUser.user_pfp_height = spotifyResJSON['images'][0]['height'],
-    spotifyUser.user_pfp_width = spotifyResJSON['images'][0]['width'],
   # Save Spotify User Data Obj
   spotifyUser.save()
   # Toggle User's 'spotify_connected' Field
@@ -135,5 +135,5 @@ def isUserSpotifyConnected(request: HttpRequest):
     # Return boolean of spotify connection status
     return site_user.spotify_connected
   except Exception as e:
-    logger.error("SESSION COOKIE FOR SPOTIFY AGE NOT FOUND!!!")
+    logger.error("SESSION COOKIE FOR SPOTIFY NOT FOUND!!!")
     return False

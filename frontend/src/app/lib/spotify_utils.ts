@@ -40,7 +40,7 @@ export async function getSpotifyData() {
   const spotifyUserData = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getSpotifyData`, {
     method: "GET",
     credentials: "include",
-    cache: 'force-cache',
+    cache: 'no-cache',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }

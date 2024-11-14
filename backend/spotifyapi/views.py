@@ -85,15 +85,17 @@ def doSpotifyTokenSwap(request: HttpRequest):
   storeSpotDataInSession(request, spotifyResJSON)
   # Retrieve spotify user data to set up an account
   reqHeaders = {
-    'Authorization': f"Authorization: Bearer {request.session['spotify_access_token']}"
+    'Authorization': f"Bearer {spotifyResJSON['access_token']}"
   }
   try:
     logger.info("Making request to spotify api for User Data to create spotify user entry...")
+    logger.info(f"Making request to spotify with headers: {reqHeaders}...")
     spotifyRes = requests.get("https://api.spotify.com/v1/me", headers=reqHeaders)
     if(spotifyRes.status_code != 200):
-      print("Error in request:\n" + str(spotifyRes.json()))
+      print("Error in request:\n" + str(spotifyRes))
       spotifyRes.raise_for_status()
-  except:
+  except Exception as e:
+    logger.warning(f"Error getting user data from spotify! Error: {e}")
     return HttpResponse(status=500)
   # Convert response to Json
   spotifyResJSON = spotifyRes.json()
@@ -135,7 +137,6 @@ def getSpotifyData(request: HttpRequest):
 ###
 def getTopItems(request: HttpRequest, item_type, time_range, limit, offset):
   logger.info("getTopItems called...")
-  # Attempt to refresh token, if that fails, return a blank json object 
   # Check for expired token
   if(isSpotifyTokenExpired(request)):
     refreshSpotifyToken(request)
@@ -147,7 +148,7 @@ def getTopItems(request: HttpRequest, item_type, time_range, limit, offset):
     return res
   # Prepare Header Data
   reqHeaders = { 
-    'Authorization': f"Authorization: Bearer {request.session.get('spotify_access_token')}"
+    'Authorization': f"Bearer {request.session.get('spotify_access_token')}"
   }
   # Make request to spotify api
   logger.info(f"Making request to spotify for top items with following requests: type={item_type}, time_range={time_range}, limit={limit}, offset={offset} USER: {request.session.get('discord_id')}...")
