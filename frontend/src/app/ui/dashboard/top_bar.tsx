@@ -34,7 +34,7 @@ export default function TopBar(props) {
     <div className="flex flex-col items-center justify-between px-24 pt-20 lg:pt-10 pb-0">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex flex-col lg:flex-row">
         <User
-          className="w-auto ml-5 py-2 px-2 backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800"
+          className="fixed lg:static top-2.5 left-0 z-10 w-auto ml-5 py-2 px-2 backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800"
           name={props.userInfo['nickname']}
           description={(
             <SettingsModal 
@@ -50,13 +50,13 @@ export default function TopBar(props) {
         <div className="fixed bottom-0 left-0 flex-col h-48 w-full items-end justify-center bg-gradient-to-t from-black via-black lg:static lg:size-auto lg:bg-none">
           <Link 
             href="/logout"
-            className="fixed lg:static left-0 top-0 flex w-full justify-center pb-6 pt-8 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:w-auto lg:rounded-xl lg:border lg:p-4 hover:underline"
+            className="z-10 fixed lg:static right-0 top-0 flex w-full justify-end pb-6 pt-8 pr-4 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:w-auto lg:rounded-xl lg:border lg:p-4 hover:underline"
           >
             Logout
           </Link>
         </div>
       </div>
-      <div className="flex w-full max-w-5xl">
+      <div className="hidden lg:flex w-full max-w-5xl">
         <a
           className="pointer-events-none w-fit place-items-center gap-2 p-8 ml-6 font-mono text-sm lg:pointer-events-auto lg:p-0"
           href="https://homelab.nanophage.win"
