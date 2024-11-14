@@ -60,7 +60,7 @@ export async function getSpotifyTopItems(type, time_range, limit, offset) {
   const spotifyTopItemsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getTopItems/${type}/${time_range}/${limit}/${offset}`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'force-cache',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }

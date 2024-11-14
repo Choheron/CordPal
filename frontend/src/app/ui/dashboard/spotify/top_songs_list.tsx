@@ -1,5 +1,8 @@
 'use client'
 
+import { Image } from "@nextui-org/react";
+import {Badge} from "@nextui-org/badge";
+import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/card";
 import {Avatar} from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { getSpotifyTopItems } from "@/app/lib/spotify_utils";
@@ -35,43 +38,77 @@ export default function TopSongsBox(props) {
             // Extract data from massive JSON
             const album_img_src = song_obj['album']['images'][0]['url']
             const album_name = song_obj['album']['name']
+            const album_link = song_obj['album']['external_urls']['spotify']
             const album_release_date = song_obj['album']['release_date']
             const artist_name = song_obj['artists'][0]['name']
             const artist_link = song_obj['artists'][0]['external_urls']['spotify']
             const song_name = song_obj['name']
             const song_link = song_obj['external_urls']['spotify']
-      
-            // Return Data
+            
+
             return (
-              <div className="flex" key={index + 1}>
-                <h1 className="text-lg my-auto mr-2">{index + 1}.</h1>
-                <div className="flex flex-row w-full">
-                  <Avatar src={album_img_src} className="w-16 h-16 text-large" />
-                  <div className="flex flex-col ml-4">
-                    <p className="w-full line-clamp-1"><b>{song_name}</b></p>
-                    <p className="w-full line-clamp-1 text-sm">
-                      <a href={artist_link} target="_noreferrer" className="w-fit hover:text-purple-400">
-                        {artist_name}
-                      </a>
-                    - {album_name}
-                    </p>
-                    <a href={song_link} target="_noreferrer" className="underline hover:text-purple-400 w-fit text-sm">Listen</a>
-                  </div>
-                </div>
-              </div>
+              <Badge 
+                content={(index + 1) + "."} 
+                size="lg" 
+                color="primary" 
+                placement="top-left" 
+                shape="rectangle"
+                showOutline={false}
+                variant="solid"
+                className="-ml-4"
+              >
+                <Card 
+                  key={index + 1}
+                  className="h-28 w-full"
+                >
+                  <CardHeader className="absolute my-auto z-10 top-1 flex !items-start">
+                    <Avatar 
+                      src={album_img_src}
+                      className="w-20 h-20 min-w-20 max-w-20 text-large"
+                    />
+                    <div className="flex flex-col ml-4">
+                      <h4 className="w-full font-bold text-large truncate">{song_name}</h4>
+                      <p className="text-tiny">
+                        <a href={artist_link} target="_noreferrer" className="w-fit hover:underline">
+                          {artist_name}
+                        </a>
+                        {" - "}
+                        <a href={album_link} target="_noreferrer" className="w-fit hover:underline">
+                          {album_name}
+                        </a>
+                      </p>
+                      <small className="text-default-500"><a href={song_link} target="_noreferrer" className="underline hover:text-purple-400 w-fit text-sm">Listen</a></small>
+                    </div>
+                  </CardHeader>
+                  <Image
+                    removeWrapper
+                    alt="Album cover"
+                    className="z-0 w-full h-full object-none object-center blur-md brightness-50"
+                    src={album_img_src}
+                  />
+                </Card>
+              </Badge>
             );
           })
         )
       }
     }
     mapData()
-    setLoading(false)
   }, [trackData]);
+
+  // Honestly I have NO CLUE what im looking at here but it seems to be working?? Not sure how I feel about it....
+  useEffect(() => {
+    if(mapSongList.length == 0) {
+      setLoading(true)
+    } else {
+      setLoading(false)
+    }
+  }, [mapSongList]);
 
   return (
     <div className="w-full">
       <p className="text-center">{props.title}:</p>
-      <div className="flex flex-col gap-6 backdrop-blur-2xl px-2 py-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+      <div className="flex flex-col gap-4 backdrop-blur-2xl px-2 py-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
       <Conditional showWhen={loading}>
         <Spinner size="lg" />
       </Conditional>
