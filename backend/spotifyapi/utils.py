@@ -124,9 +124,16 @@ def createSpotifyUserFromResponse(request: HttpRequest, spotifyResJSON: json):
 
 # Return status of user's spotify connection (true if user has verififed with spotify)
 def isUserSpotifyConnected(request: HttpRequest):
-  # Retrieve users discord_id from session
-  discord_id = request.session.get("discord_id")
-  # Get user object from DB
-  site_user = User.objects.get(discord_id = discord_id)
-  # Return boolean of spotify connection status
-  return site_user.spotify_connected
+  try:
+    # Retrieve users discord_id from session
+    discord_id = request.session.get("discord_id")
+    # Get user object from DB
+    site_user = User.objects.get(discord_id = discord_id)
+    # If spotify data is found, attempt a token refresh if expired
+    if(isSpotifyTokenExpired(request)):
+      refreshSpotifyToken(request)
+    # Return boolean of spotify connection status
+    return site_user.spotify_connected
+  except Exception as e:
+    logger.error("SESSION COOKIE FOR SPOTIFY AGE NOT FOUND!!!")
+    return False

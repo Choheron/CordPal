@@ -28,6 +28,10 @@ ALLOWED_HOSTS = ['*']
 # Proxy settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Sessions Settings
+SESSION_COOKIE_AGE = 315360000 # 10 years
+SESSION_SAVE_EVERY_REQUEST = True
+
 # Application definition
 
 INSTALLED_APPS = [

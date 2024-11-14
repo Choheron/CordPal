@@ -135,6 +135,7 @@ def getSpotifyData(request: HttpRequest):
 ###
 def getTopItems(request: HttpRequest, item_type, time_range, limit, offset):
   logger.info("getTopItems called...")
+  # Attempt to refresh token, if that fails, return a blank json object 
   # Check for expired token
   if(isSpotifyTokenExpired(request)):
     refreshSpotifyToken(request)
