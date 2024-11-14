@@ -22,6 +22,7 @@ export default function TopSongsBox(props) {
     const getData = async () => {
       setTrackData(await getSpotifyTopItems("tracks", props.time_range, props.limit, props.offset))
     }
+    setLoading(true)
     getData()
   }, []);
 
