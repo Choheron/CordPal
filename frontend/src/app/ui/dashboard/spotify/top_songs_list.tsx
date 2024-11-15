@@ -59,7 +59,7 @@ export default function TopSongsBox(props) {
                 className="-ml-4"
               >
                 <Card 
-                  className="h-28 w-full"
+                  className="h-28 w-full max-w-[640px]"
                 >
                   <CardHeader className="absolute my-auto z-10 top-1 flex !items-start">
                     <Avatar 
@@ -108,7 +108,7 @@ export default function TopSongsBox(props) {
   return (
     <div className="w-full">
       <p className="text-center">{props.title}:</p>
-      <div className="flex flex-col gap-4 backdrop-blur-2xl px-2 py-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+      <div className="flex flex-col mx-auto max-w-[650px] gap-4 backdrop-blur-2xl px-2 py-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
       <Conditional showWhen={loading}>
         <Spinner size="lg" />
       </Conditional>
