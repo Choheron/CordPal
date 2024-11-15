@@ -18,10 +18,10 @@ export default async function Page() {
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
       <PageTitle text="Homepage" />
       <div className="flex flex-col w-full lg:justify-center gap-3 lg:w-10/12 lg:flex-row" >
-        <div className="flex flex-row items-center border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
+        <div className="flex flex-col w-full px-2 py-2 md:flex-row items-center border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
           <div className="mx-2 mb-auto">
             <p>Here is your discord user data:</p>
-            <p className="b pt-10 pb-2">
+            <p className="pt-10 pb-2">
               ID: {discordUserData['id']}<br/>
               Username: {discordUserData['username']}<br/>
               Avatar Hash: {discordUserData['avatar']}<br/>
@@ -44,7 +44,7 @@ export default async function Page() {
           <Divider orientation="vertical" className="mx-3"/>
           <div className="mx-2 mb-auto">
             <p>Here is the data this site has stored in the DB:</p>
-            <p className="b pt-10 pb-2">
+            <p className="pt-10 pb-2">
               Discord ID: {userData['discord_id']}<br/>
               Username: {userData['username']}<br/>
               Nickname: {userData['nickname']}<br/>
@@ -61,7 +61,7 @@ export default async function Page() {
           </div>
         </div>
         <Conditional showWhen={(memberStatus)}>
-          <div className="flex flex-row items-center border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
+          <div className="flex flex-row px-2 py-2 items-center border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
             <div className="flex flex-col gap-2 h-full">
               <p className="mb-2">
                 Other users that have validated:
