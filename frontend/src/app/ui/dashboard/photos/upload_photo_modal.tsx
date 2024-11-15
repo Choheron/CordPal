@@ -94,11 +94,12 @@ export default function UploadPhotoModal(props) {
   return (
     <>
       <Button 
-        className="px-0 text-tiny text-inheret min-w-0 min-h-0 h-fit hover:underline"
+        className="p-3 -mt-2 mb-2 text-sm text-inheret min-w-0 min-h-0 h-fit hover:underline"
         size="sm"
         onPress={onOpen}
-        radius="none"
-        variant="light"
+        radius="lg"
+        variant="solid"
+        color="secondary"
       >
         Upload Image
       </Button>

@@ -10,7 +10,6 @@ const getCookie = async (name: string) => {
 //
 // Retrieve a list of user IDs
 // - RETURN: Json containing user data from DB
-//
 export async function getUserList() {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');

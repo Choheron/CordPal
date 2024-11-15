@@ -19,7 +19,7 @@ export default async function UserCard(props) {
 
   return (
     <User   
-      className="w-full"
+      className="w-fit"
       name={userData['nickname']}
       avatarProps={{
         showFallback: true,
