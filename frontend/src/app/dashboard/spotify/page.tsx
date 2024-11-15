@@ -15,7 +15,7 @@ export default async function music() {
         <SpotifyLoginBox />
       </Conditional>
       <Conditional showWhen={spot_authenticated}>
-        <div className="flex flex-col pb-36 lg:flex-row w-4/5 gap-5">
+        <div className="flex flex-col pb-36 w-full lg:flex-row md:w-4/5 gap-5">
           <TopSongsBox 
             title={"Top Songs (4 Weeks)"}
             time_range={"short_term"}

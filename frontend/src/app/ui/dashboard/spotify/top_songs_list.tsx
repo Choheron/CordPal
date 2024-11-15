@@ -78,6 +78,7 @@ export default function TopSongsBox(props) {
                         </a>
                       </p>
                       <small className="text-default-500"><a href={song_link} target="_noreferrer" className="underline hover:text-purple-400 w-fit text-sm">Listen</a></small>
+                      <small className="text-default-500">Released: {album_release_date}</small>
                     </div>
                   </CardHeader>
                   <Image
