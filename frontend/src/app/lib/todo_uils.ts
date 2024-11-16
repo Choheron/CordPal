@@ -61,11 +61,33 @@ export async function createToDoItem(todoData) {
   const createTodoResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/todo/createTodo`, {
     method: "POST",
     credentials: "include",
-    cache: 'force-cache',
+    cache: 'no-cache',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
     body: todoData,
   });
   return createTodoResponse.status
+}
+
+//
+// Update todo list item with required json data
+//
+export async function updateToDoItem(todoData) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const updateTodoResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/todo/updateTodo`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+    body: JSON.stringify(todoData),
+  });
+  return updateTodoResponse.status
 }

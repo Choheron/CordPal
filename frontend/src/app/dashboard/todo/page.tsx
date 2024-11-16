@@ -21,13 +21,13 @@ export default async function todo() {
 
   const genTodoList: ReactNode = todoList.filter((todoItem) => todoItem['todo_status'] != "Done").sort((a, b) => a['todo_status'] < b['todo_status'] ? 1 : -1).map((work_obj, index) => {
     return (
-      <TodoItem key={work_obj['todo_status'] + index} todo_object={work_obj} index={index} />
+      <TodoItem key={work_obj['todo_status'] + index} isUserAdmin={adminStatus} todo_object={work_obj} index={index} />
     );
   });
 
   const genDoneList: ReactNode = todoList.filter((todoItem) => todoItem['todo_status'] == "Done").sort((a, b) => a['todo_category'] < b['todo_category'] ? 1 : -1).map((work_obj, index) => {
     return (
-      <TodoItem key={work_obj['todo_status'] + index} todo_object={work_obj} index={index} />
+      <TodoItem key={work_obj['todo_status'] + index} isUserAdmin={adminStatus} todo_object={work_obj} index={index} />
     );
   });
 
@@ -63,6 +63,11 @@ export default async function todo() {
               <th className="text-xl py-1 px-3">
                 Completed Items
               </th>
+              <Conditional showWhen={adminStatus}>
+                <th className={`w-1/5 text-xl border-gray-500 border-l py-1 px-3`}>
+                  Completion Status
+                </th>
+              </Conditional>
               <th className="w-2/12 text-xl border-gray-500 border-l py-1 px-3">
                 Category
               </th>

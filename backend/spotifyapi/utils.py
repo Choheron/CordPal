@@ -7,9 +7,14 @@ import json
 import base64
 import datetime
 import requests
+import pytz
 
 from users.models import User
 from .models import SpotifyUserData
+
+from users.utils import (
+  getSpotifyUser
+)
 
 # Declare logging
 logger = logging.getLogger('django')
@@ -30,17 +35,17 @@ def getAuthB64():
   return base64_string
 
 
-def storeSpotDataInSession(request: HttpRequest, spotifyResJSON: json):
-  logger.info("Attempting to store spotify token data in session object...")
-  # Store token data in session data object
-  request.session['spotify_access_token'] = spotifyResJSON['access_token']
-  request.session['spotify_token_type'] = spotifyResJSON['token_type']
-  request.session['spotify_scope'] = spotifyResJSON['scope']
+def updateSpotifyAuthData(spotUserDataObj: SpotifyUserData, spotifyResJSON: json):
+  logger.info("Attempting to store spotify token data in database...")
+  # Store token data in database object
+  spotUserDataObj.access_token = spotifyResJSON['access_token']
+  spotUserDataObj.token_type = spotifyResJSON['token_type']
+  spotUserDataObj.token_scope = spotifyResJSON['scope']
   # Calculate Expiry time then store as string
-  expiryTime = datetime.datetime.now() + datetime.timedelta(seconds=spotifyResJSON['expires_in'])
-  request.session["spotify_expiry_date"] = expiryTime.strftime("%d-%m-%Y %H:%M:%S")
-  request.session['spotify_refresh_token'] = spotifyResJSON['refresh_token']
-  request.session.modified = True
+  expiryTime = datetime.datetime.now(tz=pytz.UTC) + datetime.timedelta(seconds=spotifyResJSON['expires_in'])
+  spotUserDataObj.token_expiry_date = expiryTime
+  spotUserDataObj.refresh_token = spotifyResJSON['refresh_token']
+  spotUserDataObj.save()
   # Return True
   return True
 
@@ -48,12 +53,14 @@ def storeSpotDataInSession(request: HttpRequest, spotifyResJSON: json):
 def isSpotifyTokenExpired(request: HttpRequest):
   logger.info("Checking if spotify token is expired...")
   # Get current time
-  curTime = datetime.datetime.now()
+  curTime = datetime.datetime.now(tz=pytz.UTC)
+  # Retrieve user data obj from DB
+  spotUserDataObj = SpotifyUserData.objects.filter(user = getSpotifyUser(request.session.get('discord_id'))).first()
   # Get session Expiry time
-  tokenExpireTime = datetime.datetime.strptime(request.session['spotify_expiry_date'], "%d-%m-%Y %H:%M:%S")
-  # Check if request session's spotify token is out of date
+  tokenExpireTime = spotUserDataObj.token_expiry_date
+  # Check if request users's spotify token is out of date
   if(curTime > tokenExpireTime):
-    logger.info("Token IS expired...")
+    logger.info("Spotify Token IS expired...")
     return True
   # Return false if not expired
   return False
@@ -61,8 +68,10 @@ def isSpotifyTokenExpired(request: HttpRequest):
 
 def refreshSpotifyToken(request: HttpRequest):
   logger.info("Refreshing Spotify Token...")
-  # Retrieve session data
-  refreshToken = request.session['spotify_refresh_token']
+  # Retrieve user data obj from DB
+  spotUserDataObj = SpotifyUserData.objects.filter(user = getSpotifyUser(request.session.get('discord_id'))).first()
+  # Retrieve refresh token
+  refreshToken = spotUserDataObj.refresh_token
   # Prep request data and headers to spotify api
   reqHeaders = { 
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -80,13 +89,13 @@ def refreshSpotifyToken(request: HttpRequest):
     spotifyRes.raise_for_status()
   # Convert response to Json
   spotifyResJSON = spotifyRes.json()
-  # Store discord data in session data
-  storeSpotDataInSession(request, spotifyResJSON)
+  # Store discord data in databse
+  updateSpotifyAuthData(spotUserDataObj, spotifyResJSON)
   # Return True if Successful
   return True
 
 
-def createSpotifyUserFromResponse(request: HttpRequest, spotifyResJSON: json):
+def createSpotifyUserFromResponse(request: HttpRequest, spotifyResJSON: json, spotifyAuthResJSON: json):
   logger.info("createSpotifyUserFromResponse starting...")
   # Retrieve users discord_id from session
   discord_id = request.session.get("discord_id")
@@ -96,6 +105,8 @@ def createSpotifyUserFromResponse(request: HttpRequest, spotifyResJSON: json):
   logger.info(f"Checking if spotify data exists for discord ID {discord_id} (User {site_user.nickname})...")
   if(SpotifyUserData.objects.filter(user = site_user).exists()):
     logger.info(f"Spotify Data already exists for user {site_user.nickname} with discord ID: {site_user.discord_id}!...")
+    logger.info(f"Updating login info and breaking function...")
+    updateSpotifyAuthData(SpotifyUserData.objects.get(user = site_user), spotifyAuthResJSON)
     return
   # Create new spotify user from json data
   logger.info(f"Creating new spotify data for discord ID {discord_id} (User {site_user.nickname})...")
@@ -107,7 +118,13 @@ def createSpotifyUserFromResponse(request: HttpRequest, spotifyResJSON: json):
     follower_count = spotifyResJSON['followers']['total'],
     spotify_url = spotifyResJSON['href'],
     spotify_id = spotifyResJSON['id'],
-    membership_type = spotifyResJSON['product']
+    membership_type = spotifyResJSON['product'],
+    # Auth Data
+    access_token = spotifyAuthResJSON['access_token'],
+    token_type = spotifyAuthResJSON['token_type'],
+    token_scope = spotifyAuthResJSON['scope'],
+    token_expiry_date = (datetime.datetime.now(tz=pytz.UTC) + datetime.timedelta(seconds=spotifyAuthResJSON['expires_in'])).strftime("%d-%m-%Y %H:%M:%S"),
+    refresh_token = spotifyAuthResJSON['refresh_token'],
   )
   # If user data for image exists, set it
   if(len(spotifyResJSON['images']) > 0):
@@ -135,5 +152,5 @@ def isUserSpotifyConnected(request: HttpRequest):
     # Return boolean of spotify connection status
     return site_user.spotify_connected
   except Exception as e:
-    logger.error("SESSION COOKIE FOR SPOTIFY NOT FOUND!!!")
+    logger.error(f"USER COOKIE OR SPOTIFY DATA REFRESH ERROR!!! ERROR: {e}")
     return False

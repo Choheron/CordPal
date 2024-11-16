@@ -27,6 +27,12 @@ class SpotifyUserData(models.Model):
   membership_type = models.CharField(max_length=256)
   # Automatic Fields
   creation_timestamp = models.DateTimeField(auto_now_add=True)
+  # Fields for authentication and login
+  access_token = models.CharField(null=True, max_length=512)
+  token_type = models.CharField(null=True, max_length=30)
+  token_scope = models.CharField(null=True, max_length=512)
+  token_expiry_date = models.DateTimeField(null=True)
+  refresh_token = models.CharField(null=True, max_length=512)
 
   # toString Method
   def __str__(self):

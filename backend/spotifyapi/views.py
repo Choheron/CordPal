@@ -3,7 +3,6 @@ from django.forms.models import model_to_dict
 
 from .utils import (
   getAuthB64,
-  storeSpotDataInSession,
   createSpotifyUserFromResponse,
   isSpotifyTokenExpired,
   refreshSpotifyToken,
@@ -74,18 +73,16 @@ def doSpotifyTokenSwap(request: HttpRequest):
   }
   # Make request to spotify api
   logger.info("Making request to spotify api for Auth Token...")
-  spotifyRes = requests.post("https://accounts.spotify.com/api/token", headers=reqHeaders, data=reqData)
-  if(spotifyRes.status_code != 200):
-    print("Error in request:\n" + str(spotifyRes.json()))
-    spotifyRes.raise_for_status()
+  spotifyAuthRes = requests.post("https://accounts.spotify.com/api/token", headers=reqHeaders, data=reqData)
+  if(spotifyAuthRes.status_code != 200):
+    print("Error in request:\n" + str(spotifyAuthRes.json()))
+    spotifyAuthRes.raise_for_status()
   # Convert response to Json
   logger.info("Spotify api returned, converting to json...")
-  spotifyResJSON = spotifyRes.json()
-  # Store Spotify Token Data in Session
-  storeSpotDataInSession(request, spotifyResJSON)
+  spotifyAuthResJSON = spotifyAuthRes.json()
   # Retrieve spotify user data to set up an account
   reqHeaders = {
-    'Authorization': f"Bearer {spotifyResJSON['access_token']}"
+    'Authorization': f"Bearer {spotifyAuthResJSON['access_token']}"
   }
   try:
     logger.info("Making request to spotify api for User Data to create spotify user entry...")
@@ -99,8 +96,8 @@ def doSpotifyTokenSwap(request: HttpRequest):
     return HttpResponse(status=500)
   # Convert response to Json
   spotifyResJSON = spotifyRes.json()
-  # Create spotify user data object if required
-  createSpotifyUserFromResponse(request, spotifyResJSON)
+  # Create spotify user data object if required (includes auth data now)
+  createSpotifyUserFromResponse(request, spotifyResJSON, spotifyAuthResJSON)
   # Write success message
   messageOut = { 'message': "Success" }
   # Return Code
@@ -140,6 +137,8 @@ def getTopItems(request: HttpRequest, item_type, time_range, limit, offset):
   # Check for expired token
   if(isSpotifyTokenExpired(request)):
     refreshSpotifyToken(request)
+  # Retrieve user data obj from DB
+  spotUserDataObj = SpotifyUserData.objects.filter(user = getSpotifyUser(request.session.get('discord_id'))).first()
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getSpotifyToken called with a non-GET method, returning 405.")
@@ -148,7 +147,7 @@ def getTopItems(request: HttpRequest, item_type, time_range, limit, offset):
     return res
   # Prepare Header Data
   reqHeaders = { 
-    'Authorization': f"Bearer {request.session.get('spotify_access_token')}"
+    'Authorization': f"Bearer {spotUserDataObj.access_token}"
   }
   # Make request to spotify api
   logger.info(f"Making request to spotify for top items with following requests: type={item_type}, time_range={time_range}, limit={limit}, offset={offset} USER: {request.session.get('discord_id')}...")

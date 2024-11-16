@@ -99,6 +99,34 @@ def createTodo(request: HttpRequest):
   return HttpResponse(status=200)
 
 ###
+# Update an existing todo item in the database
+###
+def updateTodo(request: HttpRequest):
+  logger.info("updateTodo called...")
+  # Make sure request is a post request
+  if(request.method != "POST"):
+    logger.warning("updateTodo called with a non-POST method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Body data
+  reqBody = json.loads(request.body)
+  # Retrie todo item from db
+  item = TodoItem.objects.get(id = reqBody['id'])
+  # Update todo item
+  item.todo_title = reqBody['todo_title']
+  if(('todo_description' in reqBody.keys()) and (len(reqBody['todo_description']) > 0)):
+    item.todo_description = reqBody['todo_description']
+  if('todo_category' in reqBody.keys()):
+    item.todo_category = stringConvert(reqBody['todo_category'])
+  if('todo_status' in reqBody.keys()):
+    item.todo_status = stringConvert(reqBody['todo_status'])
+  # Save Item
+  item.save()
+  # Return list of all todo items
+  return HttpResponse(status=200)
+
+###
 # Bulk add todo items from a raw list
 ###
 def bulkCreateTodo(request: HttpRequest):

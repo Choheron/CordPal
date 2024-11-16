@@ -8,4 +8,5 @@ urlpatterns = [
     path('createTodo', views.createTodo),
     path('bulkCreateTodo', views.bulkCreateTodo),
     path('getAllToDoChoices', views.getAllToDoChoices),
+    path('updateTodo', views.updateTodo),
 ]
