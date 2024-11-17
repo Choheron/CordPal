@@ -17,18 +17,21 @@ export default async function music() {
       <Conditional showWhen={spot_authenticated}>
         <div className="flex flex-col pb-36 w-full lg:flex-row md:w-4/5 gap-5">
           <TopSongsBox 
+            previewVolume={0.5}
             title={"Top Songs (4 Weeks)"}
             time_range={"short_term"}
             limit={"50"}
             offset={"0"}
           />
           <TopSongsBox 
+            previewVolume={0.5}
             title={"Top Songs (6 Months)"}
             time_range={"medium_term"}
             limit={"50"}
             offset={"0"}
           />
           <TopSongsBox 
+            previewVolume={0.5}
             title={"Top Songs (1 Year)"}
             time_range={"long_term"}
             limit={"50"}
