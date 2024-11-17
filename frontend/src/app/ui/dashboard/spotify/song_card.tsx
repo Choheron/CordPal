@@ -17,7 +17,7 @@ export default function SongCard(props) {
   const song_obj = props.songObj
   const ranking = props.ranking
   // Reference to the audio player
-  const audioRef = useRef(null); // Reference to the audio element
+  const audioRef = useRef<HTMLAudioElement>(null); // Reference to the audio element
   // Extract data from massive JSON
   const album_img_src = song_obj['album']['images'][0]['url']
   const album_name = song_obj['album']['name']
