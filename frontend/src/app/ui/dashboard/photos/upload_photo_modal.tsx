@@ -99,7 +99,6 @@ export default function UploadPhotoModal(props) {
         onPress={onOpen}
         radius="lg"
         variant="solid"
-        color="secondary"
       >
         Upload Image
       </Button>
