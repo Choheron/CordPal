@@ -2,10 +2,11 @@
 
 import {Badge} from "@nextui-org/badge";
 import {Card, CardHeader } from "@nextui-org/card";
-import {Avatar} from "@nextui-org/react";
+import {Avatar, Button} from "@nextui-org/react";
 import { Image } from "@nextui-org/react";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
+import { Conditional } from "../conditional";
 
 // Display a songcard from spotify
 // Expected Props:
@@ -18,6 +19,7 @@ export default function SongCard(props) {
   const ranking = props.ranking
   // Reference to the audio player
   const audioRef = useRef<HTMLAudioElement>(null); // Reference to the audio element
+  const [audioSrc, setAudioSrc] = useState(null) // Initialize the source to null to avoid needless loading
   // Extract data from massive JSON
   const album_img_src = song_obj['album']['images'][0]['url']
   const album_name = song_obj['album']['name']
@@ -34,7 +36,7 @@ export default function SongCard(props) {
     if(audioRef != null && audioRef.current != null) {
       audioRef.current.volume = props.previewVolume
     }
-  }, []);
+  }, [audioSrc]);
 
   return (
     <Badge 
@@ -71,10 +73,23 @@ export default function SongCard(props) {
                 <small className="text-default-500"><a href={song_link} target="_noreferrer" className="underline hover:text-purple-400 w-fit text-sm">Spotify</a></small>
                 <small className="text-default-500">{album_release_date}</small>
               </div>
-              <audio controls ref={audioRef} className="pt-2 pb-2 pl-2 w-64 lg:w-full">
-                <source src={song_preview_url} type="audio/mpeg"/>
-                Your browser does not support the audio element.
-              </audio>
+              { /* Show Button if user has not loaded preview */ }
+              <Conditional showWhen={audioSrc == null}>
+                <Button 
+                  size="sm"
+                  className="pt-2 pb-2 pl-2 my-auto"
+                  onPress={() => {setAudioSrc(song_preview_url)}}
+                >
+                  Load Preview
+                </Button>  
+              </Conditional>
+              { /* Do not load audio source if the user has not clicked "load preview" */ }
+              { audioSrc && (
+                <audio controls ref={audioRef} className="pt-2 pb-2 pl-2 w-64 lg:w-full">
+                  <source src={audioSrc} type="audio/mpeg"/>
+                  Your browser does not support the audio element.
+                </audio>
+              )}
             </div>
           </div>
         </CardHeader>

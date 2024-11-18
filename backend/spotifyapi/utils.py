@@ -44,7 +44,8 @@ def updateSpotifyAuthData(spotUserDataObj: SpotifyUserData, spotifyResJSON: json
   # Calculate Expiry time then store as string
   expiryTime = datetime.datetime.now(tz=pytz.UTC) + datetime.timedelta(seconds=spotifyResJSON['expires_in'])
   spotUserDataObj.token_expiry_date = expiryTime
-  spotUserDataObj.refresh_token = spotifyResJSON['refresh_token']
+  if('refresh_token' in spotifyResJSON):
+    spotUserDataObj.refresh_token = spotifyResJSON['refresh_token']
   spotUserDataObj.save()
   # Return True
   return True
@@ -89,7 +90,7 @@ def refreshSpotifyToken(request: HttpRequest):
     spotifyRes.raise_for_status()
   # Convert response to Json
   spotifyResJSON = spotifyRes.json()
-  # Store discord data in databse
+  # Store discord data in database
   updateSpotifyAuthData(spotUserDataObj, spotifyResJSON)
   # Return True if Successful
   return True

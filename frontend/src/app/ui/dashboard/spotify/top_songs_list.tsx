@@ -33,7 +33,6 @@ export default function TopSongsBox(props) {
     loading: () => <Spinner />
   });
 
-  // Honestly I have NO CLUE what im looking at here but it seems to be working?? Not sure how I feel about it....
   useEffect(() => {
     const mapData = async () => {
       if (trackData['items']) {
