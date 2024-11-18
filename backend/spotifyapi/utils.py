@@ -123,7 +123,7 @@ def createSpotifyUserFromResponse(request: HttpRequest, spotifyResJSON: json, sp
     access_token = spotifyAuthResJSON['access_token'],
     token_type = spotifyAuthResJSON['token_type'],
     token_scope = spotifyAuthResJSON['scope'],
-    token_expiry_date = (datetime.datetime.now(tz=pytz.UTC) + datetime.timedelta(seconds=spotifyAuthResJSON['expires_in'])).strftime("%d-%m-%Y %H:%M:%S"),
+    token_expiry_date = (datetime.datetime.now(tz=pytz.UTC) + datetime.timedelta(seconds=spotifyAuthResJSON['expires_in'])),
     refresh_token = spotifyAuthResJSON['refresh_token'],
   )
   # If user data for image exists, set it
