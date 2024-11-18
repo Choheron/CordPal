@@ -33,6 +33,8 @@ class SpotifyUserData(models.Model):
   token_scope = models.CharField(null=True, max_length=512)
   token_expiry_date = models.DateTimeField(null=True)
   refresh_token = models.CharField(null=True, max_length=512)
+  # Fields for top songs
+  top_track_long_term = models.TextField(null=True)
 
   # toString Method
   def __str__(self):

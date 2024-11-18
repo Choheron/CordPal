@@ -40,7 +40,28 @@ export async function getSpotifyData() {
   const spotifyUserData = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getSpotifyData`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  return await spotifyUserData.json();
+}
+
+// 
+// Retrieve user data from all users in spotify backend db.
+// - RETURN: JSON Objects 
+//
+export async function getAllSpotifyUsersObj() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Retrieve list of users from spotify
+  console.log("getSpotifyData: Sending request to backend '/spotifyapi/getSpotifyUsersObj'")
+  const spotifyUserData = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getSpotifyUsersObj`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { revalidate: 60 },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }

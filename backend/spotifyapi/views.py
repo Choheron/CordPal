@@ -44,6 +44,29 @@ def isSpotifyConnected(request: HttpRequest):
 
 
 ###
+# Get a list of users who have connected spotify
+###
+def getSpotifyUsersObj(request: HttpRequest):
+  logger.info("getSpotifyUsersList called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getSpotifyUsersList called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Iterate and retrieve SpotifyUserData entries
+  spotUserList = SpotifyUserData.objects.all()
+  # Declare and populate out dict
+  out = {}
+  for spotUser in spotUserList:
+    tempDict = model_to_dict(spotUser)
+    tempDict['discord_id'] = spotUser.user.discord_id
+    # Store tempDict in out json
+    out[tempDict['discord_id']] = tempDict
+  return JsonResponse(out)
+
+
+###
 # Exchange spotify auth code for spotify api token. This will create a spotify user data entry, which has a one-to-one relationship with a user.
 ###
 def doSpotifyTokenSwap(request: HttpRequest):
@@ -158,6 +181,12 @@ def getTopItems(request: HttpRequest, item_type, time_range, limit, offset):
   # Convert response to Json
   logger.info("Spotify api returned, converting to json...")
   spotifyResJSON = spotifyRes.json()
+  # Store top song data in user TODO: Make this not as clunky (Refactor this to store time based data on users)
+  if(item_type == "tracks"):
+    if(time_range == "long_term"):
+      logger.info(f"Storing long term track for user {spotUserDataObj.display_name}...")
+      spotUserDataObj.top_track_long_term = json.dumps(spotifyResJSON['items'][0])
+      spotUserDataObj.save()
   # TODO: Add logic here to store this data (massive data) to allow users to view other user's data
   # Return Spotify Response
   return JsonResponse(spotifyResJSON)
