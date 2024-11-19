@@ -109,64 +109,66 @@ export default function PhotoModal(props) {
         <ModalContent className="bg-transparent w-fit h-fit max-h-full shadow-none">
           {() => (
             <>
-              <ModalHeader className={`flex flex-col gap-2 opacity-0 ${(imgData['uploader'] !== imgData['creator'] ? "-mb-48" : "-mb-36")} z-40 group-hover:opacity-100 duration-1000 ease-in-out`}>
-                <Conditional showWhen={loading}>
-                  <Spinner size="lg" />
-                </Conditional>
-                <Conditional showWhen={!loading}>
-                  <b>{imgData['title']}</b>
-                  {imgData['description']}
-                  <div className="flex gap-3 ">
-                    <p className="my-auto">{(imgData['uploader'] !== imgData['creator'] ? "Uploader:" : "Mastermind:")} </p>
-                    <User
-                      className=""
-                      name={uploaderData['nickname']}
-                      avatarProps={{
-                        src: `${uploaderData['avatar_url']}`
-                      }}
-                    />
-                  </div>
-                  <Conditional showWhen={imgData['uploader'] !== imgData['creator']} >
+              <Conditional showWhen={loading}>
+                <Spinner size="lg" />
+              </Conditional>
+              <Conditional showWhen={!loading}>
+                <ModalHeader className={`flex flex-col gap-2 opacity-0 ${(imgData['uploader'] !== imgData['creator'] ? "-mb-48" : "-mb-36")} z-40 group-hover:opacity-100 duration-1000 ease-in-out`}>
+                  <Conditional showWhen={!loading}>
+                    <b>{imgData['title']}</b>
+                    {imgData['description']}
                     <div className="flex gap-3 ">
-                      <p className="my-auto">Creator: </p>
+                      <p className="my-auto">{(imgData['uploader'] !== imgData['creator'] ? "Uploader:" : "Mastermind:")} </p>
                       <User
                         className=""
-                        name={creatorData['nickname']}
+                        name={uploaderData['nickname']}
                         avatarProps={{
-                          src: `${creatorData['avatar_url']}`
+                          src: `${uploaderData['avatar_url']}`
                         }}
                       />
                     </div>
+                    <Conditional showWhen={imgData['uploader'] !== imgData['creator']} >
+                      <div className="flex gap-3 ">
+                        <p className="my-auto">Creator: </p>
+                        <User
+                          className=""
+                          name={creatorData['nickname']}
+                          avatarProps={{
+                            src: `${creatorData['avatar_url']}`
+                          }}
+                        />
+                      </div>
+                    </Conditional>
                   </Conditional>
-                </Conditional>
-              </ModalHeader>
-              <ModalBody className="p-0 filter h-fit group-hover:brightness-50 group-hover:blur-md duration-1000 ease-in-out">
-                <Image
-                  alt={imgData['title']}
-                  loading="lazy"
-                  className="object-cover"
-                  width={0}
-                  height={0}
-                  src={props.imageSrc}
-                  style={{ width: 'auto', height: 'auto' }}
-                />
-              </ModalBody>
-              <ModalFooter className="flex flex-col max-w-full opacity-0 -mt-32 pb-2 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
-                <Conditional showWhen={!loading}>
-                  <p>Uploaded: {convertToLocalTZString(uploadTimestamp)}</p>
-                  <p>Filename: {imgData['filename']}</p>
-                  <Button 
-                    as={Link}
-                    href={props.imageSrc}
-                    target="_blank"
-                    radius="lg"
-                    className="z-40 text-white border-white bg-white hover:underline bg-opacity-0 hover:bg-opacity-40 duration-1000 ease-in-out" 
-                    variant="bordered"
-                  >
-                    Download
-                  </Button> 
-                </Conditional>
-              </ModalFooter>
+                </ModalHeader>
+                <ModalBody className="p-0 filter h-fit group-hover:brightness-50 group-hover:blur-md duration-1000 ease-in-out">
+                  <Image
+                    alt={imgData['title']}
+                    loading="lazy"
+                    className="object-cover"
+                    width={0}
+                    height={0}
+                    src={props.imageSrc}
+                    style={{ width: 'auto', height: 'auto' }}
+                  />
+                </ModalBody>
+                <ModalFooter className="flex flex-col max-w-full opacity-0 -mt-32 pb-2 z-40 group-hover:opacity-100 duration-1000 ease-in-out">
+                  <Conditional showWhen={!loading}>
+                    <p>Uploaded: {convertToLocalTZString(uploadTimestamp)}</p>
+                    <p>Filename: {imgData['filename']}</p>
+                    <Button 
+                      as={Link}
+                      href={props.imageSrc}
+                      target="_blank"
+                      radius="lg"
+                      className="z-40 text-white border-white bg-white hover:underline bg-opacity-0 hover:bg-opacity-40 duration-1000 ease-in-out" 
+                      variant="bordered"
+                    >
+                      Download
+                    </Button> 
+                  </Conditional>
+                </ModalFooter>
+              </Conditional>
             </>
           )}
         </ModalContent>
