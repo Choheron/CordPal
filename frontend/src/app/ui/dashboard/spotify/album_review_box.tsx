@@ -42,12 +42,13 @@ export default function AlbumReviewBox(props) {
   const submitReview = () => {
     // Build out object
     let out = {}
-    out['album'] = {}
-    out['album']['id'] = props.album_id
+    out['album_id'] = props.album_id
     out['score'] = rating
     out['comment'] = comment 
 
     submitReviewToBackend(out)
+    // Turn off review ready checkmark
+    setIsReady(false)
     // Reload page
     router.refresh()
   }

@@ -11,6 +11,7 @@ urlpatterns = [
   path('getTopItems/<str:item_type>/<str:time_range>/<str:limit>/<str:offset>', views.getTopItems),
   path('spotifySearch/<str:item_type>/<str:query>/<str:limit>/<str:offset>', views.spotifySearch),
   path('checkIfAlbumAlreadyExists/<str:album_spotify_id>', views.checkIfAlbumAlreadyExists),
+  path('submitReview', views.submitReview),
   path('getReviewsForAlbum/<str:album_spotify_id>', views.getReviewsForAlbum),
   path('submitAlbum', views.submitAlbum),
   path('getAlbum/<str:album_spotify_id>', views.getAlbum),

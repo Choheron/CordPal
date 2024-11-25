@@ -315,6 +315,7 @@ def getAlbum(request: HttpRequest, album_spotify_id: str):
   out['raw_data'] = model_to_dict(albumObj)
   out['raw_album_data'] = json.dumps(albumObj.raw_data)
   out['title'] = albumObj.title
+  out['album_id'] = albumObj.spotify_id
   out['album_img_src'] = albumObj.cover_url
   out['album_src'] = albumObj.spotify_url
   out['artist'] = {}
@@ -337,7 +338,7 @@ def getAlbum(request: HttpRequest, album_spotify_id: str):
 ###
 # Submit a new review of an album by a user.
 ###
-def submitNewReview(request: HttpRequest):
+def submitReview(request: HttpRequest):
   logger.info("submitReview called...")
   # Make sure request is a post request
   if(request.method != "POST"):
@@ -350,17 +351,24 @@ def submitNewReview(request: HttpRequest):
   # Get user from database
   userObj = getSpotifyUser(request.session.get('discord_id'))
   # Get Album from the database
-  albumObj = Album.objects.get(spotify_id=reqBody['album']['id'])
-  # Declare new Review object
-  print(reqBody)
-  newReview = Review(
-    album=albumObj,
-    user=userObj,
-    score=float(reqBody['score']),
-    review_text=reqBody['comment'],
-  )
-  # Save new Review data
-  newReview.save()
+  albumObj = Album.objects.get(spotify_id=reqBody['album_id'])
+  # Check if a review already exists for this user
+  try:
+    reviewObj = Review.objects.get(album=albumObj, user=userObj)
+    reviewObj.score = float(reqBody['score'])
+    reviewObj.review_text = reqBody['comment']
+    # Save/Update Object
+    reviewObj.save()
+  except Review.DoesNotExist:
+    # Declare new Review object
+    newReview = Review(
+      album=albumObj,
+      user=userObj,
+      score=float(reqBody['score']),
+      review_text=reqBody['comment'],
+    )
+    # Save new Review data
+    newReview.save()
   return HttpResponse(200)
 
 
@@ -378,10 +386,21 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str):
   # Get Album from the database
   albumObj = Album.objects.get(spotify_id=album_spotify_id)
   # Get all reivews for album
-  reviewsObj = Review.objects.filter(album=albumObj).values()
+  reviewsObj = Review.objects.filter(album=albumObj)
+  # Declare outlist and populate
+  outList = []
+  for review in reviewsObj:
+    outObj = {}
+    outObj['user_id'] = review.user.discord_id
+    outObj['album_id'] = review.album.spotify_id
+    outObj['score'] = review.score
+    outObj['comment'] = review.review_text
+    outObj['review_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
+    outObj['last_upated'] = review.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
+    # Append to list
+    outList.append(outObj)
   # Return list of reviews
-  print(reviewsObj)
-  return HttpResponse(200)
+  return JsonResponse({"review_list": outList})
 
 
 ###
