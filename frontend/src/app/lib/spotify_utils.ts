@@ -88,3 +88,120 @@ export async function getSpotifyTopItems(type, time_range, limit, offset) {
   });
   return await spotifyTopItemsResponse.json();
 }
+
+// 
+// Submit a search query to the backend for spotify searching.
+// - RETURN: JSON Objects 
+//
+export async function spotifySearch(type, query, limit, offset) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log("spotifySearch: Sending request to backend '/spotifyapi/spotifySearch'")
+  const spotifySearchItemsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/spotifySearch/${type}/${query}/${limit}/${offset}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  return await spotifySearchItemsResponse.json();
+}
+
+// 
+// Check the backend to see if an album has already been submitted by a user
+// - RETURN: Boolean
+//
+export async function checkIfAlbumAlreadyExists(album_spotify_id) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log("checkIfAlbumAlreadyExists: Sending request to backend '/spotifyapi/checkIfAlbumAlreadyExists'")
+  const spotifyAlbumExistsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/checkIfAlbumAlreadyExists/${album_spotify_id}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const existsResponse = await spotifyAlbumExistsResponse.json()
+  const exists = existsResponse['exists']
+  return exists;
+}
+
+//
+// Submit an album for adding to the Album of the day pool in the backend
+// - RETURN: HttpResponse
+//
+export async function submitAlbumToBackend(albumObject) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log("submitAlbumToBackend: Sending request to backend '/spotifyapi/submitAlbum'")
+  const submitAlbumResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/submitAlbum`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+    body: JSON.stringify(albumObject)
+  });
+}
+
+//
+// Get album of the day data
+// - RETURN: object containing album of the day data
+//
+export async function getAlbumOfTheDayData(date: string = '') {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Ternary optional date submission
+  // Expected date format: yyyy-mm-dd
+  const urlTail = ((date === "") ? '' : '/' + date)
+  // Validate that user has connected spotify
+  console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbumOfDay${urlTail}'`)
+  const albumOfDayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumOfDay${urlTail}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const albumOfDayInfo = await albumOfDayResponse.json()
+  console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbum/${albumOfDayInfo['album_id']}'`)
+  const albumDayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbum/${albumOfDayInfo['album_id']}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const albumData = await albumDayResponse.json()
+  console.log(albumData);
+  return albumData
+}
+
+//
+// Submit a review to the baclend
+// - RETURN: HttpResponse
+//
+export async function submitReviewToBackend(reviewObject) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log("submitReviewToBackend: Sending request to backend '/spotifyapi/submitNewReview'")
+  const submitAlbumResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/submitNewReview`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+    body: JSON.stringify(reviewObject)
+  });
+}

@@ -15,7 +15,7 @@ import {Spinner} from "@nextui-org/spinner";
 //  - limit: Limit to retrieve (Range 0-50)
 //  - offset: Page to retrieve (most of the time this will be 0 until over 50 results is implemented)
 //  - previewVolume: Volume of the preview sound
-export default function TopSongsBox(props) {
+export default function TopSongsList(props) {
   const [loading, setLoading] = useState(true)
   const [trackData, setTrackData] = useState({})
   const [mapSongList, setMapSongList] = useState([])

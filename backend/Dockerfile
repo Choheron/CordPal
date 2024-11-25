@@ -1,7 +1,14 @@
-FROM python:3.11-alpine
+FROM python:3.11-slim
 
 WORKDIR /app 
 
+RUN apt-get update \
+    && apt-get install -y cron
+
+# Set Timezone
+ENV TZ='America/Chicago'
+
+# Install required python packages
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
