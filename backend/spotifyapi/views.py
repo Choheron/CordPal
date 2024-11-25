@@ -418,7 +418,13 @@ def getAlbumOfDay(request: HttpRequest, date: str = datetime.date.today().strfti
   date_format = '%Y-%m-%d'
   albumDay = datetime.datetime.strptime(date, date_format).date()
   # Get Album from the database
-  dailyAlbumObj = DailyAlbum.objects.get(date=albumDay)
+  try:
+    dailyAlbumObj = DailyAlbum.objects.get(date=albumDay)
+  except DailyAlbum.DoesNotExist:
+    out = {}
+    out['err_message'] = 'Not Found'
+    print(f'Daily Album not Found for: {date}')
+    return JsonResponse(out)
   # Return album of passed in day
   out = {} 
   out['raw_response'] = model_to_dict(dailyAlbumObj)

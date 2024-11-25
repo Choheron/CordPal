@@ -172,6 +172,10 @@ export async function getAlbumOfTheDayData(date: string = '') {
     },
   });
   const albumOfDayInfo = await albumOfDayResponse.json()
+  if("err_message" in albumOfDayInfo) {
+    console.log("Error when retrieving album of the day!")
+    return {}
+  }
   console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbum/${albumOfDayInfo['album_id']}'`)
   const albumDayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbum/${albumOfDayInfo['album_id']}`, {
     method: "GET",
@@ -210,6 +214,10 @@ export async function submitReviewToBackend(reviewObject) {
 // - RETURN: HttpResponse
 //
 export async function getReviewsForAlbum(album_spotify_id) {
+  // If no album ID provided, return empty list
+  if(album_spotify_id == "") {
+    return []
+  }
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Validate that user has connected spotify

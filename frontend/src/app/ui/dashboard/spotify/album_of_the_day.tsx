@@ -13,21 +13,29 @@ import { getAlbumOfTheDayData, getReviewsForAlbum } from "@/app/lib/spotify_util
 export default async function AlbumOfTheDayBox(props) {
   const albumOfTheDayObj = await getAlbumOfTheDayData()
 
+  function albumData(key) {
+    if(key in albumOfTheDayObj) {
+      return albumOfTheDayObj[key]
+    } else { 
+      return ''
+    }
+  }
+
   return (
     <div className="w-full lg:w-fit flex flex-col lg:flex-row backdrop-blur-2xl px-2 mx-auto py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
       <div className="w-full">
         <AlbumDisplay 
-          title={albumOfTheDayObj.title}
-          album_img_src={albumOfTheDayObj.album_img_src}
-          album_src={albumOfTheDayObj.album_src}
-          artist={albumOfTheDayObj.artist}
-          submitter={albumOfTheDayObj.submitter}
-          submitter_comment={albumOfTheDayObj.submitter_comment}
-          submission_date={albumOfTheDayObj.submission_date}
-          avg_rating={albumOfTheDayObj.avg_rating}
+          title={albumData("title")}
+          album_img_src={albumData("album_img_src")}
+          album_src={albumData("album_src")}
+          artist={albumData("artist")}
+          submitter={albumData("submitter")}
+          submitter_comment={albumData("submitter_comment")}
+          submission_date={albumData("submission_date")}
+          avg_rating={albumData("avg_rating")}
         />
         <AlbumReviewBox 
-          album_id={albumOfTheDayObj.album_id}
+          album_id={albumData("album_id")}
         />
       </div>
       <Divider 
@@ -35,7 +43,7 @@ export default async function AlbumOfTheDayBox(props) {
         orientation="vertical" 
       />
       <ReviewDisplay 
-        album_id={albumOfTheDayObj.album_id}
+        album_id={albumData("album_id")}
       />
     </div>
   )
