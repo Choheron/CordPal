@@ -22,7 +22,7 @@ export default async function AlbumDisplay(props) {
   // Album props checks
   const title = (props.title) ? props.title : "No Album Title Found";
   const album_url = (props.album_src) ? props.album_src : "https://www.google.com/search?q=sad+face";
-  const album_img_src = (props.album_img_src) ? props.album_img_src : "/images/DALL-E_Album_Cover_Not_Found.webp";
+  const album_img_src = (props.album_img_src) ? props.album_img_src : "/images/DALL-E_Album_Not_Found.webp";
   // Artist props checks
   const artist_name = (props.artist && props.artist['name']) ? props.artist['name'] : "Artist Name not Found";
   const artist_url = (props.artist && props.artist['href']) ? props.artist['href'] : "https://www.google.com/search?q=sad+face";
