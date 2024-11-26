@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: false,
   images: {
-    domains: ['i.scdn.co'], // Add your allowed domains here
+    domains: ['i.scdn.co'], // Add allowed domains here
   },
 };
 
