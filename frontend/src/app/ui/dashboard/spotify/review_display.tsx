@@ -51,7 +51,7 @@ export default async function ReviewDisplay(props) {
                   </p>
                   <p className="mx-2 my-2 max-w-[320px]">{review['comment']}</p>
                   <p className="mx-2 my-2 align-middle">
-                    Submitted: {convertToLocalTZString(new Date(review['review_date']))}
+                    Submitted: {convertToLocalTZString(new Date(review['review_date']), true)}
                   </p>
                 </PopoverContent>
               </Popover>
