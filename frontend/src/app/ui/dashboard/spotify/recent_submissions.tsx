@@ -12,7 +12,7 @@ export default async function RecentSubmissions(props) {
   const recentSubs = (props.albumList) ? props.albumList : [];
 
   return (
-    <div className="w-[340px] mx-2 lg:mx-1 my-2 flex flex-col rounded-2xl bg-zinc-800/30 border border-neutral-800">
+    <div className="min-w-[320px] w-[340px] mx-2 lg:mx-1 my-2 flex flex-col rounded-2xl bg-zinc-800/30 border border-neutral-800">
       <p className='text-xl mx-auto py-2 font-extralight'>Recent Album Submissions:</p>
       <div className="flex flex-col justify-around h-full mx-auto">
         {recentSubs.length === 0 ? (

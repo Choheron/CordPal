@@ -55,12 +55,15 @@ export default async function AboutBlock(props) {
           <ol className="list-decimal pl-10">
             <li>A Frontend running on <a href="https://nextjs.org/" className="text-blue-500 hover:underline">NextJS</a></li>
             <li>A Backend running on <a href="https://www.djangoproject.com/" className="text-blue-500 hover:underline">Django</a></li>
+            <li>A Cron-Manager container running on <a href="https://alpinelinux.org/" className="text-blue-500 hover:underline">Alpine</a></li>
             <li>A <a href="https://www.postgresql.org/" className="text-blue-500 hover:underline">Postgresql</a> Database</li>
             <li>A Discord Bot written in <a href="https://www.python.org/" className="text-blue-500 hover:underline">Python</a></li>
           </ol>
           <p>
             The two main instances handle the serving of the frontend and the handling/tranforming/retrieval of data from a (currently) in memory database on the backend, 
-            via an api layer. The third compute instance runs the discord bot that users can interact with, within the server. All of these
+            via an api layer. The third compute instance runs the discord bot that users can interact with, within the server. You may ask me, why use a cron manager and 
+            not the host crontab? Great question! The issue is that currently all of these containers run on my UNRAID server, which can be a little finicky with user crons.
+            Also, eventually I would like to migrate this site to a selfhosted k8s cluster, so by having a written out crontab I can migrate to K8s with more ease. All of these
             instances are containerized and self-hosted so that I can have full control over the process and learn as much as possible. Below is a simplified infra diagram:
           </p>
           <Conditional showWhen={loggedIn}>

@@ -21,7 +21,7 @@ export default async function music() {
       </Conditional>
       <Conditional showWhen={spot_authenticated}>
         <AddAlbumModal />
-        <div className="flex flex-col w-fit justify-center lg:flex-row md:w-4/5 gap-5">
+        <div className="flex flex-col w-fit justify-center lg:flex-row md:w-4/5 gap-2">
           <AlbumOfTheDayBox title={"Album Of The Day"} />
           <RecentSubmissions 
             albumList={recentSubmissionsResponse['album_list']} 
