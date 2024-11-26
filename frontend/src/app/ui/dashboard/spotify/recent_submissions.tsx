@@ -19,7 +19,7 @@ export default async function RecentSubmissions(props) {
             <p className='mx-auto my-auto'>No Recent Submissions...</p>
           ) : (
             recentSubs.map((submission, index) => (
-              <div className="mx-auto" key={index}>
+              <div className="ml-1" key={index}>
                 <User
                   name={(
                     <a href={submission['album_src']} className="hover:underline">
