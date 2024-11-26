@@ -35,12 +35,10 @@ export default async function AlbumDisplay(props) {
 
   return (
     <div className="w-full min-w-[320px] lg:min-w-[650px] mx-2 lg:mx-1 my-2 flex flex-col lg:flex-row">
-      <Image
+      <img 
         src={album_img_src}
-        width={320}
-        height={320}
+        className='h-[300px] w-[300px] rounded-2xl mx-auto'
         alt={`Album Cover for ${title} by ${artist_name}`}
-        className={'h-[300px] w-[300px] rounded-2xl mx-auto'}
       />
       <div className="w-full flex flex-col gap-2 pl-5 pt-2 my-auto">
         <a href={album_url} target="_noreferrer" className="text-3xl hover:underline">
