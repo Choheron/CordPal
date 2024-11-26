@@ -26,6 +26,7 @@ from dotenv import load_dotenv
 import os
 import json
 import datetime
+import random
 
 # Declare logging
 logger = logging.getLogger('django')
@@ -433,6 +434,7 @@ def getAlbumOfDay(request: HttpRequest, date: str = datetime.date.today().strfti
   out['date'] = date
   return JsonResponse(out)
 
+
 ###
 # Get All Reviews for a specific album. Returns a spotify album id and date
 ###
@@ -459,3 +461,48 @@ def getLastXAlbums(request: HttpRequest, count: int):
     # Append to List
     album_list.append(albumObj)
   return JsonResponse({ "album_list": album_list, "timestamp" : datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")})
+
+
+###
+# Set a new album of the day.. return 
+###
+def setAlbumOfDay(request: HttpRequest):
+  logger.info("setAlbumOfDay called...")
+  # Make sure request is a post request
+  if(request.method != "POST"):
+    logger.warning("setAlbumOfDay called with a non-POST method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get current date
+  day = datetime.date.today()
+  # Check if a current album of the day already exists
+  try:
+    currDayAlbum = DailyAlbum.objects.get(date=day)
+    logger.warning(f"WARN: Album of the day already selected: {currDayAlbum}")
+    return HttpResponse(425)
+  except DailyAlbum.DoesNotExist:
+    print("Today does not yet have an album, selecting one...")
+  # Get Date a year ago to filter by
+  one_year_ago = day - datetime.timedelta(days=365)
+  # Define a boolean for selecting the right album
+  selected = False
+  # Define Album Object
+  albumOfTheDay = None
+  while(not selected):
+    tempAlbum = random.choice(Album.objects.all())
+    try:
+      albumCheck = DailyAlbum.objects.filter(date__gte=one_year_ago).get(album=tempAlbum)
+    except DailyAlbum.DoesNotExist:
+      albumOfTheDay = tempAlbum
+      selected = True
+  # Create an album of the day object
+  albumOfTheDayObj = DailyAlbum(
+    album=albumOfTheDay,
+    date=day
+  )
+  # Save object
+  albumOfTheDayObj.save()
+  # Print success
+  logger.info(f'Successfully selected album of the day: {albumOfTheDayObj}')
+  return HttpResponse(200)

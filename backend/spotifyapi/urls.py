@@ -19,4 +19,6 @@ urlpatterns = [
   # Below URL has two variations (one for lack of URL Param)
   path('getAlbumOfDay/<str:date>', views.getAlbumOfDay),
   path('getAlbumOfDay', views.getAlbumOfDay),
+  # Command to be called by cronjob to set the album of the day
+  path('setAlbumOfDay', views.setAlbumOfDay),
 ]
