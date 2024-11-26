@@ -34,7 +34,7 @@ export default async function AlbumDisplay(props) {
   const avg_rating = (props.avg_rating) ? props.avg_rating : 0;
 
   return (
-    <div className="w-full min-w-[320px] mx-2 lg:mx-1 my-2 flex flex-col lg:flex-row">
+    <div className="w-full min-w-[320px] lg:min-w-[650px] mx-2 lg:mx-1 my-2 flex flex-col lg:flex-row">
       <Image
         src={album_img_src}
         width={320}

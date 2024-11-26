@@ -22,8 +22,8 @@ export default async function AlbumOfTheDayBox(props) {
   }
 
   return (
-    <div className="w-full lg:w-fit flex flex-col lg:flex-row backdrop-blur-2xl px-2 mx-auto py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-      <div className="w-full">
+    <div className="w-full lg:w-fit flex flex-col lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+      <div className="w-full my-auto">
         <AlbumDisplay 
           title={albumData("title")}
           album_img_src={albumData("album_img_src")}

@@ -432,3 +432,30 @@ def getAlbumOfDay(request: HttpRequest, date: str = datetime.date.today().strfti
   out['album_name'] = dailyAlbumObj.album.title
   out['date'] = date
   return JsonResponse(out)
+
+###
+# Get All Reviews for a specific album. Returns a spotify album id and date
+###
+def getLastXAlbums(request: HttpRequest, count: int):
+  logger.info("getLastXAlbums called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getLastXAlbums called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get last X count of albums
+  last_X = Album.objects.all().order_by('-id')[:count]
+  # Build list of custom Album Objects
+  album_list = []
+  for album in last_X:
+    albumObj = {}
+    albumObj['title'] = album.title
+    albumObj['album_img_src'] = album.cover_url
+    albumObj['album_src'] = album.spotify_url
+    albumObj['submitter'] = album.submitted_by.nickname
+    albumObj['submission_date'] = album.submission_date
+    albumObj['raw_album'] = album.raw_data
+    # Append to List
+    album_list.append(albumObj)
+  return JsonResponse({ "album_list": album_list, "timestamp" : datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")})

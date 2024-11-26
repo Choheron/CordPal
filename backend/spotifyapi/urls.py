@@ -15,6 +15,7 @@ urlpatterns = [
   path('getReviewsForAlbum/<str:album_spotify_id>', views.getReviewsForAlbum),
   path('submitAlbum', views.submitAlbum),
   path('getAlbum/<str:album_spotify_id>', views.getAlbum),
+  path('getLastXAlbums/<int:count>', views.getLastXAlbums),
   # Below URL has two variations (one for lack of URL Param)
   path('getAlbumOfDay/<str:date>', views.getAlbumOfDay),
   path('getAlbumOfDay', views.getAlbumOfDay),

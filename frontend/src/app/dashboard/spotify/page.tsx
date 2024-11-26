@@ -3,14 +3,15 @@
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { Conditional } from "@/app/ui/dashboard/conditional";
 import SpotifyLoginBox from "@/app/ui/dashboard/spotify/spotify_login_box";
-import { getSpotifyData, isSpotifyLinked } from "@/app/lib/spotify_utils";
+import { getLastXSubmissions, getSpotifyData, isSpotifyLinked } from "@/app/lib/spotify_utils";
 import TopSongsList from "@/app/ui/dashboard/spotify/top_songs_list";
 import AlbumOfTheDayBox from "@/app/ui/dashboard/spotify/album_of_the_day";
 import AddAlbumModal from "@/app/ui/dashboard/spotify/add_album_modal";
+import RecentSubmissions from "@/app/ui/dashboard/spotify/recent_submissions";
 
 export default async function music() {
   const spot_authenticated = await isSpotifyLinked();
-  const spotifyUserData = await getSpotifyData();
+  const recentSubmissionsResponse = await getLastXSubmissions(10);
 
   return (
     <div className="flex min-h-screen flex-col items-center p-3 pb-36 md:px-24 pt-10">
@@ -20,8 +21,12 @@ export default async function music() {
       </Conditional>
       <Conditional showWhen={spot_authenticated}>
         <AddAlbumModal />
-        <div className="flex flex-col w-full lg:flex-row md:w-4/5 gap-5">
+        <div className="flex flex-col w-fit justify-center lg:flex-row md:w-4/5 gap-5">
           <AlbumOfTheDayBox title={"Album Of The Day"} />
+          <RecentSubmissions 
+            albumList={recentSubmissionsResponse['album_list']} 
+            timestamp={recentSubmissionsResponse['timestamp']}
+          />
         </div>
       </Conditional>
       <Conditional showWhen={spot_authenticated}>

@@ -231,6 +231,30 @@ export async function getReviewsForAlbum(album_spotify_id) {
     },
   });
   const reviewListRes = await reviewResponse.json()
-  console.log(reviewListRes)
   return reviewListRes['review_list'];
+}
+
+//
+// Get Last X Album Submissions
+// - RETURN: list in JSON
+//
+export async function getLastXSubmissions(count = 0) {
+  // If no album ID provided, return empty list
+  if(count == 0) {
+    return []
+  }
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getLastXSubmissions: Sending request to backend '/spotifyapi/getLastXAlbums/${count}'`)
+  const subResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getLastXAlbums/${count}`, {
+    method: "GET",
+    credentials: "include",
+    next: { revalidate: 5 },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const reviewListRes = await subResponse.json()
+  return reviewListRes;
 }
