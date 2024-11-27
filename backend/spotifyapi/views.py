@@ -325,15 +325,31 @@ def getAlbum(request: HttpRequest, album_spotify_id: str):
   out['submitter'] = albumObj.submitted_by.discord_id
   out['submitter_comment'] = albumObj.user_comment
   out['submission_date'] = albumObj.submission_date.strftime('%Y-%m-%d')
+  # Return final object
+  return JsonResponse(out)
+
+
+###
+# Get the average rating for an album.
+###
+def getAlbumAvgRating(request: HttpRequest, album_spotify_id: str):
+  logger.info("getAlbumAvgRating called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getAlbumAvgRating called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Retrieve album from database
+  albumObj = Album.objects.get(spotify_id=album_spotify_id)
   # Get average review score of album
   reviewList = Review.objects.filter(album=albumObj)
   review_sum = 0.0
   for review in reviewList:
-    review_sum += review.score
+    review_sum += float(review.score)
   # Calculate Average
-  out['avg_rating'] = review_sum/len(reviewList) if len(reviewList) > 0 else 0.0
-  # Return final object
-  return JsonResponse(out)
+  rating = (round((review_sum/float(len(reviewList)))*2)/2 if len(reviewList) > 0 else 0.0)
+  return JsonResponse({"rating": rating})
 
 
 ###

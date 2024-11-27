@@ -161,7 +161,7 @@ export async function getAlbumOfTheDayData(date: string = '') {
   // Ternary optional date submission
   // Expected date format: yyyy-mm-dd
   const urlTail = ((date === "") ? '' : '/' + date)
-  // Validate that user has connected spotify
+  // Get album of the day
   console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbumOfDay${urlTail}'`)
   const albumOfDayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumOfDay${urlTail}`, {
     method: "GET",
@@ -176,6 +176,7 @@ export async function getAlbumOfTheDayData(date: string = '') {
     console.log("Error when retrieving album of the day!")
     return {}
   }
+  // Get album Data
   console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbum/${albumOfDayInfo['album_id']}'`)
   const albumDayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbum/${albumOfDayInfo['album_id']}`, {
     method: "GET",
@@ -187,6 +188,27 @@ export async function getAlbumOfTheDayData(date: string = '') {
   });
   const albumData = await albumDayResponse.json()
   return albumData
+}
+
+//
+// Get album rating
+// - RETURN: object containing album of the day data
+//
+export async function getAlbumAvgRating(spotify_album_id) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbumAvgRating/${spotify_album_id}'`)
+  const avgRatingResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumAvgRating/${spotify_album_id}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const albumAvgRatingData = await avgRatingResponse.json()
+  return albumAvgRatingData['rating'];
 }
 
 //

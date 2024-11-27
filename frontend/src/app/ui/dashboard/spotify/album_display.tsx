@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Conditional } from "../conditional"
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
+import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
 
 // GUI Display for an Album
 // Expected Props:
@@ -17,7 +18,7 @@ import StarRating from '../../general/star_rating';
 //  - submitter: String - (Optional) The discord id of the user that submitted this album, not applicable in all use cases
 //  - submitter_comment: String - (Optional) An optional comment that the album submitter may have left with this album
 //  - submission_date: String - (Optional) A String representation of the submission date of the Album
-//  - avg_rating: Int - Average rating of album by site users who have authenticated
+//  - album_spotify_id: String - (Optional) Album Spotify ID for retrieval of average from database
 export default async function AlbumDisplay(props) {
   // Album props checks
   const title = (props.title) ? props.title : "No Album Title Found";
@@ -31,7 +32,7 @@ export default async function AlbumDisplay(props) {
   const submitter_comment = (props.submitter_comment) ? props.submitter_comment : "No Comment Provided";
   const submission_date = (props.submission_date) ? props.submission_date : "Not Provided";
   // Rating props check
-  const avg_rating = (props.avg_rating) ? props.avg_rating : 0;
+  const avg_rating = (props.album_spotify_id) ? await getAlbumAvgRating(props.album_spotify_id): 0.0;
 
   return (
     <div className="w-full min-w-[320px] lg:min-w-[650px] mx-2 lg:mx-1 my-2 flex flex-col lg:flex-row">

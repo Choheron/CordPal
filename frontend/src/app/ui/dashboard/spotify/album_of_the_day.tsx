@@ -28,11 +28,11 @@ export default async function AlbumOfTheDayBox(props) {
           title={albumData("title")}
           album_img_src={albumData("album_img_src")}
           album_src={albumData("album_src")}
+          album_spotify_id={albumData("album_id")}
           artist={albumData("artist")}
           submitter={albumData("submitter")}
           submitter_comment={albumData("submitter_comment")}
           submission_date={albumData("submission_date")}
-          avg_rating={albumData("avg_rating")}
         />
         <AlbumReviewBox 
           album_id={albumData("album_id")}
