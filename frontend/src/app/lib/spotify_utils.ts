@@ -166,7 +166,7 @@ export async function getAlbumOfTheDayData(date: string = '') {
   const albumOfDayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumOfDay${urlTail}`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'no-store',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -181,7 +181,7 @@ export async function getAlbumOfTheDayData(date: string = '') {
   const albumDayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbum/${albumOfDayInfo['album_id']}`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'no-store',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
