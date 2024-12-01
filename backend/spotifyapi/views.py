@@ -522,4 +522,4 @@ def setAlbumOfDay(request: HttpRequest):
   albumOfTheDayObj.save()
   # Print success
   logger.info(f'Successfully selected album of the day: {albumOfTheDayObj}')
-  return HttpResponse(200)
+  return HttpResponse(f'Successfully selected album of the day: {albumOfTheDayObj}')
