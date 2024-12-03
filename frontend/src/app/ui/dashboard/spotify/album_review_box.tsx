@@ -20,8 +20,8 @@ export default function AlbumReviewBox(props) {
   // Activate Router
   const router = useRouter();
   // State management
-  const [rating, setRating] = useState<SliderValue>(5);
-  const [comment, setComment] = useState("No Comment Provided");
+  const [rating, setRating] = useState<SliderValue>((props.rating != null) ? props.rating : 5);
+  const [comment, setComment] = useState((props.comment != null) ? props.comment : "No Comment Provided");
   // const [favSong, setFavSong] = useState<Selection>(new Set([]));
   const [isReady, setIsReady] = useState(false);
   // Prop validation
@@ -94,13 +94,13 @@ export default function AlbumReviewBox(props) {
           isSelected={isReady}
           onValueChange={setIsReady}
         >
-          Ready to Submit?
+          Ready to {(props.rating != null)? "Update" : "Submit"}?
         </Checkbox>
         <Button
           isDisabled={!isReady}
           onPress={submitReview}
         >
-          Submit Review
+          {(props.rating != null)? "Update" : "Submit"} Review
         </Button>
       </div>
     </div>

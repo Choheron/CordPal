@@ -181,7 +181,7 @@ export async function getAlbumOfTheDayData(date: string = '') {
   const albumDayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbum/${albumOfDayInfo['album_id']}`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-store',
+    next: { revalidate: 60 },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -233,7 +233,7 @@ export async function submitReviewToBackend(reviewObject) {
 
 //
 // Get Reviews from Backend
-// - RETURN: HttpResponse
+// - RETURN: JSON Object of List of reviews
 //
 export async function getReviewsForAlbum(album_spotify_id) {
   // If no album ID provided, return empty list
@@ -247,13 +247,38 @@ export async function getReviewsForAlbum(album_spotify_id) {
   const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getReviewsForAlbum/${album_spotify_id}`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    next: { revalidate: 5 },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
   });
   const reviewListRes = await reviewResponse.json()
   return reviewListRes['review_list'];
+}
+
+//
+// Get Review by User for specific Album from Backend
+// - RETURN: HttpResponse
+//
+export async function getUserReviewForAlbum(album_spotify_id) {
+  // If no album ID provided, return null
+  if(album_spotify_id == "") {
+    return null
+  }
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getUserReviewForAlbum: Sending request to backend '/spotifyapi/getUserReviewForAlbum/${album_spotify_id}'`)
+  const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getUserReviewForAlbum/${album_spotify_id}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const reviewRes = await reviewResponse.json()
+  return reviewRes['review'];
 }
 
 //

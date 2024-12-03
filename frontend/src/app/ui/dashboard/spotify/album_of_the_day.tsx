@@ -5,14 +5,16 @@ import { Divider } from "@nextui-org/react";
 import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
 import ReviewDisplay from "./review_display";
-import { getAlbumOfTheDayData, getReviewsForAlbum } from "@/app/lib/spotify_utils";
+import { getAlbumOfTheDayData, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
 
 // GUI Display for the Album of the Day
 // Expected Props:
 //  - title: Title of the list
 export default async function AlbumOfTheDayBox(props) {
   const albumOfTheDayObj = await getAlbumOfTheDayData()
+  const albumReview = await getUserReviewForAlbum(albumData("album_id"))
 
+  // Pull data from album object, return empty string if not available
   function albumData(key) {
     if(key in albumOfTheDayObj) {
       return albumOfTheDayObj[key]
@@ -36,6 +38,8 @@ export default async function AlbumOfTheDayBox(props) {
         />
         <AlbumReviewBox 
           album_id={albumData("album_id")}
+          rating={(albumReview != null) ? albumReview['score'] : null}
+          comment={(albumReview != null) ? albumReview['comment'] : null}
         />
       </div>
       <Divider 

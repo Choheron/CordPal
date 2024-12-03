@@ -4,15 +4,19 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+  # Oauth URLS
   path('token', views.doSpotifyTokenSwap),
   path('connected', views.isSpotifyConnected),
+  # Basic Spotify Interaction Endpoints
   path('getSpotifyData', views.getSpotifyData),
   path('getSpotifyUsersObj', views.getSpotifyUsersObj),
   path('getTopItems/<str:item_type>/<str:time_range>/<str:limit>/<str:offset>', views.getTopItems),
+  # Alub of the Day Endpoints
   path('spotifySearch/<str:item_type>/<str:query>/<str:limit>/<str:offset>', views.spotifySearch),
   path('checkIfAlbumAlreadyExists/<str:album_spotify_id>', views.checkIfAlbumAlreadyExists),
   path('submitReview', views.submitReview),
   path('getReviewsForAlbum/<str:album_spotify_id>', views.getReviewsForAlbum),
+  path('getUserReviewForAlbum/<str:album_spotify_id>', views.getUserReviewForAlbum),
   path('submitAlbum', views.submitAlbum),
   path('getAlbum/<str:album_spotify_id>', views.getAlbum),
   path('getLastXAlbums/<int:count>', views.getLastXAlbums),

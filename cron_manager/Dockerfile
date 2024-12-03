@@ -3,11 +3,13 @@ FROM alpine:3.6
 # Run as root user
 USER root
 
-# Set Timezone
-ENV TZ='America/Chicago'
-
+# Install Timezone Package
+RUN apk add --no-cache tzdata
 # Install curl
 RUN apk --no-cache add curl
+
+# Set Timezone
+ENV TZ='America/Chicago'
 
 # copy crontabs for root user
 COPY ./crontab /etc/crontabs/root

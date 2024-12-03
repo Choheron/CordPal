@@ -26,6 +26,7 @@ from dotenv import load_dotenv
 import os
 import json
 import datetime
+import pytz
 import random
 
 # Declare logging
@@ -390,7 +391,7 @@ def submitReview(request: HttpRequest):
 
 
 ###
-# Get All Reviews for a specific album. //TODO: Test with album
+# Get All Reviews for a specific album.
 ###
 def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str):
   logger.info("getReviewsForAlbum called...")
@@ -421,9 +422,39 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str):
 
 
 ###
+# Get USER Reviews for a specific album.
+###
+def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str):
+  logger.info("getUserReviewForAlbum called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getUserReviewForAlbum called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get Album from the database
+  albumObj = Album.objects.get(spotify_id=album_spotify_id)
+  # Get reivew for album
+  try: 
+    review = Review.objects.get(album=albumObj, user=getSpotifyUser(request.session.get('discord_id')))
+  except ObjectDoesNotExist:
+    return JsonResponse({"review": None})
+  # Declare out object and populate
+  outObj = {}
+  outObj['user_id'] = review.user.discord_id
+  outObj['album_id'] = review.album.spotify_id
+  outObj['score'] = review.score
+  outObj['comment'] = review.review_text
+  outObj['review_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
+  outObj['last_upated'] = review.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
+  # Return user review
+  return JsonResponse({"review": outObj})
+
+
+###
 # Get All Reviews for a specific album. Returns a spotify album id and date
 ###
-def getAlbumOfDay(request: HttpRequest, date: str = datetime.date.today().strftime('%Y-%m-%d')):
+def getAlbumOfDay(request: HttpRequest, date: str = datetime.datetime.now().strftime('%Y-%m-%d')):
   logger.info("getAlbumOfDay called...")
   # Make sure request is a get request
   if(request.method != "GET"):
@@ -497,7 +528,7 @@ def setAlbumOfDay(request: HttpRequest):
   try:
     currDayAlbum = DailyAlbum.objects.get(date=day)
     logger.warning(f"WARN: Album of the day already selected: {currDayAlbum}")
-    return HttpResponse(425)
+    return HttpResponse(f"WARN: Album of the day already selected: {currDayAlbum}", status=425)
   except DailyAlbum.DoesNotExist:
     print("Today does not yet have an album, selecting one...")
   # Get Date a year ago to filter by

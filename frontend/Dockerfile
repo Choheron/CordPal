@@ -12,6 +12,11 @@ FROM node:18-alpine AS runtime
 
 ENV NODE_ENV=production
 
+# Install Timezone Package
+RUN apk add --no-cache tzdata
+# Set Timezone
+ENV TZ='America/Chicago'
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
