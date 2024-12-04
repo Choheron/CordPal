@@ -15,7 +15,7 @@ export default async function MusicStatsBox(props) {
     return (
       <div 
         key={index}
-        className="flex justify-between w-full"
+        className="flex justify-between w-full my-1"
       >
         <UserCard
           userDiscordID={user['discord_id']}
