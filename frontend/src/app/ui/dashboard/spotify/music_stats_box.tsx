@@ -14,7 +14,7 @@ export default async function MusicStatsBox(props) {
   const userDiv = albumStatsJson['user_objs'].map((user, index) => {
     return (
       <div 
-        key={index}
+        key={user['submission_count']}
         className="flex justify-between w-full my-1"
       >
         <UserCard
