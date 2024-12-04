@@ -54,7 +54,7 @@ export default function AlbumReviewBox(props) {
   }
 
   return (
-    <div className="w-full max-w-[640px] mx-2 px-2 lg:mx-1 my-2 py-2 flex flex-col rounded-xl bg-zinc-800/30 border border-neutral-800">
+    <div className="w-full max-w-[640px] px-2 lg:mx-1 py-2 flex flex-col rounded-xl bg-zinc-800/30 border border-neutral-800">
       <div className="w-full flex flex-col lg:flex-row gap-2 justify-between">
         <Slider   
           size="md"

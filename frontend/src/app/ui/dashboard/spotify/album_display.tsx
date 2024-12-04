@@ -35,17 +35,17 @@ export default async function AlbumDisplay(props) {
   const avg_rating = (props.album_spotify_id) ? await getAlbumAvgRating(props.album_spotify_id): 0.0;
 
   return (
-    <div className="w-full min-w-[320px] lg:min-w-[650px] mx-2 lg:mx-1 my-2 flex flex-col lg:flex-row">
+    <div className="w-full min-w-[320px] lg:min-w-[650px] mx-2 lg:mx-1 my-2 flex flex-row">
       <img 
         src={album_img_src}
-        className='h-[300px] w-[300px] rounded-2xl mx-auto'
+        className='h-[125px] w-[125px] lg:h-[300px] lg:w-[300px] rounded-2xl mx-auto'
         alt={`Album Cover for ${title} by ${artist_name}`}
       />
-      <div className="w-full flex flex-col gap-2 pl-5 pt-2 my-auto">
-        <a href={album_url} target="_noreferrer" className="text-3xl hover:underline">
+      <div className="w-full flex flex-col lg:gap-2 pl-2 lg:pl-5 pt-1 lg:pt-2 my-auto">
+        <a href={album_url} target="_noreferrer" className="text-xl lg:text-3xl hover:underline">
           {title}
         </a>
-        <a href={artist_url} target="_noreferrer" className="text-xl hover:underline italic">
+        <a href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline italic">
           {artist_name}
         </a>
         <Conditional showWhen={props.submitter}>
