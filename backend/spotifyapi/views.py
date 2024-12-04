@@ -454,8 +454,11 @@ def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str):
 ###
 # Get All Reviews for a specific album. Returns a spotify album id and date
 ###
-def getAlbumOfDay(request: HttpRequest, date: str = datetime.datetime.now().strftime('%Y-%m-%d')):
+def getAlbumOfDay(request: HttpRequest, date: str = ""):
   logger.info("getAlbumOfDay called...")
+  # Fill date if it isnt provided
+  if(date == ""):
+    date = datetime.datetime.now().strftime('%Y-%m-%d')
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAlbumOfDay called with a non-GET method, returning 405.")
