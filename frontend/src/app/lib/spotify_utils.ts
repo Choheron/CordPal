@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 // Below Code allows for serverside computing of cookie stuff!
@@ -212,26 +213,6 @@ export async function getAlbumAvgRating(spotify_album_id) {
 }
 
 //
-// Submit a review to the backend
-// - RETURN: HttpResponse
-//
-export async function submitReviewToBackend(reviewObject) {
-  // Check for sessionid in cookies
-  const sessionCookie = await getCookie('sessionid');
-  // Validate that user has connected spotify
-  console.log("submitReviewToBackend: Sending request to backend '/spotifyapi/submitReview'")
-  const submitReviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/submitReview`, {
-    method: "POST",
-    credentials: "include",
-    cache: 'no-cache',
-    headers: {
-      Cookie: `sessionid=${sessionCookie};`
-    },
-    body: JSON.stringify(reviewObject)
-  });
-}
-
-//
 // Get Reviews from Backend
 // - RETURN: JSON Object of List of reviews
 //
@@ -282,6 +263,26 @@ export async function getUserReviewForAlbum(album_spotify_id) {
 }
 
 //
+// Submit a review to the backend
+// - RETURN: HttpResponse
+//
+export async function submitReviewToBackend(reviewObject) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log("submitReviewToBackend: Sending request to backend '/spotifyapi/submitReview'")
+  const submitReviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/submitReview`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+    body: JSON.stringify(reviewObject)
+  });
+}
+
+//
 // Get Last X Album Submissions
 // - RETURN: list in JSON
 //
@@ -304,4 +305,25 @@ export async function getLastXSubmissions(count = 0) {
   });
   const reviewListRes = await subResponse.json()
   return reviewListRes;
+}
+
+//
+// Get Album Submission Stats
+// - RETURN: list in JSON
+//
+export async function getAlbumsStats() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getAlbumsStats: Sending request to backend '/spotifyapi/getAlbumsStats'`)
+  const albumStatResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumsStats`, {
+    method: "GET",
+    credentials: "include",
+    next: { revalidate: 5 },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const albumStatJson = await albumStatResponse.json()
+  return albumStatJson;
 }

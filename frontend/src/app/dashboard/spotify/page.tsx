@@ -8,13 +8,14 @@ import TopSongsList from "@/app/ui/dashboard/spotify/top_songs_list";
 import AlbumOfTheDayBox from "@/app/ui/dashboard/spotify/album_of_the_day";
 import AddAlbumModal from "@/app/ui/dashboard/spotify/add_album_modal";
 import RecentSubmissions from "@/app/ui/dashboard/spotify/recent_submissions";
+import MusicStatsBox from "@/app/ui/dashboard/spotify/music_stats_box";
 
 export default async function music() {
   const spot_authenticated = await isSpotifyLinked();
   const recentSubmissionsResponse = await getLastXSubmissions(10);
 
   return (
-    <div className="flex min-h-screen flex-col items-center p-3 pb-36 md:px-24 pt-10">
+    <div className="flex min-h-screen flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text="Spotify" />
       <Conditional showWhen={!spot_authenticated}>
         <SpotifyLoginBox />
@@ -27,6 +28,9 @@ export default async function music() {
             albumList={recentSubmissionsResponse['album_list']} 
             timestamp={recentSubmissionsResponse['timestamp']}
           />
+        </div>
+        <div className="flex flex-col w-fit justify-center lg:flex-row md:w-4/5 gap-2">
+          <MusicStatsBox />
         </div>
       </Conditional>
       <Conditional showWhen={spot_authenticated}>

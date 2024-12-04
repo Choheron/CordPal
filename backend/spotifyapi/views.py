@@ -233,6 +233,11 @@ def spotifySearch(request: HttpRequest, item_type, query, limit, offset):
   # Return Spotify Response
   return JsonResponse(spotifyResJSON)
 
+
+## =========================================================================================================================================================================================
+## ALBUM METHODS
+## =========================================================================================================================================================================================
+
 ###
 # Check if an album already exists in the database
 ###
@@ -354,6 +359,70 @@ def getAlbumAvgRating(request: HttpRequest, album_spotify_id: str):
 
 
 ###
+# Get All Reviews for a specific album. Returns a spotify album id and date
+###
+def getLastXAlbums(request: HttpRequest, count: int):
+  logger.info("getLastXAlbums called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getLastXAlbums called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get last X count of albums
+  last_X = Album.objects.all().order_by('-id')[:count]
+  # Build list of custom Album Objects
+  album_list = []
+  for album in last_X:
+    albumObj = {}
+    albumObj['title'] = album.title
+    albumObj['album_img_src'] = album.cover_url
+    albumObj['album_src'] = album.spotify_url
+    albumObj['submitter'] = album.submitted_by.nickname
+    albumObj['submission_date'] = album.submission_date
+    albumObj['raw_album'] = album.raw_data
+    # Append to List
+    album_list.append(albumObj)
+  return JsonResponse({ "album_list": album_list, "timestamp" : datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")})
+
+
+###
+# Get Album Stats (submission numbers)
+###
+def getAlbumsStats(request: HttpRequest):
+  logger.info("getAlbumsStats called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getAlbumsStats called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Declare out object
+  out = {}
+  # Get total album count
+  out['total_albums'] = Album.objects.all().count()
+  # Get all spotify users
+  spotUsers = SpotifyUserData.objects.all()
+  # Iterate through and build user json
+  userStatsList = []
+  for user in spotUsers:
+    userData = {}
+    userData['submission_count'] = Album.objects.filter(submitted_by=user.user).count()
+    userData['discord_id'] = user.user.discord_id
+    userData['nickname'] = user.user.nickname
+    # Append to List
+    userStatsList.append(userData)
+  # Add list to out
+  out['user_objs'] = userStatsList
+  # Return Object
+  return JsonResponse(out)
+
+
+## =========================================================================================================================================================================================
+## REVIEW METHODS
+## =========================================================================================================================================================================================
+
+###
 # Submit a new review of an album by a user.
 ###
 def submitReview(request: HttpRequest):
@@ -451,6 +520,10 @@ def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str):
   return JsonResponse({"review": outObj})
 
 
+## =========================================================================================================================================================================================
+## ALBUM OF THE DAY
+## =========================================================================================================================================================================================
+
 ###
 # Get All Reviews for a specific album. Returns a spotify album id and date
 ###
@@ -484,34 +557,6 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
   out['date'] = date
   logger.info(f"Returning Album of Day Object for Date {date}: {out}...")
   return JsonResponse(out)
-
-
-###
-# Get All Reviews for a specific album. Returns a spotify album id and date
-###
-def getLastXAlbums(request: HttpRequest, count: int):
-  logger.info("getLastXAlbums called...")
-  # Make sure request is a get request
-  if(request.method != "GET"):
-    logger.warning("getLastXAlbums called with a non-GET method, returning 405.")
-    res = HttpResponse("Method not allowed")
-    res.status_code = 405
-    return res
-  # Get last X count of albums
-  last_X = Album.objects.all().order_by('-id')[:count]
-  # Build list of custom Album Objects
-  album_list = []
-  for album in last_X:
-    albumObj = {}
-    albumObj['title'] = album.title
-    albumObj['album_img_src'] = album.cover_url
-    albumObj['album_src'] = album.spotify_url
-    albumObj['submitter'] = album.submitted_by.nickname
-    albumObj['submission_date'] = album.submission_date
-    albumObj['raw_album'] = album.raw_data
-    # Append to List
-    album_list.append(albumObj)
-  return JsonResponse({ "album_list": album_list, "timestamp" : datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")})
 
 
 ###
