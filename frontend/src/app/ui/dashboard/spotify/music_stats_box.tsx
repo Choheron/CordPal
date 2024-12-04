@@ -13,7 +13,10 @@ export default async function MusicStatsBox(props) {
 
   const userDiv = albumStatsJson['user_objs'].map((user, index) => {
     return (
-      <div className="flex justify-between w-full">
+      <div 
+        key={index}
+        className="flex justify-between w-full"
+      >
         <UserCard
           userDiscordID={user['discord_id']}
         />
@@ -31,7 +34,7 @@ export default async function MusicStatsBox(props) {
         <p className="mx-auto text-xl underline mb-1">
           Album Submission Stats: 
         </p>
-        <div className="flex justify-between w-full">
+        <div className="flex gap-2 justify-between w-full">
           <p>
             Total Albums Submitted:
           </p>
