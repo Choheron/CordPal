@@ -531,7 +531,7 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
   logger.info("getAlbumOfDay called...")
   # Fill date if it isnt provided
   if(date == ""):
-    date = datetime.datetime.now().strftime('%Y-%m-%d')
+    date = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d')
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAlbumOfDay called with a non-GET method, returning 405.")
