@@ -429,8 +429,10 @@ def getLowestHighestAlbumStats(request: HttpRequest):
   # Declare placeholders 
   lowest_album = None
   lowest_album_rating = 0.0
+  lowest_album_date = None
   highest_album = None
   highest_album_rating = 0.0
+  highest_album_date = None
   # Iterate through and retreive data
   for dailyAlbum in all_albums:
     album_rating = getAlbumRating(dailyAlbum.album.spotify_id, rounded=False)
@@ -438,15 +440,19 @@ def getLowestHighestAlbumStats(request: HttpRequest):
     if(lowest_album == None or album_rating < lowest_album_rating):
       lowest_album = dailyAlbum.album
       lowest_album_rating = album_rating
+      lowest_album_date = dailyAlbum.date
     # Check for highest album
     if(highest_album == None or album_rating > highest_album_rating):
       highest_album = dailyAlbum.album
       highest_album_rating = album_rating
+      highest_album_date = dailyAlbum.date
   # Populate out objects
   out['lowest_album'] = albumToDict(lowest_album)
   out['lowest_album']['rating'] = getAlbumRating(lowest_album.spotify_id, rounded=False)
+  out['lowest_album']['date'] = lowest_album_date
   out['highest_album'] = albumToDict(highest_album)
   out['highest_album']['rating'] = getAlbumRating(highest_album.spotify_id, rounded=False)
+  out['highest_album']['date'] = highest_album_date
   # Return Object
   return JsonResponse(out)
 
