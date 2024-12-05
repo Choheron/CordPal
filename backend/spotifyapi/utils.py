@@ -167,6 +167,9 @@ def getAlbumRating(album_spotify_id, rounded=True):
   albumObj = Album.objects.get(spotify_id=album_spotify_id)
   # Get average review score of album
   reviewList = Review.objects.filter(album=albumObj)
+  # Return None if the album has not been reviewed
+  if(len(reviewList) == 0):
+    return None
   review_sum = 0.0
   for review in reviewList:
     review_sum += float(review.score)

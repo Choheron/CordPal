@@ -307,7 +307,7 @@ def submitAlbum(request: HttpRequest):
   
 
 ###
-# Submit an Album to the album of the day pool.
+# Get an Album from the album of the day pool.
 ###
 def getAlbum(request: HttpRequest, album_spotify_id: str):
   logger.info("submitAlbum called...")
@@ -335,6 +335,48 @@ def getAlbum(request: HttpRequest, album_spotify_id: str):
   out['submission_date'] = albumObj.submission_date.strftime('%Y-%m-%d')
   # Return final object
   return JsonResponse(out)
+
+
+###
+# Get ALL Album from the album of the day pool.
+###
+def getAllAlbums(request: HttpRequest):
+  logger.info("submitAlbum called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("submitAlbum called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Retrieve all albums from database
+  albumObj = Album.objects.all()
+  # Declare list of albums
+  albumList = []
+  # Iterate through albums
+  for album in albumObj:
+    # Build album object
+    albumObj = {}
+    albumObj['title'] = album.title
+    albumObj['album_id'] = album.spotify_id
+    albumObj['album_img_src'] = album.cover_url
+    albumObj['album_src'] = album.spotify_url
+    albumObj['artist'] = {}
+    albumObj['artist']['name'] = album.artist
+    albumObj['artist']['href'] = (album.artist_url if album.artist_url != "" else album.raw_data['album']['artists'][0]['external_urls']['spotify'])
+    albumObj['submitter'] = album.submitted_by.discord_id
+    albumObj['submitter_nickname'] = album.submitted_by.nickname
+    albumObj['submitter_comment'] = album.user_comment
+    albumObj['submission_date'] = album.submission_date.strftime('%Y-%m-%d')
+    # Check if album has been rated
+    albumObj['rating'] = getAlbumRating(album.spotify_id, rounded=False)
+    if(albumObj['rating'] != None):
+      albumObj['AOD_date'] = DailyAlbum.objects.get(album=album).date
+    else:
+      albumObj['AOD_date'] = None
+    # Append to List
+    albumList.append(albumObj)
+  # Return final object
+  return JsonResponse({"timestamp": datetime.datetime.now(), "albums_list": albumList})
 
 
 ###

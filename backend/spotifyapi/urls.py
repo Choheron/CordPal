@@ -19,6 +19,7 @@ urlpatterns = [
   path('getUserReviewForAlbum/<str:album_spotify_id>', views.getUserReviewForAlbum),
   path('submitAlbum', views.submitAlbum),
   path('getAlbum/<str:album_spotify_id>', views.getAlbum),
+  path('getAllAlbums', views.getAllAlbums),
   path('getLastXAlbums/<int:count>', views.getLastXAlbums),
   path('getAlbumAvgRating/<str:album_spotify_id>', views.getAlbumAvgRating),
   # Below URL has two variations (one for lack of URL Param)
