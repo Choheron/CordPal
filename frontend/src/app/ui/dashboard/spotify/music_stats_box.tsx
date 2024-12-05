@@ -28,7 +28,7 @@ export default async function MusicStatsBox(props) {
   })
 
   return (
-    <div className="w-fill min-w-[340px] mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row rounded-2xl bg-zinc-800/30 border border-neutral-800">
+    <div className="w-fill min-w-[340px] mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
       {/* Album Submission Stats */}
       <div className='min-w-[300px] w-fit mx-auto flex flex-col'>
         <p className="mx-auto text-xl underline mb-1">

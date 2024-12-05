@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import {Providers} from "./providers";
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,6 +19,15 @@ export default function RootLayout({
   return (
     <html lang="en" className='dark'>
       <body className={`${inter.className} dark`}>
+        <Image
+          src="/images/holiday_decor/string-lights-png-hd-9.png"
+          width={0}
+          height={0}
+          sizes="100vw"
+          alt="Image of some Christmas Lights, Merry Christmas!"
+          className="fixed mt-20 z-0 lg:mt-0 lg:static gradient-to-b from-transparent to-black"
+          style={{ width: '100%', height: 'auto' }}
+        />
         <Providers>
           {children}
         </Providers>
