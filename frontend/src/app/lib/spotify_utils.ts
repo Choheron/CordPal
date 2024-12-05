@@ -327,3 +327,24 @@ export async function getAlbumsStats() {
   const albumStatJson = await albumStatResponse.json()
   return albumStatJson;
 }
+
+//
+// Get Lowest and Highest Album Stats
+// - RETURN: Json Obejcts
+//
+export async function getLowestHighestAlbumStats() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getLowestHighestAlbumStats: Sending request to backend '/spotifyapi/getLowestHighestAlbumStats'`)
+  const albumLowHighStatResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getLowestHighestAlbumStats`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const albumLowHighStatJson = await albumLowHighStatResponse.json()
+  return albumLowHighStatJson;
+}

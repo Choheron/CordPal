@@ -28,8 +28,8 @@ export default async function music() {
             albumList={recentSubmissionsResponse['album_list']} 
             timestamp={recentSubmissionsResponse['timestamp']}
           />
-          <MusicStatsBox />
         </div>
+        <MusicStatsBox />
       </Conditional>
       <Conditional showWhen={spot_authenticated}>
         <div className="flex flex-col w-full lg:flex-row md:w-4/5 gap-5">
