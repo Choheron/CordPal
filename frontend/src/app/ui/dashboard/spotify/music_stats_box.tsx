@@ -53,7 +53,7 @@ export default async function MusicStatsBox(props) {
         {/* Album Highest Stats */}
         <div className='min-w-[300px] w-fit mx-auto flex flex-col'>
           <p className="mx-auto text-xl underline mb-1">
-            Highest Album: 
+            Highest Album: {albumLowHighStatsJson['highest_album']['date']}
           </p>
           <Badge 
             content={albumLowHighStatsJson['highest_album']['rating']} 
@@ -62,7 +62,7 @@ export default async function MusicStatsBox(props) {
             shape="rectangle"
             showOutline={false}
             variant="shadow"
-            className="-ml-4 bg-yellow-300 text-xl text-black"
+            className="lg:-ml-4 bg-yellow-300 lg:text-xl text-black"
           >
             <AlbumDisplay
               title={albumLowHighStatsJson['highest_album']["title"]}
@@ -80,7 +80,7 @@ export default async function MusicStatsBox(props) {
         {/* Album Lowest Stats */}
         <div className='min-w-[300px] w-fit mx-auto flex flex-col'>
           <p className="mx-auto text-xl underline mb-1">
-            Lowest Album: 
+            Lowest Album: {albumLowHighStatsJson['lowest_album']['date']}
           </p>
           <Badge 
             content={albumLowHighStatsJson['lowest_album']['rating']} 
@@ -89,7 +89,7 @@ export default async function MusicStatsBox(props) {
             shape="rectangle"
             showOutline={false}
             variant="shadow"
-            className="-ml-4 bg-red-500 text-xl text-black"
+            className="lg:-ml-4 bg-red-500 lg:text-xl text-black"
           >
             <AlbumDisplay
               title={albumLowHighStatsJson['lowest_album']["title"]}
