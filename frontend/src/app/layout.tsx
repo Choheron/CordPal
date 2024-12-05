@@ -19,18 +19,49 @@ export default function RootLayout({
   return (
     <html lang="en" className='dark'>
       <body className={`${inter.className} dark`}>
-        <Image
-          src="/images/holiday_decor/string-lights-png-hd-9.png"
-          width={0}
-          height={0}
-          sizes="100vw"
-          alt="Image of some Christmas Lights, Merry Christmas!"
-          className="fixed mt-20 z-0 lg:mt-0 lg:static gradient-to-b from-transparent to-black"
-          style={{ width: '100%', height: 'auto' }}
-        />
+        <div className="flex">
+          <Image
+            src="/images/holiday_decor/string-lights-png-hd-9.png"
+            width={0}
+            height={0}
+            sizes="49vw"
+            alt="Image of some Christmas Lights, Merry Christmas!"
+            className="fixed mt-20 z-0 lg:mt-0 lg:static"
+            style={{ width: '100%', height: 'auto' }}
+          />
+          <Image
+            src="/images/holiday_decor/string-lights-png-hd-9.png"
+            width={0}
+            height={0}
+            sizes="49vw"
+            alt="Image of some Christmas Lights, Merry Christmas!"
+            className="fixed mt-20 z-0 lg:mt-0 lg:static scale-x-[-1]"
+            style={{ width: '100%', height: 'auto' }}
+          />
+        </div>
         <Providers>
           {children}
         </Providers>
+        <div className="flex">
+          <Image
+            src="/images/holiday_decor/string-lights-png-hd-9.png"
+            width={0}
+            height={0}
+            sizes="49vw"
+            alt="Image of some Christmas Lights, Merry Christmas!"
+            className="fixed mt-20 z-0 lg:mt-0 lg:static"
+            style={{ width: '100%', height: 'auto' }}
+          />
+          <Image
+            src="/images/holiday_decor/string-lights-png-hd-9.png"
+            width={0}
+            height={0}
+            sizes="49vw"
+            alt="Image of some Christmas Lights, Merry Christmas!"
+            className="fixed mt-20 z-0 lg:mt-0 lg:static scale-x-[-1]"
+            style={{ width: '100%', height: 'auto' }}
+          />
+        </div>
       </body>
     </html>
   );
