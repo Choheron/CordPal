@@ -32,7 +32,7 @@ export default async function MusicStatsBox(props) {
   })
 
   return (
-    <div className="w-fill min-w-[340px] mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row gap-5 backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
+    <div className="w-fill min-w-[340px] mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row gap-10 backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
       {/* Album Submission Stats */}
       <div className='min-w-[300px] w-fit mx-auto flex flex-col'>
         <p className="mx-auto text-xl underline mb-1">
@@ -56,7 +56,7 @@ export default async function MusicStatsBox(props) {
             Highest Album: {albumLowHighStatsJson['highest_album']['date']}
           </p>
           <Badge 
-            content={albumLowHighStatsJson['highest_album']['rating']} 
+            content={albumLowHighStatsJson['highest_album']['rating'].toFixed(2)} 
             size="lg" 
             placement="top-left" 
             shape="rectangle"
@@ -83,7 +83,7 @@ export default async function MusicStatsBox(props) {
             Lowest Album: {albumLowHighStatsJson['lowest_album']['date']}
           </p>
           <Badge 
-            content={albumLowHighStatsJson['lowest_album']['rating']} 
+            content={albumLowHighStatsJson['lowest_album']['rating'].toFixed(2)} 
             size="lg" 
             placement="top-left" 
             shape="rectangle"
