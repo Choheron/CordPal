@@ -10,7 +10,11 @@ import requests
 import pytz
 
 from users.models import User
-from .models import SpotifyUserData
+from .models import (
+  SpotifyUserData,
+  Album,
+  Review
+)
 
 from users.utils import (
   getSpotifyUser
@@ -155,3 +159,40 @@ def isUserSpotifyConnected(request: HttpRequest):
   except Exception as e:
     logger.error(f"USER COOKIE OR SPOTIFY DATA REFRESH ERROR!!! ERROR: {e}")
     return False
+ 
+
+# Get album's average rating (by spotifyid passed in [NOT ALBUM OBJECT])
+def getAlbumRating(album_spotify_id, rounded=True):
+  # Retrieve album from database
+  albumObj = Album.objects.get(spotify_id=album_spotify_id)
+  # Get average review score of album
+  reviewList = Review.objects.filter(album=albumObj)
+  review_sum = 0.0
+  for review in reviewList:
+    review_sum += float(review.score)
+  # Calculate Average
+  if(rounded):
+    rating = (round((review_sum/float(len(reviewList)))*2)/2 if len(reviewList) > 0 else 0.0)
+    # Return rating
+    return rating
+  else:
+    rating = review_sum/float(len(reviewList))
+    # Return rating
+    return rating
+
+
+# Return an dictionary version of the passed in album object
+def albumToDict(album: Album):
+  albumObj = {}
+  albumObj['spotify_id'] = album.spotify_id
+  albumObj['title'] = album.title
+  albumObj['artist'] = album.artist
+  albumObj['artist_url'] = album.artist_url
+  albumObj['album_img_src'] = album.cover_url
+  albumObj['spotify_url'] = album.spotify_url
+  albumObj['submitter'] = album.submitted_by.nickname
+  albumObj['submitter_id'] = album.submitted_by.discord_id
+  albumObj['submission_date'] = album.submission_date
+  albumObj['user_comment'] = album.user_comment
+  albumObj['raw_album'] = album.raw_data
+  return albumObj

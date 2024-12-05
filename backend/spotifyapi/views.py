@@ -8,6 +8,8 @@ from .utils import (
   isSpotifyTokenExpired,
   refreshSpotifyToken,
   isUserSpotifyConnected,
+  getAlbumRating,
+  albumToDict,
 )
 
 from users.utils import getSpotifyUser
@@ -346,15 +348,7 @@ def getAlbumAvgRating(request: HttpRequest, album_spotify_id: str):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Retrieve album from database
-  albumObj = Album.objects.get(spotify_id=album_spotify_id)
-  # Get average review score of album
-  reviewList = Review.objects.filter(album=albumObj)
-  review_sum = 0.0
-  for review in reviewList:
-    review_sum += float(review.score)
-  # Calculate Average
-  rating = (round((review_sum/float(len(reviewList)))*2)/2 if len(reviewList) > 0 else 0.0)
+  rating = getAlbumRating(album_spotify_id)
   return JsonResponse({"rating": rating})
 
 
@@ -417,6 +411,44 @@ def getAlbumsStats(request: HttpRequest):
   # Return Object
   return JsonResponse(out)
 
+###
+# Get Lowest and Highest Rated Albums
+###
+def getLowestHighestAlbumStats(request: HttpRequest):
+  logger.info("getLowestHighestAlbumStats called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getLowestHighestAlbumStats called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Declare out object
+  out = {}
+  # Get all albums from album of the day
+  all_albums = DailyAlbum.objects.all()
+  # Declare placeholders 
+  lowest_album = None
+  lowest_album_rating = 0.0
+  highest_album = None
+  highest_album_rating = 0.0
+  # Iterate through and retreive data
+  for dailyAlbum in all_albums:
+    album_rating = getAlbumRating(dailyAlbum.album.spotify_id, rounded=False)
+    # Check for lowest album
+    if(lowest_album == None or album_rating < lowest_album_rating):
+      lowest_album = dailyAlbum.album
+      lowest_album_rating = album_rating
+    # Check for highest album
+    if(highest_album == None or album_rating > highest_album_rating):
+      highest_album = dailyAlbum.album
+      highest_album_rating = album_rating
+  # Populate out objects
+  out['lowest_album'] = albumToDict(lowest_album)
+  out['lowest_album']['rating'] = getAlbumRating(lowest_album.spotify_id, rounded=False)
+  out['highest_album'] = albumToDict(highest_album)
+  out['highest_album']['rating'] = getAlbumRating(highest_album.spotify_id, rounded=False)
+  # Return Object
+  return JsonResponse(out)
 
 ## =========================================================================================================================================================================================
 ## REVIEW METHODS

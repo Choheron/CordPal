@@ -11,7 +11,7 @@ urlpatterns = [
   path('getSpotifyData', views.getSpotifyData),
   path('getSpotifyUsersObj', views.getSpotifyUsersObj),
   path('getTopItems/<str:item_type>/<str:time_range>/<str:limit>/<str:offset>', views.getTopItems),
-  # Alub of the Day Endpoints
+  # Album of the Day Endpoints
   path('spotifySearch/<str:item_type>/<str:query>/<str:limit>/<str:offset>', views.spotifySearch),
   path('checkIfAlbumAlreadyExists/<str:album_spotify_id>', views.checkIfAlbumAlreadyExists),
   path('submitReview', views.submitReview),
@@ -26,6 +26,7 @@ urlpatterns = [
   path('getAlbumOfDay', views.getAlbumOfDay),
   # Statistics Endpoints
   path('getAlbumsStats', views.getAlbumsStats),
+  path('getLowestHighestAlbumStats', views.getLowestHighestAlbumStats),
   # Command to be called by cronjob to set the album of the day
   path('setAlbumOfDay', views.setAlbumOfDay),
 ]
