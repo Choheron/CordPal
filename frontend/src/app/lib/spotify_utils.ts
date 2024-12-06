@@ -365,7 +365,28 @@ export async function getAllAlbums() {
   const allAlbumsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAllAlbums`, {
     method: "GET",
     credentials: "include",
-    cache: 'force-cache',
+    next: { revalidate: 30 },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const allAlbumsJson = await allAlbumsResponse.json()
+  return allAlbumsJson;
+}
+
+//
+// Get all Albums from Album Pool HARD RELOAD (No cache)
+// - RETURN: Json Obejcts
+//
+export async function getAllAlbumsNoCache() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getAllAlbums: Sending request to backend '/spotifyapi/getAllAlbums'`)
+  const allAlbumsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAllAlbums`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },

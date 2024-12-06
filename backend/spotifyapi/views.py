@@ -364,6 +364,7 @@ def getAllAlbums(request: HttpRequest):
     albumObj['artist']['name'] = album.artist
     albumObj['artist']['href'] = (album.artist_url if album.artist_url != "" else album.raw_data['album']['artists'][0]['external_urls']['spotify'])
     albumObj['submitter'] = album.submitted_by.discord_id
+    albumObj['submitter_avatar_url'] = album.submitted_by.get_avatar_url()
     albumObj['submitter_nickname'] = album.submitted_by.nickname
     albumObj['submitter_comment'] = album.user_comment
     albumObj['submission_date'] = album.submission_date.strftime('%Y-%m-%d')

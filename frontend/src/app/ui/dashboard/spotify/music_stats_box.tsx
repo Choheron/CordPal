@@ -7,6 +7,7 @@ import AlbumDisplay from "./album_display";
 
 import {Badge} from "@nextui-org/badge";
 import { Divider } from "@nextui-org/react";
+import { ratingToTailwindBgColor } from "@/app/lib/utils";
 
 // GUI Display for an Album
 // Expected Props:
@@ -62,7 +63,7 @@ export default async function MusicStatsBox(props) {
             shape="rectangle"
             showOutline={false}
             variant="shadow"
-            className="lg:-ml-4 bg-yellow-300 lg:text-xl text-black"
+            className={`lg:-ml-4 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2))} lg:text-xl text-black`}
           >
             <AlbumDisplay
               title={albumLowHighStatsJson['highest_album']["title"]}
@@ -88,7 +89,7 @@ export default async function MusicStatsBox(props) {
             shape="rectangle"
             showOutline={false}
             variant="shadow"
-            className="lg:-ml-4 bg-red-500 lg:text-xl text-black"
+            className={`lg:-ml-4 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2))} lg:text-xl text-black`}
           >
             <AlbumDisplay
               title={albumLowHighStatsJson['lowest_album']["title"]}

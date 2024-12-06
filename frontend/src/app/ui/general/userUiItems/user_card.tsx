@@ -1,3 +1,5 @@
+'use server'
+
 import {User} from "@nextui-org/user";
 
 import { getUserData, getUserAvatarURL } from "@/app/lib/user_utils";

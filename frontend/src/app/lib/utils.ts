@@ -30,3 +30,32 @@ export function convertToLocalTZString(date: Date, full: boolean = false) {
   hours = (hours == 0)? 12 : hours;
   return `${splitString[0]} ${splitString[1]} ${splitString[2]}` + ((full) ? ` ${hours}:${adjustedDate.getMinutes()}:${adjustedDate.getSeconds()} ${suffix}` : "")
 }
+
+// Convert a rating to a string representing tailwind color
+export function ratingToTailwindBgColor(rating: number) {
+  // Normalize rating
+  rating = Math.max(0.0, rating);
+  rating = Math.min(10.00, rating);
+    if(rating == 9.99)
+      return "bg-[#55ff00]"
+    if(rating >= 9.0)
+      return "bg-[#83ee00]"
+    if(rating >= 8.0)
+      return "bg-[#a4db00]"
+    if(rating >= 7.0)
+      return "bg-[#bac800]"
+    if(rating >= 6.0)
+      return "bg-[#cdb400]"
+    if(rating >= 5.0)
+      return "bg-[#dc9e00]"
+    if(rating >= 4.0)
+      return "bg-[#ea8600]"
+    if(rating >= 3.0)
+      return "bg-[#f66900]"
+    if(rating >= 2.0)
+      return "bg-[#fc4700]"
+    if(rating >= 1.0)
+      return "bg-[#de1111]"
+    if(rating >= 0.0)
+      return "bg-[#ff0000]"
+}
