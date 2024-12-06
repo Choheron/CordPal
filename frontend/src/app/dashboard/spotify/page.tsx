@@ -9,6 +9,7 @@ import AlbumOfTheDayBox from "@/app/ui/dashboard/spotify/album_of_the_day";
 import AddAlbumModal from "@/app/ui/dashboard/spotify/add_album_modal";
 import RecentSubmissions from "@/app/ui/dashboard/spotify/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/spotify/music_stats_box";
+import AllAlbumsModal from "@/app/ui/dashboard/spotify/all_albums_modal";
 
 export default async function music() {
   const spot_authenticated = await isSpotifyLinked();
@@ -24,10 +25,13 @@ export default async function music() {
         <AddAlbumModal />
         <div className="flex flex-col w-fit justify-center xl:flex-row md:w-4/5 gap-2">
           <AlbumOfTheDayBox title={"Album Of The Day"} />
-          <RecentSubmissions 
-            albumList={recentSubmissionsResponse['album_list']} 
-            timestamp={recentSubmissionsResponse['timestamp']}
-          />
+          <div className="flex flex-col">
+            <RecentSubmissions 
+              albumList={recentSubmissionsResponse['album_list']} 
+              timestamp={recentSubmissionsResponse['timestamp']}
+            />
+            <AllAlbumsModal />
+          </div>
         </div>
         <MusicStatsBox />
       </Conditional>

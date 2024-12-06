@@ -11,8 +11,14 @@ import { getAlbumOfTheDayData, getUserReviewForAlbum } from "@/app/lib/spotify_u
 // Expected Props:
 //  - title: Title of the list
 export default async function AlbumOfTheDayBox(props) {
-  const albumOfTheDayObj = await getAlbumOfTheDayData()
+  let albumOfTheDayObj = await getAlbumOfTheDayData()
   const albumReview = await getUserReviewForAlbum(albumData("album_id"))
+
+  // Check if album of the day is outdated
+  let todayDate = new Date()
+  if(todayDate.toISOString().split('T')[0] != albumOfTheDayObj['AOD_date']) {
+    albumOfTheDayObj = await getAlbumOfTheDayData()
+  }
 
   // Pull data from album object, return empty string if not available
   function albumData(key) {

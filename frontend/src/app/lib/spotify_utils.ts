@@ -188,19 +188,23 @@ export async function getAlbumOfTheDayData(date: string = '') {
     },
   });
   const albumData = await albumDayResponse.json()
-  return albumData
+  // Add Date for album of day
+  albumData['AOD_date'] = albumOfDayInfo['date']
+  return albumData;
 }
 
 //
 // Get album rating
 // - RETURN: object containing album of the day data
 //
-export async function getAlbumAvgRating(spotify_album_id) {
+export async function getAlbumAvgRating(spotify_album_id, rounded = true) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
+  // Tail to string for variants in API calls
+  const urlTail = (rounded) ? "" : "/false"
   // Validate that user has connected spotify
-  console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbumAvgRating/${spotify_album_id}'`)
-  const avgRatingResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumAvgRating/${spotify_album_id}`, {
+  console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbumAvgRating/${spotify_album_id}${urlTail}'`)
+  const avgRatingResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumAvgRating/${spotify_album_id}${urlTail}`, {
     method: "GET",
     credentials: "include",
     cache: 'no-cache',
@@ -340,11 +344,32 @@ export async function getLowestHighestAlbumStats() {
   const albumLowHighStatResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getLowestHighestAlbumStats`, {
     method: "GET",
     credentials: "include",
-    cache: 'force-cache',
+    next: { revalidate: 30 },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
   });
   const albumLowHighStatJson = await albumLowHighStatResponse.json()
   return albumLowHighStatJson;
+}
+
+//
+// Get all Albums from Album Pool
+// - RETURN: Json Obejcts
+//
+export async function getAllAlbums() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getAllAlbums: Sending request to backend '/spotifyapi/getAllAlbums'`)
+  const allAlbumsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAllAlbums`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const allAlbumsJson = await allAlbumsResponse.json()
+  return allAlbumsJson;
 }

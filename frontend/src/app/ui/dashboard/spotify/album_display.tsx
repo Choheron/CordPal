@@ -57,7 +57,7 @@ export default async function AlbumDisplay(props) {
             <p>On: <i>{submission_date}</i></p>
           </div>
         </Conditional>
-        <Conditional showWhen={(avg_rating != 0)}>
+        <Conditional showWhen={(avg_rating != 0) && ((avg_rating != null))}>
           <div className="">
             <p>Average User Rating: </p>
             <div className="ml-2">

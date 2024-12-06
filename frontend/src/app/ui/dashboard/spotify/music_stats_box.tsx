@@ -2,7 +2,7 @@
 
 import { Conditional } from "../conditional"
 import UserCard from '../../general/userUiItems/user_card';
-import { getAlbumsStats, getLowestHighestAlbumStats } from "@/app/lib/spotify_utils";
+import { getAlbumAvgRating, getAlbumsStats, getLowestHighestAlbumStats } from "@/app/lib/spotify_utils";
 import AlbumDisplay from "./album_display";
 
 import {Badge} from "@nextui-org/badge";
@@ -56,7 +56,7 @@ export default async function MusicStatsBox(props) {
             Highest Album: {albumLowHighStatsJson['highest_album']['date']}
           </p>
           <Badge 
-            content={albumLowHighStatsJson['highest_album']['rating'].toFixed(2)} 
+            content={(await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2)} 
             size="lg" 
             placement="top-left" 
             shape="rectangle"
@@ -68,7 +68,6 @@ export default async function MusicStatsBox(props) {
               title={albumLowHighStatsJson['highest_album']["title"]}
               album_img_src={albumLowHighStatsJson['highest_album']["album_img_src"]}
               album_src={albumLowHighStatsJson['highest_album']["spotify_url"]}
-              album_spotify_id={albumLowHighStatsJson['highest_album']["album_id"]}
               artist={{"name": albumLowHighStatsJson['highest_album']["artist"], "href": albumLowHighStatsJson['highest_album']["artist_url"]}}
               submitter={albumLowHighStatsJson['highest_album']["submitter_id"]}
               submitter_comment={albumLowHighStatsJson['highest_album']["submitter_comment"]}
@@ -83,7 +82,7 @@ export default async function MusicStatsBox(props) {
             Lowest Album: {albumLowHighStatsJson['lowest_album']['date']}
           </p>
           <Badge 
-            content={albumLowHighStatsJson['lowest_album']['rating'].toFixed(2)} 
+            content={(await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2)} 
             size="lg" 
             placement="top-left" 
             shape="rectangle"
@@ -95,7 +94,6 @@ export default async function MusicStatsBox(props) {
               title={albumLowHighStatsJson['lowest_album']["title"]}
               album_img_src={albumLowHighStatsJson['lowest_album']["album_img_src"]}
               album_src={albumLowHighStatsJson['lowest_album']["spotify_url"]}
-              album_spotify_id={albumLowHighStatsJson['lowest_album']["album_id"]}
               artist={{"name": albumLowHighStatsJson['lowest_album']["artist"], "href": albumLowHighStatsJson['lowest_album']["artist_url"]}}
               submitter={albumLowHighStatsJson['lowest_album']["submitter_id"]}
               submitter_comment={albumLowHighStatsJson['lowest_album']["submitter_comment"]}

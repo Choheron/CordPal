@@ -382,15 +382,20 @@ def getAllAlbums(request: HttpRequest):
 ###
 # Get the average rating for an album.
 ###
-def getAlbumAvgRating(request: HttpRequest, album_spotify_id: str):
+def getAlbumAvgRating(request: HttpRequest, album_spotify_id: str, rounded: str = "true"):
   logger.info("getAlbumAvgRating called...")
+  # Convert bool to string
+  if(rounded == "true"):
+    rounded = True
+  else: 
+    rounded = False
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAlbumAvgRating called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  rating = getAlbumRating(album_spotify_id)
+  rating = getAlbumRating(album_spotify_id, rounded=rounded)
   return JsonResponse({"rating": rating})
 
 
@@ -479,12 +484,12 @@ def getLowestHighestAlbumStats(request: HttpRequest):
   for dailyAlbum in all_albums:
     album_rating = getAlbumRating(dailyAlbum.album.spotify_id, rounded=False)
     # Check for lowest album
-    if(lowest_album == None or album_rating < lowest_album_rating):
+    if(lowest_album == None or (album_rating != None and album_rating < lowest_album_rating)):
       lowest_album = dailyAlbum.album
       lowest_album_rating = album_rating
       lowest_album_date = dailyAlbum.date
     # Check for highest album
-    if(highest_album == None or album_rating > highest_album_rating):
+    if(highest_album == None or (album_rating != None and album_rating > highest_album_rating)):
       highest_album = dailyAlbum.album
       highest_album_rating = album_rating
       highest_album_date = dailyAlbum.date

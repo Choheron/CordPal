@@ -10,6 +10,8 @@ export function capitalizeFirstLetter(string) {
 
 // Convert passed in date object to local timezone
 export function convertToLocalTZString(date: Date, full: boolean = false) {
+  // Use client to get proper times
+  "use client"
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   // Convert timezone
   const adjustedDate = new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: timezone}));
