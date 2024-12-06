@@ -189,6 +189,9 @@ export default function AllAlbumsModal(props) {
                     Data Last Updated: {convertToLocalTZString(updateTimestamp, true)}
                   </p>
                   <div>
+                    <Button color="primary" variant="solid" className="mr-2" onPress={hardRefresh}>
+                      Hard Refresh
+                    </Button>
                     <Button color="danger" variant="bordered" onPress={onClose}>
                       Close
                     </Button>
