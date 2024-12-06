@@ -1,8 +1,7 @@
 'use server'
 
-import Image from 'next/image'
-
 import { Conditional } from "../conditional"
+import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
 import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
@@ -52,7 +51,16 @@ export default async function AlbumDisplay(props) {
           <div className="">
             <p>Submitted By: </p>
             <div className="ml-2 -mb-1">
-              <UserCard userDiscordID={submitter} fallbackName={"User Not Found"}/>
+              <Popover placement="left" showArrow={true} className="w-fit">
+                <PopoverTrigger>
+                  <div>
+                    <UserCard userDiscordID={submitter} fallbackName={"User Not Found"}/>
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <p>{submitter_comment}</p>
+                </PopoverContent>
+              </Popover>
             </div>
             <p>On: <i>{submission_date}</i></p>
           </div>
