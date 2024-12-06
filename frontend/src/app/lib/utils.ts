@@ -17,7 +17,6 @@ export function convertToLocalTZString(date: Date, full: boolean = false) {
   const adjustedDate = new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: timezone}));
   // Get in String
   const adjDateString = adjustedDate.toString();
-  console.log(adjDateString)
   // Trim down string as needed
   let splitString = adjDateString.split(" ")
   // Delete not required string elements
