@@ -60,6 +60,11 @@ export default function AllAlbumsModal(props) {
       label: "RATING (IF AVAIL)",
       sortable: true,
     },
+    {
+      key: "AOD_date",
+      label: "LAST AOD",
+      sortable: true,
+    },
   ];
 
   // Custom sorting method
@@ -106,6 +111,14 @@ export default function AllAlbumsModal(props) {
         setAlbumList(albumList.sort((a, b) => {
           if (descriptor.direction === "ascending") return ((a['title'] < b['title']) ? 1 : -1);
           if (descriptor.direction === "descending") return ((a['title'] > b['title']) ? 1 : -1);
+          return 0;
+        }))
+        break;
+      // Sort on Last Album of Day Date
+      case 'AOD_date':
+        setAlbumList(albumList.sort((a, b) => {
+          if (descriptor.direction === "ascending") return ((a['AOD_date'] < b['AOD_date']) ? 1 : -1);
+          if (descriptor.direction === "descending") return ((a['AOD_date'] > b['AOD_date']) ? 1 : -1);
           return 0;
         }))
         break;
@@ -173,6 +186,12 @@ export default function AllAlbumsModal(props) {
               --
             </p>
         );
+      case "AOD_date":
+          return (
+            <p className="my-auto">
+              {(album['AOD_date'] != null) ? album['AOD_date'] : "N/A"}
+            </p>
+          );
     }
   }, []);
 
