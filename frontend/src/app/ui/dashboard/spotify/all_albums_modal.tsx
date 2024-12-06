@@ -245,6 +245,7 @@ export default function AllAlbumsModal(props) {
                   aria-label="Album Submissions"
                   sortDescriptor={sortDescriptor}
                   onSortChange={handleSortChange}
+                  isStriped
                 >
                   <TableHeader columns={columns}>
                     {(column) =>
