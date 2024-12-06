@@ -28,6 +28,8 @@ import { convertToLocalTZString, ratingToTailwindBgColor } from "@/app/lib/utils
 export default function AllAlbumsModal(props) {
   const [updateTimestamp, setUpdateTimestamp] = React.useState<any>("")
   const [albumList, setAlbumList] = React.useState([])
+  // Sorting variables
+  const [sortDescriptor, setSortDescriptor] = React.useState<any>()
   // Modal Controller Vars
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
@@ -36,22 +38,22 @@ export default function AllAlbumsModal(props) {
     {
       key: "title",
       label: "ALBUM NAME",
-      sortable: false,
+      sortable: true,
     },
     {
       key: "artist",
       label: "ARTIST",
-      sortable: false,
+      sortable: true,
     },
     {
       key: "submitter",
       label: "SUBMITTER",
-      sortable: false,
+      sortable: true,
     },
     {
       key: "submission_date",
       label: "SUBMITTED ON",
-      sortable: false,
+      sortable: true,
     },
     {
       key: "rating",
@@ -59,6 +61,56 @@ export default function AllAlbumsModal(props) {
       sortable: true,
     },
   ];
+
+  // Custom sorting method
+  const handleSortChange = (descriptor) => {
+    setSortDescriptor(descriptor)
+    switch(descriptor.column) {
+      // Sort on rating
+      case 'rating':
+        setAlbumList(albumList.sort((a, b) => {
+          if (descriptor.direction === "ascending") return a['rating'] - b['rating'];
+          if (descriptor.direction === "descending") return b['rating'] - a['rating'];
+          return 0;
+        }))
+        break;
+      // Sort on Submission Date
+      case 'submission_date':
+        setAlbumList(albumList.sort((a, b) => {
+          const dateA: any = new Date(a['submission_date']);
+          const dateB: any = new Date(b['submission_date']);
+          
+          if (descriptor.direction === "ascending") return (dateA - dateB);
+          if (descriptor.direction === "descending") return (dateB - dateA);
+          return 0;
+        }))
+        break;
+      // Sort on Submitter Nickname
+      case 'submitter':
+        setAlbumList(albumList.sort((a, b) => {
+          if (descriptor.direction === "ascending") return ((a['submitter_nickname'] < b['submitter_nickname']) ? 1 : -1);
+          if (descriptor.direction === "descending") return ((a['submitter_nickname'] > b['submitter_nickname']) ? 1 : -1);
+          return 0;
+        }))
+        break;
+      // Sort on Artist Name
+      case 'artist':
+        setAlbumList(albumList.sort((a, b) => {
+          if (descriptor.direction === "ascending") return ((a['artist']['name'] < b['artist']['name']) ? 1 : -1);
+          if (descriptor.direction === "descending") return ((a['artist']['name'] > b['artist']['name']) ? 1 : -1);
+          return 0;
+        }))
+        break;
+      // Sort on Album Title
+      case 'title':
+        setAlbumList(albumList.sort((a, b) => {
+          if (descriptor.direction === "ascending") return ((a['title'] < b['title']) ? 1 : -1);
+          if (descriptor.direction === "descending") return ((a['title'] > b['title']) ? 1 : -1);
+          return 0;
+        }))
+        break;
+    }
+  };
 
   // UseEffect to pull Album Data
   React.useEffect(() => {
@@ -167,9 +219,15 @@ export default function AllAlbumsModal(props) {
                 Album Data
               </ModalHeader>
               <ModalBody>
-                <Table aria-label="Album Submissions">
+                <Table 
+                  aria-label="Album Submissions"
+                  sortDescriptor={sortDescriptor}
+                  onSortChange={handleSortChange}
+                >
                   <TableHeader columns={columns}>
-                    {(column) => <TableColumn key={column.key} className="w-fit">{column.label}</TableColumn>}
+                    {(column) =>
+                      <TableColumn key={column.key} allowsSorting={column.sortable} className="w-fit">{column.label}</TableColumn>
+                    }
                   </TableHeader>
                   <TableBody 
                     items={albumList}
