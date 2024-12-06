@@ -19,7 +19,7 @@ import {
 import { Avatar, Button } from "@nextui-org/react";
 import React from "react";
 import { useRouter } from 'next/navigation';
-import { getAllAlbums } from "@/app/lib/spotify_utils";
+import { getAllAlbums, getAllAlbumsNoCache } from "@/app/lib/spotify_utils";
 import { convertToLocalTZString, ratingToTailwindBgColor } from "@/app/lib/utils";
 
 
@@ -125,6 +125,16 @@ export default function AllAlbumsModal(props) {
   }, []);
 
   // Reset values on cancel button press
+  const hardRefresh = () => {
+    const ingestNewData = async () => {
+      let albumData = await getAllAlbumsNoCache()
+      setAlbumList(albumData['albums_list'])
+      setUpdateTimestamp(albumData['timestamp'])
+    }
+    ingestNewData()
+  }
+
+  // Reset values on cancel button press
   const cancelPress = () => {
     onClose()
     // Reload page
@@ -178,9 +188,11 @@ export default function AllAlbumsModal(props) {
                   <p className="my-auto">
                     Data Last Updated: {convertToLocalTZString(updateTimestamp, true)}
                   </p>
-                  <Button color="danger" variant="light" onPress={onClose}>
-                    Close
-                  </Button>
+                  <div>
+                    <Button color="danger" variant="bordered" onPress={onClose}>
+                      Close
+                    </Button>
+                  </div>
                 </div>
               </ModalFooter>
             </>
