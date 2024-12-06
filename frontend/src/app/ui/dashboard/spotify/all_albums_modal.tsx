@@ -152,7 +152,7 @@ export default function AllAlbumsModal(props) {
         );
       case "artist":
         return (
-          <a href={album['artist']['href']} target="_noreferrer" className="text-md my-auto hover:underline">
+          <a href={album['artist']['href']} target="_noreferrer" className="w-fit text-md my-auto hover:underline">
             {album['artist']['name']}
           </a>
         );
@@ -230,6 +230,9 @@ export default function AllAlbumsModal(props) {
         onOpenChange={onOpenChange} 
         backdrop="blur"
         onClose={cancelPress}
+        classNames={{
+          base: "max-w-[75%]",
+        }}
       >
         <ModalContent>
           {() => (
