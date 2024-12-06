@@ -344,7 +344,7 @@ export async function getLowestHighestAlbumStats() {
   const albumLowHighStatResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getLowestHighestAlbumStats`, {
     method: "GET",
     credentials: "include",
-    next: { revalidate: 30 },
+    next: { revalidate: 60 },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
