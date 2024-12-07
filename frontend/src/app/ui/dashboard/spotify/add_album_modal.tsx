@@ -17,7 +17,6 @@ import { Listbox,  ListboxSection,  ListboxItem} from "@nextui-org/listbox";
 
 import { checkIfAlbumAlreadyExists, spotifySearch, submitAlbumToBackend } from "@/app/lib/spotify_utils";
 import { Conditional } from "../conditional";
-import AlbumDisplay from "./album_display";
 
 // Modal to allow a user to submit an album for the album of the day pool
 export default function AddAlbumModal(props) {
@@ -153,13 +152,13 @@ export default function AddAlbumModal(props) {
   return (
     <>
       <Button 
-        className="p-1 mb-1 rounded-lg text-tiny text-inheret min-w-0 min-h-0 h-fit hover:underline"
-        size="sm"
+        className="p-2 my-4 mx-auto rounded-lg text-inheret min-w-0 min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline"
+        size="lg"
         onPress={onOpen}
         radius="none"
         variant="solid"
       >
-        Submit An Album
+        <b>Submit An Album</b>
       </Button>
       <Modal size="xl" isOpen={isOpen} isDismissable={false} onOpenChange={onOpenChange} onClose={cancelPress}>
         <ModalContent>

@@ -22,7 +22,6 @@ export default async function music() {
         <SpotifyLoginBox />
       </Conditional>
       <Conditional showWhen={spot_authenticated}>
-        <AddAlbumModal />
         <div className="flex flex-col w-fit justify-center xl:flex-row md:w-4/5 gap-2">
           <AlbumOfTheDayBox title={"Album Of The Day"} />
           <div className="flex flex-col">

@@ -16,7 +16,7 @@ export default async function MusicStatsBox(props) {
   const albumStatsJson = await getAlbumsStats();
   const albumLowHighStatsJson = await getLowestHighestAlbumStats();
 
-  const userDiv = albumStatsJson['user_objs'].sort((a, b) => a['submission_count'] < b['submission_count'] ? 1 : -1).map((user, index) => {
+  const albumUserStatsList = albumStatsJson['user_objs'].sort((a, b) => a['submission_count'] < b['submission_count'] ? 1 : -1).map((user, index) => {
     return (
       <div 
         key={user['submission_count']}
@@ -48,12 +48,12 @@ export default async function MusicStatsBox(props) {
           </p>
         </div>
         <Divider className="my-1" />
-        {userDiv}
+        {albumUserStatsList}
       </div>
       <div className="flex flex-col">
         {/* Album Highest Stats */}
         <div className='min-w-[300px] w-fit mx-auto flex flex-col'>
-          <p className="mx-auto text-xl underline mb-1">
+          <p className="mx-auto text-xl underline mb-2">
             Highest Album: {albumLowHighStatsJson['highest_album']['date']}
           </p>
           <Badge 
@@ -63,7 +63,7 @@ export default async function MusicStatsBox(props) {
             shape="rectangle"
             showOutline={false}
             variant="shadow"
-            className={`lg:-ml-4 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2))} lg:text-xl text-black`}
+            className={`lg:-ml-4 -mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2))} lg:text-xl text-black`}
           >
             <AlbumDisplay
               title={albumLowHighStatsJson['highest_album']["title"]}
@@ -79,7 +79,7 @@ export default async function MusicStatsBox(props) {
         </div>
         {/* Album Lowest Stats */}
         <div className='min-w-[300px] w-fit mx-auto flex flex-col'>
-          <p className="mx-auto text-xl underline mb-1">
+          <p className="mx-auto text-xl underline mb-2">
             Lowest Album: {albumLowHighStatsJson['lowest_album']['date']}
           </p>
           <Badge 
@@ -89,7 +89,7 @@ export default async function MusicStatsBox(props) {
             shape="rectangle"
             showOutline={false}
             variant="shadow"
-            className={`lg:-ml-4 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2))} lg:text-xl text-black`}
+            className={`lg:-ml-4 -mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2))} lg:text-xl text-black`}
           >
             <AlbumDisplay
               title={albumLowHighStatsJson['lowest_album']["title"]}

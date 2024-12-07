@@ -54,7 +54,7 @@ export default function AlbumReviewBox(props) {
   }
 
   return (
-    <div className="w-full max-w-[640px] px-2 lg:mx-1 py-2 flex flex-col rounded-xl bg-zinc-800/30 border border-neutral-800">
+    <div className="w-full max-w-[1080px] px-2 lg:mx-auto py-2 flex flex-col rounded-xl bg-zinc-800/30 border border-neutral-800">
       <div className="w-full flex flex-col lg:flex-row gap-2 justify-between">
         <Slider   
           size="md"
@@ -68,7 +68,7 @@ export default function AlbumReviewBox(props) {
           minValue={0} 
           value={rating}
           onChange={setRating}
-          className="max-w-md mx-auto" 
+          className="max-w-full px-10 mx-auto" 
         />
         {/* <Select 
           label="Favorite Song" 

@@ -6,6 +6,7 @@ import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
 import ReviewDisplay from "./review_display";
 import { getAlbumOfTheDayData, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
+import AddAlbumModal from "./add_album_modal";
 
 // GUI Display for the Album of the Day
 // Expected Props:
@@ -30,8 +31,8 @@ export default async function AlbumOfTheDayBox(props) {
   }
 
   return (
-    <div className="w-full lg:w-fit flex flex-col lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-      <div className="w-full my-auto">
+    <div className="w-full lg:max-w-[1080px] flex flex-col lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+      <div className="w-full flex flex-col">
         <AlbumDisplay 
           title={albumData("title")}
           album_img_src={albumData("album_img_src")}
@@ -47,6 +48,9 @@ export default async function AlbumOfTheDayBox(props) {
           rating={(albumReview != null) ? albumReview['score'] : null}
           comment={(albumReview != null) ? albumReview['comment'] : null}
         />
+        <div className="w-full flex">
+          <AddAlbumModal />
+        </div>
       </div>
       <Divider 
         className="mx-3" 

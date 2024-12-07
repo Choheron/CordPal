@@ -34,7 +34,7 @@ export default async function AlbumDisplay(props) {
   const avg_rating = (props.album_spotify_id) ? await getAlbumAvgRating(props.album_spotify_id): 0.0;
 
   return (
-    <div className="w-full min-w-[320px] lg:min-w-[650px] mx-2 lg:mx-1 my-2 flex flex-row">
+    <div className="w-full min-w-[320px] lg:min-w-[650px] mx-2 lg:mx-1 my-auto flex flex-row">
       <img 
         src={album_img_src}
         className='h-[125px] w-[125px] lg:h-[300px] lg:w-[300px] rounded-2xl mx-auto'
