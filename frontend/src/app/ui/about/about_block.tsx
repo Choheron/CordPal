@@ -43,7 +43,7 @@ export default async function AboutBlock(props) {
         </p>
         <AboutAccordion />
         <p className="w-full text-center italic">
-          But until then, its just a fun side project!
+          If this becomes something larger, so be it. But until then, its just a fun side project!
         </p>
         <h3 className="text-2xl italic pt-1">
           How is it set up?

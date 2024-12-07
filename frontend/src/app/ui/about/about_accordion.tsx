@@ -36,7 +36,7 @@ export default function AboutAccordion(props) {
         page is the Album Of the Day. Which utilizes User interaction to randomly select an album on a daily cronjob schedule, from a list of albums submitted by users through an in-site spotify search integration, to become the Album Of the Day. Once users authenticate
         with spotify, they are able to leave a review of the album and see other users&apos; reviews. The site keeps track of all reviews and all average scores to provide many statistics and show leaderboards of albums, users, and review data. 
       </AccordionItem>
-      <AccordionItem key="4" aria-label="ToDo List" title="Todo List">
+      <AccordionItem key="5" aria-label="ToDo List" title="Todo List">
         This page is simple and just allows users to view the progress of the site and what work is currently being prioritized. Admin users can control the status of todo items and add new ones via a modal. 
       </AccordionItem>
     </Accordion>
