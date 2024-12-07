@@ -215,7 +215,7 @@ export default function AllAlbumsModal(props) {
   return (
     <>
       <Button 
-        className="p-2 mx-auto w-[90%] text-sm text-inheret h-fit hover:underline"
+        className="p-2 mx-auto my-2 w-[90%] text-sm text-inheret h-fit hover:underline"
         size="sm"
         onPress={onOpen}
         radius="lg"
