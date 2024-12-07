@@ -231,7 +231,7 @@ export default function AllAlbumsModal(props) {
         backdrop="blur"
         onClose={cancelPress}
         classNames={{
-          base: "max-w-[75%]",
+          base: "max-w-full lg:max-w-[75%]",
         }}
       >
         <ModalContent>

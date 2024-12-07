@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import {Providers} from "./providers";
 import Image from "next/image";
+import ClientSnowfall from "./ui/general/holiday/snowfall";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -62,6 +63,7 @@ export default function RootLayout({
             style={{ width: '100%', height: 'auto' }}
           />
         </div>
+        <ClientSnowfall />
       </body>
     </html>
   );
