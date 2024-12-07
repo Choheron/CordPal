@@ -31,8 +31,13 @@ export default function AboutAccordion(props) {
           className="mx-auto rounded-xl"
         />
       </AccordionItem>
+      <AccordionItem key="4" aria-label="ToDo List" title="Music/Spotify">
+        This page allows users to login with spotify using the Oauth2 flow. After logging in users are able to view their top songs in three timeframes (<i>4 weeks, 6 months, 1 year</i>). Perhaps the most developed and fun part of the music
+        page is the Album Of the Day. Which utilizes User interaction to randomly select an album on a daily cronjob schedule, from a list of albums submitted by users through an in-site spotify search integration, to become the Album Of the Day. Once users authenticate
+        with spotify, they are able to leave a review of the album and see other users&apos; reviews. The site keeps track of all reviews and all average scores to provide many statistics and show leaderboards of albums, users, and review data. 
+      </AccordionItem>
       <AccordionItem key="4" aria-label="ToDo List" title="Todo List">
-        This page is simple and just allows users to view the progress of the site and what work is currently being prioritized.
+        This page is simple and just allows users to view the progress of the site and what work is currently being prioritized. Admin users can control the status of todo items and add new ones via a modal. 
       </AccordionItem>
     </Accordion>
   )
