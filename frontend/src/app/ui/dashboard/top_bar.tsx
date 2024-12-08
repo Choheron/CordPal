@@ -41,7 +41,7 @@ export default function TopBar(props) {
             width={50}
             height={50}
             alt="Santa Hat on top of Avatar for User"
-            className="absolute z-50 -ml-[5px] -mt-2 -scale-x-100"
+            className="invisible lg:visible lg:absolute z-50 -scale-x-100"
           />
           <User
             className="fixed lg:static top-2.5 left-0 z-10 w-auto ml-5 lg:ml-0 py-2 px-2 backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800"
