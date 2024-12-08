@@ -365,7 +365,7 @@ export async function getAllAlbums() {
   const allAlbumsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAllAlbums`, {
     method: "GET",
     credentials: "include",
-    next: { revalidate: 30 },
+    next: { revalidate: 300 },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
