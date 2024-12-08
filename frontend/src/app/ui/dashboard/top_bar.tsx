@@ -9,6 +9,7 @@ import {User} from "@nextui-org/user";
 import clsx from 'clsx';
 
 import SettingsModal from "./settings_modal";
+import Image from "next/image";
 
 // Expected props:
 //  - isMember: Boolean indicating if the current session user is a member of the desired server
@@ -33,20 +34,30 @@ export default function TopBar(props) {
   return (
     <div className="flex flex-col items-center justify-between px-24 pt-20 lg:pt-10 pb-0">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex flex-col lg:flex-row">
-        <User
-          className="fixed lg:static top-2.5 left-0 z-10 w-auto ml-5 lg:ml-0 py-2 px-2 backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800"
-          name={props.userInfo['nickname']}
-          description={(
-            <SettingsModal 
-              userInfo={props.userInfo}
-              avatarURL={props.avatarURL}
-              linkedAccounts={props.linkedAccounts}
-            />
-          )}
-          avatarProps={{
-            src: props.avatarURL
-          }}
-        />
+        <div>
+          {/* Santa Hat on User Avatar, because its festive :) */}
+          <Image 
+            src="/images/holiday_decor/santa_hat_PNG64.png"
+            width={50}
+            height={50}
+            alt="Santa Hat on top of Avatar for User"
+            className="absolute z-50 -ml-[5px] -mt-2 -scale-x-100"
+          />
+          <User
+            className="fixed lg:static top-2.5 left-0 z-10 w-auto ml-5 lg:ml-0 py-2 px-2 backdrop-blur-2xl bg-zinc-800/30 border border-neutral-800"
+            name={props.userInfo['nickname']}
+            description={(
+              <SettingsModal 
+                userInfo={props.userInfo}
+                avatarURL={props.avatarURL}
+                linkedAccounts={props.linkedAccounts}
+              />
+            )}
+            avatarProps={{
+              src: props.avatarURL
+            }}
+          />
+        </div>
         <div className="fixed bottom-0 left-0 flex-col h-48 w-full items-end justify-center bg-gradient-to-t from-black via-black lg:static lg:size-auto lg:bg-none">
           <Link 
             href="/logout"
