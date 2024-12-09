@@ -21,6 +21,7 @@ import React from "react";
 import { useRouter } from 'next/navigation';
 import { getAllAlbums, getAllAlbumsNoCache } from "@/app/lib/spotify_utils";
 import { convertToLocalTZString, ratingToTailwindBgColor } from "@/app/lib/utils";
+import Link from "next/link";
 
 
 // Modal to display all submitted albums
@@ -64,6 +65,11 @@ export default function AllAlbumsModal(props) {
       key: "AOD_date",
       label: "LAST AOD",
       sortable: true,
+    },
+    {
+      key: "historical_data",
+      label: "HISTORICAL DATA",
+      sortable: false,
     },
   ];
 
@@ -192,6 +198,22 @@ export default function AllAlbumsModal(props) {
               {(album['AOD_date'] != null) ? album['AOD_date'] : "N/A"}
             </p>
           );
+      case "historical_data":
+            return (
+              (album['AOD_date'] != null) ? (
+                <Button 
+                  as={Link}
+                  href={"/dashboard/spotify/historical/" + album['AOD_date']}
+                  radius="lg"
+                  className={`w-fit mx-auto hover:underline text-white`}
+                  variant="solid"
+                >
+                  <b>View Historical Data</b>
+                </Button> 
+              ):(
+                <></>
+              )
+            );
     }
   }, []);
 

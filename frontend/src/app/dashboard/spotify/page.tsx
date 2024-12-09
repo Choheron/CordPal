@@ -6,10 +6,10 @@ import SpotifyLoginBox from "@/app/ui/dashboard/spotify/spotify_login_box";
 import { getLastXSubmissions, getSpotifyData, isSpotifyLinked } from "@/app/lib/spotify_utils";
 import TopSongsList from "@/app/ui/dashboard/spotify/top_songs_list";
 import AlbumOfTheDayBox from "@/app/ui/dashboard/spotify/album_of_the_day";
-import AddAlbumModal from "@/app/ui/dashboard/spotify/add_album_modal";
+import AddAlbumModal from "@/app/ui/dashboard/spotify/modals/add_album_modal";
 import RecentSubmissions from "@/app/ui/dashboard/spotify/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/spotify/music_stats_box";
-import AllAlbumsModal from "@/app/ui/dashboard/spotify/all_albums_modal";
+import AllAlbumsModal from "@/app/ui/dashboard/spotify/modals/all_albums_modal";
 
 export default async function music() {
   const spot_authenticated = await isSpotifyLinked();

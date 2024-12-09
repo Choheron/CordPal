@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation';
 import { Listbox,  ListboxSection,  ListboxItem} from "@nextui-org/listbox";
 
 import { checkIfAlbumAlreadyExists, spotifySearch, submitAlbumToBackend } from "@/app/lib/spotify_utils";
-import { Conditional } from "../conditional";
+import { Conditional } from "../../conditional";
 
 // Modal to allow a user to submit an album for the album of the day pool
 export default function AddAlbumModal(props) {

@@ -5,6 +5,6 @@ import { josefin } from "../fonts"
 export default function PageTitle(props) {
   
   return (
-    <h1 className={`${josefin.className} text-4xl underline antialiased pb-5`}>{props['text']}</h1>
+    <h1 className={`${josefin.className} text-4xl text-center underline antialiased pb-5`}>{props['text']}</h1>
   );
 }

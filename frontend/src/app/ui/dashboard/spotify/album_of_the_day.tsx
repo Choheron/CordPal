@@ -6,7 +6,7 @@ import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
 import ReviewDisplay from "./review_display";
 import { getAlbumOfTheDayData, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
-import AddAlbumModal from "./add_album_modal";
+import AddAlbumModal from "./modals/add_album_modal";
 
 // GUI Display for the Album of the Day
 // Expected Props:
