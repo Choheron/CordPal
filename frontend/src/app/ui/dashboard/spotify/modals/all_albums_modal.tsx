@@ -135,7 +135,7 @@ export default function AllAlbumsModal(props) {
   React.useEffect(() => {
     const ingestData = async () => {
       let albumData = await getAllAlbums()
-      setAlbumList(albumData['albums_list'])
+      setAlbumList(albumData['albums_list'].sort((a,b) => {return b['rating'] - a['rating']}))
       setUpdateTimestamp(albumData['timestamp'])
     }
     ingestData()
