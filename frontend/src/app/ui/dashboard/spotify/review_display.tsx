@@ -21,7 +21,7 @@ export default async function ReviewDisplay(props) {
       {reviews.length === 0 ? (
           <p>No User Reviews Yet</p>
         ) : (
-          reviews.map((review, index) => (
+          reviews.sort((a, b) => a['score'] < b['score'] ? 1 : -1).map((review, index) => (
             <div className="mx-auto" key={index}>
               <Popover placement="bottom" showArrow={true}>
                 <PopoverTrigger>
