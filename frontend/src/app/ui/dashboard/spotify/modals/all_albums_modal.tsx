@@ -30,7 +30,7 @@ export default function AllAlbumsModal(props) {
   const [updateTimestamp, setUpdateTimestamp] = React.useState<any>("")
   const [albumList, setAlbumList] = React.useState([])
   // Sorting variables
-  const [sortDescriptor, setSortDescriptor] = React.useState<any>()
+  const [sortDescriptor, setSortDescriptor] = React.useState<any>({ column: "rating", direction: "descending"})
   // Modal Controller Vars
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
