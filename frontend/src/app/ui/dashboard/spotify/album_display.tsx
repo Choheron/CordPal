@@ -5,6 +5,9 @@ import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
 import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
+import { Button } from "@nextui-org/react";
+import Link from "next/link";
+import { ratingToTailwindBgColor } from "@/app/lib/utils";
 
 // GUI Display for an Album
 // Expected Props:
@@ -18,6 +21,7 @@ import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
 //  - submitter_comment: String - (Optional) An optional comment that the album submitter may have left with this album
 //  - submission_date: String - (Optional) A String representation of the submission date of the Album
 //  - album_spotify_id: String - (Optional) Album Spotify ID for retrieval of average from database
+//  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
 export default async function AlbumDisplay(props) {
   // Album props checks
   const title = (props.title) ? props.title : "No Album Title Found";
@@ -32,6 +36,9 @@ export default async function AlbumDisplay(props) {
   const submission_date = (props.submission_date) ? props.submission_date : "Not Provided";
   // Rating props check
   const avg_rating = (props.album_spotify_id) ? await getAlbumAvgRating(props.album_spotify_id): 0.0;
+  // Historical props checks
+  const historical = (props.historical_date) ? true : false;
+  const historical_date = (props.historical_date) ? props.historical_date : "0000-00-00";
 
   return (
     <div className="w-full min-w-[320px] lg:min-w-[650px] mx-2 lg:mx-1 my-auto flex flex-row">
@@ -75,6 +82,17 @@ export default async function AlbumDisplay(props) {
               />
             </div>
           </div>
+        </Conditional>
+        <Conditional showWhen={historical}>
+          <Button 
+            as={Link}
+            href={"/dashboard/spotify/historical/" + historical_date}
+            radius="lg"
+            className={`w-fit hover:underline text-white`}
+            variant="solid"
+          >
+            <b>All Reviews</b>
+          </Button> 
         </Conditional>
       </div>
     </div>

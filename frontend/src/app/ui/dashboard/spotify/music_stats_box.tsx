@@ -67,12 +67,14 @@ export default async function MusicStatsBox(props) {
           >
             <AlbumDisplay
               title={albumLowHighStatsJson['highest_album']["title"]}
+              album_spotify_id={albumLowHighStatsJson['highest_album']["spotify_id"]}
               album_img_src={albumLowHighStatsJson['highest_album']["album_img_src"]}
               album_src={albumLowHighStatsJson['highest_album']["spotify_url"]}
               artist={{"name": albumLowHighStatsJson['highest_album']["artist"], "href": albumLowHighStatsJson['highest_album']["artist_url"]}}
               submitter={albumLowHighStatsJson['highest_album']["submitter_id"]}
               submitter_comment={albumLowHighStatsJson['highest_album']["submitter_comment"]}
               submission_date={albumLowHighStatsJson['highest_album']["submission_date"]}
+              historical_date={albumLowHighStatsJson['highest_album']['date']}
             />
           </Badge>
           <Divider className="my-1" />
@@ -93,12 +95,14 @@ export default async function MusicStatsBox(props) {
           >
             <AlbumDisplay
               title={albumLowHighStatsJson['lowest_album']["title"]}
+              album_spotify_id={albumLowHighStatsJson['lowest_album']["spotify_id"]}
               album_img_src={albumLowHighStatsJson['lowest_album']["album_img_src"]}
               album_src={albumLowHighStatsJson['lowest_album']["spotify_url"]}
               artist={{"name": albumLowHighStatsJson['lowest_album']["artist"], "href": albumLowHighStatsJson['lowest_album']["artist_url"]}}
               submitter={albumLowHighStatsJson['lowest_album']["submitter_id"]}
               submitter_comment={albumLowHighStatsJson['lowest_album']["submitter_comment"]}
               submission_date={albumLowHighStatsJson['lowest_album']["submission_date"]}
+              historical_date={albumLowHighStatsJson['lowest_album']['date']}
             />
           </Badge>
         </div>
