@@ -58,14 +58,12 @@ export default function TopBar(props) {
             }}
           />
         </div>
-        <div className="fixed bottom-0 left-0 flex-col h-48 w-full items-end justify-center bg-gradient-to-t from-black via-black lg:static lg:size-auto lg:bg-none">
-          <Link 
-            href="/logout"
-            className="z-10 fixed lg:static right-0 top-0 flex w-full justify-end lg:justify-center pb-6 pt-8 pr-4 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:w-auto lg:rounded-xl lg:border lg:p-4 hover:underline"
-          >
-            Logout
-          </Link>
-        </div>
+        <Link 
+          href="/logout"
+          className="z-0 fixed lg:static right-0 top-0 flex w-full justify-end lg:justify-center pb-6 pt-8 pr-4 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:w-auto lg:rounded-xl lg:border lg:p-4 hover:underline"
+        >
+          Logout
+        </Link>
       </div>
       <div className="hidden lg:flex w-full max-w-5xl">
         <a
