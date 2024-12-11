@@ -16,12 +16,13 @@ import {
   TableRow,
   TableCell
 } from "@nextui-org/table";
-import { Avatar, Button } from "@nextui-org/react";
+import { Avatar, Button, Spinner } from "@nextui-org/react";
 import React from "react";
 import { useRouter } from 'next/navigation';
 import { getAllAlbums, getAllAlbumsNoCache } from "@/app/lib/spotify_utils";
 import { convertToLocalTZString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import Link from "next/link";
+import { Conditional } from "../../conditional";
 
 
 // Modal to display all submitted albums
@@ -29,6 +30,8 @@ import Link from "next/link";
 export default function AllAlbumsModal(props) {
   const [updateTimestamp, setUpdateTimestamp] = React.useState<any>("")
   const [albumList, setAlbumList] = React.useState([])
+  // Album List Loading vars
+  const [listLoading, setListLoading] = React.useState(true)
   // Sorting variables
   const [sortDescriptor, setSortDescriptor] = React.useState<any>({ column: "rating", direction: "descending"})
   // Modal Controller Vars
@@ -139,7 +142,13 @@ export default function AllAlbumsModal(props) {
       setUpdateTimestamp(albumData['timestamp'])
     }
     ingestData()
+    setListLoading(false)
   }, [])
+
+  // UseEffect for when list changes
+  React.useEffect(() => {
+    setListLoading(false)
+  }, [albumList])
 
   // Render Cell dynamically
   const renderCell = React.useCallback((album , columnKey: React.Key) => {
@@ -224,6 +233,7 @@ export default function AllAlbumsModal(props) {
       setAlbumList(albumData['albums_list'])
       setUpdateTimestamp(albumData['timestamp'])
     }
+    setListLoading(true)
     ingestNewData()
   }
 
@@ -291,9 +301,14 @@ export default function AllAlbumsModal(props) {
                   <p className="my-auto">
                     Data Last Updated: {convertToLocalTZString(updateTimestamp, true)}
                   </p>
-                  <div>
-                    <Button color="primary" variant="solid" className="mr-2" onPress={hardRefresh}>
-                      Hard Refresh
+                  <div className="flex">
+                    <Button color="primary" variant="solid" className="mr-2 mt-auto" isDisabled={listLoading} onPress={hardRefresh}>
+                      <Conditional showWhen={!listLoading}>
+                        Hard Refresh
+                      </Conditional>
+                      <Conditional showWhen={listLoading}>
+                        <Spinner color="warning" />
+                      </Conditional>
                     </Button>
                     <Button color="danger" variant="bordered" onPress={onClose}>
                       Close
