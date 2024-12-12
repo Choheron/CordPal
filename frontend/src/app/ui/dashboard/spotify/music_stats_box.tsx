@@ -106,6 +106,9 @@ export default async function MusicStatsBox(props) {
             />
           </Badge>
         </div>
+        <div className="max-w-[320px] lg:max-w-[650px] px-2 py-2 mt-2 text-small italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
+          <p>In order to be considered for highest or lowest album, an album must have 4 or more reviews. Any album with 3 or less reviews will not be counted.</p>
+        </div>
       </div>
     </div>
   )
