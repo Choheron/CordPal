@@ -27,7 +27,7 @@ export default function RootLayout({
           width={960}
           height={540}
           style={{ width: '100vw', height: 'auto' }}
-          className="fixed bottom-0 opacity-75"
+          className="fixed bottom-0 2xl:-bottom-40 opacity-75"
         />
         <div className="flex">
           <Image
