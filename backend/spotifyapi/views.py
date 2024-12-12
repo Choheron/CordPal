@@ -649,7 +649,7 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
 
 
 ###
-# Set a new album of the day.. return 
+# Set a new album of the day. Returns an HTTPResponse
 ###
 def setAlbumOfDay(request: HttpRequest):
   logger.info("setAlbumOfDay called...")
@@ -691,3 +691,29 @@ def setAlbumOfDay(request: HttpRequest):
   # Print success
   logger.info(f'Successfully selected album of the day: {albumOfTheDayObj}')
   return HttpResponse(f'Successfully selected album of the day: {albumOfTheDayObj}')
+
+###
+# Set a new album of the day.  NOTE: This WILL OVERRIDE any already set album for any date! Returns an HTTPResponse
+###
+def setAlbumOfDayADMIN(request: HttpRequest, date: str, album_spotify_id: str):
+  logger.info("setAlbumOfDayADMIN called...")
+  # Make sure request is a post request
+  if(request.method != "POST"):
+    logger.warning("setAlbumOfDayADMIN called with a non-POST method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get current date
+  day = datetime.datetime.strptime(date, "%Y-%m-%d")
+  # Define Album Object
+  albumOfTheDay = Album.objects.get(spotify_id=album_spotify_id)
+  # Create an album of the day object
+  albumOfTheDayObj = DailyAlbum(
+    album=albumOfTheDay,
+    date=day
+  )
+  # Save object
+  albumOfTheDayObj.save()
+  # Print success
+  logger.info(f'Successfully set album of the day for {date}: {albumOfTheDayObj}')
+  return HttpResponse(f'Successfully set album of the day for {date}: {albumOfTheDayObj}')

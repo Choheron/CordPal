@@ -32,4 +32,6 @@ urlpatterns = [
   path('getLowestHighestAlbumStats', views.getLowestHighestAlbumStats),
   # Command to be called by cronjob to set the album of the day
   path('setAlbumOfDay', views.setAlbumOfDay),
+  # ADMIN Command to be called by admin for special occasion album of the days
+  path('setAlbumOfDayADMIN/<str:date>/<str:album_spotify_id>', views.setAlbumOfDayADMIN),
 ]
