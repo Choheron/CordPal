@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import {Providers} from "./providers";
 import Image from "next/image";
+
 import ClientSnowfall from "./ui/general/holiday/snowfall";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,6 +21,14 @@ export default function RootLayout({
   return (
     <html lang="en" className='dark'>
       <body className={`${inter.className} dark`}>
+        <Image 
+          src={`/svgs/holiday_decor/snowbanks.svg`} 
+          alt="Background Snow, Happy Holidays!" 
+          width={960}
+          height={540}
+          style={{ width: '100vw', height: 'auto' }}
+          className="fixed bottom-0 opacity-75"
+        />
         <div className="flex">
           <Image
             src="/images/holiday_decor/string-lights-png-hd-9.png"
