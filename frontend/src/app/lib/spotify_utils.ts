@@ -232,7 +232,7 @@ export async function getReviewsForAlbum(album_spotify_id) {
   const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getReviewsForAlbum/${album_spotify_id}`, {
     method: "GET",
     credentials: "include",
-    next: { revalidate: 5 },
+    cache: 'no-cache',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
