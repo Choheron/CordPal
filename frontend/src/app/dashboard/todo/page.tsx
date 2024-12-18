@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { getAllTodoItems, getTodoOptions } from "@/app/lib/todo_uils";
 import TodoItem from "@/app/ui/dashboard/todo/todo_item";
-import AddTodoModal from "@/app/ui/dashboard/todo/add_todo_modal";
+import AddTodoModal from "@/app/ui/dashboard/todo/modals/add_todo_modal";
 import { Conditional } from "@/app/ui/dashboard/conditional";
 import { isUserAdmin } from "@/app/lib/user_utils";
 

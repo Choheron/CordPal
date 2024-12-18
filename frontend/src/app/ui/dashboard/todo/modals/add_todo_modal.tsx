@@ -82,8 +82,8 @@ export default function AddTodoModal(props) {
                 <Input
                   isRequired
                   className="mt-2"
-                  label="Image Title"
-                  placeholder="Enter Image Title"
+                  label="Task Title"
+                  placeholder="Enter Task Title"
                   value={titleValue}
                   onValueChange={setTitleValue}
                 />

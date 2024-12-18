@@ -17,7 +17,7 @@ export async function getAllTodoItems() {
   const todoListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/todo/getAllTodoItems`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    next: {revalidate: 5 },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
