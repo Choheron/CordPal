@@ -58,3 +58,14 @@ export function ratingToTailwindBgColor(rating: number) {
   if(rating >= 0.0)
     return "bg-[#ff0000]"
 }
+
+// Return true if it is currently in December
+export const isDecember = () => {
+  // Get Current Date
+  const today = new Date();
+  // Get month (0 indexed return)
+  let month = today.getMonth(); 
+
+  // Return equality operation
+  return month == 11;
+};
