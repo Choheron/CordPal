@@ -2,7 +2,7 @@
 
 import Snowfall from "react-snowfall"
 
-export default async function ClientSnowfall(props) {
+export default function ClientSnowfall(props) {
   return(
     <Snowfall
       style={{
