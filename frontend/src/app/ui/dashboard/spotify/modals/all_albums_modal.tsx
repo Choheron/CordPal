@@ -289,7 +289,7 @@ export default function AllAlbumsModal(props) {
                     emptyContent={"No rows to display."}
                   >
                     {(item) => (
-                      <TableRow key={item['title']}>
+                      <TableRow key={`${item['title']} - ${item['artist']['name']} - ${item['submitter_nickname']}`}>
                         {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                       </TableRow>
                     )}
