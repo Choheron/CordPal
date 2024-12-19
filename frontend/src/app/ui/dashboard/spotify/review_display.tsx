@@ -5,6 +5,7 @@ import UserCard from "../../general/userUiItems/user_card";
 
 import { convertToLocalTZString } from "@/app/lib/utils";
 import { getReviewsForAlbum } from "@/app/lib/spotify_utils";
+import ClientTimestamp from "../../general/client_timestamp";
 
 // GUI Display for reviews of an album
 // Expected Props:
@@ -65,9 +66,12 @@ export default async function ReviewDisplay(props) {
                     <b>Comment:</b>
                   </p>
                   <div className="mx-2 my-2 max-w-[320px]" dangerouslySetInnerHTML={{__html: generateEmbed(review['comment'])}} />
-                  <p className="mx-2 my-2 align-middle">
-                    Submitted: {convertToLocalTZString(new Date(review['review_date']), true)}
-                  </p>
+                  <div className="flex justify-between w-full px-2 mt-2 align-middle">
+                    First Submitted: <ClientTimestamp timestamp={review['review_date']} full={true} />
+                  </div>
+                  <div className="flex justify-between w-full px-2 align-middle">
+                    Last Updated: <ClientTimestamp timestamp={review['last_upated']} full={true} />
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>

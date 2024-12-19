@@ -8,6 +8,19 @@ export function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+// Pad a number with leading zeros
+export const zeroPad = (num, places) => String(num).padStart(places, '0')
+
+// Generate a date object from a UTC string in the following format
+// 12/19/2024, 15:07:22
+export function generateDateFromUTCString(utcString) {
+  const splitList = utcString.split(",")
+  const dateList = splitList[0].split("/")
+  const timeList = splitList[1].split(":")
+
+  return new Date(Date.UTC(dateList[2], parseInt(dateList[0]) - 1, dateList[1], timeList[0], timeList[1], timeList[2]))
+}
+
 // Convert passed in date object to local timezone
 export function convertToLocalTZString(date: Date, full: boolean = false) {
   // Use client to get proper times

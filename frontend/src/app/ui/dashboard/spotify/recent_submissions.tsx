@@ -3,6 +3,7 @@
 import {User} from "@nextui-org/user";
 
 import { convertToLocalTZString } from "@/app/lib/utils";
+import ClientTimestamp from "../../general/client_timestamp";
 
 // GUI Display for recent submissions
 // Expected Props:
@@ -38,7 +39,10 @@ export default async function RecentSubmissions(props) {
           )
         }
       </div>
-      <p className="mx-auto text-sm text-gray-500 italic">Last Updated: {convertToLocalTZString(props.timestamp, true)}</p>
+      <div className="flex mx-auto text-sm text-gray-500 italic">
+        Last Updated: 
+        <ClientTimestamp className="ml-2" timestamp={props.timestamp} full={true} />
+      </div>
     </div>
   )
 }
