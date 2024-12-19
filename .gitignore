@@ -10,6 +10,7 @@
 __pycache__
 **/__pycache__
 **/__pycache__/**
+*/venv
 
 # Ignore backend media files
 **/backend/media
