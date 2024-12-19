@@ -3,9 +3,9 @@ import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
 import StarRating from "../../general/star_rating";
 import UserCard from "../../general/userUiItems/user_card";
 
-import { convertToLocalTZString } from "@/app/lib/utils";
 import { getReviewsForAlbum } from "@/app/lib/spotify_utils";
 import ClientTimestamp from "../../general/client_timestamp";
+import { Conditional } from "../conditional";
 
 // GUI Display for reviews of an album
 // Expected Props:
@@ -69,9 +69,11 @@ export default async function ReviewDisplay(props) {
                   <div className="flex justify-between w-full px-2 mt-2 align-middle">
                     First Submitted: <ClientTimestamp timestamp={review['review_date']} full={true} />
                   </div>
-                  <div className="flex justify-between w-full px-2 align-middle">
-                    Last Updated: <ClientTimestamp timestamp={review['last_upated']} full={true} />
-                  </div>
+                  <Conditional showWhen={review['last_upated'] != review['review_date']}>
+                    <div className="flex justify-between w-full px-2 align-middle">
+                      Last Updated: <ClientTimestamp timestamp={review['last_upated']} full={true} />
+                    </div>
+                  </Conditional>
                 </PopoverContent>
               </Popover>
             </div>
