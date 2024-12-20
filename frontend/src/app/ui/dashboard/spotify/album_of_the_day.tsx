@@ -47,6 +47,7 @@ export default async function AlbumOfTheDayBox(props) {
           album_id={albumData("album_id")}
           rating={(albumReview != null) ? albumReview['score'] : null}
           comment={(albumReview != null) ? albumReview['comment'] : null}
+          first_listen={(albumReview != null) ? albumReview['first_listen']: null}
         />
         <div className="w-full flex">
           <AddAlbumModal />

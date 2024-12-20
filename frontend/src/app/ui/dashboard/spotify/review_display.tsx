@@ -62,12 +62,17 @@ export default async function ReviewDisplay(props) {
                       className="text-yellow-400 text-lg my-auto"
                     />
                   </div>
+                  <Conditional showWhen={review['first_listen'] == true}>
+                    <p className="bg-green-500 rounded-xl px-2 py-1 border border-black text-black font-bold italic text-xs">
+                      First Time Listen
+                    </p>
+                  </Conditional>
                   <p className="ml-2 mr-auto">
                     <b>Comment:</b>
                   </p>
                   <div className="mx-2 my-2 max-w-[320px]" dangerouslySetInnerHTML={{__html: generateEmbed(review['comment'])}} />
-                  <div className="flex justify-between w-full px-2 mt-2 align-middle">
-                    First Submitted: <ClientTimestamp timestamp={review['review_date']} full={true} />
+                  <div className="flex justify-between w-full px-2 mt-2 align-middle gap-1">
+                    Submitted: <ClientTimestamp timestamp={review['review_date']} full={true} />
                   </div>
                   <Conditional showWhen={review['last_upated'] != review['review_date']}>
                     <div className="flex justify-between w-full px-2 align-middle">

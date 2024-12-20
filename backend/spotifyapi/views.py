@@ -542,6 +542,7 @@ def submitReview(request: HttpRequest):
       user=userObj,
       score=float(reqBody['score']),
       review_text=reqBody['comment'],
+      first_listen=reqBody['first_listen'],
     )
     # Save new Review data
     newReview.save()
@@ -573,6 +574,7 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str):
     outObj['comment'] = review.review_text
     outObj['review_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
     outObj['last_upated'] = review.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
+    outObj['first_listen'] = review.first_listen
     # Append to list
     outList.append(outObj)
   # Return list of reviews
@@ -605,6 +607,7 @@ def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str):
   outObj['comment'] = review.review_text
   outObj['review_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
   outObj['last_upated'] = review.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
+  outObj['first_listen'] = review.first_listen
   # Return user review
   return JsonResponse({"review": outObj})
 

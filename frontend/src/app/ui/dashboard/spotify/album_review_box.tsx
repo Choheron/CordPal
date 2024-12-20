@@ -8,6 +8,7 @@ import { Textarea } from "@nextui-org/input";
 import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@nextui-org/react";
 import { submitReviewToBackend } from "@/app/lib/spotify_utils";
 
+
 // GUI Display for an Album Review Box
 // Expected Props:
 //  - album_id: String - Album ID (spotify ID)
@@ -16,6 +17,7 @@ import { submitReviewToBackend } from "@/app/lib/spotify_utils";
 //  - rating: Float - (optional) User rating if they left a previous review
 //  - fav_song: String - (optional) Favorite song if they left a previous review
 //  - comment: String - (optional) User's comment if they left a previous review
+//  - first_listen: Boolean - (optional) Status of first listen if they left a previous review 
 export default function AlbumReviewBox(props) {
   // Activate Router
   const router = useRouter();
@@ -24,6 +26,7 @@ export default function AlbumReviewBox(props) {
   const [comment, setComment] = useState((props.comment != null) ? props.comment : "No Comment Provided");
   // const [favSong, setFavSong] = useState<Selection>(new Set([]));
   const [isReady, setIsReady] = useState(false);
+  const [isFirstListen, setIsFirstListen] = useState((props.first_listen != null) ? props.first_listen : false);
   // Prop validation
   const songList = (props.song_data) ? props.song_data : [{name: "None Provided"}]
 
@@ -45,6 +48,7 @@ export default function AlbumReviewBox(props) {
     out['album_id'] = props.album_id
     out['score'] = rating
     out['comment'] = comment 
+    out['first_listen'] = isFirstListen
 
     submitReviewToBackend(out)
     // Turn off review ready checkmark
@@ -91,17 +95,25 @@ export default function AlbumReviewBox(props) {
       />
       <div className="w-full flex flex-col lg:flex-row gap-2 justify-between">
         <Checkbox
-          isSelected={isReady}
-          onValueChange={setIsReady}
+          isSelected={isFirstListen}
+          onValueChange={setIsFirstListen}
         >
-          Ready to {(props.rating != null)? "Update" : "Submit"}?
+          First Time Listen?
         </Checkbox>
-        <Button
-          isDisabled={!isReady}
-          onPress={submitReview}
-        >
-          {(props.rating != null)? "Update" : "Submit"} Review
-        </Button>
+        <div className="flex flex-col gap-1 ">
+          <Checkbox
+            isSelected={isReady}
+            onValueChange={setIsReady}
+          >
+            Ready to {(props.rating != null)? "Update" : "Submit"}?
+          </Checkbox>
+          <Button
+            isDisabled={!isReady}
+            onPress={submitReview}
+          >
+            {(props.rating != null)? "Update" : "Submit"} Review
+          </Button>
+        </div>
       </div>
     </div>
   );
