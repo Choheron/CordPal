@@ -195,7 +195,7 @@ def albumToDict(album: Album):
   albumObj['spotify_url'] = album.spotify_url
   albumObj['submitter'] = album.submitted_by.nickname
   albumObj['submitter_id'] = album.submitted_by.discord_id
-  albumObj['submission_date'] = album.submission_date
+  albumObj['submission_date'] = album.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
   albumObj['user_comment'] = album.user_comment
   albumObj['raw_album'] = album.raw_data
   return albumObj

@@ -332,7 +332,7 @@ def getAlbum(request: HttpRequest, album_spotify_id: str):
   out['artist']['href'] = (albumObj.artist_url if albumObj.artist_url != "" else albumObj.raw_data['album']['artists'][0]['external_urls']['spotify'])
   out['submitter'] = albumObj.submitted_by.discord_id
   out['submitter_comment'] = albumObj.user_comment
-  out['submission_date'] = albumObj.submission_date.strftime('%Y-%m-%d')
+  out['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
   # Return final object
   return JsonResponse(out)
 
@@ -367,7 +367,7 @@ def getAllAlbums(request: HttpRequest):
     albumObj['submitter_avatar_url'] = album.submitted_by.get_avatar_url()
     albumObj['submitter_nickname'] = album.submitted_by.nickname
     albumObj['submitter_comment'] = album.user_comment
-    albumObj['submission_date'] = album.submission_date.strftime('%Y-%m-%d')
+    albumObj['submission_date'] = album.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
     # Check if album has been rated
     albumObj['rating'] = getAlbumRating(album.spotify_id, rounded=False)
     if(albumObj['rating'] != None):
@@ -610,6 +610,61 @@ def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str):
   outObj['first_listen'] = review.first_listen
   # Return user review
   return JsonResponse({"review": outObj})
+
+###
+# Get Review stats for all users.
+# TODO: Track streaks of reviews to see which user has been maintaining the streak
+###
+def getAllUserReviewStats(request: HttpRequest):
+  logger.info("getAllUserReviewStats called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getAllUserReviewStats called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get all user reviews
+  all_reviews = Review.objects.all()
+  # Declare reviewData object and populate
+  reviewData = {}
+  totalReviews = 0
+  for review in all_reviews:
+    # Increment total review count
+    totalReviews += 1
+    # If user has not appeared before, create new object for user
+    if(review.user.discord_id not in reviewData.keys()):
+      reviewData[review.user.discord_id] = {
+        "discord_id": review.user.discord_id, # This is the same as the key, just for ease of reference 
+        "total_reviews": 0, 
+        "review_score_sum": 0,
+        "average_review_score": -1, # This will be calculated at the end
+        "lowest_score_given": -1,
+        "lowest_score_album": None,
+        "lowest_score_date": None,
+        "highest_score_given": -1,
+        "highest_score_album": None,
+        "highest_score_date": None,
+        }
+    # Update review data for user based on current review
+    reviewData[review.user.discord_id]['total_reviews'] += 1
+    reviewData[review.user.discord_id]['review_score_sum'] += review.score
+    if((reviewData[review.user.discord_id]['lowest_score_given'] == -1) or (reviewData[review.user.discord_id]['lowest_score_given'] > review.score)):
+      reviewData[review.user.discord_id]['lowest_score_given'] = review.score
+      reviewData[review.user.discord_id]['lowest_score_album'] = review.album.spotify_id
+      reviewData[review.user.discord_id]['lowest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
+    if((reviewData[review.user.discord_id]['highest_score_given'] == -1) or (reviewData[review.user.discord_id]['highest_score_given'] <= review.score)):
+      reviewData[review.user.discord_id]['highest_score_given'] = review.score
+      reviewData[review.user.discord_id]['highest_score_album'] = review.album.spotify_id
+      reviewData[review.user.discord_id]['highest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
+  # Calcualte averages 
+  for userReviewData in reviewData.keys():
+    reviewData[userReviewData]['average_review_score'] = reviewData[userReviewData]['review_score_sum']/reviewData[userReviewData]['total_reviews']
+  # Convert user reviews object to list
+  outList = []
+  for user in reviewData:
+    outList.append(reviewData[user])
+  # Return data 
+  return JsonResponse({'total_reviews': totalReviews, 'review_data': outList})
 
 
 ## =========================================================================================================================================================================================

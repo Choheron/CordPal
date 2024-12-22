@@ -375,6 +375,27 @@ export async function getAllAlbums() {
 }
 
 //
+// Get all Albums from Album Pool
+// - RETURN: Json Obejcts
+//
+export async function getAlbum(album_spotify_id: string) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getAlbum: Sending request to backend '/spotifyapi/getAlbum/${album_spotify_id}'`)
+  const allAlbumsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbum/${album_spotify_id}`, {
+    method: "GET",
+    credentials: "include",
+    next: { revalidate: 300 },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const allAlbumsJson = await allAlbumsResponse.json()
+  return allAlbumsJson;
+}
+
+//
 // Get all Albums from Album Pool HARD RELOAD (No cache)
 // - RETURN: Json Obejcts
 //
@@ -393,4 +414,25 @@ export async function getAllAlbumsNoCache() {
   });
   const allAlbumsJson = await allAlbumsResponse.json()
   return allAlbumsJson;
+}
+
+//
+// Get Users Review Statistics
+// - RETURN: Json Obejct
+//
+export async function getAllUserReviewStats() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getLowestHighestAlbumStats: Sending request to backend '/spotifyapi/getAllUserReviewStats'`)
+  const userReviewStatResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAllUserReviewStats`, {
+    method: "GET",
+    credentials: "include",
+    next: { revalidate: 60 },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const userReviewStatJson = await userReviewStatResponse.json()
+  return userReviewStatJson;
 }

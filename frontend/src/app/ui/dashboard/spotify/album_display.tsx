@@ -8,6 +8,7 @@ import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
 import { Button } from "@nextui-org/react";
 import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
+import ClientTimestamp from "../../general/client_timestamp";
 
 // GUI Display for an Album
 // Expected Props:
@@ -33,7 +34,7 @@ export default async function AlbumDisplay(props) {
   // User rating props checks
   const submitter = (props.submitter) ? props.submitter : "Not Provided";
   const submitter_comment = (props.submitter_comment) ? props.submitter_comment : "No Comment Provided";
-  const submission_date = (props.submission_date) ? props.submission_date : "Not Provided";
+  const submission_date: string = (props.submission_date) ? props.submission_date : "Not Provided";
   // Rating props check
   const avg_rating = (props.album_spotify_id) ? await getAlbumAvgRating(props.album_spotify_id): 0.0;
   // Historical props checks
@@ -69,7 +70,10 @@ export default async function AlbumDisplay(props) {
                 </PopoverContent>
               </Popover>
             </div>
-            <p>On: <i>{submission_date}</i></p>
+            <div className="flex">
+              <p>On:</p>
+              <ClientTimestamp className="italic pl-2" timestamp={submission_date} full={true}/>
+            </div>
           </div>
         </Conditional>
         <Conditional showWhen={(avg_rating != 0) && ((avg_rating != null))}>

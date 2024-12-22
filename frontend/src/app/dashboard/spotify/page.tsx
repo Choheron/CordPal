@@ -8,7 +8,7 @@ import TopSongsList from "@/app/ui/dashboard/spotify/top_songs_list";
 import AlbumOfTheDayBox from "@/app/ui/dashboard/spotify/album_of_the_day";
 import AddAlbumModal from "@/app/ui/dashboard/spotify/modals/add_album_modal";
 import RecentSubmissions from "@/app/ui/dashboard/spotify/recent_submissions";
-import MusicStatsBox from "@/app/ui/dashboard/spotify/music_stats_box";
+import MusicStatsBox from "@/app/ui/dashboard/spotify/statistics_displays/music_stats_box";
 import AllAlbumsModal from "@/app/ui/dashboard/spotify/modals/all_albums_modal";
 
 export default async function music() {
