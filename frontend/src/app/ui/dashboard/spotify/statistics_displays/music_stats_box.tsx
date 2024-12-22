@@ -17,8 +17,6 @@ export default async function MusicStatsBox(props) {
   const albumLowHighStatsJson = await getLowestHighestAlbumStats();
   const userReviewStatsJson = await getAllUserReviewStats();
 
-  console.log(userReviewStatsJson)
-
   const albumUserStatsList = albumStatsJson['user_objs'].sort((a, b) => a['submission_count'] < b['submission_count'] ? 1 : -1).map((user, index) => {
     return (
       <div 
