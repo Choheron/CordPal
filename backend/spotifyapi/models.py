@@ -94,6 +94,7 @@ class Review(models.Model):
                 score=self.score,
                 review_text=self.review_text,
                 review_date=self.review_date,
+                first_listen=self.first_listen,
             )
         super().save(*args, **kwargs)
 
@@ -107,6 +108,7 @@ class ReviewHistory(models.Model):
     score = models.IntegerField()
     review_text = models.TextField(null=True, blank=True)
     review_date = models.DateTimeField()  # Original date of the review
+    first_listen = models.BooleanField(default=None, null=True) # Is this review a result of a first listen?
 
     recorded_at = models.DateTimeField(auto_now_add=True)  # When the history record was created
 
