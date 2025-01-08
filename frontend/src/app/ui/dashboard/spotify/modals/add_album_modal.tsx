@@ -15,11 +15,14 @@ import React from "react";
 import { useRouter } from 'next/navigation';
 import { Listbox,  ListboxSection,  ListboxItem} from "@nextui-org/listbox";
 
-import { checkIfAlbumAlreadyExists, spotifySearch, submitAlbumToBackend } from "@/app/lib/spotify_utils";
+import { checkIfAlbumAlreadyExists, checkIfUserCanSubmit, spotifySearch, submitAlbumToBackend } from "@/app/lib/spotify_utils";
 import { Conditional } from "../../conditional";
 
 // Modal to allow a user to submit an album for the album of the day pool
 export default function AddAlbumModal(props) {
+  // Validation Checks
+  const [userAllowedToSubmit, setUserAllowedToSubmit] = React.useState(false);
+  const [userAllowedToSubmitMessage, setUserAllowedToSubmitMessage] = React.useState("");
   // Dynamic values
   const [commentValue, setCommentValue] = React.useState("");
   const [selectedAlbum, setSelectedAlbum] = React.useState(null);
@@ -41,6 +44,16 @@ export default function AddAlbumModal(props) {
 
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
+
+   // UseEffect to check if a user is allowed to submit albums
+   React.useEffect(() => {
+    const getUserSubmissionValidity = async () => {
+      const canSubmitObj: {} = await checkIfUserCanSubmit();
+      setUserAllowedToSubmit(canSubmitObj['canSubmit']);
+      setUserAllowedToSubmitMessage(canSubmitObj['reason']);
+    }
+    getUserSubmissionValidity()
+  }, [])
 
   // Send a search request and a
   const searchPress = () => {
@@ -151,15 +164,25 @@ export default function AddAlbumModal(props) {
   
   return (
     <>
-      <Button 
-        className="p-2 my-4 mx-auto rounded-lg text-inheret min-w-0 min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline"
-        size="lg"
-        onPress={onOpen}
-        radius="none"
-        variant="solid"
-      >
-        <b>Submit An Album</b>
-      </Button>
+      <div className="flex flex-col justify-evenly w-full">
+        <Button 
+          className="p-2 my-4 mx-auto rounded-lg text-inheret min-w-0 min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline"
+          size="lg"
+          onPress={onOpen}
+          radius="none"
+          variant="solid"
+          isDisabled={!userAllowedToSubmit}
+        >
+          <b>Submit An Album</b>
+        </Button>
+        <Conditional showWhen={!userAllowedToSubmit}>
+          <div className="w-fit mx-auto backdrop-blur-2xl px-2 py-2 rounded-2xl bg-red-800/30 border border-neutral-800">
+            <p className="my-2 text-sm">
+              {userAllowedToSubmitMessage}
+            </p>
+          </div>
+        </Conditional>
+      </div>
       <Modal size="xl" isOpen={isOpen} isDismissable={false} onOpenChange={onOpenChange} onClose={cancelPress}>
         <ModalContent>
           {() => (

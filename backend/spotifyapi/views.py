@@ -266,6 +266,65 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, album_spotify_id: str):
   # Return Spotify Response
   return JsonResponse(out)
 
+###
+# If the user meets the criteria to be able to submit an album.
+###
+def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
+  logger.info("checkIfUserCanSubmit called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("checkIfUserCanSubmit called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Declare object to decide if they can be submitted
+  validityStatus = {}
+  validityStatus['canSubmit'] = True
+  validityStatus['reason'] = "User is able to submit albums."
+  # Get user from database
+  userObj = getSpotifyUser(request.session.get('discord_id'))
+  # Fill date if it isnt provided (Defauly to current time)
+  if(date == ""):
+    date = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d')
+
+  ## Check if user is being album limited (USER CAN ONLY SUBMIT ONE ALBUM A DAY)
+  # Convert String to date
+  date_format = '%Y-%m-%d'
+  albumDay = datetime.datetime.strptime(date, date_format).date()
+  # Filter submissions by date
+  dateSubmissionsCount = Album.objects.filter(submitted_by=userObj).filter(submission_date__date=albumDay).count()
+  if(dateSubmissionsCount > 0):
+    validityStatus['canSubmit'] = False
+    validityStatus['reason'] = f"You have already submitted an album for today! ({albumDay}) (CST)"
+  # Return Statuses
+  return JsonResponse(validityStatus)
+
+###
+# Check if an album already exists in the database
+###
+def checkIfAlbumAlreadyExists(request: HttpRequest, album_spotify_id: str):
+  logger.info("checkIfAlbumAlreadyExists called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("checkIfAlbumAlreadyExists called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Convert response to Json
+  logger.info(f"Checking if album with ID {album_spotify_id} is already submitted...")
+  # Declare out dict
+  out = {}
+  # Get album from database
+  try:
+    albumObject = Album.objects.get(spotify_id = album_spotify_id)
+    if(albumObject):
+      logger.info(f"Album does already exist, name: {albumObject.title}!")
+    out['exists'] = True
+  except ObjectDoesNotExist as e:
+    out['exists'] = False
+  # Return Spotify Response
+  return JsonResponse(out)
+
 
 ###
 # Submit an Album to the album of the day pool.

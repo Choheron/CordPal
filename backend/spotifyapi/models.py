@@ -60,6 +60,9 @@ class Album(models.Model):
     submission_date = models.DateTimeField(auto_now_add=True) 
     raw_data = models.JSONField(null=True) # JSON field to store all data returned from the frontend
 
+    def subDateToCalString(self):
+        return self.submission_date.strftime('%Y-%m-%d')
+
     def __str__(self):
         return f"{self.title} by {self.artist}"
 

@@ -15,6 +15,9 @@ urlpatterns = [
   path('spotifySearch/<str:item_type>/<str:query>/<str:limit>/<str:offset>', views.spotifySearch),
   path('checkIfAlbumAlreadyExists/<str:album_spotify_id>', views.checkIfAlbumAlreadyExists),
   path('submitAlbum', views.submitAlbum),
+  # Below URL has two variations (one for lack of URL Param)
+  path('checkIfUserCanSubmit/<str:date>', views.checkIfUserCanSubmit),
+  path('checkIfUserCanSubmit', views.checkIfUserCanSubmit),
   path('getAlbum/<str:album_spotify_id>', views.getAlbum),
   path('getAllAlbums', views.getAllAlbums),
   path('getLastXAlbums/<int:count>', views.getLastXAlbums),

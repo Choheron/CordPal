@@ -29,6 +29,29 @@ export async function isSpotifyLinked() {
   return isSpotifyConnected;
 }
 
+//
+// Determine if a user is allowed to submit an album based off of criteria on the backend
+// - RETURN: Object containing submission validity information
+//
+export async function checkIfUserCanSubmit() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log("checkIfUserCanSubmit: Sending request to backend '/spotifyapi/checkIfUserCanSubmit'")
+  const canSubmitResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/checkIfUserCanSubmit`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const canSubmitData = await canSubmitResponse.json();
+  console.log(canSubmitData)
+  return canSubmitData;
+}
+
+
 // 
 // Retrieve user data from backend relating to spotify.
 // - RETURN: JSON Objects 
