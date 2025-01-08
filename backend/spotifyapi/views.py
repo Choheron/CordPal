@@ -255,7 +255,7 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, album_spotify_id: str):
   logger.info(f"Checking if album with ID {album_spotify_id} is already submitted...")
   # Declare out dict
   out = {}
-  # Get album from batabase
+  # Get album from database
   try:
     albumObject = Album.objects.get(spotify_id = album_spotify_id)
     if(albumObject):
