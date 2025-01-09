@@ -23,7 +23,7 @@ export default async function RecentSubmissions(props) {
               <div className="ml-1" key={index}>
                 <User
                   name={(
-                    <a href={submission['album_src']} className="hover:underline">
+                    <a href={submission['album_src']} className="hover:underline line-clamp-1">
                       {submission['title']}
                     </a>
                   )}
@@ -31,7 +31,7 @@ export default async function RecentSubmissions(props) {
                   avatarProps={{
                     name: submission['title'],
                     src: submission['album_img_src'],
-                    size: "lg"
+                    size: "lg",
                   }}
                 />
               </div>
