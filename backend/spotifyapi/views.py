@@ -477,11 +477,11 @@ def getLastXAlbums(request: HttpRequest, count: int):
   for album in last_X:
     albumObj = {}
     albumObj['title'] = album.title
+    albumObj['spotify_id'] = album.spotify_id
     albumObj['album_img_src'] = album.cover_url
     albumObj['album_src'] = album.spotify_url
     albumObj['submitter'] = album.submitted_by.nickname
     albumObj['submission_date'] = album.submission_date
-    albumObj['raw_album'] = album.raw_data
     # Append to List
     album_list.append(albumObj)
   return JsonResponse({ "album_list": album_list, "timestamp" : datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")})
