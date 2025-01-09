@@ -23,7 +23,7 @@ export default async function RecentSubmissions(props) {
               <div className="ml-1" key={index}>
                 <User
                   name={(
-                    <a href={submission['album_src']} className="hover:underline line-clamp-1">
+                    <a href={submission['album_src']} className="hover:underline line-clamp-1 max-w-60">
                       {submission['title']}
                     </a>
                   )}
