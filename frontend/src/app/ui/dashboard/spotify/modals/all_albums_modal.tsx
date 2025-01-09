@@ -23,6 +23,7 @@ import { getAllAlbums, getAllAlbumsNoCache } from "@/app/lib/spotify_utils";
 import { convertToLocalTZString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import Link from "next/link";
 import { Conditional } from "../../conditional";
+import ClientTimestamp from "@/app/ui/general/client_timestamp";
 
 
 // Modal to display all submitted albums
@@ -159,8 +160,9 @@ export default function AllAlbumsModal(props) {
           <div className="flex gap-2">
             <Avatar
               src={album['album_img_src']}
+              className='my-auto'
             />
-            <a href={album['album_src']} target="_noreferrer" className="text-lg my-auto hover:underline">
+            <a href={album['album_src']} target="_noreferrer" className="text-lg my-auto hover:underline max-w-lg">
               {album['title']}
             </a>
           </div>
@@ -185,7 +187,7 @@ export default function AllAlbumsModal(props) {
       case "submission_date":
         return (
           <p className="my-auto">
-            {album['submission_date']}
+            <ClientTimestamp timestamp={album['submission_date']} full={true} />
           </p>
         );
       case "rating":
