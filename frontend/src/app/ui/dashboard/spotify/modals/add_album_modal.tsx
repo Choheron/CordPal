@@ -17,6 +17,7 @@ import { Listbox,  ListboxSection,  ListboxItem} from "@nextui-org/listbox";
 
 import { checkIfAlbumAlreadyExists, checkIfUserCanSubmit, spotifySearch, submitAlbumToBackend } from "@/app/lib/spotify_utils";
 import { Conditional } from "../../conditional";
+import InfoPopover from "@/app/ui/general/info_popover";
 
 // Modal to allow a user to submit an album for the album of the day pool
 export default function AddAlbumModal(props) {
@@ -164,9 +165,9 @@ export default function AddAlbumModal(props) {
   
   return (
     <>
-      <div className="flex flex-col justify-evenly w-full">
+      <div className="flex flex-col lg:flex-row gap-1 justify-center w-full">
         <Button 
-          className="p-2 my-4 mx-auto rounded-lg text-inheret min-w-0 min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline"
+          className="p-2 mt-4 mb-1 rounded-lg text-inheret min-w-0 min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline"
           size="lg"
           onPress={onOpen}
           radius="none"
@@ -175,11 +176,20 @@ export default function AddAlbumModal(props) {
         >
           <b>Submit An Album</b>
         </Button>
-        <Conditional showWhen={!userAllowedToSubmit}>
-          <div className="w-fit mx-auto backdrop-blur-2xl px-2 py-2 rounded-2xl bg-red-800/30 border border-neutral-800">
-            <p className="my-2 text-sm">
-              {userAllowedToSubmitMessage}
+        <Conditional showWhen={!userAllowedToSubmit && userAllowedToSubmitMessage != ""}>
+          <div className="flex gap-1 w-fit mx-2 my-4 backdrop-blur-2xl px-2 py-2 rounded-2xl border border-neutral-800">
+            <p className="text-sm my-auto">
+              You are currently unable to Submit an album. 
             </p>
+            <InfoPopover 
+              triggerText=" Why?" 
+              triggerClassName="my-auto"
+              triggerTextColor="blue-500"
+              popoverTitle="Why am I unable to submit an album?"
+              popoverText={userAllowedToSubmitMessage}
+              popoverPlacement="top"
+              showArrow={true}
+            />
           </div>
         </Conditional>
       </div>
