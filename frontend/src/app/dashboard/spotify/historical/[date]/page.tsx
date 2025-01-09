@@ -6,7 +6,7 @@ import ReviewDisplay from "@/app/ui/dashboard/spotify/review_display"
 import { Badge, Button } from "@nextui-org/react"
 import Link from "next/link"
 
-// Page to display historial data for an album
+// Page to display historial data for an specific date
 export default async function Page({
   params,
 }: {

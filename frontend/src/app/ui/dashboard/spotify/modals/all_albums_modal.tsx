@@ -158,13 +158,21 @@ export default function AllAlbumsModal(props) {
       case "title":
         return (
           <div className="flex gap-2">
-            <Avatar
-              src={album['album_img_src']}
-              className='my-auto'
-            />
-            <a href={album['album_src']} target="_noreferrer" className="text-lg my-auto hover:underline max-w-lg">
-              {album['title']}
-            </a>
+            <Button 
+              as={Link}
+              href={"/dashboard/spotify/album/" + album['album_id']}
+              radius="lg"
+              className={`w-fit h-fit mr-auto hover:underline text-white py-2`}
+              variant="light"
+            >
+              <Avatar
+                src={album['album_img_src']}
+                className='my-auto'
+              />
+              <p className="text-lg my-auto hover:underline max-w-lg">
+                {album['title']}
+              </p>
+            </Button>
           </div>
         );
       case "artist":

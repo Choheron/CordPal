@@ -1,9 +1,11 @@
 'use server'
 
 import {User} from "@nextui-org/user";
+import { Button } from "@nextui-org/react";
 
 import { convertToLocalTZString } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";
+import Link from "next/link";
 
 // GUI Display for recent submissions
 // Expected Props:
@@ -21,19 +23,27 @@ export default async function RecentSubmissions(props) {
           ) : (
             recentSubs.map((submission, index) => (
               <div className="ml-1" key={index}>
-                <User
-                  name={(
-                    <a href={submission['album_src']} className="hover:underline line-clamp-1 max-w-60">
-                      {submission['title']}
-                    </a>
-                  )}
-                  description={"Submitted by: " + submission['submitter']}
-                  avatarProps={{
-                    name: submission['title'],
-                    src: submission['album_img_src'],
-                    size: "lg",
-                  }}
-                />
+                <Button 
+                  as={Link}
+                  href={"/dashboard/spotify/album/" + submission['spotify_id']}
+                  radius="lg"
+                  className={`h-fit mr-auto hover:underline text-white py-2`}
+                  variant="light"
+                >
+                  <User
+                    name={(
+                      <p className="hover:underline line-clamp-1 max-w-56 text-ellipsis">
+                        {submission['title']}
+                      </p>
+                    )}
+                    description={"Submitted by: " + submission['submitter']}
+                    avatarProps={{
+                      name: submission['title'],
+                      src: submission['album_img_src'],
+                      size: "lg",
+                    }}
+                  />
+                </Button>
               </div>
             ))
           )
