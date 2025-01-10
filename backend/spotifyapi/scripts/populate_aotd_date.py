@@ -56,4 +56,7 @@ def run():
     review.save()
     
   # Print out failed albums from update
-  print(failed_update)
+  print("| Review ID/Date/Album | AOtD ID/Date/Album |")
+  print("| -------------------- | ------------------ |")
+  for entry in failed_update:
+    print(f"| {entry["Review ID/Date/Album"]} | {entry["AOtD ID/Date/Album"]} |")
