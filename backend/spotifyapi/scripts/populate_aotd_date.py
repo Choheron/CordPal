@@ -20,10 +20,10 @@ def run():
     # Verify that date is correct by checking DailyAlbum table
     verification_aotd = DailyAlbum.objects.get(album=album)
     if(verification_aotd.date != review_date):
-      print(f"ERROR: Incorrect date found for album of the day!\n\tReview Date/Album: {review_date}/{review.album.title}\n\tAOtD Date/Album: {verification_aotd.date}/{verification_aotd.album.title}")
+      print(f"ERROR: Incorrect date found for album of the day!\n\tReview ID/Date/Album: {review.pk}/{review_date}/{review.album.title}\n\tAOtD Date/Album: {verification_aotd.pk}/{verification_aotd.date}/{verification_aotd.album.title}")
       exit(1)
     # Update Review field with album of the day date
-    print(f"SUCCESS: Setting AOtD Date of {verification_aotd.date} for review submitter/album: {review.user.nickname}/{review.album.title}...")
+    print(f"SUCCESS: Setting AOtD ID/Date of {verification_aotd.pk}/{verification_aotd.date} for review ID/submitter/album: {review.pk}/{review.user.nickname}/{review.album.title}...")
     review.aotd_date = verification_aotd.date
     # Save Review
     review.save()
