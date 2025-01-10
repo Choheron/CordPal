@@ -55,6 +55,10 @@ def run():
     # Save Review
     review.save()
     
+  # Exit if successful
+  if(len(failed_update) == 0):
+    exit(0)
+  
   # Print out failed albums from update
   print("| Review ID/Date/Album | AOtD ID/Date/Album |")
   print("| -------------------- | ------------------ |")
