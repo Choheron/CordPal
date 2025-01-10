@@ -6,6 +6,7 @@ from .models import User
 import logging
 import os
 import json
+import requests
 
 # Declare logging
 logger = logging.getLogger('django')
@@ -116,6 +117,18 @@ def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
     return res
   # Call user method to get URL and convert to json
   userDataURLJson = json.dumps({"url": userData.get_avatar_url()})
+  # Check if url is still valid, if not, call discord api to get new avatar
+  # Prep headers to discord api
+  reqHeaders = { 
+    'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
+  }
+  # Send Request to API
+  try:
+    discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
+  except:
+    logger.info("user avatar url invalid, setting new avatar hash...")
+    userData.discord_avatar = discordRes['avatar']
+    userData.save()
   # Return user data json
   return HttpResponse(userDataURLJson, content_type='text/json', status=200)
 
