@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Django Extensions
+    "django_extensions",
+    "django_prometheus",
     # Custom Apps
     'todo.apps.TodoConfig',
     'users.apps.UsersConfig',
@@ -48,10 +51,12 @@ INSTALLED_APPS = [
     'spotifyapi.apps.SpotifyapiConfig',
     # Outside Apps
     "corsheaders",
-    "django_extensions",
 ]
 
 MIDDLEWARE = [
+    # Prometheus Before Middleware (Before all other middleware)
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
+    # All other middleware in here
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -59,7 +64,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Prometheus After Middleware (After all other middleware)
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
+
+# Prometheus Settings
+PROMETHEUS_METRIC_NAMESPACE = "discordsite_prod"
 
 # Session Data
 SESSION_COOKIE_DOMAIN=".nanophage.win"
@@ -120,7 +130,9 @@ LOGGING = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        # NOTE: Has been updated to include prometheus tracking of database
+        # Was previously: 'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django_prometheus.db.backends.postgresql',
         "OPTIONS": {
             "service": "discordsite_prod",
         },

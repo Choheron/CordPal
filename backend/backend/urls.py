@@ -18,6 +18,9 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    # Prometheus URLs
+    path('', include('django_prometheus.urls')),
+    # All other URLs
     path('discordapi/', include('discordapi.urls')),
     path('botInteraction/', include('botInteraction.urls')),
     path("todo/", include('todo.urls')),

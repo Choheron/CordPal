@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Django Extensions
+    "django_extensions",
+    "django_prometheus",
     # Custom Apps
     'todo.apps.TodoConfig',
     'users.apps.UsersConfig',
@@ -50,7 +53,6 @@ INSTALLED_APPS = [
     'spotifyapi.apps.SpotifyapiConfig',
     # Outside Apps
     "corsheaders",
-    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -62,6 +64,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+# Prometheus Settings
+PROMETHEUS_METRIC_NAMESPACE = "discordsite_prod"
+
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True

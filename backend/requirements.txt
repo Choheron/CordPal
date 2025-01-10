@@ -1,6 +1,7 @@
 django
 django-cors-headers
 django-extensions
+django-prometheus
 python-dotenv
 requests
 pytz
