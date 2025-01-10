@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@nextui-org/react";
@@ -27,6 +27,8 @@ export default function AlbumReviewBox(props) {
   // const [favSong, setFavSong] = useState<Selection>(new Set([]));
   const [isReady, setIsReady] = useState(false);
   const [isFirstListen, setIsFirstListen] = useState((props.first_listen != null) ? props.first_listen : false);
+  // Track if user has updated their review to be something different
+  const [isReviewUpdated, setIsReviewUpdated] = useState(false);
   // Prop validation
   const songList = (props.song_data) ? props.song_data : [{name: "None Provided"}]
 
@@ -41,6 +43,15 @@ export default function AlbumReviewBox(props) {
     return steps
   }
 
+  // UseEffect to ensure review cannot be updated unless something changes
+  useEffect(() => {
+    if((rating != props.rating) || (comment != props.comment) || (isFirstListen != props.first_listen)) {
+      setIsReviewUpdated(true)
+    } else {
+      setIsReviewUpdated(false)
+    }
+  }, [rating, comment, isFirstListen])
+
   // Send request to upload the submitted image
   const submitReview = () => {
     // Build out object
@@ -53,8 +64,9 @@ export default function AlbumReviewBox(props) {
     submitReviewToBackend(out)
     // Turn off review ready checkmark
     setIsReady(false)
+    setIsReviewUpdated(false)
     // Reload page
-    router.refresh()
+    router.push("spotify")
   }
 
   return (
@@ -104,6 +116,7 @@ export default function AlbumReviewBox(props) {
           <Checkbox
             isSelected={isReady}
             onValueChange={setIsReady}
+            isDisabled={!isReviewUpdated}
           >
             Ready to {(props.rating != null)? "Update" : "Submit"}?
           </Checkbox>
