@@ -162,7 +162,7 @@ export default function AllAlbumsModal(props) {
               as={Link}
               href={"/dashboard/spotify/album/" + album['album_id']}
               radius="lg"
-              className={`w-fit h-fit mr-auto hover:underline text-white py-2`}
+              className={`w-fit h-fit mr-auto hover:underline text-white py-1`}
               variant="light"
             >
               <Avatar
