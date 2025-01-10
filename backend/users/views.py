@@ -96,7 +96,7 @@ def getUserData(request: HttpRequest, user_discord_id: str = ""):
 ###
 def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
   logger.info("getUserAvatarURL called...")
-  # Make sure request is a post request
+  # Make sure request is a GET request
   if(request.method != "GET"):
     logger.warning("getUserAvatarURL called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
