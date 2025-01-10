@@ -13,6 +13,9 @@ def run():
   review_objects = Review.objects.all()
   # Iterate through all review objects and search album to determine date
   for review in review_objects:
+    # Verify that "aotd_date" is null
+    if(review.aotd_date != None):
+      continue
     # Determine album
     album = review.album
     # Determine aotd date (cut off time from date)
@@ -33,6 +36,9 @@ def run():
   review_objects = ReviewHistory.objects.all()
   # Iterate through all HISTORICAL review objects and search album to determine date
   for review in review_objects:
+    # Verify that "aotd_date" is null
+    if(review.aotd_date != None):
+      continue
     # Determine album
     album = review.review.album
     # Determine aotd date (cut off time from date)
