@@ -27,7 +27,7 @@ export default async function RecentSubmissions(props) {
                   as={Link}
                   href={"/dashboard/spotify/album/" + submission['spotify_id']}
                   radius="lg"
-                  className={`h-fit mr-auto hover:underline text-white py-2`}
+                  className={`h-fit mr-auto hover:underline text-white py-1`}
                   variant="light"
                 >
                   <User
