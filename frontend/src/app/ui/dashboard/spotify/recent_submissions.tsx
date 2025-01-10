@@ -27,22 +27,24 @@ export default async function RecentSubmissions(props) {
                   as={Link}
                   href={"/dashboard/spotify/album/" + submission['spotify_id']}
                   radius="lg"
-                  className={`h-fit mr-auto hover:underline text-white py-1`}
+                  className={`h-fit w-full hover:underline text-white py-1`}
                   variant="light"
                 >
-                  <User
-                    name={(
-                      <p className="hover:underline line-clamp-1 max-w-56 text-ellipsis">
-                        {submission['title']}
-                      </p>
-                    )}
-                    description={"Submitted by: " + submission['submitter']}
-                    avatarProps={{
-                      name: submission['title'],
-                      src: submission['album_img_src'],
-                      size: "lg",
-                    }}
-                  />
+                  <div className="w-full">
+                    <User
+                      name={(
+                        <p className="hover:underline line-clamp-1 max-w-56 text-ellipsis">
+                          {submission['title']}
+                        </p>
+                      )}
+                      description={"Submitted by: " + submission['submitter']}
+                      avatarProps={{
+                        name: submission['title'],
+                        src: submission['album_img_src'],
+                        size: "lg",
+                      }}
+                    />
+                  </div>
                 </Button>
               </div>
             ))
