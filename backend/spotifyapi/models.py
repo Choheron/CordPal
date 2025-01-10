@@ -99,6 +99,7 @@ class Review(models.Model):
                 review_text=self.review_text,
                 review_date=self.review_date,
                 first_listen=self.first_listen,
+                aotd_date=self.aotd_date
             )
         super().save(*args, **kwargs)
 
