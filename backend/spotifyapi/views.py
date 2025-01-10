@@ -602,6 +602,7 @@ def submitReview(request: HttpRequest):
       score=float(reqBody['score']),
       review_text=reqBody['comment'],
       first_listen=reqBody['first_listen'],
+      aotd_date=datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d'),
     )
     # Save new Review data
     newReview.save()
