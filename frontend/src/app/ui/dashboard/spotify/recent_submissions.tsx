@@ -34,7 +34,7 @@ export default async function RecentSubmissions(props) {
                     <User
                       name={(
                         <p className="hover:underline line-clamp-1 max-w-56">
-                          {(submission['title'].length > 30) ? (submission['title'].substring(0, 30) + "...") : submission['title']}
+                          {(submission['title'].length > 27) ? (submission['title'].substring(0, 27) + "...") : submission['title']}
                         </p>
                       )}
                       description={"Submitted by: " + submission['submitter']}
