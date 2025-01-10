@@ -59,4 +59,4 @@ def run():
   print("| Review ID/Date/Album | AOtD ID/Date/Album |")
   print("| -------------------- | ------------------ |")
   for entry in failed_update:
-    print(f"| {entry["Review ID/Date/Album"]} | {entry["AOtD ID/Date/Album"]} |")
+    print(f"| {entry['Review ID/Date/Album']} | {entry['AOtD ID/Date/Album']} |")
