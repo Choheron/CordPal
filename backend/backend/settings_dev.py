@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'spotifyapi.apps.SpotifyapiConfig',
     # Outside Apps
     "corsheaders",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
