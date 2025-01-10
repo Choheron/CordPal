@@ -196,7 +196,6 @@ def checkIfPrevAuth(request: HttpRequest):
   # Ensure user is logged in
   if(validSession and isDiscordTokenExpired(request)):
     refreshDiscordToken(request)
-  # 
   # Return JsonResponse containing true or false in body
   logger.info(f"Returning prevAuth status of: {validSession}...")
   out = {}
