@@ -3,6 +3,11 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from .models import User
 
+from discordapi.utils import (
+  isDiscordTokenExpired, 
+  refreshDiscordToken, 
+)
+
 import logging
 import os
 import json
@@ -164,8 +169,35 @@ def updateUserData(request: HttpRequest):
     return res
   # Body data
   reqBody = json.loads(request.body)
-  # Retrieve user data via session storage
-  # Update user data
+  # Retrieve user data via session storage then update user data
   User.objects.filter(discord_id=request.session['discord_id']).update(**reqBody)
+  # Check if user profile photo is still accurate, if not update data
+  user = User.objects.get(discord_id=request.session['discord_id'])
+  # Call avatar url
+  avatar_res = requests.get(user.get_avatar_url())
+  # If 404, refresh avatar data
+  if(avatar_res.status_code == 404):
+    # Ensure user is logged in
+    if(isDiscordTokenExpired(request)):
+      refreshDiscordToken(request)
+    # Prep request data and headers to discord api
+    reqHeaders = { 
+      'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
+    }
+    # Send Request to API
+    logger.info("Making request to discord api...")
+    try:
+      discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
+      if(discordRes.status_code != 200):
+        print("Error in request:\n" + str(discordRes.json()))
+        discordRes.raise_for_status()
+    except:
+      return HttpResponse(status=500)
+    # Convert response to Json
+    discordResJSON = discordRes.json()
+    # Store avatar hash in user object
+    user.discord_avatar = discordResJSON['avatar']
+    # Update user
+    user.save()
   # Return success code
   return HttpResponse(200)
