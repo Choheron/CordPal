@@ -49,5 +49,5 @@ def run():
     # Save Review
     review.save()
     
-    # Print out failed albums from update
-    print(failed_update)
+  # Print out failed albums from update
+  print(failed_update)
