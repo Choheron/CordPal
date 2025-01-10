@@ -48,3 +48,6 @@ def run():
     review.aotd_date = verification_aotd.date
     # Save Review
     review.save()
+    
+    # Print out failed albums from update
+    print(failed_update)
