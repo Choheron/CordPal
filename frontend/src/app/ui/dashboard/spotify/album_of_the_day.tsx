@@ -1,12 +1,13 @@
 "use server"
 
-import { Divider } from "@nextui-org/react";
+import { Button, Divider } from "@nextui-org/react";
 
 import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
 import ReviewDisplay from "./review_display";
 import { getAlbumOfTheDayData, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
 import AddAlbumModal from "./modals/add_album_modal";
+import Link from "next/link";
 
 // GUI Display for the Album of the Day
 // Expected Props:
@@ -21,6 +22,9 @@ export default async function AlbumOfTheDayBox(props) {
     albumOfTheDayObj = await getAlbumOfTheDayData()
   }
 
+  // Get yesterday's date
+  const yesterdayString = new Date(new Date().setDate(new Date().getDate()-1)).toISOString().split('T')[0];
+
   // Pull data from album object, return empty string if not available
   function albumData(key) {
     if(key in albumOfTheDayObj) {
@@ -33,6 +37,17 @@ export default async function AlbumOfTheDayBox(props) {
   return (
     <div className="w-full lg:max-w-[1080px] flex flex-col lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
       <div className="w-full flex flex-col">
+        <div className="ml-2 mt-1">
+          <Button 
+            as={Link}
+            href={"/dashboard/spotify/historical/" + yesterdayString}
+            radius="lg"
+            className={`w-fit hover:underline text-white`}
+            variant="solid"
+          >
+            <b>View Yesterday's Album</b>
+          </Button> 
+        </div>
         <AlbumDisplay 
           title={albumData("title")}
           album_img_src={albumData("album_img_src")}

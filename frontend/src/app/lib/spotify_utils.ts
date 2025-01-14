@@ -236,7 +236,7 @@ export async function getAlbumAvgRating(spotify_album_id, rounded = true) {
     },
   });
   const albumAvgRatingData = await avgRatingResponse.json()
-  return albumAvgRatingData['rating'];
+  return (albumAvgRatingData['rating'] != null) ? (albumAvgRatingData['rating']) : (0.0);
 }
 
 //
