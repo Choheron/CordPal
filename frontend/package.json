@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@lightenna/react-mermaid-diagram": "^1.0.17",
     "@nextui-org/react": "^2.4.6",
     "clsx": "^2.1.1",
     "framer-motion": "^11.3.21",
     "iron-session": "^8.0.1",
+    "mermaid": "^11.4.1",
     "next": "^14.2.5",
     "next-auth": "^4.24.7",
     "react": "^18.3.1",
