@@ -78,7 +78,12 @@ export default async function AlbumDisplay(props) {
         </Conditional>
         <Conditional showWhen={(avg_rating != 0) && ((avg_rating != null))}>
           <div className="">
-            <p>Average User Rating: </p>
+            <div className="flex mb-1">
+              <p>Average User Rating: </p>
+              <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(avg_rating)}`}>
+                <b>{avg_rating}</b>
+              </p>
+            </div>
             <div className="ml-2">
               <StarRating 
                 className="text-yellow-400 text-xl"
