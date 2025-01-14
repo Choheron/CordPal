@@ -1,5 +1,6 @@
 import { getAlbumAvgRating, getAlbumOfTheDayData } from "@/app/lib/spotify_utils"
-import { ratingToTailwindBgColor } from "@/app/lib/utils"
+import { dateToYYYYMMDD, getNextDay, getPrevDay, ratingToTailwindBgColor } from "@/app/lib/utils"
+import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/spotify/album_display"
 import ReviewDisplay from "@/app/ui/dashboard/spotify/review_display"
@@ -14,6 +15,21 @@ export default async function Page({
 }) {
   const date = (await params).date
   const albumOfTheDayObj = await getAlbumOfTheDayData((await params).date)
+  // Get previous day's date
+  const prevString = dateToYYYYMMDD(getPrevDay(new Date(Date.parse(date))))
+  // Get next day's date (null if next day is in the future)
+  const nextString = dateToYYYYMMDD(getNextDay(new Date(Date.parse(date))))
+  // Boolean to determine if this date is today
+  const isToday = isTodayCheck()
+
+  // This may be my ugliest function in this whole thing.... Timezones are really confusing me
+  function isTodayCheck() {
+    const date1String = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0])).toISOString().split('T')[0]
+    const splitDate = date.split("-")
+    const date2String = new Date(Date.parse(new Date(parseInt(splitDate[0]), parseInt(splitDate[1])-1, parseInt(splitDate[2])).toISOString().split('T')[0])).toISOString().split('T')[0]
+    // Return string equals
+    return date1String == date2String;
+  }
 
   // Pull data from album object, return empty string if not available
   function albumData(key) {
@@ -33,6 +49,28 @@ export default async function Page({
         </p>
         <div className="w-fit mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row">
           <div className="backdrop-blur-2xl px-3 py-3 my-2 mx-auto rounded-2xl bg-zinc-800/30 border border-neutral-800">
+            <div className="mx-1 mt-1 mb-2 flex justify-between w-full">
+              <Button 
+                as={Link}
+                href={"/dashboard/spotify/historical/" + prevString}
+                radius="lg"
+                className={`w-fit hover:underline text-white`}
+                variant="solid"
+              >
+                <b>Prev Day</b>
+              </Button> 
+              <Conditional showWhen={!isToday}>
+                <Button
+                  as={Link}
+                  href={"/dashboard/spotify/historical/" + nextString}
+                  radius="lg"
+                  className={`w-fit hover:underline text-white`}
+                  variant="solid"
+                >
+                  <b>Next Day</b>
+                </Button> 
+              </Conditional>
+            </div>
             <Badge
               content={(await getAlbumAvgRating(albumData('album_id'), false)).toFixed(2)} 
               size="lg" 

@@ -45,7 +45,7 @@ export default async function AlbumOfTheDayBox(props) {
             className={`w-fit hover:underline text-white`}
             variant="solid"
           >
-            <b>View Yesterday's Album</b>
+            <b>View Yesterday&apos;s Album</b>
           </Button> 
         </div>
         <AlbumDisplay 

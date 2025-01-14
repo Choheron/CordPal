@@ -82,3 +82,22 @@ export const isDecember = () => {
   // Return equality operation
   return month == 11;
 };
+
+// Get day before passed in date
+export function getPrevDay(day: Date) {
+  let dateObj = new Date(day);
+  dateObj.setDate(dateObj.getDate() - 1);
+  return dateObj
+}
+
+// Get day before passed in date
+export function getNextDay(day: Date) {
+  let dateObj = new Date(day);
+  dateObj.setDate(dateObj.getDate() + 1);
+  return dateObj
+}
+
+// Convert date to yyyy-mm-dd format
+export function dateToYYYYMMDD(day: Date) {
+  return day.toISOString().split('T')[0];
+}
