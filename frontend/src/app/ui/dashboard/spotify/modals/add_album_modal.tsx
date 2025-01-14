@@ -160,8 +160,7 @@ export default function AddAlbumModal(props) {
     
     onClose()
     // Reload page
-    router.refresh()
-    router.refresh()
+    location.reload()
   }
   
   return (
