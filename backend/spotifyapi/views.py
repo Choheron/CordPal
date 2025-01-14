@@ -292,10 +292,12 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
   date_format = '%Y-%m-%d'
   albumDay = datetime.datetime.strptime(date, date_format).date()
   # Filter submissions by date
-  dateSubmissionsCount = Album.objects.filter(submitted_by=userObj).filter(submission_date__date=albumDay).count()
-  if(dateSubmissionsCount > 0):
-    validityStatus['canSubmit'] = False
-    validityStatus['reason'] = f"You have already submitted an album for today! ({albumDay}) (CST)"
+  dateSubmissions = Album.objects.filter(submitted_by=userObj)
+  for submission in dateSubmissions:
+    if(submission.submission_date.astimezone(tz=pytz.timezone('America/Chicago')).date().strftime('%Y-%m-%d') == date):
+      validityStatus['canSubmit'] = False
+      validityStatus['reason'] = f"You have already submitted an album for today! ({albumDay}) (CST)"
+      break
   # Return Statuses
   return JsonResponse(validityStatus)
 
