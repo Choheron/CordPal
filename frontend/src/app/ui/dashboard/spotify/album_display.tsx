@@ -81,7 +81,7 @@ export default async function AlbumDisplay(props) {
             <div className="flex mb-1">
               <p>Average User Rating: </p>
               <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(avg_rating)}`}>
-                <b>{avg_rating}</b>
+                <b>{avg_rating.toFixed(2)}</b>
               </p>
             </div>
             <div className="ml-2">
