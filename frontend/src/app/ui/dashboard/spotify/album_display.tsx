@@ -36,7 +36,7 @@ export default async function AlbumDisplay(props) {
   const submitter_comment = (props.submitter_comment) ? props.submitter_comment : "No Comment Provided";
   const submission_date: string = (props.submission_date) ? props.submission_date : "Not Provided";
   // Rating props check
-  const avg_rating = (props.album_spotify_id) ? await getAlbumAvgRating(props.album_spotify_id): 0.0;
+  const avg_rating = (props.album_spotify_id) ? await getAlbumAvgRating(props.album_spotify_id, false): 0.0;
   // Historical props checks
   const historical = (props.historical_date) ? true : false;
   const historical_date = (props.historical_date) ? props.historical_date : "0000-00-00";
