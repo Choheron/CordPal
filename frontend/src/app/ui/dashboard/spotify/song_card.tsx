@@ -74,6 +74,7 @@ export default function SongCard(props) {
                 <small className="text-default-500">{album_release_date}</small>
               </div>
               { /* Show Button if user has not loaded preview */ }
+              { /*
               <Conditional showWhen={audioSrc == null}>
                 <Button 
                   size="sm"
@@ -83,13 +84,16 @@ export default function SongCard(props) {
                   Load Preview
                 </Button>  
               </Conditional>
+              */ }
               { /* Do not load audio source if the user has not clicked "load preview" */ }
+              { /*
               { audioSrc && (
                 <audio controls ref={audioRef} className="pt-2 pb-2 pl-2 w-64 lg:w-full">
                   <source src={audioSrc} type="audio/mpeg"/>
                   Your browser does not support the audio element.
                 </audio>
               )}
+                */ }
             </div>
           </div>
         </CardHeader>
