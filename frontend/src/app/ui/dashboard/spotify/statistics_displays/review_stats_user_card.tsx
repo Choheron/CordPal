@@ -1,11 +1,11 @@
 'use server'
 
-import { Popover, PopoverTrigger, PopoverContent} from "@nextui-org/react"
+import { Popover, PopoverTrigger, PopoverContent, Divider} from "@nextui-org/react"
 import { Button, Link } from "@nextui-org/react"
 
 import UserCard from "@/app/ui/general/userUiItems/user_card"
 import StarRating from "@/app/ui/general/star_rating"
-import { getAlbum, getAlbumOfTheDayData } from "@/app/lib/spotify_utils"
+import { getAlbum } from "@/app/lib/spotify_utils"
 import { ratingToTailwindBgColor } from "@/app/lib/utils"
 
 // User Card showing the review stats for a user
@@ -53,6 +53,7 @@ export default async function ReviewStatsUserCard(props) {
             <p>Review Statistics</p>
           }
         />
+        <Divider className="mt-1" />
         <div className='flex justify-between w-full'>
           <p className="my-auto">Total Reviews Submitted:</p>
           <p className="my-auto px-2 py-1 bg-gray-800 rounded-full">
@@ -60,15 +61,21 @@ export default async function ReviewStatsUserCard(props) {
           </p>
         </div>
         <div className='w-full'>
-          <p className="my-auto">Average Aggregate Review Score:</p>
+          <div className='flex justify-between w-full'>
+            <p className="my-auto">Average Review Given:</p>
+            <p className={`px-2 my-1 rounded-xl text-black ${ratingToTailwindBgColor(reviewData['average_review_score'])}`}>
+              <b>{reviewData['average_review_score'].toFixed(2)}</b>
+            </p>
+          </div>
           <StarRating
             rating={reviewData['average_review_score']}
             className="text-yellow-400 text-lg my-auto justify-center"
           />
         </div>
+        <Divider className="mt-2" />
         {/* Album Highest Stats */}
-        <div className='w-full flex flex-col align-middle'>
-          <p className="my-auto">Highest Rated Album:</p>
+        <div className='w-full flex flex-col align-middle pt-1'>
+          <p className="my-auto mx-auto">Highest Rated Album:</p>
           <Button 
             as={Link}
             href={"/dashboard/spotify/historical/" + convertToHistoricalDate(reviewData['highest_score_date'])}
@@ -91,7 +98,7 @@ export default async function ReviewStatsUserCard(props) {
         </div>
         {/* Album Lowest Stats */}
         <div className='w-full flex flex-col align-middle'>
-          <p className="my-auto">Lowest Rated Album:</p>
+          <p className="my-auto mx-auto">Lowest Rated Album:</p>
           <Button 
             as={Link}
             href={"/dashboard/spotify/historical/" + convertToHistoricalDate(reviewData['lowest_score_date'])}
