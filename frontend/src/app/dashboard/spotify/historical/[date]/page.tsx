@@ -44,7 +44,7 @@ export default async function Page({
     <div className="flex min-h-screen flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text={`Historical Album Of the Day Data - ${date}`} />
       <div className="flex flex-col w-fit justify-center md:w-4/5 gap-2">
-        <p className="mx-auto">
+        <p className="mx-auto px-2 py-2 text-small italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
           You are viewing historical Album Of the Day Data, you cannot make any changes or submit any new data on this page.
         </p>
         <div className="w-fit mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row">
