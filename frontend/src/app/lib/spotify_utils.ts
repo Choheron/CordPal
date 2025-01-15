@@ -198,7 +198,7 @@ export async function getAlbumOfTheDayData(date: string = '') {
   const albumOfDayInfo = await albumOfDayResponse.json()
   if("err_message" in albumOfDayInfo) {
     console.log("Error when retrieving album of the day!")
-    return {}
+    return {"error_message": "No album found", "album_id": null}
   }
   // Get album Data
   console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbum/${albumOfDayInfo['album_id']}'`)
@@ -221,6 +221,10 @@ export async function getAlbumOfTheDayData(date: string = '') {
 // - RETURN: object containing album of the day data
 //
 export async function getAlbumAvgRating(spotify_album_id, rounded = true) {
+  // If spotify id is null, return 0
+  if(spotify_album_id == null) {
+    return 0.0
+  }
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Tail to string for variants in API calls

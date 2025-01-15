@@ -623,9 +623,21 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str):
     res.status_code = 405
     return res
   # Get Album from the database
-  albumObj = Album.objects.get(spotify_id=album_spotify_id)
+  try:
+    albumObj = Album.objects.get(spotify_id=album_spotify_id)
+  except Album.DoesNotExist:
+    out = {}
+    out['review_list'] = []
+    print(f'Album {album_spotify_id} not found...')
+    return JsonResponse(out)
   # Get all reivews for album
-  reviewsObj = Review.objects.filter(album=albumObj)
+  try:
+    reviewsObj = Review.objects.filter(album=albumObj)
+  except Review.DoesNotExist:
+    out = {}
+    out['review_list'] = []
+    print(f'No reviews found for album {album_spotify_id}...')
+    return JsonResponse(out)
   # Declare outlist and populate
   outList = []
   for review in reviewsObj:
