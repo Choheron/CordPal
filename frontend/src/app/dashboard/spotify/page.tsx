@@ -10,6 +10,7 @@ import AddAlbumModal from "@/app/ui/dashboard/spotify/modals/add_album_modal";
 import RecentSubmissions from "@/app/ui/dashboard/spotify/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/spotify/statistics_displays/music_stats_box";
 import AllAlbumsModal from "@/app/ui/dashboard/spotify/modals/all_albums_modal";
+import AllTopSongsBox from "@/app/ui/dashboard/spotify/all_top_songs_box";
 
 export default async function music() {
   const spot_authenticated = await isSpotifyLinked();
@@ -35,29 +36,7 @@ export default async function music() {
         <MusicStatsBox />
       </Conditional>
       <Conditional showWhen={spot_authenticated}>
-        <div className="flex flex-col w-full lg:flex-row md:w-4/5 gap-5">
-          <TopSongsList 
-            previewVolume={0.5}
-            title={"Top Songs (4 Weeks)"}
-            time_range={"short_term"}
-            limit={"50"}
-            offset={"0"}
-          />
-          <TopSongsList 
-            previewVolume={0.5}
-            title={"Top Songs (6 Months)"}
-            time_range={"medium_term"}
-            limit={"50"}
-            offset={"0"}
-          />
-          <TopSongsList 
-            previewVolume={0.5}
-            title={"Top Songs (1 Year)"}
-            time_range={"long_term"}
-            limit={"50"}
-            offset={"0"}
-          />
-        </div>
+        <AllTopSongsBox />
       </Conditional>
     </div>
   );
