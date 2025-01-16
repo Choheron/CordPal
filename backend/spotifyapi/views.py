@@ -667,7 +667,10 @@ def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str):
     res.status_code = 405
     return res
   # Get Album from the database
-  albumObj = Album.objects.get(spotify_id=album_spotify_id)
+  try: 
+    albumObj = Album.objects.get(spotify_id=album_spotify_id)
+  except ObjectDoesNotExist:
+    return JsonResponse({"review": None})
   # Get reivew for album
   try: 
     review = Review.objects.get(album=albumObj, user=getSpotifyUser(request.session.get('discord_id')))
