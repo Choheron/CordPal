@@ -1,6 +1,6 @@
 "use server"
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 // Below Code allows for serverside computing of cookie stuff!
@@ -173,6 +173,8 @@ export async function submitAlbumToBackend(albumObject) {
     },
     body: JSON.stringify(albumObject)
   });
+  // Revalidate requests to see recent submissions
+  revalidateTag('album_submissions')
 }
 
 //
@@ -254,12 +256,13 @@ export async function getReviewsForAlbum(album_spotify_id) {
   }
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
-  // Validate that user has connected spotify
+  // Get all user reviews for an album
   console.log(`getReviewsForAlbum: Sending request to backend '/spotifyapi/getReviewsForAlbum/${album_spotify_id}'`)
   const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getReviewsForAlbum/${album_spotify_id}`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'force-cache',
+    next: { tags: ['reviews'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -279,7 +282,7 @@ export async function getUserReviewForAlbum(album_spotify_id) {
   }
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
-  // Validate that user has connected spotify
+  // Get user's review for an album
   console.log(`getUserReviewForAlbum: Sending request to backend '/spotifyapi/getUserReviewForAlbum/${album_spotify_id}'`)
   const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getUserReviewForAlbum/${album_spotify_id}`, {
     method: "GET",
@@ -300,7 +303,7 @@ export async function getUserReviewForAlbum(album_spotify_id) {
 export async function submitReviewToBackend(reviewObject) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
-  // Validate that user has connected spotify
+  // Submit user's review to the backend
   console.log("submitReviewToBackend: Sending request to backend '/spotifyapi/submitReview'")
   const submitReviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/submitReview`, {
     method: "POST",
@@ -311,6 +314,8 @@ export async function submitReviewToBackend(reviewObject) {
     },
     body: JSON.stringify(reviewObject)
   });
+  // Revalidate review related calls
+  revalidateTag('reviews')
 }
 
 //
@@ -329,7 +334,8 @@ export async function getLastXSubmissions(count = 0) {
   const subResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getLastXAlbums/${count}`, {
     method: "GET",
     credentials: "include",
-    next: { revalidate: 5 },
+    cache: 'force-cache',
+    next: { tags: ['album_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
