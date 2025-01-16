@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 // Below Code allows for serverside computing of cookie stuff!
@@ -96,6 +97,7 @@ export async function getUserData(discord_id = "") {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
+    next: { tags: ['user-data'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
@@ -125,5 +127,8 @@ export async function updateUserData(updatedJSON) {
       Cookie: `sessionid=${sessionCookie};`
     }
   });
+  // Revalidate User Data
+  revalidateTag('user-data')
+  // Return json
   return await userDataResponse.json();
 }
