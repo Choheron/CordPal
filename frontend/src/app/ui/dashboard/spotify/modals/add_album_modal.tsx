@@ -206,7 +206,7 @@ export default function AddAlbumModal(props) {
                 <div className="max-w-[320px] lg:max-w-[650px] px-2 py-2 mt-2 text-small italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
                   <p>
                     NOTE: Please refrain from submitting &quot;best of&quot; albums to the AOtD pool. The purpose of the AOtD is to add albums created by the artist in their originial form &#40;extended editions,
-                    deluxes, and the like are allowed&#41;. If any album is in question, ask in the discord. Additionally, please check if an album's deluxe, extended, etc edition has already been submitted before
+                    deluxes, and the like are allowed&#41;. If any album is in question, ask in the discord. Additionally, please check if an album&apos;s deluxe, extended, etc edition has already been submitted before
                     submitting an album. 
                   </p>
                 </div>
