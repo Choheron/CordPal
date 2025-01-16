@@ -356,7 +356,8 @@ export async function getAlbumsStats() {
   const albumStatResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumsStats`, {
     method: "GET",
     credentials: "include",
-    next: { revalidate: 5 },
+    cache: 'force-cache',
+    next: { tags: ['album_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -377,7 +378,8 @@ export async function getLowestHighestAlbumStats() {
   const albumLowHighStatResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getLowestHighestAlbumStats`, {
     method: "GET",
     credentials: "include",
-    next: { revalidate: 60 },
+    cache: 'force-cache',
+    next: { tags: ['reviews'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -398,7 +400,8 @@ export async function getAllAlbums() {
   const allAlbumsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAllAlbums`, {
     method: "GET",
     credentials: "include",
-    next: { revalidate: 300 },
+    cache: 'force-cache',
+    next: { tags: ['reviews', 'album_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -461,7 +464,8 @@ export async function getAllUserReviewStats() {
   const userReviewStatResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAllUserReviewStats`, {
     method: "GET",
     credentials: "include",
-    next: { revalidate: 60 },
+    cache: 'force-cache',
+    next: { tags: ['reviews'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
