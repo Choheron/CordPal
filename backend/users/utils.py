@@ -20,7 +20,7 @@ def createUserFromDiscordJSON(discordDataJson):
   user = User(
     username = discordDataJson['username'], 
     email = discordDataJson['email'],
-    nickname = discordDataJson['global_name'],
+    nickname = discordDataJson['global_name'] if (discordDataJson['global_name'] != None) else  discordDataJson['username'], # Strange issue when certian users were joining, bandaid fix
     discord_id = discordDataJson['id'],
     discord_discriminator = discordDataJson['discriminator'],
     discord_is_verified = discordDataJson['verified'],
