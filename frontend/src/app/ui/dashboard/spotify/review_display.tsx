@@ -14,7 +14,7 @@ export default async function ReviewDisplay(props) {
   // Setup Props
   const reviews = await getReviewsForAlbum(props.album_id)
 
-  // Regex for youtube video embedding (Thanks GPT)
+  // Regex for youtube video embedding
   const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\?[\w=&%-]*)?(?:&t=(\d+h)?(\d+m)?(\d+s)?)?/g;
 
   const generateEmbed = (textWithLinks) => {
