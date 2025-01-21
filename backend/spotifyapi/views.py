@@ -594,6 +594,7 @@ def submitReview(request: HttpRequest):
     reviewObj = Review.objects.get(album=albumObj, user=userObj)
     reviewObj.score = float(reqBody['score'])
     reviewObj.review_text = reqBody['comment']
+    reviewObj.first_listen = reqBody['first_listen']
     # Save/Update Object
     reviewObj.save()
   except Review.DoesNotExist:
