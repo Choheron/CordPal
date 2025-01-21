@@ -35,7 +35,7 @@ export default function StarRating(props) {
             className={`absolute inset-0 ${filledColor}`} 
             style={{
               width: `${partialStar * 100}%`,
-              background: 'linear-gradient(to right, gold, gold)',
+              background: `linear-gradient(to right, #eab308, #eab308)`,
               WebkitBackgroundClip: 'text',
               color: 'transparent'
             }}
