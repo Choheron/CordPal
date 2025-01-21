@@ -1,6 +1,7 @@
 // GUI Representation for a star rating system
 // Expected Props:
 // - rating: Float - Number rating out of 10 (incrments of 0.5)
+// - textSize: String - Tailwind text size indicator
 export default function StarRating(props) {
   const rating = (props.rating) ? Math.min(props.rating, 10) : 0;
   // Determine star ratios
@@ -8,10 +9,10 @@ export default function StarRating(props) {
   const partialStar = rating - fullStars; // Fractional part of the rating
   // Star array for display
   const stars: any = [];
-  // Tailwind configs
+  // Tailwind configs (Some can be passed in as props, otherwise defaulted)
   const filledColor = 'text-yellow-500'
   const emptyColor = 'text-gray-500'
-  const textSize = 'text-2xl'
+  const textSize = (props.textSize) ? props.textSize : 'text-2xl';
 
   console.log(`${rating} - ${fullStars} - ${partialStar}`)
 
