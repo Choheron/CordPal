@@ -1,7 +1,3 @@
-import { IconContext } from "react-icons";
-
-import { IoStarOutline, IoStarHalf, IoStar } from "react-icons/io5";
-
 // GUI Representation for a star rating system
 // Expected Props:
 // - rating: Float - Number rating out of 10 (incrments of 0.5)
