@@ -47,7 +47,6 @@ export async function checkIfUserCanSubmit() {
     }
   });
   const canSubmitData = await canSubmitResponse.json();
-  console.log(canSubmitData)
   return canSubmitData;
 }
 
