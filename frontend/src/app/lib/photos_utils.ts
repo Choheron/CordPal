@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 // Below Code allows for serverside computing of cookie stuff!
@@ -20,7 +21,8 @@ export async function getAllPhotoshops() {
   const photosResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/photos/getAllImages`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'force-cache',
+    next: { tags: ['all_photoshops'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
@@ -71,5 +73,7 @@ export async function uploadImageToBackend(formData) {
     },
     body: formData,
   });
+  // Revalidate photoshops tag
+  revalidateTag('all_photoshops')
   return uploadResponse.status;
 }

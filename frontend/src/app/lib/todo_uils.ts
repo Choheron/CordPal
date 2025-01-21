@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 // Below Code allows for serverside computing of cookie stuff!
@@ -17,7 +18,8 @@ export async function getAllTodoItems() {
   const todoListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/todo/getAllTodoItems`, {
     method: "GET",
     credentials: "include",
-    next: {revalidate: 5 },
+    cache: "force-cache",
+    next: { tags: ['all_todo'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
@@ -67,6 +69,8 @@ export async function createToDoItem(todoData) {
     },
     body: todoData,
   });
+  // Revalidate all_toto tag
+  revalidateTag('all_todo')
   return createTodoResponse.status
 }
 
@@ -89,5 +93,7 @@ export async function updateToDoItem(todoData) {
     },
     body: JSON.stringify(todoData),
   });
+  // Revalidate all_toto tag
+  revalidateTag('all_todo')
   return updateTodoResponse.status
 }
