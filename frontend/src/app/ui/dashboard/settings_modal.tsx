@@ -13,6 +13,8 @@ import React from "react";
 import { useRouter } from 'next/navigation';
 
 import { updateUserData } from "@/app/lib/user_utils";
+import ClientTimestamp from "../general/client_timestamp";
+import { boolToString } from "@/app/lib/utils";
 
 
 // Expected props:
@@ -20,10 +22,34 @@ import { updateUserData } from "@/app/lib/user_utils";
 //  - avatarURL: String URL of Discord User's Avatar
 //  - linkedAccounts: List containing connected account data 
 export default function SettingsModal(props) {
+  // Static values
+  const userInfo = props.userInfo // UserInfo Object Keys: {guid, username, last_updated_timestamp, creation_timestamp, email, nickname, discord_id, discord_discriminator, discord_is_verified, discord_avatar, spotify_connected, is_active, is_staff, avatar_url}
+  // Dynamic values
   const [emailValue, setEmailValue] = React.useState(props.userInfo['email']);
   const [nicknameValue, setNicknameValue] = React.useState(props.userInfo['nickname']);
+  // Modal Values
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
+
+  // Display static user information
+  function userInfoBlock() {
+    return(
+      <div className="text-sm mx-auto -mt-2 w-2/3">
+        <div className="flex justify-between w-full">
+          <p>System GUID:</p>
+          <p>{userInfo['guid']}</p>
+        </div>
+        <div className="flex justify-between w-full">
+          <p>Discord ID:</p>
+          <p>{userInfo['discord_id']}</p>
+        </div>
+        <div className="flex justify-between w-full">
+          <p>Is Admin:</p>
+          <p>{boolToString(userInfo['is_staff'])}</p>
+        </div>
+      </div>
+    )
+  }
 
   function linkedAccountsBlock() {
     return props.linkedAccounts.map((integrationObject) => {
@@ -116,6 +142,10 @@ export default function SettingsModal(props) {
                 <p> 
                   This page allows you to view and update the data stored in the database and shown on the webpages.
                 </p>
+                <p>User Information:</p>
+                <div>
+                  {userInfoBlock()}
+                </div>
                 <p>Linked Accounts:</p>
                 <div>
                   {linkedAccountsBlock()}
