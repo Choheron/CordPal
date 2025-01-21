@@ -88,7 +88,7 @@ export default async function AlbumDisplay(props) {
               <StarRating 
                 className="text-yellow-400 text-xl"
                 rating={avg_rating} 
-                textSize="text-4xl"
+                textSize="text-2xl lg:text-4xl"
               />
             </div>
           </div>

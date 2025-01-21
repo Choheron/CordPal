@@ -14,8 +14,6 @@ export default function StarRating(props) {
   const emptyColor = 'text-gray-500'
   const textSize = (props.textSize) ? props.textSize : 'text-2xl';
 
-  console.log(`${rating} - ${fullStars} - ${partialStar}`)
-
   // Add full stars
   for (let i = 0; i < fullStars; i++) {
     stars.push(
