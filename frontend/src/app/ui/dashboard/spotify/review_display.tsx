@@ -6,6 +6,7 @@ import UserCard from "../../general/userUiItems/user_card";
 import { getReviewsForAlbum } from "@/app/lib/spotify_utils";
 import ClientTimestamp from "../../general/client_timestamp";
 import { Conditional } from "../conditional";
+import { getUserCount } from "@/app/lib/user_utils";
 
 // GUI Display for reviews of an album
 // Expected Props:
@@ -13,6 +14,8 @@ import { Conditional } from "../conditional";
 export default async function ReviewDisplay(props) {
   // Setup Props
   const reviews = await getReviewsForAlbum(props.album_id)
+  // Get count of users in website
+  const userCount = await getUserCount()
 
   // Regex for youtube video embedding
   const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\?[\w=&%-]*)?(?:&t=(\d+h)?(\d+m)?(\d+s)?)?/g;
@@ -34,7 +37,7 @@ export default async function ReviewDisplay(props) {
     <div className="w-full lg:w-fit min-w-[300px] mx-2 lg:mx-1 my-2 flex flex-col gap-2">
       <div className="flex mx-auto gap-3">
         <p>User Reviews:</p>
-        <p>{reviews.length}/12</p> { /* TODO: Make this user count dynamic */}
+        <p>{reviews.length}/{userCount}</p> { /* TODO: Make this user count dynamic */}
       </div>
       {reviews.length === 0 ? (
           <p>No User Reviews Yet</p>

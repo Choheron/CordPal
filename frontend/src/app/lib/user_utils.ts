@@ -9,6 +9,28 @@ const getCookie = async (name: string) => {
 }
 
 //
+// Get a count of users in the system
+// - RETURN: Json containing user data from DB
+export async function getUserCount() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const userListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserCount`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const userListJSON = await userListResponse.json()
+  return Object.values(userListJSON);
+}
+
+//
 // Retrieve a list of user IDs
 // - RETURN: Json containing user data from DB
 export async function getUserList() {
