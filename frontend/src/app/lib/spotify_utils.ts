@@ -60,8 +60,8 @@ export async function getSpotifyUserCount() {
   if(sessionCookie === "") {
     return false;
   }
-  console.log("getSpotifyUserCount: Sending request to backend '/spotifyapi/getUserCount'")
-  const userListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getUserCount`, {
+  console.log("getSpotifyUserCount: Sending request to backend '/spotifyapi/getSpotifyUserCount'")
+  const userListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getSpotifyUserCount`, {
     method: "GET",
     credentials: "include",
     cache: 'no-cache',
