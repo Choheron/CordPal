@@ -50,6 +50,29 @@ export async function checkIfUserCanSubmit() {
   return canSubmitData;
 }
 
+//
+// Get a count of users who have connected spotify
+// - RETURN: Json containing user data from DB
+export async function getSpotifyUserCount() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  console.log("getSpotifyUserCount: Sending request to backend '/spotifyapi/getUserCount'")
+  const userListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getUserCount`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const userListJSON = await userListResponse.json()
+  return userListJSON['count'];
+}
+
 
 // 
 // Retrieve user data from backend relating to spotify.

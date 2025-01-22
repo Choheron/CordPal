@@ -10,6 +10,7 @@ urlpatterns = [
   # Basic Spotify Interaction Endpoints
   path('getSpotifyData', views.getSpotifyData),
   path('getSpotifyUsersObj', views.getSpotifyUsersObj),
+  path('getSpotifyUserCount', views.getSpotifyUserCount),
   path('getTopItems/<str:item_type>/<str:time_range>/<str:limit>/<str:offset>', views.getTopItems),
   # Album of the Day Endpoints
   path('spotifySearch/<str:item_type>/<str:query>/<str:limit>/<str:offset>', views.spotifySearch),

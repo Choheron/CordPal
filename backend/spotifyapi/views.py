@@ -138,6 +138,27 @@ def doSpotifyTokenSwap(request: HttpRequest):
   logger.info("Returning HTTP 200 Response...")
   return HttpResponse(content=messageOut, content_type='text/json', status=200)
   
+## =========================================================================================================================================================================================
+## USER METHODS
+## =========================================================================================================================================================================================
+
+###
+# Get a count of all users in the Spotify DB
+###
+def getSpotifyUserCount(request: HttpRequest):
+  logger.info("getSpotifyUserCount called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getSpotifyUserCount called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Return user count
+  userCount = SpotifyUserData.objects.count()
+  # Create response 
+  usersCountData = {"count": str(userCount)}
+  # Return json containing count
+  return JsonResponse(usersCountData)
 
 ###
 # Retrieve spotify Data from databse for current user

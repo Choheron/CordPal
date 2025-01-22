@@ -37,7 +37,7 @@ export default async function AlbumOfTheDayBox(props) {
   return (
     <div className="w-full lg:max-w-[1080px] flex flex-col lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
       <div className="w-full flex flex-col">
-        <div className="ml-2 mt-1">
+        <div className="ml-2 mt-1 mb-1">
           <Button 
             as={Link}
             href={"/dashboard/spotify/historical/" + yesterdayString}
