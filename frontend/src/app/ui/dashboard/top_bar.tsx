@@ -27,13 +27,13 @@ export default function TopBar(props) {
     // { name: 'Clips', href: '/dashboard/clips', conditional: props['isMember'], disabled: false },
     { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'], disabled: false },
     { name: 'Quotes', href: '/dashboard/quotes', conditional: props['isMember'], disabled: false },
-    { name: 'Spotify', href: '/dashboard/spotify', conditional: props['isMember'], disabled: false },
+    { name: 'Album Of the Day (Spotify)', href: '/dashboard/spotify', conditional: props['isMember'], disabled: false },
     { name: 'Todo List', href: '/dashboard/todo', conditional: props['isMember'], disabled: false },
     { name: 'About', href: '/dashboard/about', conditional: true, disabled: false },
   ];
 
   return (
-    <div className="flex flex-col items-center justify-between px-24 pt-20 lg:pt-10 pb-0">
+    <div className="flex flex-col items-center justify-between px-4 lg:px-24 pt-20 lg:pt-10 pb-0">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex flex-col lg:flex-row">
         <div>
           {/* Santa Hat on User Avatar, because its festive :) */}
@@ -80,7 +80,7 @@ export default function TopBar(props) {
           Nanophage
         </a>
       </div>
-      <div className="z-10 w-full max-w-5xl items-center justify-around font-mono text-sm flex flex-col lg:flex-row pt-5">
+      <div className="w-full max-w-5xl items-center justify-around font-mono text-sm flex flex-col lg:flex-row lg:pt-5">
         {links.map((link, index) => {
             return(
               <Conditional 
@@ -100,7 +100,7 @@ export default function TopBar(props) {
           })
         }
       </div>
-      <Divider className='mt-2 w-3/4' />
+      <Divider className='mt-2 w-full lg:w-3/4' />
     </div>
   );
 }
