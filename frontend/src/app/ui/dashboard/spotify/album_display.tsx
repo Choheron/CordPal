@@ -57,7 +57,7 @@ export default async function AlbumDisplay(props) {
         </a>
         <Conditional showWhen={props.submitter}>
           <div className="">
-            <p>Submitted By: </p>
+            <p>Submitter: </p>
             <div className="ml-2 -mb-1">
               <Popover placement="left" showArrow={true} className="w-fit">
                 <PopoverTrigger>
@@ -71,8 +71,8 @@ export default async function AlbumDisplay(props) {
               </Popover>
             </div>
             <div className="flex">
-              <p>On:</p>
-              <ClientTimestamp className="italic pl-2" timestamp={submission_date} full={true}/>
+              <p>Submission Date:</p>
+              <ClientTimestamp className="italic pl-1" timestamp={submission_date} full={false}/>
             </div>
           </div>
         </Conditional>
