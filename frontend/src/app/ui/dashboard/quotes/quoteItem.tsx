@@ -37,12 +37,14 @@ export default async function QuoteItem(props) {
         <div className={`${textStyle} antialiased text-3xl p-1 pb-0 text-center`} >
           <p dangerouslySetInnerHTML={{__html: applyQuoteRegex("&quot;" + props.quoteObject['text'] + "&quot;")}}/>
         </div>
-        <div className={`${textStyle} text-right justify-end px-10`}>
-          <p>Submitted by:</p>
-          <UserCard 
-            userDiscordID={props.quoteObject['addedBy'].split('/')[1]} 
-            fallbackName={capitalizeFirstLetter(props.quoteObject['addedBy'].split('/')[0])}
-          />
+        <div className={`${textStyle} text-right px-10`}>
+          <div className="flex w-fit ml-auto">
+            <p className="my-auto pr-1 ">Submitted by:</p>
+            <UserCard 
+              userDiscordID={props.quoteObject['addedBy'].split('/')[1]} 
+              fallbackName={capitalizeFirstLetter(props.quoteObject['addedBy'].split('/')[0])}
+            />
+          </div>
           <p>On: <i>{props.quoteObject['timestamp'].split(',')[0]}</i></p>
         </div>
       </div>
