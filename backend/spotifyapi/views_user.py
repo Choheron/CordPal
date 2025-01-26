@@ -72,6 +72,7 @@ def getSpotifyUserCount(request: HttpRequest):
   # Return json containing count
   return JsonResponse(usersCountData)
 
+
 ###
 # Retrieve spotify Data from databse for current user
 ###

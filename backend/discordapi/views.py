@@ -12,7 +12,6 @@ from .utils import (
   checkPreviousAuthorization,
 )
 
-import datetime
 import logging
 import requests
 from dotenv import load_dotenv

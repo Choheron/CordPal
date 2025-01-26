@@ -1,4 +1,6 @@
-from django.http import HttpRequest
+from django.http import HttpResponse, HttpRequest
+
+from users.models import User
 
 import requests
 import datetime 
@@ -59,8 +61,42 @@ def refreshDiscordToken(request: HttpRequest):
   discordResJSON = discordRes.json()
   # Store discord data in session data
   storeDiscordTokenInSession(request, discordResJSON)
+  # After updating session, check if user's profile picture needs to be updated
+  refreshDiscordProfilePic(request)
   # Return True if Successful
   return True
+
+
+def refreshDiscordProfilePic(request: HttpRequest):
+  # Check if user profile photo is still accurate, if not update data
+  user = User.objects.get(discord_id=request.session['discord_id'])
+  # Call avatar url
+  avatar_res = requests.get(user.get_avatar_url())
+  # If 404, refresh avatar data
+  if(avatar_res.status_code == 404):
+    logger.info("Refreshing user's discord profile picture...")
+    # Ensure user is logged in
+    if(isDiscordTokenExpired(request)):
+      refreshDiscordToken(request)
+    # Prep request data and headers to discord api
+    reqHeaders = { 
+      'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
+    }
+    # Send Request to API
+    logger.info("Making request to discord api...")
+    try:
+      discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
+      if(discordRes.status_code != 200):
+        print("Error in request:\n" + str(discordRes.json()))
+        discordRes.raise_for_status()
+    except:
+      return HttpResponse(status=500)
+    # Convert response to Json
+    discordResJSON = discordRes.json()
+    # Store avatar hash in user object
+    user.discord_avatar = discordResJSON['avatar']
+    # Update user
+    user.save()
 
 
 def checkPreviousAuthorization(request: HttpRequest):

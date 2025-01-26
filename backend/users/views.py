@@ -1,17 +1,10 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.core.serializers.json import DjangoJSONEncoder
 
 from .models import User
-
-from discordapi.utils import (
-  isDiscordTokenExpired, 
-  refreshDiscordToken, 
-)
 
 import logging
 import os
 import json
-import requests
 
 # Declare logging
 logger = logging.getLogger('django')
@@ -40,6 +33,7 @@ def getUserCount(request: HttpRequest):
   # Return json containing count
   return HttpResponse(usersCountData, content_type='text/json', status=200)
 
+
 ###
 # Get a list of all users in json form, list includes each users ID, avatar URL, and Nickname
 ###
@@ -64,6 +58,7 @@ def getUserList(request: HttpRequest):
     out[user.guid] = tempDict
   # Return dict response
   return JsonResponse(out)
+
 
 ###
 # Get user data for the current session's user or the passed in ID
@@ -97,6 +92,7 @@ def getUserData(request: HttpRequest, user_discord_id: str = ""):
   # Return user data json
   return JsonResponse(out, status=200)
 
+
 ###
 # Get user avatar url for the current session's user or the passed in ID
 ###
@@ -124,6 +120,7 @@ def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
   userDataURLJson = json.dumps({"url": userData.get_avatar_url()})
   # Return user data json
   return HttpResponse(userDataURLJson, content_type='text/json', status=200)
+
 
 ###
 # Get a boolean if a user is an admin or not
@@ -156,6 +153,7 @@ def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
   # Return user admin status json
   return JsonResponse(out, status=200)
 
+
 ###
 # Update user data changing the fields provided in the request
 ###
@@ -171,33 +169,5 @@ def updateUserData(request: HttpRequest):
   reqBody = json.loads(request.body)
   # Retrieve user data via session storage then update user data
   User.objects.filter(discord_id=request.session['discord_id']).update(**reqBody)
-  # Check if user profile photo is still accurate, if not update data
-  user = User.objects.get(discord_id=request.session['discord_id'])
-  # Call avatar url
-  avatar_res = requests.get(user.get_avatar_url())
-  # If 404, refresh avatar data
-  if(avatar_res.status_code == 404):
-    # Ensure user is logged in
-    if(isDiscordTokenExpired(request)):
-      refreshDiscordToken(request)
-    # Prep request data and headers to discord api
-    reqHeaders = { 
-      'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
-    }
-    # Send Request to API
-    logger.info("Making request to discord api...")
-    try:
-      discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
-      if(discordRes.status_code != 200):
-        print("Error in request:\n" + str(discordRes.json()))
-        discordRes.raise_for_status()
-    except:
-      return HttpResponse(status=500)
-    # Convert response to Json
-    discordResJSON = discordRes.json()
-    # Store avatar hash in user object
-    user.discord_avatar = discordResJSON['avatar']
-    # Update user
-    user.save()
   # Return success code
   return HttpResponse(200)
