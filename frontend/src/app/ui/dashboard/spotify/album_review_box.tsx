@@ -101,7 +101,7 @@ export default function AlbumReviewBox(props) {
         className="my-2"
         label="Comment (Not Required)"
         minRows={1}
-        description="Enter an optional comment to go with your review of this album."
+        description="Enter an optional comment to go with your review of this album. Youtube and Tenor links will automatically be updated to show in the review."
         value={comment}
         onValueChange={setComment}
       />
