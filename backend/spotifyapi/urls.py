@@ -1,43 +1,58 @@
 from django.contrib import admin
 from django.urls import path
 
-from . import views
+from . import views_aotd
+from . import views_review
+from . import views_album
+from . import views_user
+from . import views_oauth
 
 urlpatterns = [
-  # Oauth URLS
-  path('token', views.doSpotifyTokenSwap),
-  path('connected', views.isSpotifyConnected),
-  # Basic Spotify Interaction Endpoints
-  path('getSpotifyData', views.getSpotifyData),
-  path('getSpotifyUsersObj', views.getSpotifyUsersObj),
-  path('getSpotifyUserCount', views.getSpotifyUserCount),
-  path('getTopItems/<str:item_type>/<str:time_range>/<str:limit>/<str:offset>', views.getTopItems),
-  # Album of the Day Endpoints
-  path('spotifySearch/<str:item_type>/<str:query>/<str:limit>/<str:offset>', views.spotifySearch),
-  path('checkIfAlbumAlreadyExists/<str:album_spotify_id>', views.checkIfAlbumAlreadyExists),
-  path('submitAlbum', views.submitAlbum),
+  ## ============================================================================================================
+  ## OAuth Views
+  ## ============================================================================================================
+  path('token', views_oauth.doSpotifyTokenSwap),
+  path('connected', views_oauth.isSpotifyConnected),
+  ## ============================================================================================================
+  ## User Views
+  ## ============================================================================================================
+  path('getSpotifyData', views_user.getSpotifyData),
+  path('getSpotifyUsersObj', views_user.getSpotifyUsersObj),
+  path('getSpotifyUserCount', views_user.getSpotifyUserCount),
+  path('getTopItems/<str:item_type>/<str:time_range>/<str:limit>/<str:offset>', views_user.getTopItems),
+  path('spotifySearch/<str:item_type>/<str:query>/<str:limit>/<str:offset>', views_user.spotifySearch),
+  ## ============================================================================================================
+  ## Album Views
+  ## ============================================================================================================
+  path('checkIfAlbumAlreadyExists/<str:album_spotify_id>', views_album.checkIfAlbumAlreadyExists),
+  path('submitAlbum', views_album.submitAlbum),
+  path('getAlbum/<str:album_spotify_id>', views_album.getAlbum),
+  path('getAllAlbums', views_album.getAllAlbums),
+  path('getLastXAlbums/<int:count>', views_album.getLastXAlbums),
   # Below URL has two variations (one for lack of URL Param)
-  path('checkIfUserCanSubmit/<str:date>', views.checkIfUserCanSubmit),
-  path('checkIfUserCanSubmit', views.checkIfUserCanSubmit),
-  path('getAlbum/<str:album_spotify_id>', views.getAlbum),
-  path('getAllAlbums', views.getAllAlbums),
-  path('getLastXAlbums/<int:count>', views.getLastXAlbums),
-  # Review Endpoints
-  path('submitReview', views.submitReview),
-  path('getReviewsForAlbum/<str:album_spotify_id>', views.getReviewsForAlbum),
-  path('getUserReviewForAlbum/<str:album_spotify_id>', views.getUserReviewForAlbum),
-  path('getAllUserReviewStats', views.getAllUserReviewStats),
+  path('getAlbumAvgRating/<str:album_spotify_id>/<str:rounded>', views_album.getAlbumAvgRating),
+  path('getAlbumAvgRating/<str:album_spotify_id>', views_album.getAlbumAvgRating),
   # Below URL has two variations (one for lack of URL Param)
-  path('getAlbumAvgRating/<str:album_spotify_id>/<str:rounded>', views.getAlbumAvgRating),
-  path('getAlbumAvgRating/<str:album_spotify_id>', views.getAlbumAvgRating),
-  # Below URL has two variations (one for lack of URL Param)
-  path('getAlbumOfDay/<str:date>', views.getAlbumOfDay),
-  path('getAlbumOfDay', views.getAlbumOfDay),
+  path('checkIfUserCanSubmit/<str:date>', views_album.checkIfUserCanSubmit),
+  path('checkIfUserCanSubmit', views_album.checkIfUserCanSubmit),
   # Statistics Endpoints
-  path('getAlbumsStats', views.getAlbumsStats),
-  path('getLowestHighestAlbumStats', views.getLowestHighestAlbumStats),
+  path('getAlbumsStats', views_album.getAlbumsStats),
+  path('getLowestHighestAlbumStats', views_album.getLowestHighestAlbumStats), 
+  ## ============================================================================================================
+  ## Review Views
+  ## ============================================================================================================
+  path('submitReview', views_review.submitReview),
+  path('getReviewsForAlbum/<str:album_spotify_id>', views_review.getReviewsForAlbum),
+  path('getUserReviewForAlbum/<str:album_spotify_id>', views_review.getUserReviewForAlbum),
+  path('getAllUserReviewStats', views_review.getAllUserReviewStats),
+  ## ============================================================================================================
+  ## Album Of the Day Views
+  ## ============================================================================================================
+  # Below URL has two variations (one for lack of URL Param)
+  path('getAlbumOfDay/<str:date>', views_aotd.getAlbumOfDay),
+  path('getAlbumOfDay', views_aotd.getAlbumOfDay),
   # Command to be called by cronjob to set the album of the day
-  path('setAlbumOfDay', views.setAlbumOfDay),
+  path('setAlbumOfDay', views_aotd.setAlbumOfDay),
   # ADMIN Command to be called by admin for special occasion album of the days
-  path('setAlbumOfDayADMIN/<str:date>/<str:album_spotify_id>', views.setAlbumOfDayADMIN),
+  path('setAlbumOfDayADMIN/<str:date>/<str:album_spotify_id>', views_aotd.setAlbumOfDayADMIN),
 ]
