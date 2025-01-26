@@ -18,9 +18,12 @@ export default async function ReviewDisplay(props) {
 
   // Regex for youtube video embedding
   const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\?[\w=&%-]*)?(?:&t=(\d+h)?(\d+m)?(\d+s)?)?/g;
+  // Regex for tenor gif embedding
+  const tenorRegex = /(?:https?:\/\/)?(?:www\.)?tenor\.com\/view\/[a-zA-Z0-9_-]+-(\d+)/g;
 
-  const generateEmbed = (textWithLinks) => {
-    return textWithLinks.replace(youtubeRegex, (match, videoId, hours, minutes, seconds) => {
+  const generateEmbeds = (textWithLinks) => {
+    // Do youtube link replacements
+    let out =  textWithLinks.replace(youtubeRegex, (match, videoId, hours, minutes, seconds) => {
       // Convert timestamp to seconds
       const h = hours ? parseInt(hours) * 3600 : 0;
       const m = minutes ? parseInt(minutes) * 60 : 0;
@@ -30,6 +33,12 @@ export default async function ReviewDisplay(props) {
       const startParam = startTime > 0 ? `?start=${startTime}` : '';
       return `<iframe width="300" height="168.75" src="https://www.youtube.com/embed/${videoId}${startParam}" frameborder="0" allowfullscreen></iframe>`;
     })
+    // Do tenor link replacements
+    out =  out.replace(tenorRegex, (match, gifId) => {
+      return `<iframe src="https://tenor.com/embed/${gifId}" frameborder="0" width="300" height="168.75" class="w-full h-full" allowfullscreen></iframe>`;
+    })
+    // Return final html string
+    return out;
   };
 
   return (
@@ -74,7 +83,7 @@ export default async function ReviewDisplay(props) {
                   <p className="ml-2 mr-auto">
                     <b>Comment:</b>
                   </p>
-                  <div className="mx-2 my-2 max-w-[320px]" dangerouslySetInnerHTML={{__html: generateEmbed(review['comment'])}} />
+                  <div className="mx-2 my-2 max-w-[320px]" dangerouslySetInnerHTML={{__html: generateEmbeds(review['comment'])}} />
                   <div className="flex justify-between w-full px-2 mt-2 align-middle gap-1">
                     Submitted: <ClientTimestamp timestamp={review['review_date']} full={true} />
                   </div>
