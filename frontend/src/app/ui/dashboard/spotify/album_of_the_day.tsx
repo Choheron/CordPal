@@ -42,7 +42,7 @@ export default async function AlbumOfTheDayBox(props) {
             as={Link}
             href={"/dashboard/spotify/historical/" + yesterdayString}
             radius="lg"
-            className={`w-fit hover:underline text-white`}
+            className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
             variant="solid"
           >
             <b>View Yesterday&apos;s Album</b>

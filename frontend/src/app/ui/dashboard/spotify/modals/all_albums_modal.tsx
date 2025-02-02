@@ -257,13 +257,13 @@ export default function AllAlbumsModal(props) {
   return (
     <>
       <Button 
-        className="p-2 mx-auto my-2 w-[90%] text-sm text-inheret h-fit hover:underline"
+        className="p-2 mx-auto my-2 w-[90%] text-sm text-inheret h-fit bg-gradient-to-br from-green-700/80 to-green-800/80 hover:underline"
         size="sm"
         onPress={onOpen}
         radius="lg"
         variant="solid"
       >
-        View All Albums
+        <b>View All Albums</b>
       </Button>
       <Modal 
         size="5xl" 
