@@ -34,6 +34,7 @@ export default async function ReviewAvatarCard(props) {
     const startParam = startTime > 0 ? `?start=${startTime}` : '';
     return `<iframe width="300" height="168.75" src="https://www.youtube.com/embed/${videoId}${startParam}" frameborder="0" allowfullscreen></iframe>`;
   })
+  
   // Do Tenor Link Replacements
   // Extract all Tenor GIF IDs
   const tenorMatches = [...reviewMessage.matchAll(tenorRegex)];

@@ -514,7 +514,7 @@ export async function getTenorGifData(tenor_url: string = "", tenor_gif_id: stri
     throw new Error("A gif ID or URL must be provided...");
   }
   // Build call to tenor API
-  const callUrl = `https://tenor.googleapis.com/v2/posts?ids=${gif_id}&key=${process.env.TENOR_API_KEY}&client_key=${process.env.TENOR_CLIENT_KEY}&media_filter=gif`
+  const callUrl = `${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/tenor/getGifUrl/${gif_id}`
   // Make call to API
   console.log(`getTenorGifData: Sending request to Tenor API url: ${callUrl}`)
   const tenorGifResponse = await fetch(callUrl, {
@@ -522,8 +522,6 @@ export async function getTenorGifData(tenor_url: string = "", tenor_gif_id: stri
     next: { revalidate: 86400 }
   });
   const retJson = await tenorGifResponse.json();
-  // Extract gif_obj
-  const gif_obj = retJson['results'][0]['media_formats']['gif'];
   // Return URL
-  return gif_obj['url']
+  return retJson['url']
 }

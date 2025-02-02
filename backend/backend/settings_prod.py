@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'photos.apps.PhotosConfig',
     'spotifyapi.apps.SpotifyapiConfig',
+    'tenor.apps.TenorConfig',
     # Outside Apps
     "corsheaders",
 ]
