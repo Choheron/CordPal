@@ -94,7 +94,7 @@ export default function UploadPhotoModal(props) {
   return (
     <>
       <Button 
-        className="p-3 -mt-2 mb-2 text-sm text-inheret min-w-0 min-h-0 h-fit hover:underline"
+        className="p-3 -mt-2 mb-2 text-sm text-inheret min-w-0 min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline"
         size="sm"
         onPress={onOpen}
         radius="lg"
