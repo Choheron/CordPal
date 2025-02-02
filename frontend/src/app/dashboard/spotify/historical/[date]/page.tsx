@@ -79,6 +79,7 @@ export default async function Page({
               showOutline={false}
               variant="shadow"
               className={`lg:-ml-4 -mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumData('album_id'), false)).toFixed(2))} lg:text-xl text-black`}
+              isInvisible={albumData("title") == ""}
             >
               <AlbumDisplay
                 title={albumData("title")}
