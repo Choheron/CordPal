@@ -34,7 +34,7 @@ export default async function ReviewAvatarCard(props) {
     const startParam = startTime > 0 ? `?start=${startTime}` : '';
     return `<iframe width="300" height="168.75" src="https://www.youtube.com/embed/${videoId}${startParam}" frameborder="0" allowfullscreen></iframe>`;
   })
-  
+
   // Do Tenor Link Replacements
   // Extract all Tenor GIF IDs
   const tenorMatches = [...reviewMessage.matchAll(tenorRegex)];
@@ -88,6 +88,13 @@ export default async function ReviewAvatarCard(props) {
             <b>Comment:</b>
           </p>
           <div className="mx-2 my-2 max-w-[320px]" dangerouslySetInnerHTML={{__html: reviewMessage}} />
+          <Conditional showWhen={tenorMatches.length > 0}>
+            <div className="w-fit backdrop-blur-2xl px-2 py-1 rounded-2xl border border-neutral-800">
+              <p className="text-sm italic my-auto">
+                Gifs Provided via Tenor 
+              </p>
+            </div>
+          </Conditional>
           <div className="flex justify-between w-full px-2 mt-2 align-middle gap-1">
             Submitted: <ClientTimestamp timestamp={review['review_date']} full={true} />
           </div>
