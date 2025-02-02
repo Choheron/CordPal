@@ -434,7 +434,7 @@ export async function getAllAlbums() {
 }
 
 //
-// Get all Albums from Album Pool
+// Get an Album and its data
 // - RETURN: Json Obejcts
 //
 export async function getAlbum(album_spotify_id: string) {
@@ -495,4 +495,35 @@ export async function getAllUserReviewStats() {
   });
   const userReviewStatJson = await userReviewStatResponse.json()
   return userReviewStatJson;
+}
+
+//
+// Tenor Integration to get GIF Data from Tenor based on passed in URL or Gif ID
+// Params:
+//   - tenor_url: String - Full tenor url
+//   - tenor_gif_id: String - Tenor gif ID
+//
+export async function getTenorGifData(tenor_url: string = "", tenor_gif_id: string = "") {
+  // Validate what has been passed in
+  let gif_id: any = "";
+  if(tenor_url != "") {
+    gif_id = tenor_url.split("-").at(-1)
+  } else if(tenor_gif_id != "") {
+    gif_id = tenor_gif_id
+  } else {
+    throw new Error("A gif ID or URL must be provided...");
+  }
+  // Build call to tenor API
+  const callUrl = `https://tenor.googleapis.com/v2/posts?ids=${gif_id}&key=${process.env.TENOR_API_KEY}&client_key=${process.env.TENOR_CLIENT_KEY}&media_filter=gif`
+  // Make call to API
+  console.log(`getTenorGifData: Sending request to Tenor API url: ${callUrl}`)
+  const tenorGifResponse = await fetch(callUrl, {
+    method: "GET",
+    next: { revalidate: 86400 }
+  });
+  const retJson = await tenorGifResponse.json();
+  // Extract gif_obj
+  const gif_obj = retJson['results'][0]['media_formats']['gif'];
+  // Return URL
+  return gif_obj['url']
 }
