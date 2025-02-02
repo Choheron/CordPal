@@ -13,7 +13,7 @@ import { Conditional } from "../conditional";
 // Expected Props:
 //  - review_obj: Object - Review Data Object
 //  - index: Number - Index in list
-export default async function ReviewCard(props) {
+export default async function ReviewAvatarCard(props) {
   const review = props.review_obj;
   var reviewMessage = review['comment'];
 

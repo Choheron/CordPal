@@ -1,5 +1,5 @@
 import { getReviewsForAlbum, getSpotifyUserCount } from "@/app/lib/spotify_utils";
-import ReviewCard from "./review_card";
+import ReviewAvatarCard from "./review_avatar_card";
 
 // GUI Display for reviews of an album
 // Expected Props:
@@ -21,7 +21,7 @@ export default async function ReviewDisplay(props) {
         ) : (
           reviews.sort((a, b) => a['score'] < b['score'] ? 1 : -1).map((review, index) => (
             <div className="mx-auto" key={index}>
-              <ReviewCard index={index} review_obj={review} />
+              <ReviewAvatarCard index={index} review_obj={review} />
             </div>
           ))
         )
