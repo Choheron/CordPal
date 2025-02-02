@@ -5,7 +5,7 @@ import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
 import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
-import { Button } from "@nextui-org/react";
+import { Badge, Button } from "@nextui-org/react";
 import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";
@@ -60,11 +60,20 @@ export default async function AlbumDisplay(props) {
             <p>Submitter: </p>
             <div className="ml-2 -mb-1">
               <Popover placement="left" showArrow={true} className="w-fit">
-                <PopoverTrigger>
-                  <div>
-                    <UserCard userDiscordID={submitter} fallbackName={"User Not Found"}/>
-                  </div>
-                </PopoverTrigger>
+                <Badge 
+                  content=" " 
+                  size="sm" 
+                  placement="top-left"
+                  isInvisible={submitter_comment == "No Comment Provided"}
+                  shape="circle"
+                  className="bg-blue-300 -ml-2"
+                >
+                  <PopoverTrigger>
+                    <div>
+                      <UserCard userDiscordID={submitter} fallbackName={"User Not Found"}/>
+                    </div>
+                  </PopoverTrigger>
+                </Badge>
                 <PopoverContent>
                   <p>{submitter_comment}</p>
                 </PopoverContent>
