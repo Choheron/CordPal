@@ -1,11 +1,4 @@
-import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
-
-import StarRating from "../../general/star_rating";
-import UserCard from "../../general/userUiItems/user_card";
-
-import { getReviewsForAlbum, getSpotifyUserCount, getTenorGifData } from "@/app/lib/spotify_utils";
-import ClientTimestamp from "../../general/client_timestamp";
-import { Conditional } from "../conditional";
+import { getReviewsForAlbum, getSpotifyUserCount } from "@/app/lib/spotify_utils";
 import ReviewCard from "./review_card";
 
 // GUI Display for reviews of an album
