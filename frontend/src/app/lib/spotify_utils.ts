@@ -513,10 +513,10 @@ export async function getTenorGifData(tenor_url: string = "", tenor_gif_id: stri
   } else {
     throw new Error("A gif ID or URL must be provided...");
   }
-  // Build call to tenor API
+  // Build backend URL
   const callUrl = `${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/tenor/getGifUrl/${gif_id}`
-  // Make call to API
-  console.log(`getTenorGifData: Sending request to Tenor API url: ${callUrl}`)
+  // Make call to backend
+  console.log(`getTenorGifData: Sending request to backend '${callUrl}'`)
   const tenorGifResponse = await fetch(callUrl, {
     method: "GET",
     next: { revalidate: 86400 }
