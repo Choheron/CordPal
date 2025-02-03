@@ -16,7 +16,7 @@ import {
   TableRow,
   TableCell
 } from "@nextui-org/table";
-import { Avatar, Button, Spinner } from "@nextui-org/react";
+import { Avatar, Button, Spinner, Input } from "@nextui-org/react";
 import React from "react";
 import { useRouter } from 'next/navigation';
 import { getAllAlbums, getAllAlbumsNoCache } from "@/app/lib/spotify_utils";
@@ -27,14 +27,15 @@ import ClientTimestamp from "@/app/ui/general/client_timestamp";
 
 
 // Modal to display all submitted albums
-//  - 
 export default function AllAlbumsModal(props) {
   const [updateTimestamp, setUpdateTimestamp] = React.useState<any>("")
+  const [albumListOriginal, setAlbumListOriginal] = React.useState([])
   const [albumList, setAlbumList] = React.useState([])
   // Album List Loading vars
   const [listLoading, setListLoading] = React.useState(true)
   // Sorting variables
   const [sortDescriptor, setSortDescriptor] = React.useState<any>({ column: "rating", direction: "descending"})
+  const [titleFilter, setTitleFilter] = React.useState("")
   // Modal Controller Vars
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
@@ -140,6 +141,7 @@ export default function AllAlbumsModal(props) {
     const ingestData = async () => {
       let albumData = await getAllAlbums()
       setAlbumList(albumData['albums_list'].sort((a,b) => {return b['rating'] - a['rating']}))
+      setAlbumListOriginal(albumData['albums_list'])
       setUpdateTimestamp(albumData['timestamp'])
     }
     ingestData()
@@ -150,6 +152,15 @@ export default function AllAlbumsModal(props) {
   React.useEffect(() => {
     setListLoading(false)
   }, [albumList])
+
+  // UseEffect for when title filter changes
+  React.useEffect(() => {
+    if(titleFilter != "") {
+      setAlbumList(albumListOriginal.filter(album => (album['title'] as string).includes(titleFilter)))
+    } else {
+      setAlbumList(albumListOriginal)
+    }
+  }, [titleFilter])
 
   // Render Cell dynamically
   const renderCell = React.useCallback((album , columnKey: React.Key) => {
@@ -212,27 +223,27 @@ export default function AllAlbumsModal(props) {
             </p>
         );
       case "AOD_date":
-          return (
-            <p className="my-auto">
-              {(album['AOD_date'] != null) ? album['AOD_date'] : "N/A"}
-            </p>
-          );
+        return (
+          <p className="my-auto">
+            {(album['AOD_date'] != null) ? album['AOD_date'] : "N/A"}
+          </p>
+        );
       case "historical_data":
-            return (
-              (album['AOD_date'] != null) ? (
-                <Button 
-                  as={Link}
-                  href={"/dashboard/spotify/historical/" + album['AOD_date']}
-                  radius="lg"
-                  className={`w-fit mx-auto hover:underline text-white`}
-                  variant="solid"
-                >
-                  <b>View Historical Data</b>
-                </Button> 
-              ):(
-                <></>
-              )
-            );
+        return (
+          (album['AOD_date'] != null) ? (
+            <Button 
+              as={Link}
+              href={"/dashboard/spotify/historical/" + album['AOD_date']}
+              radius="lg"
+              className={`w-fit mx-auto hover:underline text-white`}
+              variant="solid"
+            >
+              <b>View Historical Data</b>
+            </Button> 
+          ):(
+            <></>
+          )
+        );
     }
   }, []);
 
@@ -273,16 +284,22 @@ export default function AllAlbumsModal(props) {
         backdrop="blur"
         onClose={cancelPress}
         classNames={{
-          base: "max-w-full lg:max-w-[75%]",
+          base: "max-w-full 2xl:max-w-[75%]",
         }}
       >
         <ModalContent>
           {() => (
             <>
               <ModalHeader className="flex flex-col flex-wrap w-full gap-1 content-center">
-                Album Data
+                Album Data for {(titleFilter == "") ? "all" : ""} {albumList.length} Albums
               </ModalHeader>
               <ModalBody>
+                <Input 
+                  label="Title" 
+                  placeholder="Filter by Title" 
+                  value={titleFilter} 
+                  onValueChange={setTitleFilter}
+                />
                 <Table 
                   aria-label="Album Submissions"
                   sortDescriptor={sortDescriptor}
