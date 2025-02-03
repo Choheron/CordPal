@@ -58,7 +58,7 @@ export default async function MusicStatsBox(props) {
   return (
     <div className="w-fill min-w-[340px] mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row gap-10 backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
       {/* Album Submission Stats */}
-      <div className='min-w-[300px] w-fit mx-auto flex flex-col'>
+      <div className='min-w-[320px] mx-auto flex flex-col'>
         <p className="mx-auto text-xl underline mb-1">
           Album Submission Stats: 
         </p>
@@ -71,12 +71,12 @@ export default async function MusicStatsBox(props) {
           </p>
         </div>
         <Divider className="my-1" />
-        <table className="table-fixed">
+        <table className="table-fixed w-fit">
           <thead>
             <tr>
               <th className="w-1/2">User</th>
               <th className="w-1/4 px-1">Submitted</th>
-              <th className="w-1/4 px-1">AOtD</th>
+              <th className="w-1/4 pl-1">AOtD</th>
             </tr>
           </thead>
           <tbody>
