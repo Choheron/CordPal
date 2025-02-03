@@ -17,19 +17,27 @@ export default async function MusicStatsBox(props) {
   const albumLowHighStatsJson = await getLowestHighestAlbumStats();
   const userReviewStatsJson = await getAllUserReviewStats();
 
-  const albumUserStatsList = albumStatsJson['user_objs'].sort((a, b) => a['submission_count'] < b['submission_count'] ? 1 : -1).map((user, index) => {
+  const albumUserStatsTable = albumStatsJson['user_objs'].sort((a, b) => a['submission_count'] < b['submission_count'] ? 1 : -1).map((user, index) => {
     return (
-      <div 
+      <tr 
         key={user['submission_count']}
-        className="flex justify-between w-full my-1"
       >
-        <UserCard
-          userDiscordID={user['discord_id']}
-        />
-        <p className="my-auto px-2 py-1 bg-gray-800 rounded-full">
-          {user['submission_count']}
-        </p>
-      </div>
+        <td className="line-clamp-1 mx-2">
+          <UserCard
+            userDiscordID={user['discord_id']}
+          />
+        </td>
+        <td>
+          <p className="mx-auto px-2 py-1 bg-gray-800 rounded-full w-fit">
+            {user['submission_count']}
+          </p>
+        </td>
+        <td>
+          <p className="mx-auto px-2 py-1 bg-gray-800 rounded-full w-fit">
+            {user['aotd_count']}
+          </p>
+        </td>
+      </tr>
     )
   })
 
@@ -63,7 +71,18 @@ export default async function MusicStatsBox(props) {
           </p>
         </div>
         <Divider className="my-1" />
-        {albumUserStatsList}
+        <table className="w-full table-fixed">
+          <thead>
+            <tr>
+              <th className="w-1/2">User</th>
+              <th className="w-1/4">Submitted</th>
+              <th className="w-1/4">AOtD</th>
+            </tr>
+          </thead>
+          <tbody>
+            {albumUserStatsTable}
+          </tbody>
+        </table>
       </div>
       {/* Lowest and Highest Album Stats */}
       <div className="flex flex-col">
