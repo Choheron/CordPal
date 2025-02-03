@@ -305,6 +305,7 @@ def getAlbumsStats(request: HttpRequest):
   for user in spotUsers:
     userData = {}
     userData['submission_count'] = Album.objects.filter(submitted_by=user.user).count()
+    userData['aotd_count'] = DailyAlbum.objects.filter(album__submitted_by=user.user).count()
     userData['discord_id'] = user.user.discord_id
     userData['nickname'] = user.user.nickname
     # Append to List
