@@ -32,6 +32,36 @@ export async function getAllPhotoshops() {
 }
 
 //
+// Retrieve photoshops with filters applied
+//
+export async function getPhotoshops(uploader, artist, tagged) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  // Build out request body
+  const req_body = {
+    "tagged": `${tagged}`,
+    "uploader": `${uploader}`,
+    "artist": `${artist}`
+  }
+  const photosResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/photos/getImageIds`, {
+    method: "POST",
+    credentials: "include",
+    body: JSON.stringify(req_body),
+    cache: 'force-cache',
+    next: { tags: ['all_photoshops'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  let response = JSON.parse(await photosResponse.text());
+  return response['imageIds']
+}
+
+//
 // Request image data from the backend
 //
 export async function getImageData(image_id) {

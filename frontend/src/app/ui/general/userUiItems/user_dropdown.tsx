@@ -12,6 +12,8 @@ import {User} from "@nextui-org/user";
 // - label: label for select
 // - placeholder: placeholder for select
 // - setSelectionCallback: Function to callback for setting the selected data
+// - useNicknameKeys: Boolean - Use user nickname as key instead of discord id
+// - selectedKeys: Set - List of keys to be selected on default
 export default function UserDropdown(props) {
   interface IUser {
     discord_id: string;
@@ -38,6 +40,7 @@ export default function UserDropdown(props) {
       placeholder={props.placeholder}
       isLoading={loading}
       selectionMode={props.isMultipleChoice ? 'multiple' : 'single'}
+      selectedKeys={(props.selectedKeys) ? props.selectedKeys : null}
       classNames={{
         base: "w-fill",
       }}
@@ -45,7 +48,7 @@ export default function UserDropdown(props) {
       onSelectionChange={props.setSelectionCallback}
     >
       {(user) => (
-        <SelectItem key={(user as IUser).discord_id} textValue={(user as IUser).nickname}>
+        <SelectItem key={(props.useNicknameKeys) ? (user as IUser).nickname : (user as IUser).discord_id} textValue={(user as IUser).nickname}>
           <User
             className="w-full"
             name={(user as IUser)['nickname']}

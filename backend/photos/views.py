@@ -4,7 +4,7 @@ from django.core.files.storage import FileSystemStorage
 import logging
 import os
 import uuid
-import base64
+import json
 
 
 from .models import Image
@@ -155,3 +155,37 @@ def getImage(request: HttpRequest, imageID: int):
   # Retrieve filename from database
   fileName = Image.objects.get(image_id=imageID).filename
   return FileResponse(open(f"{os.getenv('PHOTOSHOP_PATH')}{fileName}", "rb"))
+
+
+###
+# Return a filtered list of image IDs based on passed in body params
+# Expected Body Filtering Options:
+# - tagged: List of User Nicknames
+# - uploader: Single User Nickname
+# - artist: Single User Nickname
+###
+def getImageIds(request: HttpRequest):
+  # Read Request Body
+  body_params = json.loads(request.body)
+  logger.info(f"getImages called with following filters: {body_params}...")
+  # Make sure request is a post request
+  if(request.method != "POST"):
+    logger.warning("getImage called with a non-POST method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get all objects
+  imageQuery = Image.objects.all()
+  # Retrieve data from request body and filter
+  if(body_params["tagged"] != 'undefined'): # NOTE: Tagged users current doesnt work
+    for nick in body_params['tagged']:
+      imageQuery = imageQuery.filter(tagged_users__nickname=nick)
+  if(body_params["uploader"] != 'undefined'):
+    imageQuery = imageQuery.filter(uploader__nickname=body_params['uploader'])
+  if(body_params["artist"] != 'undefined'):
+    imageQuery = imageQuery.filter(artist__nickname=body_params['artist'])
+  # Declare and populate outstring
+  outstring = ""
+  for image in imageQuery:
+    outstring += f"{image.image_id},"
+  return JsonResponse({"imageIds": outstring})
