@@ -71,12 +71,12 @@ export default async function MusicStatsBox(props) {
           </p>
         </div>
         <Divider className="my-1" />
-        <table className="w-full table-fixed">
+        <table className="table-fixed">
           <thead>
             <tr>
               <th className="w-1/2">User</th>
-              <th className="w-1/4">Submitted</th>
-              <th className="w-1/4">AOtD</th>
+              <th className="w-1/4 px-1">Submitted</th>
+              <th className="w-1/4 px-1">AOtD</th>
             </tr>
           </thead>
           <tbody>
