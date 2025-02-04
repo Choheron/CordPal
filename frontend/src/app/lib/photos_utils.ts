@@ -132,7 +132,6 @@ export async function getAllUploaders() {
   });
   // Parse uploader list
   const idList = (await uploaderListResponse.json())['uploaders'];
-  console.log(idList)
   // Return uploader list
   return idList;
 }
@@ -161,7 +160,6 @@ export async function getAllArtists() {
   });
   // Parse artist list
   const idList = (await artistListResponse.json())['artists'];
-  console.log(idList)
   // Return artist list
   return idList;
 }
