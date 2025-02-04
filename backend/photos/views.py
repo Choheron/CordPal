@@ -167,10 +167,10 @@ def getImage(request: HttpRequest, imageID: int):
 def getImageIds(request: HttpRequest):
   # Read Request Body
   body_params = json.loads(request.body)
-  logger.info(f"getImages called with following filters: {body_params}...")
+  logger.info(f"getImageIds called with following filters: {body_params}...")
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("getImage called with a non-POST method, returning 405.")
+    logger.warning("getImageIds called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -189,3 +189,55 @@ def getImageIds(request: HttpRequest):
   for image in imageQuery:
     outstring += f"{image.image_id},"
   return JsonResponse({"imageIds": outstring})
+
+
+###
+# Return a list of all discord User IDs that have submitted photoshops
+###
+def getAllUploaders(request: HttpRequest):
+  logger.info(f"getAllUploaders called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getAllUploaders called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get distinct uploaders
+  uploaders = Image.objects.all().values("uploader").distinct()
+  # Iterate through uploaders and create list of discord IDs
+  out = []
+  for uploader in uploaders:
+    uploader_obj = User.objects.get(pk=uploader['uploader'])
+    tempDict = {}
+    tempDict['discord_id'] = uploader_obj.discord_id
+    tempDict['avatar_url'] = uploader_obj.get_avatar_url()
+    tempDict['nickname'] = uploader_obj.nickname
+    # Store tempDict in out json
+    out.append(tempDict)
+  return JsonResponse({"uploaders": out})
+
+
+###
+# Return a list of all discord User IDs that have been marked as artists
+###
+def getAllArtists(request: HttpRequest):
+  logger.info(f"getAllArtists called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getAllArtists called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get distinct artists
+  artists = Image.objects.all().values("artist").distinct()
+  # Iterate through artists and create list of discord IDs
+  out = []
+  for artist in artists:
+    artist_obj = User.objects.get(pk=artist['artist'])
+    tempDict = {}
+    tempDict['discord_id'] = artist_obj.discord_id
+    tempDict['avatar_url'] = artist_obj.get_avatar_url()
+    tempDict['nickname'] = artist_obj.nickname
+    # Store tempDict in out json
+    out.append(tempDict)
+  return JsonResponse({"artists": out})

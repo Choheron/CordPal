@@ -7,6 +7,9 @@ import UserDropdown from "@/app/ui/general/userUiItems/user_dropdown";
 
 
 // Block to filter photoshops by various criteria
+// Expected Props:
+// - uploaderList: List - List of Discord IDs to populate the uplaoder list
+// - artistList: List - List of Discord IDs to populate the artist list
 export default function PhotoFilterBlock(props) {
   // Get Router
   const router = useRouter();
@@ -41,6 +44,7 @@ export default function PhotoFilterBlock(props) {
           setSelectionCallback={setUploader}
           useNicknameKeys
           selectedKeys={[props.uploader]}
+          idListOverride={props.uploaderList}
         />
         <UserDropdown 
           label="Artist"
@@ -48,6 +52,7 @@ export default function PhotoFilterBlock(props) {
           setSelectionCallback={setArtist}
           useNicknameKeys
           selectedKeys={[props.artist]}
+          idListOverride={props.artistList}
         />
         {/* <UserDropdown 
           label="Tagged"

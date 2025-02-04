@@ -14,6 +14,7 @@ import {User} from "@nextui-org/user";
 // - setSelectionCallback: Function to callback for setting the selected data
 // - useNicknameKeys: Boolean - Use user nickname as key instead of discord id
 // - selectedKeys: Set - List of keys to be selected on default
+// - idListOverride: List - OPTIONAL: List of Discord USER IDs to override from backend request 
 export default function UserDropdown(props) {
   interface IUser {
     discord_id: string;
@@ -27,7 +28,7 @@ export default function UserDropdown(props) {
   useEffect(() => {
     // Fetch users when the component mounts
     async function fetchUsers() {
-      const fetchedUsers: any = await getUserList();
+      const fetchedUsers: any = (props.idListOverride) ? props.idListOverride : await getUserList();
       setUsers(fetchedUsers);
       setLoading(false); // Set loading to false after fetching users
     }

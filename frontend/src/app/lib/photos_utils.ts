@@ -47,7 +47,7 @@ export async function getPhotoshops(uploader, artist, tagged) {
     "uploader": `${uploader}`,
     "artist": `${artist}`
   }
-  const photosResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/photos/getImageIds`, {
+  const photosResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/photos/getImageIds/`, {
     method: "POST",
     credentials: "include",
     body: JSON.stringify(req_body),
@@ -106,4 +106,62 @@ export async function uploadImageToBackend(formData) {
   // Revalidate photoshops tag
   revalidateTag('all_photoshops')
   return uploadResponse.status;
+}
+
+
+//
+// Get list of all uploader Discord IDs
+//
+export async function getAllUploaders() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const requestURL = `${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/photos/getAllUploaders/`
+  console.log(`getAllUploaders: Sending request to backend '/photos/getAllUploaders/'`)
+  const uploaderListResponse = await fetch(requestURL, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: ['all_photoshops'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  // Parse uploader list
+  const idList = (await uploaderListResponse.json())['uploaders'];
+  console.log(idList)
+  // Return uploader list
+  return idList;
+}
+
+
+//
+// Get list of all artist Discord IDs
+//
+export async function getAllArtists() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const requestURL = `${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/photos/getAllArtists/`
+  console.log(`getAllArtists: Sending request to backend '/photos/getAllArtists/'`)
+  const artistListResponse = await fetch(requestURL, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: ['all_photoshops'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  // Parse artist list
+  const idList = (await artistListResponse.json())['artists'];
+  console.log(idList)
+  // Return artist list
+  return idList;
 }

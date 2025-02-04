@@ -2,18 +2,20 @@ import PhotoModal from "@/app/ui/dashboard/photos/photo_modal";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import UploadPhotoModal from "@/app/ui/dashboard/photos/upload_photo_modal";
 
-import { getAllPhotoshops, getPhotoshops } from "@/app/lib/photos_utils";
+import { getAllArtists, getAllUploaders, getPhotoshops } from "@/app/lib/photos_utils";
 import UserDropdown from "@/app/ui/general/userUiItems/user_dropdown";
 import PhotoFilterBlock from "@/app/ui/dashboard/photos/photo_filter_block";
 
 export default async function photos({searchParams}) {
   // Get url params
   const {uploader, artist, tagged} = searchParams;
+  // Make requests to bakend to get uploader list and artist list
+  const uploaderList = await getAllUploaders();
+  const artistList = await getAllArtists();
 
   // Load Images
   async function loadImages() {
     const fileListString: any = await getPhotoshops(uploader, artist, tagged);
-    console.log(fileListString)
     if(fileListString.length == 0) {
       return (<p>No Photos meet Filter Criteria</p>)
     }
@@ -57,7 +59,9 @@ export default async function photos({searchParams}) {
       <UploadPhotoModal />
       <PhotoFilterBlock 
         uploader={(uploader != undefined) ? uploader : null}
+        uploaderList={uploaderList}
         artist={(artist != undefined) ? artist : null}
+        artistList={artistList}
         //tagged={tagged}
       />
       {loadImages()}
