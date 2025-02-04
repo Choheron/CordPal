@@ -15,6 +15,7 @@ import {User} from "@nextui-org/user";
 // - useNicknameKeys: Boolean - Use user nickname as key instead of discord id
 // - selectedKeys: Set - List of keys to be selected on default
 // - idListOverride: List - OPTIONAL: List of Discord USER IDs to override from backend request 
+// - description: String - Description to show below dropdown
 export default function UserDropdown(props) {
   interface IUser {
     discord_id: string;
@@ -47,6 +48,7 @@ export default function UserDropdown(props) {
       }}
       items={users}
       onSelectionChange={props.setSelectionCallback}
+      description={(props.description) ? props.description : null}
     >
       {(user) => (
         <SelectItem key={(props.useNicknameKeys) ? (user as IUser).nickname : (user as IUser).discord_id} textValue={(user as IUser).nickname}>
