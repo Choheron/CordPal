@@ -82,7 +82,7 @@ export default function PhotoModal(props) {
         isPressable
         onPress={onOpen}
         radius="lg"
-        className="border-none hover:scale-105 bg-transparent"
+        className="!duration-700 border-none hover:scale-105 bg-transparent"
       >
         <Image
           alt={imgData['title']}
@@ -103,7 +103,7 @@ export default function PhotoModal(props) {
         backdrop='blur'
         classNames={{
           base: "group transition-property: all;",
-          closeButton: "position:relative z-50 group-hover:text-white duration-1000 hover:bg-white/5 active:bg-white/10",
+          closeButton: "position:relative z-50 group-hover:text-white duration-150 hover:bg-white/5 active:bg-white/10",
         }}
       >
         <ModalContent className="bg-transparent w-fit h-fit max-h-full shadow-none">
