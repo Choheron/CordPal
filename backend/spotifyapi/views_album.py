@@ -95,7 +95,7 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
   ## Check if a user has submitted a review for the current album, if not, they cannot submit an album
   # Check for review submitted for the current date
   try:
-    review = Review.objects.get(review_date__date = albumDay)
+    review = Review.objects.filter(user=userObj).get(review_date__date = albumDay)
   except ObjectDoesNotExist as e:
     validityStatus['canSubmit'] = False
     validityStatus['reason'] = f"You have not submitted a review for the current album!"
