@@ -60,6 +60,7 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, album_spotify_id: str):
   # Return Spotify Response
   return JsonResponse(out)
 
+
 ###
 # If the user meets the criteria to be able to submit an album.
 ###
@@ -80,7 +81,6 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
   # Fill date if it isnt provided (Defauly to current time)
   if(date == ""):
     date = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d')
-
   ## Check if user is being album limited (USER CAN ONLY SUBMIT ONE ALBUM A DAY)
   # Convert String to date
   date_format = '%Y-%m-%d'
@@ -91,9 +91,17 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
     if(submission.submission_date.astimezone(tz=pytz.timezone('America/Chicago')).date().strftime('%Y-%m-%d') == date):
       validityStatus['canSubmit'] = False
       validityStatus['reason'] = f"You have already submitted an album for today! ({albumDay}) (CST)"
-      break
+      return JsonResponse(validityStatus)
+  ## Check if a user has submitted a review for the current album, if not, they cannot submit an album
+  # Check for review submitted for the current date
+  try:
+    review = Review.objects.get(review_date__date = albumDay)
+  except ObjectDoesNotExist as e:
+    validityStatus['canSubmit'] = False
+    validityStatus['reason'] = f"You have not submitted a review for the current album!"
   # Return Statuses
   return JsonResponse(validityStatus)
+
 
 ###
 # Check if an album already exists in the database
