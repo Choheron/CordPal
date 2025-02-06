@@ -545,6 +545,5 @@ export async function getSimilarReviewsForRatings() {
     },
   });
   const similarlyRatedJSON = await similarlyRatedResponse.json()
-  console.log(similarlyRatedJSON)
   return similarlyRatedJSON;
 }
