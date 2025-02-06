@@ -5,7 +5,7 @@ import { Button, Divider } from "@nextui-org/react";
 import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
 import ReviewDisplay from "./review_display";
-import { getAlbumOfTheDayData, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
+import { getAlbumOfTheDayData, getSimilarReviewsForRatings, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
 import AddAlbumModal from "./modals/add_album_modal";
 import Link from "next/link";
 
@@ -15,6 +15,7 @@ import Link from "next/link";
 export default async function AlbumOfTheDayBox(props) {
   let albumOfTheDayObj = await getAlbumOfTheDayData()
   const albumReview = await getUserReviewForAlbum(albumData("album_id"))
+  const similarReviewData = await getSimilarReviewsForRatings()
 
   // Check if album of the day is outdated
   let todayDate = new Date()
@@ -63,6 +64,7 @@ export default async function AlbumOfTheDayBox(props) {
           rating={(albumReview != null) ? albumReview['score'] : null}
           comment={(albumReview != null) ? albumReview['comment'] : null}
           first_listen={(albumReview != null) ? albumReview['first_listen']: null}
+          similar_review_data={similarReviewData}
         />
         <div className="w-full flex">
           <AddAlbumModal />

@@ -525,3 +525,26 @@ export async function getTenorGifData(tenor_url: string = "", tenor_gif_id: stri
   // Return URL
   return retJson['url']
 }
+
+
+//
+// Get user's similarly rated albums for the review slider tooltip
+//
+export async function getSimilarReviewsForRatings() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getSimilarReviewsForRatings: Sending request to backend '/spotifyapi/getSimilarReviewsForRatings'`)
+  const similarlyRatedResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getSimilarReviewsForRatings`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: ['reviews'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const similarlyRatedJSON = await similarlyRatedResponse.json()
+  console.log(similarlyRatedJSON)
+  return similarlyRatedJSON;
+}

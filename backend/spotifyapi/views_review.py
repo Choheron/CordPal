@@ -8,6 +8,10 @@ from .models import (
   Review,
 )
 
+from .utils import (
+  albumToDict
+)
+
 import logging
 from dotenv import load_dotenv
 import os
@@ -198,3 +202,56 @@ def getAllUserReviewStats(request: HttpRequest):
     outList.append(reviewData[user])
   # Return data 
   return JsonResponse({'total_reviews': totalReviews, 'review_data': outList})
+
+
+###
+# Get Reviews and Albums for each score given.
+# Example: Return an object similar to the following
+# {
+#   "0": {
+#     [
+#       'ALBUM DATA'
+#     ],
+#     [
+#       'ALBUM DATA'
+#     ],
+#     [
+#       'ALBUM DATA'
+#     ]
+#   },
+#   "1": {
+#     ...
+#   }
+#   ...
+# }
+###
+def getSimilarReviewsForRatings(request: HttpRequest):
+  logger.info("getSimilarReviewsForRating called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getSimilarReviewsForRating called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Retrieve user from session cookie
+  print("Getting user")
+  user = getSpotifyUser(request.session.get('discord_id'))
+  # Iterate through possible ratings and build return object
+  out = {}
+  score = 0
+  while score <= 10:
+    print(f"{score}")
+    # Get three reviews returned 
+    user_reviews = Review.objects.filter(user=user).filter(score=score).order_by('-last_updated')[:3]
+    albums_for_score = []
+    for review in user_reviews:
+      albums_for_score.append(albumToDict(review.album))
+    # Attach to out object
+    out[f"{score}"] = albums_for_score
+    # Increment score
+    score += 0.5
+  # Attach timestamp
+  out['metadata'] = {}
+  out['metadata']['timestamp'] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+  # Return data 
+  return JsonResponse(out)

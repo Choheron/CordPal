@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Button } from "@nextui-org/react";
+import { Button, Tooltip } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/input";
 import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@nextui-org/react";
 import { submitReviewToBackend } from "@/app/lib/spotify_utils";
+import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 
 
 // GUI Display for an Album Review Box
@@ -18,19 +19,24 @@ import { submitReviewToBackend } from "@/app/lib/spotify_utils";
 //  - fav_song: String - (optional) Favorite song if they left a previous review
 //  - comment: String - (optional) User's comment if they left a previous review
 //  - first_listen: Boolean - (optional) Status of first listen if they left a previous review 
+//  - similar_review_data: Object - Object containing albums organized based on rating (key is rating)
 export default function AlbumReviewBox(props) {
   // Activate Router
   const router = useRouter();
   // State management
-  const [rating, setRating] = useState<SliderValue>((props.rating != null) ? props.rating : 5);
+  const [rating, setRating] = useState((props.rating != null) ? props.rating : 5);
   const [comment, setComment] = useState((props.comment != null) ? props.comment : "No Comment Provided");
   // const [favSong, setFavSong] = useState<Selection>(new Set([]));
   const [isReady, setIsReady] = useState(false);
   const [isFirstListen, setIsFirstListen] = useState((props.first_listen != null) ? props.first_listen : false);
   // Track if user has updated their review to be something different
   const [isReviewUpdated, setIsReviewUpdated] = useState(false);
+  // Track Tooltip being open
+  const [tooltipOpen, setTooltipOpen] = useState(false);
   // Prop validation
   const songList = (props.song_data) ? props.song_data : [{name: "None Provided"}]
+  // Album Scoring Prop Validation
+  const [albumsByRating, setAlbumsByRating] = useState((props.similar_review_data != null) ? props.similar_review_data : {})
 
   const getSteps = () => {
     let steps: any = []
@@ -69,6 +75,11 @@ export default function AlbumReviewBox(props) {
     router.push("spotify")
   }
 
+  // Handle slider moving
+  const handleSliderMove = (sliderValue) => {
+    setRating(sliderValue)
+  }
+
   return (
     <div className="w-full max-w-[1080px] px-2 lg:mx-auto py-2 flex flex-col rounded-xl bg-zinc-800/30 border border-neutral-800">
       <div className="w-full flex flex-col lg:flex-row gap-2 justify-between">
@@ -83,7 +94,29 @@ export default function AlbumReviewBox(props) {
           maxValue={10} 
           minValue={0} 
           value={rating}
-          onChange={setRating}
+          onChange={handleSliderMove}
+          renderThumb={(props) => (
+            <div
+              {...props}
+              className="group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
+            >
+              <Tooltip 
+                className="bg-transparent/70 border-gray-600"
+                content={
+                  <SimilarRatingsBox 
+                    rating={rating} 
+                    albums={albumsByRating[Number.parseFloat(rating).toFixed(1)]}
+                    timestamp={albumsByRating['metadata']['timestamp']} 
+                  />
+                } 
+                showArrow={true} 
+                isOpen={tooltipOpen} 
+                onOpenChange={(open) => setTooltipOpen(open)}
+              >
+                <span className="transition-transform bg-yellow-600 shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80" />
+              </Tooltip>
+            </div>
+          )}
           className="max-w-full px-10 mx-auto" 
         />
         {/* <Select 
