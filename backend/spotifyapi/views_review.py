@@ -240,14 +240,13 @@ def getSimilarReviewsForRatings(request: HttpRequest):
   out = {}
   score = 0
   while score <= 10:
-    print(f"{score}")
     # Get three reviews returned 
     user_reviews = Review.objects.filter(user=user).filter(score=score).order_by('-last_updated')[:3]
     albums_for_score = []
     for review in user_reviews:
       albums_for_score.append(albumToDict(review.album))
     # Attach to out object
-    out[f"{score}"] = albums_for_score
+    out[f"{score + 0.0}"] = albums_for_score
     # Increment score
     score += 0.5
   # Attach timestamp
