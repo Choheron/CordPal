@@ -67,7 +67,7 @@ export default function AllAlbumsModal(props) {
       sortable: true,
     },
     {
-      key: "Last_AOtD",
+      key: "last_aotd",
       label: "LAST AOD",
       sortable: true,
     },
@@ -121,10 +121,10 @@ export default function AllAlbumsModal(props) {
         }))
         break;
       // Sort on Last Album of Day Date
-      case 'Last_AOtD':
+      case 'last_aotd':
         setAlbumList(albumList.sort((a, b) => {
-          if (descriptor.direction === "ascending") return ((a['Last_AOtD'] < b['Last_AOtD']) ? 1 : -1);
-          if (descriptor.direction === "descending") return ((a['Last_AOtD'] > b['Last_AOtD']) ? 1 : -1);
+          if (descriptor.direction === "ascending") return ((a['last_aotd'] < b['last_aotd']) ? 1 : -1);
+          if (descriptor.direction === "descending") return ((a['last_aotd'] > b['last_aotd']) ? 1 : -1);
           return 0;
         }))
         break;
@@ -200,9 +200,9 @@ export default function AllAlbumsModal(props) {
         );
       case "submission_date":
         return (
-          <p className="my-auto">
+          <div className="my-auto">
             <ClientTimestamp timestamp={album['submission_date']} full={true} />
-          </p>
+          </div>
         );
       case "rating":
         return (
@@ -217,17 +217,17 @@ export default function AllAlbumsModal(props) {
               --
             </p>
         );
-      case "Last_AOtD":
+      case "last_aotd":
         return (
-          (album['Last_AOtD'] != null) ? (
+          (album['last_aotd'] != null) ? (
             <Button 
               as={Link}
-              href={"/dashboard/spotify/historical/" + album['Last_AOtD']}
+              href={"/dashboard/spotify/historical/" + album['last_aotd']}
               radius="lg"
               className={`w-full mx-auto hover:underline text-white`}
               variant="solid"
             >
-              <b>{(album['Last_AOtD'] != null) ? album['Last_AOtD'] : "N/A"}</b>
+              <b>{(album['last_aotd'] != null) ? album['last_aotd'] : "N/A"}</b>
             </Button> 
           ):(
             <></>

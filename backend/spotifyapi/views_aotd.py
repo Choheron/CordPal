@@ -153,3 +153,27 @@ def setAlbumOfDayADMIN(request: HttpRequest, date: str, album_spotify_id: str):
   # Print success
   logger.info(f'Successfully set album of the day for {date}: {albumOfTheDayObj}')
   return HttpResponse(f'Successfully set album of the day for {date}: {albumOfTheDayObj}')
+
+
+###
+# When passed in an album, return a list of the dates in which it was AOtD
+###
+def getAotdDates(request: HttpRequest, album_spotify_id: str):
+  logger.info("getAotdDates called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getAotdDates called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Retrieve album object using spotify_id
+  album = Album.objects.get(spotify_id=album_spotify_id)
+  # Get list of dates
+  aotd_dates = list(DailyAlbum.objects.filter(album=album).values_list('date', flat=True))
+  # Create return object and return it
+  out = {}
+  out['aotd_dates'] = aotd_dates
+  out['metadata'] = {}
+  out['metadata']['timestamp'] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+  # Return data 
+  return JsonResponse(out)

@@ -245,7 +245,7 @@ export async function getAlbumOfTheDayData(date: string = '') {
 // Get album rating
 // - RETURN: object containing album of the day data
 //
-export async function getAlbumAvgRating(spotify_album_id, rounded = true) {
+export async function getAlbumAvgRating(spotify_album_id, rounded = true, date = null) {
   // If spotify id is null, return 0
   if(spotify_album_id == null) {
     return 0.0
@@ -253,7 +253,7 @@ export async function getAlbumAvgRating(spotify_album_id, rounded = true) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Tail to string for variants in API calls
-  const urlTail = (rounded) ? "" : "/false"
+  const urlTail = ((rounded) ? "" : "/false") + ((date != null) ? `/${date}` : "")
   // Validate that user has connected spotify
   console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbumAvgRating/${spotify_album_id}${urlTail}'`)
   const avgRatingResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumAvgRating/${spotify_album_id}${urlTail}`, {
@@ -272,16 +272,18 @@ export async function getAlbumAvgRating(spotify_album_id, rounded = true) {
 // Get Reviews from Backend
 // - RETURN: JSON Object of List of reviews
 //
-export async function getReviewsForAlbum(album_spotify_id) {
+export async function getReviewsForAlbum(album_spotify_id, date = null) {
   // If no album ID provided, return empty list
   if(album_spotify_id == "") {
     return []
   }
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
+  // Url Tail Definition
+  const urlTail = `/${album_spotify_id}${((date != null) ? `/${date}` : "")}`
   // Get all user reviews for an album
-  console.log(`getReviewsForAlbum: Sending request to backend '/spotifyapi/getReviewsForAlbum/${album_spotify_id}'`)
-  const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getReviewsForAlbum/${album_spotify_id}`, {
+  console.log(`getReviewsForAlbum: Sending request to backend '/spotifyapi/getReviewsForAlbum${urlTail}'`)
+  const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getReviewsForAlbum${urlTail}`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
@@ -526,7 +528,6 @@ export async function getTenorGifData(tenor_url: string = "", tenor_gif_id: stri
   return retJson['url']
 }
 
-
 //
 // Get user's similarly rated albums for the review slider tooltip
 //
@@ -546,4 +547,25 @@ export async function getSimilarReviewsForRatings() {
   });
   const similarlyRatedJSON = await similarlyRatedResponse.json()
   return similarlyRatedJSON;
+}
+
+//
+// Get aotd dates for a passed in albumid
+//
+export async function getAotdDates(album_spotify_id) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getAotdDates: Sending request to backend '/spotifyapi/getAotdDates/${album_spotify_id}'`)
+  const aotdDatesResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAotdDates/${album_spotify_id}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: ['AOtD'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const aotdDatesJson = await aotdDatesResponse.json()
+  return aotdDatesJson['aotd_dates'];
 }

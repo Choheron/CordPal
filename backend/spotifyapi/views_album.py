@@ -204,10 +204,10 @@ def getAlbum(request: HttpRequest, album_spotify_id: str):
 # Get ALL Album from the album of the day pool.
 ###
 def getAllAlbums(request: HttpRequest):
-  logger.info("submitAlbum called...")
+  logger.info("getAllAlbums called...")
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("submitAlbum called with a non-GET method, returning 405.")
+    logger.warning("getAllAlbums called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -231,12 +231,15 @@ def getAllAlbums(request: HttpRequest):
     albumObj['submitter_nickname'] = album.submitted_by.nickname
     albumObj['submitter_comment'] = album.user_comment
     albumObj['submission_date'] = album.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
-    # Check if album has been rated
-    albumObj['rating'] = getAlbumRating(album.spotify_id, rounded=False)
-    if(albumObj['rating'] != None):
-      albumObj['Last_AOtD'] = DailyAlbum.objects.filter(album=album).latest('date').date # Return most recent instance of album
-    else:
-      albumObj['Last_AOtD'] = None
+    # Check if album has been aotd
+    try:
+      # Get most recent AOtD date
+      albumObj['last_aotd'] = DailyAlbum.objects.filter(album=album).latest('date').date # Return most recent instance of album
+      # Get most recent review rating from AOtD
+      albumObj['rating'] = getAlbumRating(album_spotify_id=album.spotify_id, rounded=False, date=albumObj['last_aotd'])
+    except:
+      albumObj['last_aotd'] = None
+      albumObj['rating'] = 0      
     # Append to List
     albumList.append(albumObj)
   # Return final object
@@ -245,9 +248,12 @@ def getAllAlbums(request: HttpRequest):
 
 ###
 # Get the average rating for an album.
+# If a date is not provided in the url bar, will return the most recent aotd ratings for that album
 ###
-def getAlbumAvgRating(request: HttpRequest, album_spotify_id: str, rounded: str = "true"):
+def getAlbumAvgRating(request: HttpRequest, album_spotify_id: str, rounded: str = "true", date: str = None):
   logger.info("getAlbumAvgRating called...")
+  # If date is not provided grab the most recent date of AOtD
+  aotd_date = date if (date) else DailyAlbum.objects.filter(album__spotify_id=album_spotify_id).latest('date').date
   # Convert bool to string
   if(rounded == "true"):
     rounded = True
@@ -259,7 +265,7 @@ def getAlbumAvgRating(request: HttpRequest, album_spotify_id: str, rounded: str 
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  rating = getAlbumRating(album_spotify_id, rounded=rounded)
+  rating = getAlbumRating(album_spotify_id, rounded=rounded, date=aotd_date)
   return JsonResponse({"rating": rating})
 
 

@@ -6,6 +6,7 @@ from users.utils import getSpotifyUser
 from .models import (
   Album,
   Review,
+  DailyAlbum,
 )
 
 from .utils import (
@@ -74,7 +75,7 @@ def submitReview(request: HttpRequest):
 ###
 # Get All Reviews for a specific album.
 ###
-def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str):
+def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str, date: str = None):
   logger.info("getReviewsForAlbum called...")
   # Make sure request is a get request
   if(request.method != "GET"):
@@ -82,6 +83,14 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  # If date is not provided grab the most recent date of AOtD
+  try:
+    aotd_date = date if (date) else DailyAlbum.objects.filter(album__spotify_id=album_spotify_id).latest('date').date
+  except:
+    out = {}
+    out['review_list'] = []
+    print(f'Album {album_spotify_id} not found in AOtD List...')
+    return JsonResponse(out)
   # Get Album from the database
   try:
     albumObj = Album.objects.get(spotify_id=album_spotify_id)
@@ -92,7 +101,7 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str):
     return JsonResponse(out)
   # Get all reivews for album
   try:
-    reviewsObj = Review.objects.filter(album=albumObj)
+    reviewsObj = Review.objects.filter(album=albumObj).filter(aotd_date=aotd_date)
   except Review.DoesNotExist:
     out = {}
     out['review_list'] = []

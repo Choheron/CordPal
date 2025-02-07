@@ -1,5 +1,6 @@
-import { getAlbum, getAlbumAvgRating, getAlbumOfTheDayData } from "@/app/lib/spotify_utils"
+import { getAlbum, getAlbumAvgRating, getAlbumOfTheDayData, getAotdDates } from "@/app/lib/spotify_utils"
 import { ratingToTailwindBgColor } from "@/app/lib/utils"
+import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/spotify/album_display"
 import ReviewDisplay from "@/app/ui/dashboard/spotify/review_display"
@@ -16,7 +17,37 @@ export default async function Page({
   const albumid = (await params).albumid
   // Retrieve data about album from backend
   const albumObj = await getAlbum(albumid)
+  // Retrieve aotd_dates list from backend
+  const aotd_dates = await getAotdDates(albumid)
+  // Store average ratings in object
+  let ratingsObj = {}
+  for (const date of aotd_dates) {
+    ratingsObj[date] = (await getAlbumAvgRating(albumid, false, date)).toFixed(2)
+  }
   
+
+  // Box of historical review dates - Generate series of review displays based on dates
+  const pastReviewsBox = () => {
+    return aotd_dates.map((date, index) => {
+      const dateArr = date.split("-")
+      return (
+        <div key={index} className="backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+          <div className="flex w-full">
+            <p className={`w-fit h-fit my-auto ${ratingToTailwindBgColor(ratingsObj[date])} px-2 py-1 rounded-full text-black`}>
+              <b>{ratingsObj[date]}</b>
+            </p>
+            <p className="w-fit ml-auto text-xl rounded-tr-2xl rounded-bl-2xl bg-zinc-800/30 border border-neutral-800 px-2 -mr-2 py-2 -mt-2">
+              {date}
+            </p>
+          </div>
+          <ReviewDisplay
+            album_id={albumData("album_id")}
+            date={date}
+          />
+        </div>
+      )
+    })
+  }
 
   // Pull data from album object, return empty string if not available
   function albumData(key) {
@@ -42,6 +73,16 @@ export default async function Page({
             submission_date={albumData("submission_date")}
           />
         </div>
+        <Conditional showWhen={aotd_dates.length > 0}>
+          <div className='w-full'>
+            <p className='text-2xl w-fit mx-auto font-extralight'>
+              Previous Album of the Day Appearances
+            </p>
+            <div className="flex justify-around">
+              {pastReviewsBox()}
+            </div>
+          </div>
+        </Conditional>
         <Button 
           as={Link}
           href={"/dashboard/spotify"}

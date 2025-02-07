@@ -13,7 +13,8 @@ from users.models import User
 from .models import (
   SpotifyUserData,
   Album,
-  Review
+  Review,
+  DailyAlbum
 )
 
 from users.utils import (
@@ -162,11 +163,13 @@ def isUserSpotifyConnected(request: HttpRequest):
  
 
 # Get album's average rating (by spotifyid passed in [NOT ALBUM OBJECT])
-def getAlbumRating(album_spotify_id, rounded=True):
+def getAlbumRating(album_spotify_id, rounded=True, date=None):
+  # Get most recent aotd date if date is not provided
+  aotd_date = date if (date) else DailyAlbum.objects.filter(album__spotify_id=album_spotify_id).latest('date').date
   # Retrieve album from database
   albumObj = Album.objects.get(spotify_id=album_spotify_id)
   # Get average review score of album
-  reviewList = Review.objects.filter(album=albumObj)
+  reviewList = Review.objects.filter(album=albumObj).filter(aotd_date=aotd_date)
   # Return None if the album has not been reviewed
   if(len(reviewList) == 0):
     return None

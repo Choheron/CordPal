@@ -29,7 +29,8 @@ urlpatterns = [
   path('getAlbum/<str:album_spotify_id>', views_album.getAlbum),
   path('getAllAlbums', views_album.getAllAlbums),
   path('getLastXAlbums/<int:count>', views_album.getLastXAlbums),
-  # Below URL has two variations (one for lack of URL Param)
+  # Below URL has three variations (for different URL params)
+  path('getAlbumAvgRating/<str:album_spotify_id>/<str:rounded>/<str:date>', views_album.getAlbumAvgRating),
   path('getAlbumAvgRating/<str:album_spotify_id>/<str:rounded>', views_album.getAlbumAvgRating),
   path('getAlbumAvgRating/<str:album_spotify_id>', views_album.getAlbumAvgRating),
   # Below URL has two variations (one for lack of URL Param)
@@ -42,6 +43,8 @@ urlpatterns = [
   ## Review Views
   ## ============================================================================================================
   path('submitReview', views_review.submitReview),
+  # Below URL has two variations, one in which a date is provided and one where it isnt
+  path('getReviewsForAlbum/<str:album_spotify_id>/<str:date>', views_review.getReviewsForAlbum),
   path('getReviewsForAlbum/<str:album_spotify_id>', views_review.getReviewsForAlbum),
   path('getUserReviewForAlbum/<str:album_spotify_id>', views_review.getUserReviewForAlbum),
   path('getAllUserReviewStats', views_review.getAllUserReviewStats),
@@ -56,4 +59,6 @@ urlpatterns = [
   path('setAlbumOfDay', views_aotd.setAlbumOfDay),
   # ADMIN Command to be called by admin for special occasion album of the days
   path('setAlbumOfDayADMIN/<str:date>/<str:album_spotify_id>', views_aotd.setAlbumOfDayADMIN),
+  # Return dates in which the passed in album was aotd
+  path('getAotdDates/<str:album_spotify_id>', views_aotd.getAotdDates),
 ]
