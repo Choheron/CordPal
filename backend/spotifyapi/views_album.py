@@ -234,9 +234,9 @@ def getAllAlbums(request: HttpRequest):
     # Check if album has been rated
     albumObj['rating'] = getAlbumRating(album.spotify_id, rounded=False)
     if(albumObj['rating'] != None):
-      albumObj['AOD_date'] = DailyAlbum.objects.get(album=album).date
+      albumObj['Last_AOtD'] = DailyAlbum.objects.filter(album=album).latest('date').date # Return most recent instance of album
     else:
-      albumObj['AOD_date'] = None
+      albumObj['Last_AOtD'] = None
     # Append to List
     albumList.append(albumObj)
   # Return final object

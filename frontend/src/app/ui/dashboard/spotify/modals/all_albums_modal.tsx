@@ -67,14 +67,9 @@ export default function AllAlbumsModal(props) {
       sortable: true,
     },
     {
-      key: "AOD_date",
+      key: "Last_AOtD",
       label: "LAST AOD",
       sortable: true,
-    },
-    {
-      key: "historical_data",
-      label: "HISTORICAL DATA",
-      sortable: false,
     },
   ];
 
@@ -126,10 +121,10 @@ export default function AllAlbumsModal(props) {
         }))
         break;
       // Sort on Last Album of Day Date
-      case 'AOD_date':
+      case 'Last_AOtD':
         setAlbumList(albumList.sort((a, b) => {
-          if (descriptor.direction === "ascending") return ((a['AOD_date'] < b['AOD_date']) ? 1 : -1);
-          if (descriptor.direction === "descending") return ((a['AOD_date'] > b['AOD_date']) ? 1 : -1);
+          if (descriptor.direction === "ascending") return ((a['Last_AOtD'] < b['Last_AOtD']) ? 1 : -1);
+          if (descriptor.direction === "descending") return ((a['Last_AOtD'] > b['Last_AOtD']) ? 1 : -1);
           return 0;
         }))
         break;
@@ -222,23 +217,17 @@ export default function AllAlbumsModal(props) {
               --
             </p>
         );
-      case "AOD_date":
+      case "Last_AOtD":
         return (
-          <p className="my-auto">
-            {(album['AOD_date'] != null) ? album['AOD_date'] : "N/A"}
-          </p>
-        );
-      case "historical_data":
-        return (
-          (album['AOD_date'] != null) ? (
+          (album['Last_AOtD'] != null) ? (
             <Button 
               as={Link}
-              href={"/dashboard/spotify/historical/" + album['AOD_date']}
+              href={"/dashboard/spotify/historical/" + album['Last_AOtD']}
               radius="lg"
-              className={`w-fit mx-auto hover:underline text-white`}
+              className={`w-full mx-auto hover:underline text-white`}
               variant="solid"
             >
-              <b>View Historical Data</b>
+              <b>{(album['Last_AOtD'] != null) ? album['Last_AOtD'] : "N/A"}</b>
             </Button> 
           ):(
             <></>
