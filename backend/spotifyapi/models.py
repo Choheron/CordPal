@@ -36,6 +36,8 @@ class SpotifyUserData(models.Model):
   refresh_token = models.CharField(null=True, max_length=512)
   # Fields for top songs
   top_track_long_term = models.TextField(null=True)
+  # Flag for if their albums are currently blocked
+  selection_blocked_flag = models.BooleanField(default=False)
 
   # toString Method
   def __str__(self):

@@ -1,11 +1,14 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.forms.models import model_to_dict
+from django.utils.timezone import now
+from datetime import timedelta
 
 from users.utils import getSpotifyUser
-
 from .models import (
   Album,
-  DailyAlbum
+  DailyAlbum,
+  SpotifyUserData,
+  Review
 )
 
 import logging
@@ -72,6 +75,21 @@ def setAlbumOfDay(request: HttpRequest):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  # Update users to check if they need to be blocked from submitting
+  logger.info("Updating selection blocked flags based on most recent review timestamp...")
+  three_days_ago = now() - timedelta(days=3)
+  # Get list of reviews from the past 3 days
+  recent_review_users = list(Review.objects.filter(last_updated__gte=three_days_ago).values_list('user__discord_id', flat=True).distinct())
+  # Update users based on if they have reviewed an album in the last 3 days
+  for spotify_user in SpotifyUserData.objects.all():
+    logger.info(f"Checking submission validity for user: {spotify_user.user.nickname}...")
+    # Check if user is in the list of recent reviewers
+    blocked = spotify_user.user.discord_id in recent_review_users
+    different = (spotify_user.selection_blocked_flag == blocked)
+    # If value is different, update it
+    if(spotify_user.selection_blocked_flag != different):
+      spotify_user.selection_blocked_flag = different
+      spotify_user.save()
   # Get current date
   day = datetime.date.today()
   # Check if a current album of the day already exists
@@ -80,15 +98,18 @@ def setAlbumOfDay(request: HttpRequest):
     logger.warning(f"WARN: Album of the day already selected: {currDayAlbum}")
     return HttpResponse(f"WARN: Album of the day already selected: {currDayAlbum}", status=425)
   except DailyAlbum.DoesNotExist:
-    print("Today does not yet have an album, selecting one...")
+    logger.info("Today does not yet have an album, selecting one...")
   # Get Date a year ago to filter by
   one_year_ago = day - datetime.timedelta(days=365)
   # Define a boolean for selecting the right album
   selected = False
   # Define Album Object
   albumOfTheDay = None
+  # Get list of all users who are currently AOtD selection blocked
+  blocked_users = list(SpotifyUserData.objects.filter(selection_blocked_flag=True))
+  print(blocked_users)
   while(not selected):
-    tempAlbum = random.choice(Album.objects.all())
+    tempAlbum = random.choice(Album.objects.all().exclude(submitted_by__discord_id__in=blocked_users))
     try:
       albumCheck = DailyAlbum.objects.filter(date__gte=one_year_ago).get(album=tempAlbum)
     except DailyAlbum.DoesNotExist:
@@ -104,6 +125,7 @@ def setAlbumOfDay(request: HttpRequest):
   # Print success
   logger.info(f'Successfully selected album of the day: {albumOfTheDayObj}')
   return HttpResponse(f'Successfully selected album of the day: {albumOfTheDayObj}')
+
 
 ###
 # Set a new album of the day.  NOTE: This WILL OVERRIDE any already set album for any date! Returns an HTTPResponse
