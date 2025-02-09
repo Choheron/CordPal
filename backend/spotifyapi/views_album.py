@@ -95,7 +95,7 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
   ## Check if a user has submitted a review for the current album, if not, they cannot submit an album
   # Check for review submitted for the current date
   try:
-    review = Review.objects.filter(user=userObj).get(review_date__date = albumDay)
+    review = Review.objects.filter(review_date__date=albumDay).get(user=userObj)
   except ObjectDoesNotExist as e:
     validityStatus['canSubmit'] = False
     validityStatus['reason'] = f"You have not submitted a review for the current album!"
@@ -239,7 +239,7 @@ def getAllAlbums(request: HttpRequest):
       albumObj['rating'] = getAlbumRating(album_spotify_id=album.spotify_id, rounded=False, date=albumObj['last_aotd'])
     except:
       albumObj['last_aotd'] = None
-      albumObj['rating'] = 0      
+      albumObj['rating'] = None 
     # Append to List
     albumList.append(albumObj)
   # Return final object
