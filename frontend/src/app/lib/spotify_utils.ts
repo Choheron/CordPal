@@ -382,7 +382,7 @@ export async function getAlbumsStats() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['album_submissions'] },
+    next: { tags: ['album_submissions', 'reviews'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },

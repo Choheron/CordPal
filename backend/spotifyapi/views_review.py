@@ -7,10 +7,12 @@ from .models import (
   Album,
   Review,
   DailyAlbum,
+  SpotifyUserData
 )
 
 from .utils import (
-  albumToDict
+  albumToDict,
+  checkSelectionFlag
 )
 
 import logging
@@ -69,6 +71,8 @@ def submitReview(request: HttpRequest):
     )
     # Save new Review data
     newReview.save()
+  # Update user selection_blocked flag status
+  checkSelectionFlag(SpotifyUserData.objects.get(user=userObj))
   return HttpResponse(200)
 
 
