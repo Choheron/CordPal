@@ -2,7 +2,8 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.forms.models import model_to_dict
 
 from .utils import (
-  checkSelectionFlag
+  checkSelectionFlag,
+  getSpotifyUser
 )
 from .models import (
   Album,
@@ -165,3 +166,39 @@ def getAotdDates(request: HttpRequest, album_spotify_id: str):
   out['metadata']['timestamp'] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
   # Return data 
   return JsonResponse(out)
+
+
+###
+# Return the percentage chance that a user's album will be picked (given current conditions)
+###
+def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
+  logger.info("getChanceOfAotdSelect called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getChanceOfAotdSelect called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get user (use request cookie if user is not passed in)
+  user = (getSpotifyUser(request.session.get('discord_id')) if (user_discord_id=="") else (getSpotifyUser(user_discord_id)))
+  # Check if user's selections are currently blocked, return 0% chance
+  if(SpotifyUserData.objects.get(user=user).selection_blocked_flag):
+    return JsonResponse({'percentage': 0.00})
+  # Get current date
+  day = datetime.date.today()
+  # Get Date a year ago to filter by
+  one_year_ago = day - datetime.timedelta(days=365)
+  # Get counts needed to determine percentage
+  user_submissions_count = Album.objects.filter(submitted_by=user).count()
+  user_eligible_count = user_submissions_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=user).count())
+  total_eligible_count = 0
+  for spot_user in SpotifyUserData.objects.all():
+    if((spot_user.selection_blocked_flag)):
+      continue
+    temp_submission_count = Album.objects.filter(submitted_by=spot_user.user).count()
+    temp_eligible_count = temp_submission_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=spot_user.user).count())
+    total_eligible_count += temp_eligible_count
+  # Do math for percentage
+  chance = (float(user_eligible_count)/float(total_eligible_count)) * 100.00
+  # Return data 
+  return JsonResponse({'percentage': chance})

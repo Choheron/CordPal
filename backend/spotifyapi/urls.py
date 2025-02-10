@@ -62,4 +62,8 @@ urlpatterns = [
   path('setAlbumOfDayADMIN/<str:date>/<str:album_spotify_id>', views_aotd.setAlbumOfDayADMIN),
   # Return dates in which the passed in album was aotd
   path('getAotdDates/<str:album_spotify_id>', views_aotd.getAotdDates),
+  # Below URL has two variations, one in which a date is provided and one where it isnt
+  # Get chance a certian user's album will be picked given current conditions
+  path('getChanceOfAotdSelect/<str:user_discord_id>', views_aotd.getChanceOfAotdSelect),
+  path('getChanceOfAotdSelect', views_aotd.getChanceOfAotdSelect),
 ]

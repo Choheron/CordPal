@@ -569,3 +569,27 @@ export async function getAotdDates(album_spotify_id) {
   const aotdDatesJson = await aotdDatesResponse.json()
   return aotdDatesJson['aotd_dates'];
 }
+
+
+//
+// Get the percentage chance of a user's album submission being picked for AOtD
+//
+export async function getChanceOfAotdSelect(user_discord_id: string = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Determine URL tail
+  const urlTail = (user_discord_id != "") ? `/${user_discord_id}` : ""
+  // Validate that user has connected spotify
+  console.log(`getChanceOfAotdSelect: Sending request to backend '/spotifyapi/getChanceOfAotdSelect${urlTail}'`)
+  const aotdChanceResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getChanceOfAotdSelect${urlTail}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: ['AOtD', 'reviews', 'album_submissions'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const aotdChanceJson = await aotdChanceResponse.json()
+  return aotdChanceJson['percentage'];
+}

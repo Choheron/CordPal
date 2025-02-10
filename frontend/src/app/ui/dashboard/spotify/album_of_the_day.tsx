@@ -5,7 +5,7 @@ import { Button, Divider } from "@nextui-org/react";
 import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
 import ReviewDisplay from "./review_display";
-import { getAlbumOfTheDayData, getSimilarReviewsForRatings, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
+import { getAlbumOfTheDayData, getChanceOfAotdSelect, getSimilarReviewsForRatings, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
 import AddAlbumModal from "./modals/add_album_modal";
 import Link from "next/link";
 
@@ -16,6 +16,7 @@ export default async function AlbumOfTheDayBox(props) {
   let albumOfTheDayObj = await getAlbumOfTheDayData()
   const albumReview = await getUserReviewForAlbum(albumData("album_id"))
   const similarReviewData = await getSimilarReviewsForRatings()
+  const userSelectChance = await getChanceOfAotdSelect()
 
   // Check if album of the day is outdated
   let todayDate = new Date()
@@ -67,7 +68,9 @@ export default async function AlbumOfTheDayBox(props) {
           similar_review_data={similarReviewData}
         />
         <div className="w-full flex">
-          <AddAlbumModal />
+          <AddAlbumModal
+            userSelectChance={userSelectChance.toFixed(2)}
+          />
         </div>
       </div>
       <Divider 
