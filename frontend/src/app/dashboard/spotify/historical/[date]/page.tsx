@@ -22,6 +22,8 @@ export default async function Page({
   // Boolean to determine if this date is today
   const isToday = isTodayCheck()
 
+  console.log(albumOfTheDayObj)
+
   // This may be my ugliest function in this whole thing.... Timezones are really confusing me
   function isTodayCheck() {
     const date1String = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0])).toISOString().split('T')[0]
@@ -36,7 +38,7 @@ export default async function Page({
     if(key in albumOfTheDayObj) {
       return albumOfTheDayObj[key]
     } else { 
-      return ''
+      return ""
     }
   }
   
@@ -58,18 +60,26 @@ export default async function Page({
                 variant="solid"
               >
                 <b>Prev Day</b>
+              </Button>
+              <Button 
+                as={Link}
+                href={"/dashboard/spotify/album/" + albumData("album_id")}
+                radius="lg"
+                className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+                variant="solid"
+                isDisabled={albumData("album_id") == null}
+              >
+                <b>Album Page</b>
               </Button> 
-              <Conditional showWhen={!isToday}>
-                <Button
-                  as={Link}
-                  href={"/dashboard/spotify/historical/" + nextString}
-                  radius="lg"
-                  className={`w-fit hover:underline text-white`}
-                  variant="solid"
-                >
-                  <b>Next Day</b>
-                </Button> 
-              </Conditional>
+              <Button
+                as={Link}
+                href={"/dashboard/spotify/historical/" + nextString}
+                radius="lg"
+                className={`${(isToday) ? 'invisible' : ''} w-fit hover:underline text-white`}
+                variant="solid"
+              >
+                <b>Next Day</b>
+              </Button> 
             </div>
             <Badge
               content={(await getAlbumAvgRating(albumData('album_id'), false)).toFixed(2)} 
