@@ -82,14 +82,13 @@ def setAlbumOfDay(request: HttpRequest):
   recent_review_users = list(Review.objects.filter(review_date__gte=three_days_ago).values_list('user__discord_id', flat=True).distinct())
   # Update users based on if they have reviewed an album in the last 3 days
   for spotify_user in SpotifyUserData.objects.all():
-    logger.info(f"Checking submission validity for user: {spotify_user.user.nickname}...")
+    logger.info(f"Checking submission validity flag for user: {spotify_user.user.nickname} [Flag is currently: {spotify_user.selection_blocked_flag}]...")
     # Check if user is in the list of recent reviewers
     blocked = spotify_user.user.discord_id not in recent_review_users
-    different = (spotify_user.selection_blocked_flag == blocked)
     # If value is different, update it
-    if(spotify_user.selection_blocked_flag != different):
-      spotify_user.selection_blocked_flag = different
-      logger.info(f"Changing `selection_blocked_flag` to {different} for {spotify_user.user.nickname}...")
+    if(spotify_user.selection_blocked_flag != blocked):
+      spotify_user.selection_blocked_flag = blocked
+      logger.info(f"Changing `selection_blocked_flag` to {blocked} for {spotify_user.user.nickname}...")
       spotify_user.save()
   # Get current date
   day = datetime.date.today()
@@ -107,9 +106,10 @@ def setAlbumOfDay(request: HttpRequest):
   # Define Album Object
   albumOfTheDay = None
   # Get list of all users who are currently AOtD selection blocked
-  blocked_users = list(SpotifyUserData.objects.filter(selection_blocked_flag=True))
-  print(blocked_users)
+  blocked_users = list(SpotifyUserData.objects.filter(selection_blocked_flag=True).values_list('user__discord_id', flat=True))
+  logger.warning(blocked_users)
   while(not selected):
+    # Filter out blocked users albums
     tempAlbum = random.choice(Album.objects.all().exclude(submitted_by__discord_id__in=blocked_users))
     try:
       albumCheck = DailyAlbum.objects.filter(date__gte=one_year_ago).get(album=tempAlbum)
@@ -124,8 +124,8 @@ def setAlbumOfDay(request: HttpRequest):
   # Save object
   albumOfTheDayObj.save()
   # Print success
-  logger.info(f'Successfully selected album of the day: {albumOfTheDayObj}')
-  return HttpResponse(f'Successfully selected album of the day: {albumOfTheDayObj}')
+  logger.info(f'Successfully selected album of the day: \"{albumOfTheDayObj}\" submitted by: \"{albumOfTheDay.submitted_by.nickname}\"')
+  return HttpResponse(f'Successfully selected album of the day: \"{albumOfTheDayObj}\" submitted by: \"{albumOfTheDay.submitted_by.nickname}\"')
 
 
 ###
