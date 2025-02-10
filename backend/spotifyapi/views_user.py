@@ -168,3 +168,22 @@ def spotifySearch(request: HttpRequest, item_type, query, limit, offset):
   spotifyResJSON = spotifySearchRes.json()
   # Return Spotify Response
   return JsonResponse(spotifyResJSON)
+
+
+###
+# Return if the user is currently blocked from having their albums picked for the AOtD
+###
+def getSelectionBlockedFlag(request: HttpRequest):
+  logger.info("getSelectionBlockedFlag called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getSelectionBlockedFlag called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get user data from session
+  user = getSpotifyUser(request.session.get('discord_id'))
+  # Retrieve and return that user's flag status
+  flag_status = (SpotifyUserData.objects.get(user=user)).selection_blocked_flag
+  logger.info(f"Returning selection blocked flag status of {flag_status} for user {user.discord_id}...")
+  return JsonResponse({"selection_blocked": flag_status})

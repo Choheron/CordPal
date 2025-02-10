@@ -322,6 +322,7 @@ def getAlbumsStats(request: HttpRequest):
     userData['aotd_count'] = DailyAlbum.objects.filter(album__submitted_by=user.user).count()
     userData['discord_id'] = user.user.discord_id
     userData['nickname'] = user.user.nickname
+    userData['selection_blocked'] = user.selection_blocked_flag
     # Append to List
     userStatsList.append(userData)
   # Add list to out
