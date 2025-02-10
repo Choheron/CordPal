@@ -27,7 +27,7 @@ export default async function UserCard(props) {
       className="w-fit"
       name={userData['nickname']}
       description={(
-        (props.customDescription) ? props.customDescription : null
+        customDesc
       )}
       avatarProps={{
         showFallback: true,

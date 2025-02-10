@@ -5,7 +5,7 @@ import { getAlbumAvgRating, getAlbumsStats, getAllUserReviewStats, getLowestHigh
 import AlbumDisplay from "../album_display";
 
 import {Badge} from "@nextui-org/badge";
-import { Divider } from "@nextui-org/react";
+import { Divider, Tooltip } from "@nextui-org/react";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import ReviewStatsUserCard from "./review_stats_user_card";
 
@@ -25,6 +25,13 @@ export default async function MusicStatsBox(props) {
         <td className="line-clamp-1 mx-2">
           <UserCard
             userDiscordID={user['discord_id']}
+            customDescription={(
+              <Tooltip 
+                content={`${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.`}
+              >
+                {(user['selection_blocked']) ? (<p>&#9940;</p>) : (<p>&#9989;</p>)}
+              </Tooltip>
+            )}
           />
         </td>
         <td>
