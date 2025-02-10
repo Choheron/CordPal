@@ -6,14 +6,15 @@ from .utils import (
   getAlbumRating,
   albumToDict,
 )
-
 from users.utils import getSpotifyUser
-
 from .models import (
   SpotifyUserData,
   Album,
   Review,
   DailyAlbum
+)
+from .views_aotd import (
+  getChanceOfAotdSelect
 )
 
 import logging
@@ -323,6 +324,8 @@ def getAlbumsStats(request: HttpRequest):
     userData['discord_id'] = user.user.discord_id
     userData['nickname'] = user.user.nickname
     userData['selection_blocked'] = user.selection_blocked_flag
+    chance_view_response = json.loads(getChanceOfAotdSelect(request, user.user.discord_id).content)
+    userData['selection_chance'] = chance_view_response['percentage']
     # Append to List
     userStatsList.append(userData)
   # Add list to out

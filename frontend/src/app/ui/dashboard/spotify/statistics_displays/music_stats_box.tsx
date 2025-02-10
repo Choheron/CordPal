@@ -1,7 +1,7 @@
 'use server'
 
 import UserCard from "@/app/ui/general/userUiItems/user_card";
-import { getAlbumAvgRating, getAlbumsStats, getAllUserReviewStats, getLowestHighestAlbumStats } from "@/app/lib/spotify_utils";
+import { getAlbumAvgRating, getAlbumsStats, getAllUserReviewStats, getChanceOfAotdSelect, getLowestHighestAlbumStats } from "@/app/lib/spotify_utils";
 import AlbumDisplay from "../album_display";
 
 import {Badge} from "@nextui-org/badge";
@@ -26,11 +26,14 @@ export default async function MusicStatsBox(props) {
           <UserCard
             userDiscordID={user['discord_id']}
             customDescription={(
-              <Tooltip 
-                content={`${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.`}
-              >
-                {(user['selection_blocked']) ? (<p>&#9940;</p>) : (<p>&#9989;</p>)}
-              </Tooltip>
+              <div className="flex">
+                <Tooltip 
+                  content={`${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.`}
+                >
+                  {(user['selection_blocked']) ? (<p>&#9940;</p>) : (<p>&#9989;</p>)}
+                </Tooltip>
+                <p>{user['selection_chance'].toFixed(2)}%</p>
+              </div>
             )}
           />
         </td>
