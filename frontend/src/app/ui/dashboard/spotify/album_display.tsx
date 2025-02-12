@@ -5,7 +5,7 @@ import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
 import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
-import { Badge, Button } from "@nextui-org/react";
+import { Badge, Button, Tooltip } from "@nextui-org/react";
 import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";
@@ -59,25 +59,25 @@ export default async function AlbumDisplay(props) {
           <div className="">
             <p>Submitter: </p>
             <div className="ml-2 -mb-1">
-              <Popover placement="left" showArrow={true} className="w-fit">
-                <Badge 
-                  content=" " 
-                  size="sm" 
-                  placement="top-left"
-                  isInvisible={submitter_comment == "No Comment Provided"}
-                  shape="circle"
-                  className="bg-blue-300 -ml-2"
+              <Badge 
+                content=" " 
+                size="sm" 
+                placement="top-left"
+                isInvisible={submitter_comment == "No Comment Provided"}
+                shape="circle"
+                className="bg-blue-300 -ml-2"
+              >
+                <Tooltip 
+                  content={submitter_comment}
+                  showArrow
                 >
-                  <PopoverTrigger>
-                    <div>
-                      <UserCard userDiscordID={submitter} fallbackName={"User Not Found"}/>
-                    </div>
-                  </PopoverTrigger>
-                </Badge>
-                <PopoverContent>
-                  <p>{submitter_comment}</p>
-                </PopoverContent>
-              </Popover>
+                  <UserCard 
+                    userDiscordID={submitter} 
+                    fallbackName={"User Not Found"}
+                    isProfileLink
+                  />
+                </Tooltip>
+              </Badge>
             </div>
             <div className="flex">
               <p>Submission Date:</p>

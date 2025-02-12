@@ -57,7 +57,10 @@ export default async function MusicStatsBox(props) {
         key={`${user['discord_id']}-${user['total_reviews']}`}
         className="flex justify-between w-full my-1"
       >
-        <ReviewStatsUserCard userDiscordID={user['discord_id']} userReviewObj={user}/>
+        <ReviewStatsUserCard 
+          userDiscordID={user['discord_id']} 
+          userReviewObj={user} 
+        />
         <p className="my-auto px-2 py-1 bg-gray-800 rounded-full">
           {user['total_reviews']}
         </p>

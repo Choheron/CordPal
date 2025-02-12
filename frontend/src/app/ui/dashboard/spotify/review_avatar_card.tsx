@@ -71,7 +71,10 @@ export default async function ReviewAvatarCard(props) {
           </div>
         </PopoverTrigger>
         <PopoverContent>
-          <UserCard userDiscordID={review['user_id']} />
+          <UserCard 
+            userDiscordID={review['user_id']} 
+            isProfileLink
+          />
           <div className="flex">
             <p className="mx-2 my-2 align-middle">Rating:</p>
             <StarRating

@@ -52,6 +52,7 @@ export default async function ReviewStatsUserCard(props) {
           customDescription={
             <p>Review Statistics</p>
           }
+          isProfileLink
         />
         <Divider className="mt-1" />
         <div className='flex justify-between w-full'>
