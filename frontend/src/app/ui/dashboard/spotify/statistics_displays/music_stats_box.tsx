@@ -35,6 +35,7 @@ export default async function MusicStatsBox(props) {
                 <p>{user['selection_chance'].toFixed(2)}%</p>
               </div>
             )}
+            isProfileLink
           />
         </td>
         <td>
