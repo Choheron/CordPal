@@ -62,7 +62,7 @@ export default async function Page() {
         </div>
         <Conditional showWhen={(memberStatus)}>
           <div className="flex flex-row px-2 py-2 items-center border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
-            <div className="flex flex-col gap-2 h-full">
+            <div className="flex flex-col gap-1 h-full">
               <p className="mb-2">
                 Other users that have validated:
               </p>
@@ -73,6 +73,7 @@ export default async function Page() {
                       className="mb-2"
                       key={index}
                       userDiscordID={userObj['discord_id']}
+                      isProfileLink
                     />
                   )
                 })

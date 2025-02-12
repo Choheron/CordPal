@@ -64,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middleware.LastSeenMiddleware'
 ]
 # Prometheus Settings
 PROMETHEUS_METRIC_NAMESPACE = "discordsite_prod"

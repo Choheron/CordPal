@@ -171,3 +171,22 @@ def updateUserData(request: HttpRequest):
   User.objects.filter(discord_id=request.session['discord_id']).update(**reqBody)
   # Return success code
   return HttpResponse(200)
+
+
+###
+# Get a specific user's last request timestamp
+###
+def isOnline(request: HttpRequest, user_discord_id: str):
+  logger.info("getLastRequestTimestamp called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("updateUserData called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get user object from discord id
+  user = User.objects.all().get(discord_id=user_discord_id)
+  # Get timestamp and return
+  out = {"online": user.is_online()}
+  # Return success code
+  return JsonResponse(out)

@@ -154,3 +154,31 @@ export async function updateUserData(updatedJSON) {
   // Return json
   return await userDataResponse.json();
 }
+
+
+//
+// Update user info based on passed in json
+// Params:
+// - JSON containing the database keys and the new values
+// RETURN: Boolean for if a user is online or not
+//
+export async function isUserOnline(discord_id) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const userOnlineResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/isOnline/${discord_id}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  // Get online status JSON
+  const userOnlineJson = await userOnlineResponse.json();
+  // Return json
+  return userOnlineJson['online']
+}

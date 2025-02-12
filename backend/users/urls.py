@@ -7,6 +7,7 @@ urlpatterns = [
     path('getUserCount', views.getUserCount),
     path('getUserList', views.getUserList),
     path('updateUserData', views.updateUserData),
+    path('isOnline/<str:user_discord_id>', views.isOnline),
     # Below URL has two variations (one for lack of URL Param)
     path('getUserData/<str:user_discord_id>', views.getUserData),
     path('getUserData', views.getUserData),

@@ -3,6 +3,12 @@ export const boolToString = (input: boolean) => {
   return String(input).toUpperCase();
 };
 
+// Convert boolean value to emoji
+export const boolToEmoji = (input: boolean) => {
+  const bool = String(input).toUpperCase();
+  return ((bool == "TRUE") ? "<p>&#x2705;</p>" : "<p>&#x274C;</p>")
+};
+
 // Capitalize first letter in string
 export function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -19,6 +25,16 @@ export function generateDateFromUTCString(utcString) {
   const timeList = splitList[1].split(":")
 
   return new Date(Date.UTC(dateList[2], parseInt(dateList[0]) - 1, dateList[1], timeList[0], timeList[1], timeList[2]))
+}
+
+// Generate a date from a XXXTXXXZ String
+// 2024-10-17T17:24:32.191Z
+export function formatDateString(string) {
+  const splitList = string.split("T")
+  const dateList = splitList[0].split("-")
+  const timeList = splitList[1].slice(0, -1).split(":")
+
+  return `${dateList[1]}/${dateList[2]}/${dateList[0]}, ${timeList[0]}:${timeList[1]}:${timeList[2]}`
 }
 
 // Convert passed in date object to local timezone

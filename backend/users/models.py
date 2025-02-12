@@ -1,4 +1,10 @@
 from django.db import models
+from django.utils import timezone
+
+from datetime import (
+  datetime,
+  timedelta
+)
 
 # Model for Users
 class User(models.Model):
@@ -26,6 +32,8 @@ class User(models.Model):
   # User Permissions Fields
   is_active = models.BooleanField(default=True)
   is_staff = models.BooleanField(default=False)
+  # Track any and all API calls that come through with this user's session cookie
+  last_request_timestamp = models.DateTimeField(null = True)
 
   def get_avatar_url(self):
     """Construct the avatar URL from Discord's CDN."""
@@ -33,6 +41,9 @@ class User(models.Model):
         return f"https://cdn.discordapp.com/avatars/{self.discord_id}/{self.discord_avatar}.png"
     return f"https://cdn.discordapp.com/embed/avatars/{int(self.discord_discriminator) % 5}.png"
 
+  def is_online(self):
+    """Return true if the last_request_timestamp is within 5 mins ago."""
+    return ((timezone.now() - self.last_request_timestamp) < timedelta(minutes=5))
 
   # toString Method
   def __str__(self):

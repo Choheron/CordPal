@@ -13,7 +13,7 @@ import {Input} from "@nextui-org/react";
 import {Textarea} from "@nextui-org/input";
 import React from "react";
 import { useRouter } from 'next/navigation';
-import { Listbox,  ListboxSection,  ListboxItem} from "@nextui-org/listbox";
+import { Listbox,  ListboxItem} from "@nextui-org/listbox";
 
 import { checkIfAlbumAlreadyExists, checkIfUserCanSubmit, spotifySearch, submitAlbumToBackend } from "@/app/lib/spotify_utils";
 import { Conditional } from "../../conditional";
