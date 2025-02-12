@@ -22,7 +22,7 @@ export default async function Page({
   const online = await isUserOnline(userData['discord_id'])
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24 pt-10">
+    <main className="flex min-h-screen flex-col items-center lg:p-24 pt-10">
       <PageTitle text={`${userData['nickname']}'s Profile`} />
       <Button 
         as={Link}
@@ -40,7 +40,7 @@ export default async function Page({
           alt={`Profile Picture for ${userData['nickname']}`}
         />
         <div className="flex flex-col justify-between font-extralight">
-          <div className="flex flex-col min-w-[350px] w-fit">
+          <div className="flex flex-col min-w-[350px] max-w-[400px] lg:max-w-3/4 w-fit">
             <div className="w-full flex justify-between">
               <p>Nickname:</p>
               <p>{userData['nickname']}</p>
