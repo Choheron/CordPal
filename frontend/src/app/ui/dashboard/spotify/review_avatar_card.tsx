@@ -73,6 +73,7 @@ export default async function ReviewAvatarCard(props) {
         <PopoverContent>
           <UserCard 
             userDiscordID={review['user_id']} 
+            customDescription="View profile"
             isProfileLink
           />
           <div className="flex">

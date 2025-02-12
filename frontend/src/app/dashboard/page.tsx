@@ -74,6 +74,7 @@ export default async function Page() {
                       key={index}
                       userDiscordID={userObj['discord_id']}
                       isProfileLink
+                      onlineStatusDesc
                     />
                   )
                 })

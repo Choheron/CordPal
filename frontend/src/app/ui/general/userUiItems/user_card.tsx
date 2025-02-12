@@ -2,7 +2,7 @@
 
 import {User} from "@nextui-org/user";
 
-import { getUserData, getUserAvatarURL } from "@/app/lib/user_utils";
+import { getUserData, getUserAvatarURL, isUserOnline } from "@/app/lib/user_utils";
 import Link from "next/link";
 import { Button } from "@nextui-org/react";
 
@@ -13,9 +13,23 @@ import { Button } from "@nextui-org/react";
 // - fallbacksrc: (Optional) String image source for if data fetch fails
 // - customDescription: (Optional) HTML Code of a custom description
 // - isProfileLink: Boolean (Optional) [DEFAULT FALSE] - Should the usercard be treated as a link to the user's profile
+// - onlineStatusDesc: Boolean (Optional) [DEFAULT FALSE] - Should the description be a check for a users online status? Will appear before custom desc
 export default async function UserCard(props) {
-  const customDesc = (props.customDescription) ? props.customDescription : null;
+  let customDesc = (props.customDescription) ? props.customDescription : null;
   const profileLink = (props.isProfileLink) ? props.isProfileLink : false;
+  // Overwrite customDesc if user has passed in online status boolean
+  const online = (props.userDiscordID) ? (await isUserOnline(props.userDiscordID)) : null;
+  customDesc = (props.onlineStatusDesc) ? (
+    <>
+      <div className="flex">
+        <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${online ? "bg-green-600" : "bg-red-700"}`}></div>
+        <p>{(online) ? "Online" : "Offline"}</p>
+      </div>
+      <div>
+        {customDesc}
+      </div>
+    </>
+  ) : customDesc;
 
   try {
     var userData = await getUserData(props.userDiscordID)
@@ -26,7 +40,7 @@ export default async function UserCard(props) {
   }
 
   const user_card = () => (
-    <User   
+    <User
       className="w-fit"
       name={userData['nickname']}
       description={(
