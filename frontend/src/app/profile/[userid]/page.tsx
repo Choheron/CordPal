@@ -1,7 +1,7 @@
 import { getUserData, isUserOnline } from "@/app/lib/user_utils";
-import { boolToEmoji, formatDateString } from "@/app/lib/utils";
 import PageTitle from "@/app/ui/dashboard/page_title";
-import ClientTimestamp from "@/app/ui/general/client_timestamp";
+import ProfileUserDisplay from "@/app/ui/profile/profile_user_display";
+import UserAlbumFavDisplay from "@/app/ui/profile/user_album_fav_display";
 import { Button } from "@nextui-org/react";
 import { revalidateTag } from "next/cache";
 import Link from "next/link";
@@ -20,8 +20,6 @@ export default async function Page({
   const userData = await getUserData(userid);
   // Get status of user being online
   const onlineData = await isUserOnline(userData['discord_id'])
-  const online = onlineData['online']
-  const last_seen = onlineData['last_seen']
 
   return (
     <main className="flex min-h-screen flex-col items-center lg:p-24 pt-10">
@@ -35,41 +33,14 @@ export default async function Page({
       >
         <b>Return to Homepage</b>
       </Button> 
-      <div className="w-fit mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-        <img 
-          src={userData['avatar_url']}
-          className='h-[125px] w-[125px] lg:h-[200px] lg:w-[200px] rounded-2xl mx-auto'
-          alt={`Profile Picture for ${userData['nickname']}`}
-        />
-        <div className="flex flex-col justify-between font-extralight">
-          <div className="flex flex-col min-w-[350px] max-w-[400px] lg:max-w-3/4 w-fit">
-            <div className="w-full flex justify-between">
-              <p>Nickname:</p>
-              <p>{userData['nickname']}</p>
-            </div>
-            <div className="w-full flex justify-between font-extralight">
-              <p>Member Since:</p>
-              <ClientTimestamp timestamp={formatDateString(userData['creation_timestamp'])}/>
-            </div>
-            <div className="w-full flex justify-between font-extralight">
-              <p>Last Seen:</p>
-              <ClientTimestamp timestamp={formatDateString(userData['last_request_timestamp'])} full/>
-            </div>
-            <div className="w-full flex justify-between font-extralight">
-              <p>Time Since Last Seen:</p>
-              <p>{last_seen}</p>
-            </div>
-            <div className="w-full flex justify-between font-extralight">
-              <p>Spotify Connected:</p>
-              <div dangerouslySetInnerHTML={{__html: boolToEmoji(userData['spotify_connected'])}}></div>
-            </div>
-          </div>
-          <div className="flex w-full justify-end">
-            <p>{(online) ? "Online" : "Offline"}</p>
-            <div className={`w-[10px] h-[10px] mx-2 my-auto rounded-full border-2 border-black ${online ? "bg-green-600" : "bg-red-700"}`}></div>
-          </div>
-        </div>
-      </div>
+      <ProfileUserDisplay 
+        userData={userData}
+        onlineData={onlineData}
+      />
+      <UserAlbumFavDisplay 
+        userId={userid}
+        spotifyConnected={userData['spotify_connected']}
+      />
     </main>
   );
 }

@@ -4,7 +4,7 @@ import {User} from "@nextui-org/user";
 
 import { getUserData, getUserAvatarURL, isUserOnline } from "@/app/lib/user_utils";
 import Link from "next/link";
-import { Button } from "@nextui-org/react";
+import { Badge, Button } from "@nextui-org/react";
 
 // GUI Representation for a single user
 // Expected Props:
@@ -14,9 +14,11 @@ import { Button } from "@nextui-org/react";
 // - customDescription: (Optional) HTML Code of a custom description
 // - isProfileLink: Boolean (Optional) [DEFAULT FALSE] - Should the usercard be treated as a link to the user's profile
 // - onlineStatusDesc: Boolean (Optional) [DEFAULT FALSE] - Should the description be a check for a users online status? Will appear before custom desc
+// - onlineBadge: Boolean (Optional) [DEFAULT FALSE] - Show a dot in the top left signifying if the user is online or not
 export default async function UserCard(props) {
   let customDesc = (props.customDescription) ? props.customDescription : null;
   const profileLink = (props.isProfileLink) ? props.isProfileLink : false;
+  const showOnlineDot = (props.onlineBadge) ? props.onlineBadge : false;
 
   try {
     var userData = await getUserData(props.userDiscordID)
@@ -41,18 +43,27 @@ export default async function UserCard(props) {
 
 
   const user_card = () => (
-    <User
-      className="w-fit"
-      name={userData['nickname']}
-      description={(
-        customDesc
-      )}
-      avatarProps={{
-        showFallback: true,
-        name: userData['nickname'],
-        src: userAvatarURL
-      }}
-    />
+    <Badge
+      className={`absolute top-1 -left-2 ${onlineObject['online'] ? "bg-green-600" : "bg-red-700"}`}
+      size="md"
+      content=""
+      shape="circle"
+      isInvisible={!showOnlineDot}
+    >
+      <User
+        className="w-fit"
+        name={userData['nickname']}
+        description={(
+          customDesc
+        )}
+        avatarProps={{
+          showFallback: true,
+          name: userData['nickname'],
+          src: userAvatarURL,
+
+        }}
+      />
+    </Badge>
   )
 
   if(profileLink) {

@@ -75,6 +75,7 @@ export default async function ReviewAvatarCard(props) {
             userDiscordID={review['user_id']} 
             customDescription="View profile"
             isProfileLink
+            onlineBadge
           />
           <div className="flex">
             <p className="mx-2 my-2 align-middle">Rating:</p>

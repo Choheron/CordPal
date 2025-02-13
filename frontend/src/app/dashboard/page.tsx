@@ -67,7 +67,7 @@ export default async function Page() {
                 Other users that have validated:
               </p>
               { 
-                userList.map((userObj, index) => {
+                userList.sort((a, b) => (a['last_request_timestamp'] < b['last_request_timestamp']) ? 1 : -1).map((userObj, index) => {
                   return (
                     <UserCard
                       className="mb-2"

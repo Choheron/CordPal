@@ -55,6 +55,7 @@ def getUserList(request: HttpRequest):
     tempDict['discord_id'] = user.discord_id
     tempDict['avatar_url'] = user.get_avatar_url()
     tempDict['nickname'] = user.nickname
+    tempDict['last_request_timestamp'] = user.last_request_timestamp
     # Store tempDict in out json
     out[user.guid] = tempDict
   # Return dict response

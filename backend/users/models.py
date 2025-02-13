@@ -64,7 +64,7 @@ class User(models.Model):
       out += f"{minutes} minutes" if minutes > 1 else f"{minutes} minute"
     else:
       return "Now"
-    return (out + " ago.")
+    return (out + " ago")
 
   # toString Method
   def __str__(self):

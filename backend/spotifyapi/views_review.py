@@ -7,7 +7,8 @@ from .models import (
   Album,
   Review,
   DailyAlbum,
-  SpotifyUserData
+  SpotifyUserData,
+  User
 )
 
 from .utils import (
@@ -184,7 +185,7 @@ def getAllUserReviewStats(request: HttpRequest):
     # If user has not appeared before, create new object for user
     if(review.user.discord_id not in reviewData.keys()):
       reviewData[review.user.discord_id] = {
-        "discord_id": review.user.discord_id, # This is the same as the key, just for ease of reference 
+        "discord_id": review.user.discord_id,
         "total_reviews": 0, 
         "review_score_sum": 0,
         "average_review_score": -1, # This will be calculated at the end
@@ -215,6 +216,58 @@ def getAllUserReviewStats(request: HttpRequest):
     outList.append(reviewData[user])
   # Return data 
   return JsonResponse({'total_reviews': totalReviews, 'review_data': outList})
+
+
+def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
+  logger.info("getUserReviewStats called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getUserReviewStats called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get user discord id
+  userId = None
+  if(user_discord_id):
+    userId = user_discord_id
+  else:
+    userId = request.session.get('discord_id')
+  # Get user object from DB
+  user = User.objects.get(discord_id=userId)
+  # Create dict for data return
+  out = {
+    "discord_id": user.discord_id,
+    "total_reviews": 0.0, 
+    "review_score_sum": 0,
+    "average_review_score": -1, # This will be calculated at the end
+    "lowest_score_given": -1,
+    "lowest_score_album": None,
+    "lowest_score_date": None,
+    "highest_score_given": -1,
+    "highest_score_album": None,
+    "highest_score_date": None,
+  }
+  # Get all reviews left by user
+  user_reviews = Review.objects.filter(user=user)
+  # Iterate reviews and update review data for user based on current review
+  for review in user_reviews:
+    out['total_reviews'] += 1
+    out['review_score_sum'] += review.score
+    if((out['lowest_score_given'] == -1) or (out['lowest_score_given'] > review.score)):
+      out['lowest_score_given'] = review.score
+      out['lowest_score_album'] = review.album.spotify_id
+      out['lowest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
+    if((out['highest_score_given'] == -1) or (out['highest_score_given'] <= review.score)):
+      out['highest_score_given'] = review.score
+      out['highest_score_album'] = review.album.spotify_id
+      out['highest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
+  # Calculate average review score
+  out['average_review_score'] = out['review_score_sum']/out['total_reviews']
+  # Get final data on lowest and highest albums
+  out['highest_album'] = albumToDict(Album.objects.get(spotify_id=out['highest_score_album']))
+  out['lowest_album'] = albumToDict(Album.objects.get(spotify_id=out['lowest_score_album']))
+  # Return out object
+  return JsonResponse(out)
 
 
 ###

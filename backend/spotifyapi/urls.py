@@ -49,6 +49,7 @@ urlpatterns = [
   path('getReviewsForAlbum/<str:album_spotify_id>', views_review.getReviewsForAlbum),
   path('getUserReviewForAlbum/<str:album_spotify_id>', views_review.getUserReviewForAlbum),
   path('getAllUserReviewStats', views_review.getAllUserReviewStats),
+  path('getUserReviewStats/<str:user_discord_id>', views_review.getUserReviewStats),
   path('getSimilarReviewsForRatings', views_review.getSimilarReviewsForRatings),
   ## ============================================================================================================
   ## Album Of the Day Views

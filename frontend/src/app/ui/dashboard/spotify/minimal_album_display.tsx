@@ -10,7 +10,7 @@ import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";
 
-// GUI Display for an Album
+// MINIMAL GUI Display for an Album
 // Expected Props:
 //  - title: String - Title of the Album
 //  - album_img_src: string - Url to access the album image [EXTERNAL]
@@ -23,10 +23,13 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - submission_date: String - (Optional) A String representation of the submission date of the Album
 //  - album_spotify_id: String - (Optional) Album Spotify ID for retrieval of average from database
 //  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
-//  - showAlbumRating: Boolean - (Optional) [DEFAULT TRUE] Show the average user rating for the album
-export default async function AlbumDisplay(props) {
+//  - showAlbumRating: Boolean - (Optional) [DEFAULT FALSE] Show the average user rating for the album
+//  - showSubmitInfo: Boolean - (Optional) [DEFAULT FALSE] Show the submission info for the album
+//  - rating_override: int - (Optional) Override the rating to show a custom one
+export default async function MinimalAlbumDisplay(props) {
   // Configuration Props
-  const showAlbumRating = (props.showAlbumRating == false) ? props.showAlbumRating : true;
+  const showAlbumRating = (props.showAlbumRating) ? props.showAlbumRating : false;
+  const showSubmitInfo = (props.showSubmitInfo) ? props.showSubmitInfo : false;
   // Album props checks
   const title = (props.title) ? props.title : "No Album Title Found";
   const album_url = (props.album_src) ? props.album_src : "https://www.google.com/search?q=sad+face";
@@ -40,25 +43,31 @@ export default async function AlbumDisplay(props) {
   const submission_date: string = (props.submission_date) ? props.submission_date : "Not Provided";
   // Rating props check
   const avg_rating = (props.album_spotify_id && showAlbumRating) ? await getAlbumAvgRating(props.album_spotify_id, false): 0.0;
+  const rating_override = (props.ratingOverride) ? props.ratingOverride : false;
   // Historical props checks
   const historical = (props.historical_date) ? true : false;
   const historical_date = (props.historical_date) ? props.historical_date : "0000-00-00";
 
   return (
-    <div className="w-full min-w-[320px] lg:min-w-[650px] mx-2 lg:mx-1 my-auto flex flex-row">
+    <div className="group h-[125px] w-[125px] lg:h-[300px] lg:w-[300px] mx-2 lg:mx-1 my-auto flex flex-row">
       <img 
         src={album_img_src}
-        className='h-[125px] w-[125px] lg:h-[300px] lg:w-[300px] rounded-2xl mx-auto'
+        className='h-[125px] w-[125px] lg:h-[300px] lg:w-[300px] rounded-2xl mx-auto group-hover:blur-sm duration-700 ease-in-out group-hover:brightness-50'
         alt={`Album Cover for ${title} by ${artist_name}`}
       />
-      <div className="w-full flex flex-col lg:gap-2 pl-2 lg:pl-5 pt-1 lg:pt-2 my-auto">
-        <a href={album_url} target="_noreferrer" className="text-xl lg:text-3xl hover:underline">
+      <Button 
+        as={Link}
+        href={`/dashboard/spotify/album/${props.album_spotify_id}`}
+        radius="lg"
+        className="absolute flex flex-col transition opacity-0 group-hover:opacity-100 ease-in-out h-[125px] w-[125px] lg:h-[300px] lg:w-[300px] lg:gap-2 bg-transparent p-0"
+      >
+        <p className="text-center text-xl lg:text-3xl text-wrap">
           {title}
-        </a>
-        <a href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline italic">
+        </p>
+        <p className="text-center text-sm lg:text-xl italic text-wrap">
           {artist_name}
-        </a>
-        <Conditional showWhen={props.submitter}>
+        </p>
+        <Conditional showWhen={props.submitter && showSubmitInfo}>
           <div className="">
             <p>Submitter: </p>
             <div className="ml-2 -mb-1">
@@ -90,17 +99,19 @@ export default async function AlbumDisplay(props) {
         </Conditional>
         <Conditional showWhen={(avg_rating != 0) && ((avg_rating != null) && showAlbumRating)}>
           <div className="">
-            <div className="flex mb-1">
-              <p>Average User Rating: </p>
-              <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(avg_rating)}`}>
-                <b>{avg_rating.toFixed(2)}</b>
-              </p>
-            </div>
-            <div className="ml-2">
+            <Conditional showWhen={rating_override == null} >
+              <div className="flex mb-1">
+                <p>Average User Rating: </p>
+                <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor((rating_override) ? rating_override : avg_rating)}`}>
+                  <b>{avg_rating.toFixed(2)}</b>
+                </p>
+              </div>
+            </Conditional>
+            <div className="w-fit mx-auto">
               <StarRating 
-                className="text-yellow-400 text-xl"
-                rating={avg_rating} 
-                textSize="text-2xl lg:text-4xl"
+                className="text-yellow-400"
+                rating={(rating_override) ? rating_override : avg_rating} 
+                textSize="text-xl lg:text-3xl"
               />
             </div>
           </div>
@@ -116,7 +127,7 @@ export default async function AlbumDisplay(props) {
             <b>All Reviews</b>
           </Button> 
         </Conditional>
-      </div>
+      </Button>
     </div>
   )
 }
