@@ -246,11 +246,13 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
     "highest_score_given": -1,
     "highest_score_album": None,
     "highest_score_date": None,
+    "score_counts": [] # A list of objects for listing score counts
   }
   # Get all reviews left by user
   user_reviews = Review.objects.filter(user=user)
   # Iterate reviews and update review data for user based on current review
   for review in user_reviews:
+    # Increment sums, counters, and check for highest and lowest rating
     out['total_reviews'] += 1
     out['review_score_sum'] += review.score
     if((out['lowest_score_given'] == -1) or (out['lowest_score_given'] > review.score)):
@@ -261,6 +263,16 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
       out['highest_score_given'] = review.score
       out['highest_score_album'] = review.album.spotify_id
       out['highest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
+  # Convert get list of objects per score
+  index = 0.0
+  tempList = []
+  while(index <= 10):
+    count = user_reviews.filter(score=index).count()
+    if count != 0:
+      tempList.append({ "score": index, "count": count })
+    index += 0.5
+  # Attach score counts to user object
+  out['score_counts'] = tempList
   # Calculate average review score
   out['average_review_score'] = out['review_score_sum']/out['total_reviews']
   # Get final data on lowest and highest albums

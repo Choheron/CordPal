@@ -2,6 +2,7 @@
 
 import { getUserReviewStats } from "@/app/lib/spotify_utils";
 import MinimalAlbumDisplay from "../dashboard/spotify/minimal_album_display";
+import ReviewScoreCountBarChart from "../general/charts/review_score_bar_chart";
 
 // Display user favorite and least favorite albums
 // EXPECTED PROPS:
@@ -75,6 +76,18 @@ export default async function UserAlbumFavDisplay(props) {
             </div>
           </div>
           {/* Review Statistics Display */}
+          <div className="flex flex-col">
+            <p className="w-fit mx-auto">
+              Review Stats
+            </p>
+            <div className="flex">
+              <div className="w-1/2 h-80 -ml-3 mr-3">
+                <ReviewScoreCountBarChart 
+                  data={reviewStats['score_counts']}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       ):(
         <div
