@@ -49,7 +49,7 @@ class User(models.Model):
     """Return String stating how long its been since the user was last seen."""
     time_since = (timezone.now() - self.last_request_timestamp)
     # Calculate minutes and remaining seconds
-    minutes, seconds = divmod(time_since.seconds, 60)
+    minutes, seconds = divmod(int(time_since.total_seconds()), 60)
     # Calculate hours and remaining minutes
     hours, minutes = divmod(minutes, 60)
     # Calculate days and remaining hours
@@ -57,7 +57,7 @@ class User(models.Model):
     # Return Simplified String 
     out = ""
     if(days > 0):
-      out += f"{days} days" if days > 1 else f"{days} day"
+      out += f"{'{:.1f}'.format((days + (hours/24.0)))} days" if (hours > 1) else f"{days} day"
     elif(hours > 0):
       out += f"{hours} hours" if hours > 1 else f"{hours} hour"
     elif(minutes > 5):
