@@ -10,7 +10,7 @@ export default function ReviewScoreCountBarChart(props) {
 
   return (
     <div className="relative w-full h-full">
-      <div className="absolute -left-7 bottom-1/2 -rotate-90 ">
+      <div className="absolute -left-5 bottom-1/2 -rotate-90 -mb-3">
         <p>Scores Given</p>
       </div>
       <ResponsiveContainer width="100%" height="100%">

@@ -3,6 +3,8 @@
 import { getUserReviewStats } from "@/app/lib/spotify_utils";
 import MinimalAlbumDisplay from "../dashboard/spotify/minimal_album_display";
 import ReviewScoreCountBarChart from "../general/charts/review_score_bar_chart";
+import StarRating from "../general/star_rating";
+import { ratingToTailwindBgColor } from "@/app/lib/utils";
 
 // Display user favorite and least favorite albums
 // EXPECTED PROPS:
@@ -77,14 +79,29 @@ export default async function UserAlbumFavDisplay(props) {
           </div>
           {/* Review Statistics Display */}
           <div className="flex flex-col">
-            <p className="w-fit mx-auto">
+            <p className="w-fit mx-auto underline">
               Review Stats
             </p>
             <div className="flex">
-              <div className="w-1/2 h-80 -ml-3 mr-3">
+              <div className="w-1/2 h-80 -ml-5 mr-5">
                 <ReviewScoreCountBarChart 
                   data={reviewStats['score_counts']}
                 />
+              </div>
+              <div className="flex flex-col w-1/2 h-fit">
+                <div>
+                  <div className="flex w-full justify-center">
+                    <p>Average Rating Given: </p>
+                    <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(reviewStats['average_review_score'])}`}>
+                      <b>{reviewStats['average_review_score'].toFixed(2)}</b>
+                    </p>
+                  </div>
+                  <StarRating 
+                    className="text-yellow-400"
+                    rating={reviewStats['average_review_score']} 
+                    textSize="text-xl lg:text-3xl"
+                  />
+                </div>
               </div>
             </div>
           </div>

@@ -268,8 +268,7 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
   tempList = []
   while(index <= 10):
     count = user_reviews.filter(score=index).count()
-    if count != 0:
-      tempList.append({ "score": index, "count": count })
+    tempList.append({ "score": index, "count": count })
     index += 0.5
   # Attach score counts to user object
   out['score_counts'] = tempList

@@ -96,7 +96,7 @@ export default async function AlbumDisplay(props) {
                 <b>{avg_rating.toFixed(2)}</b>
               </p>
             </div>
-            <div className="ml-2">
+            <div className="ml-2 w-fit">
               <StarRating 
                 className="text-yellow-400 text-xl"
                 rating={avg_rating} 

@@ -57,7 +57,7 @@ class User(models.Model):
     # Return Simplified String 
     out = ""
     if(days > 0):
-      out += f"{'{:.1f}'.format((days + (hours/24.0)))} days" if (hours > 1) else f"{days} day"
+      out += f"{'{:.1f}'.format((days + (hours/24.0)))} days" if (hours > 3) else f"{days} day"
     elif(hours > 0):
       out += f"{hours} hours" if hours > 1 else f"{hours} hour"
     elif(minutes > 5):
