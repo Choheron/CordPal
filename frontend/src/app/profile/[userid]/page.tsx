@@ -33,14 +33,16 @@ export default async function Page({
       >
         <b>Return to Homepage</b>
       </Button> 
-      <ProfileUserDisplay 
-        userData={userData}
-        onlineData={onlineData}
-      />
-      <UserAlbumFavDisplay 
-        userId={userid}
-        spotifyConnected={userData['spotify_connected']}
-      />
+      <div className="w-fit">
+        <ProfileUserDisplay 
+          userData={userData}
+          onlineData={onlineData}
+        />
+        <UserAlbumFavDisplay 
+          userId={userid}
+          spotifyConnected={userData['spotify_connected']}
+        />
+      </div>
     </main>
   );
 }

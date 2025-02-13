@@ -27,7 +27,7 @@ export default async function UserAlbumFavDisplay(props) {
   const reviewStats = await getUserReviewStats(userId); 
 
   return (
-    <div className="w-fit mx-auto lg:max-w-[1080px] flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
+    <div className="w-full mx-auto flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
       <p className="w-fit mx-auto text-xl underline">
         Album of the Day Stats
       </p>
