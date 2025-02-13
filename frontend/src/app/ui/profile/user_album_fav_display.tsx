@@ -32,45 +32,49 @@ export default async function UserAlbumFavDisplay(props) {
         Album of the Day Stats
       </p>
       {(spotifyConnected) ? (
-        <div className="flex flex-col lg:flex-row">
-          {/* Favorite Album Display */}
-          <div className="w-fit">
-            <p className="w-fit mx-auto">
-              Favorite AOtD
-            </p>
-            <MinimalAlbumDisplay
-              showAlbumRating={true}
-              ratingOverride={reviewStats['highest_score_given']}
-              title={reviewStats['highest_album']["title"]}
-              album_spotify_id={reviewStats['highest_album']["spotify_id"]}
-              album_img_src={reviewStats['highest_album']["album_img_src"]}
-              album_src={reviewStats['highest_album']["spotify_url"]}
-              artist={{"name": reviewStats['highest_album']["artist"], "href": reviewStats['highest_album']["artist_url"]}}
-              submitter={reviewStats['highest_album']["submitter_id"]}
-              submitter_comment={reviewStats['highest_album']["submitter_comment"]}
-              submission_date={reviewStats['highest_album']["submission_date"]}
-              historical_date={reviewStats['highest_album']['date']}
-            />
+        <div>
+          {/* Favorite and Hated Album Display */}
+          <div className="flex justify-evenly">
+            {/* Favorite Album Display */}
+            <div className="w-fit">
+              <p className="w-fit mx-auto">
+                Favorite AOtD
+              </p>
+              <MinimalAlbumDisplay
+                showAlbumRating={true}
+                ratingOverride={reviewStats['highest_score_given']}
+                title={reviewStats['highest_album']["title"]}
+                album_spotify_id={reviewStats['highest_album']["spotify_id"]}
+                album_img_src={reviewStats['highest_album']["album_img_src"]}
+                album_src={reviewStats['highest_album']["spotify_url"]}
+                artist={{"name": reviewStats['highest_album']["artist"], "href": reviewStats['highest_album']["artist_url"]}}
+                submitter={reviewStats['highest_album']["submitter_id"]}
+                submitter_comment={reviewStats['highest_album']["submitter_comment"]}
+                submission_date={reviewStats['highest_album']["submission_date"]}
+                historical_date={reviewStats['highest_album']['date']}
+              />
+            </div>
+            {/* Hated Album Display */}
+            <div className="w-fit">
+              <p className="w-fit mx-auto">
+                Hated AOtD
+              </p>
+              <MinimalAlbumDisplay
+                showAlbumRating={true}
+                ratingOverride={reviewStats['lowest_score_given']}
+                title={reviewStats['lowest_album']["title"]}
+                album_spotify_id={reviewStats['lowest_album']["spotify_id"]}
+                album_img_src={reviewStats['lowest_album']["album_img_src"]}
+                album_src={reviewStats['lowest_album']["spotify_url"]}
+                artist={{"name": reviewStats['lowest_album']["artist"], "href": reviewStats['lowest_album']["artist_url"]}}
+                submitter={reviewStats['lowest_album']["submitter_id"]}
+                submitter_comment={reviewStats['lowest_album']["submitter_comment"]}
+                submission_date={reviewStats['lowest_album']["submission_date"]}
+                historical_date={reviewStats['lowest_album']['date']}
+              />
+            </div>
           </div>
-          {/* Hated Album Display */}
-          <div className="w-fit">
-            <p className="w-fit mx-auto">
-              Hated AOtD
-            </p>
-            <MinimalAlbumDisplay
-              showAlbumRating={true}
-              ratingOverride={reviewStats['lowest_score_given']}
-              title={reviewStats['lowest_album']["title"]}
-              album_spotify_id={reviewStats['lowest_album']["spotify_id"]}
-              album_img_src={reviewStats['lowest_album']["album_img_src"]}
-              album_src={reviewStats['lowest_album']["spotify_url"]}
-              artist={{"name": reviewStats['lowest_album']["artist"], "href": reviewStats['lowest_album']["artist_url"]}}
-              submitter={reviewStats['lowest_album']["submitter_id"]}
-              submitter_comment={reviewStats['lowest_album']["submitter_comment"]}
-              submission_date={reviewStats['lowest_album']["submission_date"]}
-              historical_date={reviewStats['lowest_album']['date']}
-            />
-          </div>
+          {/* Review Statistics Display */}
         </div>
       ):(
         <div
