@@ -44,6 +44,27 @@ class User(models.Model):
   def is_online(self):
     """Return true if the last_request_timestamp is within 5 mins ago."""
     return ((timezone.now() - self.last_request_timestamp) < timedelta(minutes=5))
+  
+  def last_seen(self):
+    """Return String stating how long its been since the user was last seen."""
+    time_since = (timezone.now() - self.last_request_timestamp)
+    # Calculate minutes and remaining seconds
+    minutes, seconds = divmod(time_since.seconds, 60)
+    # Calculate hours and remaining minutes
+    hours, minutes = divmod(minutes, 60)
+    # Calculate days and remaining hours
+    days, hours = divmod(hours, 24)
+    # Return Simplified String 
+    out = ""
+    if(days > 0):
+      out += f"{days} days" if days > 1 else f"{days} day"
+    elif(hours > 0):
+      out += f"{hours} hours" if hours > 1 else f"{hours} hour"
+    elif(minutes > 5):
+      out += f"{minutes} minutes" if minutes > 1 else f"{minutes} minute"
+    else:
+      return "Now"
+    return (out + " ago.")
 
   # toString Method
   def __str__(self):

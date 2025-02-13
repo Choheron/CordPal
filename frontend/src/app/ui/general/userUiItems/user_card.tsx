@@ -21,7 +21,7 @@ export default async function UserCard(props) {
   try {
     var userData = await getUserData(props.userDiscordID)
     var userAvatarURL = await getUserAvatarURL(props.userDiscordID)
-    var online = await isUserOnline(props.userDiscordID)
+    var onlineObject = await isUserOnline(props.userDiscordID)
   } catch {
     userData = {"nickname": props.fallbackName}
     userAvatarURL = props.fallbackSrc
@@ -30,8 +30,8 @@ export default async function UserCard(props) {
   // Overwrite customDesc if user has passed in online status boolean
   customDesc = (props.onlineStatusDesc) ? (
     <div className="flex">
-      <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${online ? "bg-green-600" : "bg-red-700"}`}></div>
-      <p>{(online) ? "Online" : "Offline"}</p>
+      <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${onlineObject['online'] ? "bg-green-600" : "bg-red-700"}`}></div>
+      <p>{(onlineObject['online']) ? "Online" : `Seen ${onlineObject['last_seen']}`}</p>
     </div>
   ) : (
     <div>

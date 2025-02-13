@@ -19,7 +19,9 @@ export default async function Page({
   // Retreive data from backend
   const userData = await getUserData(userid);
   // Get status of user being online
-  const online = await isUserOnline(userData['discord_id'])
+  const onlineData = await isUserOnline(userData['discord_id'])
+  const online = onlineData['online']
+  const last_seen = onlineData['last_seen']
 
   return (
     <main className="flex min-h-screen flex-col items-center lg:p-24 pt-10">
@@ -52,6 +54,10 @@ export default async function Page({
             <div className="w-full flex justify-between font-extralight">
               <p>Last Seen:</p>
               <ClientTimestamp timestamp={formatDateString(userData['last_request_timestamp'])} full/>
+            </div>
+            <div className="w-full flex justify-between font-extralight">
+              <p>Time Since Last Seen:</p>
+              <p>{last_seen}</p>
             </div>
             <div className="w-full flex justify-between font-extralight">
               <p>Spotify Connected:</p>

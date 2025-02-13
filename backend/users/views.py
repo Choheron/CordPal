@@ -1,4 +1,5 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.utils import timezone
 
 from .models import User
 
@@ -188,5 +189,8 @@ def isOnline(request: HttpRequest, user_discord_id: str):
   user = User.objects.all().get(discord_id=user_discord_id)
   # Get timestamp and return
   out = {"online": user.is_online()}
+  # Return additional information stating how longs its been since the user has been seen
+  out['last_seen'] = user.last_seen()
+  
   # Return success code
   return JsonResponse(out)

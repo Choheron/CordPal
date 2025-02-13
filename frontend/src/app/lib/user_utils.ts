@@ -180,5 +180,5 @@ export async function isUserOnline(discord_id) {
   // Get online status JSON
   const userOnlineJson = await userOnlineResponse.json();
   // Return json
-  return userOnlineJson['online']
+  return userOnlineJson
 }
