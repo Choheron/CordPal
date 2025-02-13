@@ -17,6 +17,10 @@ export default async function MusicStatsBox(props) {
   const albumLowHighStatsJson = await getLowestHighestAlbumStats();
   const userReviewStatsJson = await getAllUserReviewStats();
 
+  const test = albumStatsJson['user_objs'].map((user, index) => {
+    return {name: user['nickname'], value: user['submission_count']}
+  })
+
   const albumUserStatsTable = albumStatsJson['user_objs'].sort((a, b) => a['submission_count'] < b['submission_count'] ? 1 : -1).map((user, index) => {
     return (
       <tr 
@@ -72,7 +76,7 @@ export default async function MusicStatsBox(props) {
   return (
     <div className="w-fill min-w-[340px] mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row gap-10 backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
       {/* Album Submission Stats */}
-      <div className='min-w-[320px] mx-auto flex flex-col'>
+      <div className='min-w-[320px] w-400 mx-auto flex flex-col'>
         <p className="mx-auto text-xl underline mb-1">
           Album Submission Stats: 
         </p>
