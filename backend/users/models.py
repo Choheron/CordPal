@@ -42,8 +42,8 @@ class User(models.Model):
     return f"https://cdn.discordapp.com/embed/avatars/{int(self.discord_discriminator) % 5}.png"
 
   def is_online(self):
-    """Return true if the last_request_timestamp is within 5 mins ago."""
-    return ((timezone.now() - self.last_request_timestamp) < timedelta(minutes=5))
+    """Return true if the last_request_timestamp is within 1 min ago."""
+    return ((timezone.now() - self.last_request_timestamp) < timedelta(minutes=1))
   
   def last_seen(self):
     """Return String stating how long its been since the user was last seen."""
@@ -60,7 +60,7 @@ class User(models.Model):
       out += f"{'{:.1f}'.format((days + (hours/24.0)))} days" if (hours > 3) else f"{days} day"
     elif(hours > 0):
       out += f"{hours} hours" if hours > 1 else f"{hours} hour"
-    elif(minutes > 5):
+    elif(minutes > 1):
       out += f"{minutes} minutes" if minutes > 1 else f"{minutes} minute"
     else:
       return "Now"

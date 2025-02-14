@@ -7,6 +7,7 @@ import { boolToString } from "../lib/utils";
 import PageTitle from "../ui/dashboard/page_title";
 import { Divider } from "@nextui-org/react";
 import UserCard from "../ui/general/userUiItems/user_card";
+import LiveOnlineUsersBox from "../ui/dashboard/live_online_users_box";
 
 export default async function Page() {
   const discordUserData = await getDiscordUserData();
@@ -61,26 +62,7 @@ export default async function Page() {
           </div>
         </div>
         <Conditional showWhen={(memberStatus)}>
-          <div className="flex flex-row px-2 py-2 items-center border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
-            <div className="flex flex-col gap-1 h-full">
-              <p className="mb-2">
-                Other users that have validated:
-              </p>
-              { 
-                userList.sort((a, b) => (a['last_request_timestamp'] < b['last_request_timestamp']) ? 1 : -1).map((userObj, index) => {
-                  return (
-                    <UserCard
-                      className="mb-2"
-                      key={index}
-                      userDiscordID={userObj['discord_id']}
-                      isProfileLink
-                      onlineStatusDesc
-                    />
-                  )
-                })
-              }
-            </div>
-          </div>
+          <LiveOnlineUsersBox userList={userList} />
         </Conditional>
       </div>
       <Conditional showWhen={!(memberStatus)}>
