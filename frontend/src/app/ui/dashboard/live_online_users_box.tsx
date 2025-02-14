@@ -57,42 +57,45 @@ export default function OnlineUsersBox(props) {
         <p className="mb-2 mx-auto">
           Online Status of Users:
         </p>
-        { (loading) ? (
-          <Spinner className="h-full" />
-        ):(
-            userList.sort((a, b) => (a['last_request_timestamp'] < b['last_request_timestamp']) ? 1 : -1).map((userObj, index) => {
-              const discord_id = userObj['discord_id']
-              return (
-                <a 
-                  href={`/profile/${props.userDiscordID}`}
-                >
-                  <Badge
-                    className={`absolute top-1 -left-2 ${getStatusColor(onlineObject[discord_id])}`}
-                    size="md"
-                    content=""
-                    shape="circle"
+        <div className="flex flex-col h-full w-full">
+          { (loading) ? (
+            <Spinner className="w-full h-full" />
+          ):(
+              userList.sort((a, b) => (a['last_request_timestamp'] < b['last_request_timestamp']) ? 1 : -1).map((userObj, index) => {
+                const discord_id = userObj['discord_id']
+                return (
+                  <a 
+                    href={`/profile/${props.userDiscordID}`}
+                    key={index}
                   >
-                    <User
-                      className="w-fit"
-                      name={userObj['nickname']}
-                      description={(
-                        <div className="flex">
-                          <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${getStatusColor(onlineObject[discord_id])}`}></div>
-                          <p>{(onlineObject[discord_id] && onlineObject[discord_id]['online']) ? "Online" : `Seen ${(onlineObject[discord_id]) ? onlineObject[discord_id]['last_seen'] : "--"}`}</p>
-                        </div>
-                      )}
-                      avatarProps={{
-                        showFallback: true,
-                        name: userObj['nickname'],
-                        src: userObj['avatar_url']
-                      }}
-                    />
-                  </Badge>
-                </a>
-              )
-            })
-          )
-        }
+                    <Badge
+                      className={`absolute top-1 -left-2 ${getStatusColor(onlineObject[discord_id])}`}
+                      size="md"
+                      content=""
+                      shape="circle"
+                    >
+                      <User
+                        className="w-fit"
+                        name={userObj['nickname']}
+                        description={(
+                          <div className="flex">
+                            <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${getStatusColor(onlineObject[discord_id])}`}></div>
+                            <p>{(onlineObject[discord_id] && onlineObject[discord_id]['online']) ? "Online" : `Seen ${(onlineObject[discord_id]) ? onlineObject[discord_id]['last_seen'] : "--"}`}</p>
+                          </div>
+                        )}
+                        avatarProps={{
+                          showFallback: true,
+                          name: userObj['nickname'],
+                          src: userObj['avatar_url']
+                        }}
+                      />
+                    </Badge>
+                  </a>
+                )
+              })
+            )
+          }
+        </div>
         <p className="mb-2 mx-auto text-xs italic text-gray-500">
           Updates every {props.pollingInterval} seconds
         </p>
