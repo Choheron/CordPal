@@ -56,6 +56,7 @@ export default function ReviewCountChartBox(props) {
         <ReviewScoreCountBarChart
           data={reviewStats['score_counts']}
           dataCallback={setScore}
+          defaultIndex={score*2}
         />
       </div>
       <div className="w-1/2 rounded-2xl bg-black/30 border border-neutral-800 -pb-10">

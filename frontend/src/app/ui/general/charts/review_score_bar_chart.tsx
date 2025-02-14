@@ -7,8 +7,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label, Res
 // Expected Props:
 // - data: Object containing score counts
 // - dataCallback: Function - Callback function to set data
+// - defaultIndex: Int - Default selected int (will default to 5)
 export default function ReviewScoreCountBarChart(props) {
-  const [currIndex, setCurrIndex] = useState(5)
+  const [currIndex, setCurrIndex] = useState(props.defaultIndex)
 
   const handleClick = (data, index) => {
     setCurrIndex(index)
