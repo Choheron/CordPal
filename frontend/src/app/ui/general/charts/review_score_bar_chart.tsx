@@ -25,7 +25,12 @@ export default function ReviewScoreCountBarChart(props) {
             type="category" 
             reversed
           />
-          <XAxis dataKey={"count"} hide />
+          <XAxis 
+            dataKey={"count"} 
+            type="number"
+            domain={["dataMin", "dataMax + 1"]}
+            hide
+          />
           <Bar dataKey="count" fill="#8884d8" label={{ position: 'right' }} />
         </BarChart>
       </ResponsiveContainer>
