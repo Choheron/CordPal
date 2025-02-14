@@ -227,12 +227,16 @@ def getAllOnlineData(request: HttpRequest):
 # Heartbeat post request to determine online status
 ###
 def heartbeat(request: HttpRequest):
-  logger.info("Heartbeat received...")
   # Make sure request is a POST request
   if(request.method != "POST"):
     logger.warning("Heartbeat called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  try:
+    user = User.objects.get(discord_id=request.session['discord_id'])
+    logger.info(f"Heartbeat received from {user.nickname}...")
+  except:
+    logger.warning(f"HEARTBEAT RECIEVED FROM UNKNOWN USER!")
   # Yeah
   return HttpResponse(200)
