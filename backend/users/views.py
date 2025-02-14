@@ -216,6 +216,7 @@ def getAllOnlineData(request: HttpRequest):
     temp = {}
     temp["online"] = user.is_online()
     temp['last_seen'] = user.last_seen()
+    temp['last_request_timestamp'] = user.last_request_timestamp
     out[user.discord_id] = temp
   # Return users and timestamp
   out['timestamp'] = timezone.now()

@@ -1,20 +1,18 @@
 "use client"
 
 import { getAllOnlineData, getUserList } from "@/app/lib/user_utils";
-import ClientTimestamp from "../general/client_timestamp"
-import UserCard from "../general/userUiItems/user_card"
 import { useEffect, useState } from "react";
 import { Badge, Spinner, User } from "@nextui-org/react";
-import { formatDateString } from "@/app/lib/utils";
 
 // List of online users that is updated every 5 seconds
 // Expected Props:
 // - userList: List of Users
+// - onlineData: Object of online statuses
 // - pollingInterval: Number - Number (in seconds) between poll calls
 export default function OnlineUsersBox(props) {
-  const [userList, setUserList] = useState<any>([])
-  const [onlineObject, setOnlineObject] = useState({})
-  const [loading, setLoading] = useState(true)
+  const [userList, setUserList] = useState<any>((props.userList) ? props.userList : [])
+  const [onlineObject, setOnlineObject] = useState((props.onlineData) ? props.onlineData : {})
+  const [loading, setLoading] = useState((props.userList && props.onlineData) ? false : true)
   
   // Get user data
   const getUserData = async() => {
@@ -61,11 +59,11 @@ export default function OnlineUsersBox(props) {
           { (loading) ? (
             <Spinner className="w-full h-full" />
           ):(
-              userList.sort((a, b) => (a['last_request_timestamp'] < b['last_request_timestamp']) ? 1 : -1).map((userObj, index) => {
+              userList.sort((a, b) => (onlineObject[a['discord_id']]['last_request_timestamp'] < onlineObject[b['discord_id']]['last_request_timestamp']) ? 1 : -1).map((userObj, index) => {
                 const discord_id = userObj['discord_id']
                 return (
                   <a 
-                    href={`/profile/${props.userDiscordID}`}
+                    href={`/profile/${discord_id}`}
                     key={index}
                   >
                     <Badge
