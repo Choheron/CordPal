@@ -17,5 +17,7 @@ urlpatterns = [
     path('getUserAvatarURL', views.getUserAvatarURL),
     # Below URL has two variations (one for lack of URL Param)
     path('isUserAdmin/<str:user_discord_id>', views.isUserAdmin),
-    path('isUserAdmin', views.isUserAdmin)
+    path('isUserAdmin', views.isUserAdmin),
+    # Heartbeat url to determine online status
+    path('heartbeat', views.heartbeat),
 ]

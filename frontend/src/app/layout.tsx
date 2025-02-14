@@ -6,6 +6,7 @@ import Image from "next/image";
 
 import ClientSnowfall from "./ui/general/holiday/snowfall";
 import { isDecember } from "./lib/utils";
+import Heartbeat from "./ui/heartbeat";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,9 +20,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Render App
   return (
     <html lang="en" className='dark'>
       <body className={`${inter.className} dark`}>
+        {/* Placeholder Component to implement heartbeat */}
+        <Heartbeat />
         {/* Only display if it is December (Holiday Display) */}
         {(isDecember()) ? 
           (

@@ -221,3 +221,18 @@ def getAllOnlineData(request: HttpRequest):
   # Return users and timestamp
   out['timestamp'] = timezone.now()
   return JsonResponse(out)
+
+
+###
+# Heartbeat post request to determine online status
+###
+def heartbeat(request: HttpRequest):
+  logger.info("Heartbeat received...")
+  # Make sure request is a POST request
+  if(request.method != "POST"):
+    logger.warning("Heartbeat called with a non-POST method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Yeah
+  return HttpResponse(200)

@@ -206,3 +206,24 @@ export async function isUserOnline(discord_id) {
   // Return json
   return userOnlineJson
 }
+
+
+//
+// Make POST request to backend to implement heartbeat online status
+//
+export async function heartbeat() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const userOnlineResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/heartbeat`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+}
