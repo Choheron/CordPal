@@ -52,6 +52,30 @@ export async function getUserList() {
   return Object.values(userListJSON);
 }
 
+
+//
+// Retrieve an object containing all users online statuses
+// - RETURN: Json containing user online statuses
+export async function getAllOnlineData() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const userOnlineResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getAllOnlineData`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const userOnlineJson = await userOnlineResponse.json()
+  return userOnlineJson;
+}
+
+
 //
 // Retrieve discord user Avatar URL
 // Params:

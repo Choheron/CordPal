@@ -179,10 +179,10 @@ def updateUserData(request: HttpRequest):
 # Get a specific user's last request timestamp
 ###
 def isOnline(request: HttpRequest, user_discord_id: str):
-  logger.info("getLastRequestTimestamp called...")
+  logger.info("isOnline called...")
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("updateUserData called with a non-GET method, returning 405.")
+    logger.warning("isOnline called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -194,4 +194,29 @@ def isOnline(request: HttpRequest, user_discord_id: str):
   out['last_seen'] = user.last_seen()
   
   # Return success code
+  return JsonResponse(out)
+
+
+###
+# Get online status of ALL USERS on the site
+###
+def getAllOnlineData(request: HttpRequest):
+  logger.info("getAllOnlineData called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getAllOnlineData called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get all users
+  users = User.objects.all()
+  # Iterate through and build return object
+  out = {}
+  for user in users:
+    temp = {}
+    temp["online"] = user.is_online()
+    temp['last_seen'] = user.last_seen()
+    out[user.discord_id] = temp
+  # Return users and timestamp
+  out['timestamp'] = timezone.now()
   return JsonResponse(out)

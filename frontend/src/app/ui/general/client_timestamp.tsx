@@ -1,6 +1,6 @@
 'use client'
 
-import { generateDateFromUTCString, zeroPad } from "@/app/lib/utils";
+import { generateDateFromUTCString, zeroPad, formatDateString } from "@/app/lib/utils";
 
 // Display a time in user timezone
 // Expected Props:
@@ -9,7 +9,12 @@ import { generateDateFromUTCString, zeroPad } from "@/app/lib/utils";
 //  - full: Boolean - return full timestamp or shortened one
 export default function ClientTimestamp(props) {
   const full = (props.full) ? props.full : false;
-  const utcDate = generateDateFromUTCString(props.timestamp)
+  var utcDate = new Date()
+  try {
+    utcDate = generateDateFromUTCString(props.timestamp)
+  } catch {
+    utcDate = generateDateFromUTCString(formatDateString(props.timestamp))
+  }
   const adjustedTimestamp = convertToLocalTZString(utcDate, full)
   
   // Convert passed in date object to local timezone

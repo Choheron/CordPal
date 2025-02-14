@@ -2,18 +2,16 @@
 
 import { Conditional } from "../ui/dashboard/conditional";
 import { isMember, getDiscordUserData } from "../lib/discord_utils";
-import { getUserData, getUserList } from "../lib/user_utils";
+import { getUserData } from "../lib/user_utils";
 import { boolToString } from "../lib/utils";
 import PageTitle from "../ui/dashboard/page_title";
 import { Divider } from "@nextui-org/react";
-import UserCard from "../ui/general/userUiItems/user_card";
 import LiveOnlineUsersBox from "../ui/dashboard/live_online_users_box";
 
 export default async function Page() {
   const discordUserData = await getDiscordUserData();
   const userData = await getUserData();
   const memberStatus = await isMember();
-  const userList: any = await getUserList();
   
   return (
     <main className="flex min-h-screen flex-col items-center p-24 pt-10">
@@ -62,7 +60,9 @@ export default async function Page() {
           </div>
         </div>
         <Conditional showWhen={(memberStatus)}>
-          <LiveOnlineUsersBox userList={userList} />
+          <LiveOnlineUsersBox 
+            pollingInterval={10}
+          />
         </Conditional>
       </div>
       <Conditional showWhen={!(memberStatus)}>
