@@ -8,3 +8,5 @@ pytz
 # DB Connection Libraries
 psycopg
 psycopg2-binary
+# Prometheus
+prometheus_client
