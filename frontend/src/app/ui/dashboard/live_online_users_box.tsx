@@ -66,28 +66,21 @@ export default function OnlineUsersBox(props) {
                     href={`/profile/${discord_id}`}
                     key={index}
                   >
-                    <Badge
-                      className={`absolute top-1 -left-2 ${getStatusColor(onlineObject[discord_id])}`}
-                      size="md"
-                      content=""
-                      shape="circle"
-                    >
-                      <User
-                        className="w-fit"
-                        name={userObj['nickname']}
-                        description={(
-                          <div className="flex">
-                            <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${getStatusColor(onlineObject[discord_id])}`}></div>
-                            <p>{(onlineObject[discord_id] && onlineObject[discord_id]['online']) ? "Online" : `Seen ${(onlineObject[discord_id]) ? onlineObject[discord_id]['last_seen'] : "--"}`}</p>
-                          </div>
-                        )}
-                        avatarProps={{
-                          showFallback: true,
-                          name: userObj['nickname'],
-                          src: userObj['avatar_url']
-                        }}
-                      />
-                    </Badge>
+                    <User
+                      className="w-fit"
+                      name={userObj['nickname']}
+                      description={(
+                        <div className="flex">
+                          <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${getStatusColor(onlineObject[discord_id])}`}></div>
+                          <p>{(onlineObject[discord_id] && onlineObject[discord_id]['online']) ? "Online" : `Seen ${(onlineObject[discord_id]) ? onlineObject[discord_id]['last_seen'] : "--"}`}</p>
+                        </div>
+                      )}
+                      avatarProps={{
+                        showFallback: true,
+                        name: userObj['nickname'],
+                        src: userObj['avatar_url']
+                      }}
+                    />
                   </a>
                 )
               })
