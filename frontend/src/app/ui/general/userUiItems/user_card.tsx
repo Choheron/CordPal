@@ -27,6 +27,7 @@ export default async function UserCard(props) {
   } catch {
     userData = {"nickname": props.fallbackName}
     userAvatarURL = props.fallbackSrc
+    onlineObject = {online: null}
   }
 
   // Overwrite customDesc if user has passed in online status boolean
