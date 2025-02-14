@@ -526,6 +526,31 @@ export async function getUserReviewStats(userId: string = "") {
 
 
 //
+// Get all reviews left by a user
+// - RETURN: Json object
+//
+export async function getAllUserReviews(userId: string = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Determine url tail
+  const urlTail = `${(userId == "") ? "" : `/${userId}`}`
+  // Validate that user has connected spotify
+  console.log(`getAllUserReviews: Sending request to backend '/spotifyapi/getAllUserReviews${urlTail}'`)
+  const allUserReviewsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAllUserReviews${urlTail}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: ['reviews'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const allUserReviewsJson = await allUserReviewsResponse.json()
+  return allUserReviewsJson;
+}
+
+
+//
 // Tenor Integration to get GIF Data from Tenor based on passed in URL or Gif ID
 // Params:
 //   - tenor_url: String - Full tenor url

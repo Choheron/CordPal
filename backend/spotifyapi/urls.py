@@ -51,6 +51,9 @@ urlpatterns = [
   path('getAllUserReviewStats', views_review.getAllUserReviewStats),
   path('getUserReviewStats/<str:user_discord_id>', views_review.getUserReviewStats),
   path('getSimilarReviewsForRatings', views_review.getSimilarReviewsForRatings),
+  # Below URL has two variations, for lack of userID provided
+  path('getAllUserReviews/<str:user_discord_id>', views_review.getAllUserReviews),
+  path('getAllUserReviews', views_review.getAllUserReviews),
   ## ============================================================================================================
   ## Album Of the Day Views
   ## ============================================================================================================

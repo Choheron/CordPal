@@ -1,12 +1,21 @@
 "use client"
 
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label, ResponsiveContainer } from 'recharts';
+import React, { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label, ResponsiveContainer, Cell } from 'recharts';
 
 // Display a bar chart
 // Expected Props:
 // - data: Object containing score counts
+// - dataCallback: Function - Callback function to set data
 export default function ReviewScoreCountBarChart(props) {
+  const [currIndex, setCurrIndex] = useState(5)
+
+  const handleClick = (data, index) => {
+    setCurrIndex(index)
+    if(props.dataCallback) {
+      props.dataCallback(data['score'])
+    }
+  };
 
   return (
     <div className="relative w-full h-full">
@@ -31,7 +40,15 @@ export default function ReviewScoreCountBarChart(props) {
             domain={["dataMin", "dataMax + 1"]}
             hide
           />
-          <Bar dataKey="count" fill="#8884d8" label={{ position: 'right' }} />
+          <Bar 
+            dataKey="count" 
+            label={{ position: 'right' }}
+            onClick={handleClick}
+          >
+            {props.data.map((entry, index) => (
+              <Cell cursor="pointer" fill={index === currIndex ? '#82ca9d' : '#8884d8'} key={`cell-${index}`} />
+             ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>

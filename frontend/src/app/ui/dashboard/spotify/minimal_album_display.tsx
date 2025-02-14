@@ -1,5 +1,3 @@
-'use server'
-
 import { Conditional } from "../conditional"
 import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
 import UserCard from '../../general/userUiItems/user_card';

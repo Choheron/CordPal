@@ -311,7 +311,6 @@ def getSimilarReviewsForRatings(request: HttpRequest):
     res.status_code = 405
     return res
   # Retrieve user from session cookie
-  print("Getting user")
   user = getSpotifyUser(request.session.get('discord_id'))
   # Iterate through possible ratings and build return object
   out = {}
@@ -326,6 +325,43 @@ def getSimilarReviewsForRatings(request: HttpRequest):
     out[f"{score + 0.0}"] = albums_for_score
     # Increment score
     score += 0.5
+  # Attach timestamp
+  out['metadata'] = {}
+  out['metadata']['timestamp'] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+  # Return data 
+  return JsonResponse(out)
+
+
+###
+# Get ALL Reviews made by a user
+###
+def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
+  logger.info("getAllUserReviews called...")
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getAllUserReviews called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Retrieve user from session cookie
+  user = getSpotifyUser(request.session.get('discord_id') if (user_discord_id == None) else user_discord_id)
+  # Get all reviews
+  reviewsObj = Review.objects.filter(user=user)
+  # Declare outlist and populate
+  out = {}
+  out['reviews'] = []
+  for review in reviewsObj:
+    outObj = {}
+    outObj['user_id'] = review.user.discord_id
+    outObj['album_id'] = review.album.spotify_id
+    outObj['album'] = albumToDict(review.album)
+    outObj['score'] = review.score
+    outObj['comment'] = review.review_text
+    outObj['review_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
+    outObj['last_upated'] = review.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
+    outObj['first_listen'] = review.first_listen
+    # Append to list
+    out['reviews'].append(outObj)
   # Attach timestamp
   out['metadata'] = {}
   out['metadata']['timestamp'] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")

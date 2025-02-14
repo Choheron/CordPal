@@ -1,10 +1,11 @@
 'use server'
 
-import { getUserReviewStats } from "@/app/lib/spotify_utils";
+import { getAllUserReviews, getUserReviewStats } from "@/app/lib/spotify_utils";
 import MinimalAlbumDisplay from "../dashboard/spotify/minimal_album_display";
-import ReviewScoreCountBarChart from "../general/charts/review_score_bar_chart";
 import StarRating from "../general/star_rating";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
+import ReviewScoreCountBarChart from "../general/charts/review_score_bar_chart";
+import ReviewCountChartBox from "./review_count_chart_box";
 
 // Display user favorite and least favorite albums
 // EXPECTED PROPS:
@@ -28,6 +29,8 @@ export default async function UserAlbumFavDisplay(props) {
   //   highest_score_date: '12/05/2024, 18:20:59'
   // }
   const reviewStats = await getUserReviewStats(userId); 
+  // Get a object of all user reviews for this profile
+  const userReviewsObj = await getAllUserReviews(userId);
 
   return (
     <div className="w-full mx-auto flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
@@ -82,27 +85,24 @@ export default async function UserAlbumFavDisplay(props) {
             <p className="w-fit mx-auto underline">
               Review Stats
             </p>
-            <div className="flex">
-              <div className="w-1/2 h-80 -ml-5 mr-5">
-                <ReviewScoreCountBarChart 
-                  data={reviewStats['score_counts']}
+            <div className="flex flex-col">
+              <div className="mb-2">
+                <div className="flex w-full justify-center">
+                  <p>Average Rating Given: </p>
+                  <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(reviewStats['average_review_score'])}`}>
+                    <b>{reviewStats['average_review_score'].toFixed(2)}</b>
+                  </p>
+                </div>
+                <StarRating 
+                  className="text-yellow-400"
+                  rating={reviewStats['average_review_score']} 
+                  textSize="text-xl lg:text-3xl"
                 />
               </div>
-              <div className="flex flex-col w-1/2 h-fit">
-                <div>
-                  <div className="flex w-full justify-center">
-                    <p>Average Rating Given: </p>
-                    <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(reviewStats['average_review_score'])}`}>
-                      <b>{reviewStats['average_review_score'].toFixed(2)}</b>
-                    </p>
-                  </div>
-                  <StarRating 
-                    className="text-yellow-400"
-                    rating={reviewStats['average_review_score']} 
-                    textSize="text-xl lg:text-3xl"
-                  />
-                </div>
-              </div>
+              <ReviewCountChartBox 
+                reviewStats={reviewStats}
+                reviewsObj={userReviewsObj}
+              />
             </div>
           </div>
         </div>
