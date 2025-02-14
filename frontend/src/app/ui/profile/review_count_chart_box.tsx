@@ -21,7 +21,10 @@ export default function ReviewCountChartBox(props) {
       const album = review['album']
 
       return (
-        <div className="group relative flex h-[135px] w-[135px] m-1">
+        <div 
+          className="group relative flex h-[135px] w-[135px] m-1"
+          key={index}  
+        >
           <img 
             src={album['album_img_src']}
             className='h-full w-full rounded-2xl mx-auto group-hover:blur-sm duration-700 ease-in-out group-hover:brightness-50'
