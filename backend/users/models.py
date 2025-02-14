@@ -63,7 +63,7 @@ class User(models.Model):
     elif(minutes > 1):
       out += f"{minutes} minutes" if minutes > 1 else f"{minutes} minute"
     else:
-      return "Now"
+      return "Just Now"
     return (out + " ago")
 
   # toString Method
