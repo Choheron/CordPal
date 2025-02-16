@@ -34,7 +34,6 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 # Get All Reviews for a specific album. Returns a spotify album id and date
 ###
 def getAlbumOfDay(request: HttpRequest, date: str = ""):
-  logger.info("getAlbumOfDay called...")
   # Fill date if it isnt provided
   if(date == ""):
     date = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d')
@@ -69,7 +68,6 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
 # Set a new album of the day. Returns an HTTPResponse
 ###
 def setAlbumOfDay(request: HttpRequest):
-  logger.info("setAlbumOfDay called...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("setAlbumOfDay called with a non-POST method, returning 405.")
@@ -121,7 +119,6 @@ def setAlbumOfDay(request: HttpRequest):
 # Set a new album of the day.  NOTE: This WILL OVERRIDE any already set album for any date! Returns an HTTPResponse
 ###
 def setAlbumOfDayADMIN(request: HttpRequest, date: str, album_spotify_id: str):
-  logger.info("setAlbumOfDayADMIN called...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("setAlbumOfDayADMIN called with a non-POST method, returning 405.")
@@ -148,7 +145,6 @@ def setAlbumOfDayADMIN(request: HttpRequest, date: str, album_spotify_id: str):
 # When passed in an album, return a list of the dates in which it was AOtD
 ###
 def getAotdDates(request: HttpRequest, album_spotify_id: str):
-  logger.info("getAotdDates called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAotdDates called with a non-GET method, returning 405.")
@@ -172,7 +168,6 @@ def getAotdDates(request: HttpRequest, album_spotify_id: str):
 # Return the percentage chance that a user's album will be picked (given current conditions)
 ###
 def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
-  logger.info("getChanceOfAotdSelect called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getChanceOfAotdSelect called with a non-GET method, returning 405.")

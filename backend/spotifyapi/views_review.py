@@ -39,7 +39,6 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 # Submit a new review of an album by a user.
 ###
 def submitReview(request: HttpRequest):
-  logger.info("submitReview called...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("submitReview called with a non-POST method, returning 405.")
@@ -83,7 +82,6 @@ def submitReview(request: HttpRequest):
 # Get All Reviews for a specific album.
 ###
 def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str, date: str = None):
-  logger.info("getReviewsForAlbum called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getReviewsForAlbum called with a non-GET method, returning 405.")
@@ -136,7 +134,6 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str, date: str = 
 # Get USER Reviews for a specific album.
 ###
 def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str):
-  logger.info("getUserReviewForAlbum called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getUserReviewForAlbum called with a non-GET method, returning 405.")
@@ -171,7 +168,6 @@ def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str):
 # TODO: Track streaks of reviews to see which user has been maintaining the streak
 ###
 def getAllUserReviewStats(request: HttpRequest):
-  logger.info("getAllUserReviewStats called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAllUserReviewStats called with a non-GET method, returning 405.")
@@ -223,7 +219,6 @@ def getAllUserReviewStats(request: HttpRequest):
 
 
 def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
-  logger.info("getUserReviewStats called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getUserReviewStats called with a non-GET method, returning 405.")
@@ -307,7 +302,6 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
 # }
 ###
 def getSimilarReviewsForRatings(request: HttpRequest):
-  logger.info("getSimilarReviewsForRating called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getSimilarReviewsForRating called with a non-GET method, returning 405.")
@@ -340,7 +334,6 @@ def getSimilarReviewsForRatings(request: HttpRequest):
 # Get ALL Reviews made by a user
 ###
 def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
-  logger.info("getAllUserReviews called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAllUserReviews called with a non-GET method, returning 405.")

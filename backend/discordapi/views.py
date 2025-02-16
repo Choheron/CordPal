@@ -29,7 +29,6 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 # Exchange discord auth code for discord api token (part of the login flow)
 ###
 def getDiscordToken(request: HttpRequest):
-  logger.info("getDiscordToken called...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("getDiscordToken called with a non-POST method, returning 405.")
@@ -94,8 +93,6 @@ def getDiscordToken(request: HttpRequest):
 # Retrieve basic info about the user and create a user instance
 ###
 def getDiscordUserData(request: HttpRequest):
-  logger.info("getDiscordUserData called...")
-  logger.info("Cookies in request: " + str(request.COOKIES))
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getDiscordUserData called with a non-GET method, returning 405.")
@@ -177,7 +174,6 @@ def validateServerMember(request: HttpRequest):
 # Validate that the user has previously approved login
 ###
 def checkIfPrevAuth(request: HttpRequest):
-  logger.info("checkIfPrevAuth called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("checkIfPrevAuth called with a non-GET method, returning 405.")
@@ -206,7 +202,6 @@ def checkIfPrevAuth(request: HttpRequest):
 # Revoke discord token and clear session data for user
 ###
 def revokeDiscordToken(request: HttpRequest):
-  logger.info("revokeDiscordToken called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("revokeDiscordToken called with a non-GET method, returning 405.")

@@ -20,7 +20,6 @@ from users.models import User
 # Get a count of all users in the DB
 ###
 def getUserCount(request: HttpRequest):
-  logger.info("getUserCount called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getUserCount called with a non-GET method, returning 405.")
@@ -39,7 +38,6 @@ def getUserCount(request: HttpRequest):
 # Get a list of all users in json form, list includes each users ID, avatar URL, and Nickname
 ###
 def getUserList(request: HttpRequest):
-  logger.info("getUserList called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getUserList called with a non-GET method, returning 405.")
@@ -66,7 +64,6 @@ def getUserList(request: HttpRequest):
 # Get user data for the current session's user or the passed in ID
 ###
 def getUserData(request: HttpRequest, user_discord_id: str = ""):
-  logger.info("getUserData called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getUserData called with a non-GET method, returning 405.")
@@ -99,7 +96,6 @@ def getUserData(request: HttpRequest, user_discord_id: str = ""):
 # Get user avatar url for the current session's user or the passed in ID
 ###
 def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
-  logger.info("getUserAvatarURL called...")
   # Make sure request is a GET request
   if(request.method != "GET"):
     logger.warning("getUserAvatarURL called with a non-GET method, returning 405.")
@@ -128,7 +124,6 @@ def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
 # Get a boolean if a user is an admin or not
 ###
 def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
-  logger.info("isUserAdmin called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("isUserAdmin called with a non-GET method, returning 405.")
@@ -160,7 +155,6 @@ def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
 # Update user data changing the fields provided in the request
 ###
 def updateUserData(request: HttpRequest):
-  logger.info("updateUserData called...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("updateUserData called with a non-POST method, returning 405.")
@@ -179,7 +173,6 @@ def updateUserData(request: HttpRequest):
 # Get a specific user's last request timestamp
 ###
 def isOnline(request: HttpRequest, user_discord_id: str):
-  logger.info("isOnline called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("isOnline called with a non-GET method, returning 405.")
@@ -201,7 +194,6 @@ def isOnline(request: HttpRequest, user_discord_id: str):
 # Get online status of ALL USERS on the site
 ###
 def getAllOnlineData(request: HttpRequest):
-  logger.info("getAllOnlineData called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAllOnlineData called with a non-GET method, returning 405.")

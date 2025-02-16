@@ -39,7 +39,6 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 # Check if an album already exists in the database
 ###
 def checkIfAlbumAlreadyExists(request: HttpRequest, album_spotify_id: str):
-  logger.info("checkIfAlbumAlreadyExists called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("checkIfAlbumAlreadyExists called with a non-GET method, returning 405.")
@@ -66,7 +65,6 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, album_spotify_id: str):
 # If the user meets the criteria to be able to submit an album.
 ###
 def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
-  logger.info("checkIfUserCanSubmit called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("checkIfUserCanSubmit called with a non-GET method, returning 405.")
@@ -108,7 +106,6 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
 # Check if an album already exists in the database
 ###
 def checkIfAlbumAlreadyExists(request: HttpRequest, album_spotify_id: str):
-  logger.info("checkIfAlbumAlreadyExists called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("checkIfAlbumAlreadyExists called with a non-GET method, returning 405.")
@@ -135,7 +132,6 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, album_spotify_id: str):
 # Submit an Album to the album of the day pool.
 ###
 def submitAlbum(request: HttpRequest):
-  logger.info("submitAlbum called...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("submitAlbum called with a non-POST method, returning 405.")
@@ -174,7 +170,6 @@ def submitAlbum(request: HttpRequest):
 # Get an Album from the album of the day pool.
 ###
 def getAlbum(request: HttpRequest, album_spotify_id: str):
-  logger.info("submitAlbum called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("submitAlbum called with a non-GET method, returning 405.")
@@ -205,7 +200,6 @@ def getAlbum(request: HttpRequest, album_spotify_id: str):
 # Get ALL Album from the album of the day pool.
 ###
 def getAllAlbums(request: HttpRequest):
-  logger.info("getAllAlbums called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAllAlbums called with a non-GET method, returning 405.")
@@ -252,7 +246,6 @@ def getAllAlbums(request: HttpRequest):
 # If a date is not provided in the url bar, will return the most recent aotd ratings for that album
 ###
 def getAlbumAvgRating(request: HttpRequest, album_spotify_id: str, rounded: str = "true", date: str = None):
-  logger.info("getAlbumAvgRating called...")
   # If date is not provided grab the most recent date of AOtD
   aotd_date = date if (date) else DailyAlbum.objects.filter(album__spotify_id=album_spotify_id).latest('date').date
   # Convert bool to string
@@ -274,7 +267,6 @@ def getAlbumAvgRating(request: HttpRequest, album_spotify_id: str, rounded: str 
 # Get All Reviews for a specific album. Returns a spotify album id and date
 ###
 def getLastXAlbums(request: HttpRequest, count: int):
-  logger.info("getLastXAlbums called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getLastXAlbums called with a non-GET method, returning 405.")
@@ -302,7 +294,6 @@ def getLastXAlbums(request: HttpRequest, count: int):
 # Get Album Stats (submission numbers)
 ###
 def getAlbumsStats(request: HttpRequest):
-  logger.info("getAlbumsStats called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAlbumsStats called with a non-GET method, returning 405.")
@@ -337,7 +328,6 @@ def getAlbumsStats(request: HttpRequest):
 # Get Lowest and Highest Rated Albums
 ###
 def getLowestHighestAlbumStats(request: HttpRequest):
-  logger.info("getLowestHighestAlbumStats called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getLowestHighestAlbumStats called with a non-GET method, returning 405.")

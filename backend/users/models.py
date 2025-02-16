@@ -34,6 +34,7 @@ class User(models.Model):
   is_staff = models.BooleanField(default=False)
   # Track any and all API calls that come through with this user's session cookie
   last_request_timestamp = models.DateTimeField(null = True)
+  last_heartbeat_timestamp = models.DateTimeField(null = True)
 
   def get_avatar_url(self):
     """Construct the avatar URL from Discord's CDN."""

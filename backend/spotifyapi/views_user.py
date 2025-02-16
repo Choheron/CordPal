@@ -35,7 +35,6 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 # Get a list of users who have connected spotify
 ###
 def getSpotifyUsersObj(request: HttpRequest):
-  logger.info("getSpotifyUsersList called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getSpotifyUsersList called with a non-GET method, returning 405.")
@@ -58,7 +57,6 @@ def getSpotifyUsersObj(request: HttpRequest):
 # Get a count of all users in the Spotify DB
 ###
 def getSpotifyUserCount(request: HttpRequest):
-  logger.info("getSpotifyUserCount called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getSpotifyUserCount called with a non-GET method, returning 405.")
@@ -77,7 +75,6 @@ def getSpotifyUserCount(request: HttpRequest):
 # Retrieve spotify Data from databse for current user
 ###
 def getSpotifyData(request: HttpRequest):
-  logger.info("getSpotifyData called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getSpotifyData called with a non-GET method, returning 405.")
@@ -101,7 +98,6 @@ def getSpotifyData(request: HttpRequest):
 # Get Top Items for User, expects body items of type, time_range, limit, and offset...
 ###
 def getTopItems(request: HttpRequest, item_type, time_range, limit, offset):
-  logger.info("getTopItems called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getTopItems called with a non-GET method, returning 405.")
@@ -141,7 +137,6 @@ def getTopItems(request: HttpRequest, item_type, time_range, limit, offset):
 # Submit a search query to spotify to get items...
 ###
 def spotifySearch(request: HttpRequest, item_type, query, limit, offset):
-  logger.info("spotifySearch called...")
   # Check for expired token
   if(isSpotifyTokenExpired(request)):
     refreshSpotifyToken(request)
@@ -174,7 +169,6 @@ def spotifySearch(request: HttpRequest, item_type, query, limit, offset):
 # Return if the user is currently blocked from having their albums picked for the AOtD
 ###
 def getSelectionBlockedFlag(request: HttpRequest):
-  logger.info("getSelectionBlockedFlag called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getSelectionBlockedFlag called with a non-GET method, returning 405.")

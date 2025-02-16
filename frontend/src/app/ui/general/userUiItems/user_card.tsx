@@ -22,7 +22,11 @@ export default async function UserCard(props) {
   try {
     var userData = await getUserData(props.userDiscordID)
     var userAvatarURL = await getUserAvatarURL(props.userDiscordID)
-    var onlineObject = await isUserOnline(props.userDiscordID)
+    if(showOnlineDot) {
+      var onlineObject = await isUserOnline(props.userDiscordID)
+    } else {
+      onlineObject = {online: null}
+    }
   } catch {
     userData = {"nickname": props.fallbackName}
     userAvatarURL = props.fallbackSrc

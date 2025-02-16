@@ -30,7 +30,6 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 # Check if a user has connected spotify to their account
 ###
 def isSpotifyConnected(request: HttpRequest):
-  logger.info("isSpotifyConnected called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("isSpotifyConnected called with a non-GET method, returning 405.")
@@ -45,7 +44,6 @@ def isSpotifyConnected(request: HttpRequest):
 # Exchange spotify auth code for spotify api token. This will create a spotify user data entry, which has a one-to-one relationship with a user.
 ###
 def doSpotifyTokenSwap(request: HttpRequest):
-  logger.info("getSpotifyToken called...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("getSpotifyToken called with a non-POST method, returning 405.")

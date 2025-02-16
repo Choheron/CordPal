@@ -20,7 +20,6 @@ DISCORD_BOT_DATA_FILEPATH = os.getenv('DISCORD_BOT_DATA_FILEPATH')
 # Exchange discord auth code for discord api token (part of the login flow)
 ###
 def getAllQuotes(request: HttpRequest):
-  logger.info("getAllQuotes called...")
   # Make sure request is a post request
   if(request.method != "GET"):
     logger.warning("getAllQuotes called with a non-GET method, returning 405.")

@@ -14,7 +14,6 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 
 # Create your views here.
 def getGifUrl(request: HttpRequest, gifId: str):
-  logger.info("getGifUrl called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getGifUrl called with a non-GET method, returning 405.")

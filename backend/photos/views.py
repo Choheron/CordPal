@@ -20,7 +20,6 @@ APP_ENV = os.getenv('APP_ENV') or 'DEV'
 # Get all Image items in database
 ###
 def getAllImages(request: HttpRequest):
-  logger.info("getAllImages called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAllImages called with a non-GET method, returning 405.")
@@ -38,7 +37,6 @@ def getAllImages(request: HttpRequest):
 # Add an upload an image to the database
 ###
 def uploadImage(request: HttpRequest):
-  logger.info("uploadImage called...")
   # Make sure request is a POST request
   if(request.method != "POST"):
     logger.warning("uploadImage called with a non-POST method, returning 405.")
@@ -102,7 +100,6 @@ def uploadImage(request: HttpRequest):
 # Return all data about an image in json format via imageID
 ###
 def getImageInfo(request: HttpRequest, imageID: int):
-  logger.info(f"getImageInfo called with id: {imageID}...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getImageInfo called with a non-GET method, returning 405.")
@@ -139,7 +136,6 @@ def getImageInfo(request: HttpRequest, imageID: int):
 # Return an image based on an image id
 ###
 def getImage(request: HttpRequest, imageID: int):
-  logger.info(f"getImage called with id: {imageID}...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getImage called with a non-GET method, returning 405.")
@@ -167,7 +163,6 @@ def getImage(request: HttpRequest, imageID: int):
 def getImageIds(request: HttpRequest):
   # Read Request Body
   body_params = json.loads(request.body)
-  logger.info(f"getImageIds called with following filters: {body_params}...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("getImageIds called with a non-POST method, returning 405.")
@@ -195,7 +190,6 @@ def getImageIds(request: HttpRequest):
 # Return a list of all discord User IDs that have submitted photoshops
 ###
 def getAllUploaders(request: HttpRequest):
-  logger.info(f"getAllUploaders called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAllUploaders called with a non-GET method, returning 405.")
@@ -221,7 +215,6 @@ def getAllUploaders(request: HttpRequest):
 # Return a list of all discord User IDs that have been marked as artists
 ###
 def getAllArtists(request: HttpRequest):
-  logger.info(f"getAllArtists called...")
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAllArtists called with a non-GET method, returning 405.")

@@ -21,7 +21,6 @@ CATEGORY_CHOICES = TodoItem.TODO_CATEGORY_CHOICES
 # Get all todo list items in database
 ###
 def getAllToDo(request: HttpRequest):
-  logger.info("getAllToDo called...")
   # Make sure request is a post request
   if(request.method != "GET"):
     logger.warning("getAllToDo called with a non-GET method, returning 405.")
@@ -48,7 +47,6 @@ def getAllToDo(request: HttpRequest):
 # Get all todo item options for dropdowns
 ###
 def getAllToDoChoices(request: HttpRequest):
-  logger.info("getAllToDoChoices called...")
   # Make sure request is a post request
   if(request.method != "GET"):
     logger.warning("getAllToDoChoices called with a non-GET method, returning 405.")
@@ -75,7 +73,6 @@ def getAllToDoChoices(request: HttpRequest):
 # Add a new todo item to the database
 ###
 def createTodo(request: HttpRequest):
-  logger.info("createTodo called...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("createTodo called with a non-POST method, returning 405.")
@@ -102,7 +99,6 @@ def createTodo(request: HttpRequest):
 # Update an existing todo item in the database
 ###
 def updateTodo(request: HttpRequest):
-  logger.info("updateTodo called...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("updateTodo called with a non-POST method, returning 405.")
@@ -130,7 +126,6 @@ def updateTodo(request: HttpRequest):
 # Bulk add todo items from a raw list
 ###
 def bulkCreateTodo(request: HttpRequest):
-  logger.info("bulkCreateTodo called...")
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("bulkCreateTodo called with a non-POST method, returning 405.")
