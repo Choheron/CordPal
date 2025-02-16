@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { Button, Tooltip } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/input";
+import ReviewTipTap from "../../general/input/Tiptap";
 import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@nextui-org/react";
 import { submitReviewToBackend } from "@/app/lib/spotify_utils";
 import SimilarRatingsBox from "./tooltips/similar_ratings_box";
@@ -25,7 +26,7 @@ export default function AlbumReviewBox(props) {
   const router = useRouter();
   // State management
   const [rating, setRating] = useState((props.rating != null) ? props.rating : 5);
-  const [comment, setComment] = useState((props.comment != null) ? props.comment : "No Comment Provided");
+  const [comment, setComment] = useState((props.comment != null) ? props.comment : `<p>No Comment Provided...</p>`);
   // const [favSong, setFavSong] = useState<Selection>(new Set([]));
   const [isReady, setIsReady] = useState(false);
   const [isFirstListen, setIsFirstListen] = useState((props.first_listen != null) ? props.first_listen : false);
@@ -130,14 +131,22 @@ export default function AlbumReviewBox(props) {
           ))}
         </Select> */}
       </div>
-      <Textarea
+      <ReviewTipTap 
+        content={comment}
+        updateCallback={setComment}
+      />
+      <p className="text-xs mx-2 text-gray-400">
+        Enter an optional comment to go with your review of this album. Tenor links will be updated on the display end.
+      </p>
+      {/* 
+        <Textarea
         className="my-2"
         label="Comment (Not Required)"
         minRows={1}
         description="Enter an optional comment to go with your review of this album. Youtube and Tenor links will automatically be updated to show in the review."
         value={comment}
         onValueChange={setComment}
-      />
+      /> */}
       <div className="w-full flex flex-col lg:flex-row gap-2 justify-between">
         <Checkbox
           isSelected={isFirstListen}

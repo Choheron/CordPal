@@ -16,6 +16,7 @@ import { Conditional } from "../conditional";
 export default async function ReviewAvatarCard(props) {
   const review = props.review_obj;
   var reviewMessage = review['comment'];
+  const reviewVersion = props.review_obj['version']
 
   // Regex for youtube video embedding
   const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\?[\w=&%-]*)?(?:&t=(\d+h)?(\d+m)?(\d+s)?)?/g;
@@ -23,17 +24,19 @@ export default async function ReviewAvatarCard(props) {
   const tenorRegex = /(?:https?:\/\/)?(?:www\.)?tenor\.com\/view\/[a-zA-Z0-9_-]+-(\d+)/g;
 
   // Parse Review Text
-  // Do youtube link replacements
-  reviewMessage =  reviewMessage.replace(youtubeRegex, (match, videoId, hours, minutes, seconds) => {
-    // Convert timestamp to seconds
-    const h = hours ? parseInt(hours) * 3600 : 0;
-    const m = minutes ? parseInt(minutes) * 60 : 0;
-    const s = seconds ? parseInt(seconds) : 0;
-    const startTime = h + m + s;
+  if(reviewVersion == 1) {
+    // Do youtube link replacements [ONLY IF THIS IS A VERSION 1 REVIEW]
+    reviewMessage =  reviewMessage.replace(youtubeRegex, (match, videoId, hours, minutes, seconds) => {
+      // Convert timestamp to seconds
+      const h = hours ? parseInt(hours) * 3600 : 0;
+      const m = minutes ? parseInt(minutes) * 60 : 0;
+      const s = seconds ? parseInt(seconds) : 0;
+      const startTime = h + m + s;
 
-    const startParam = startTime > 0 ? `?start=${startTime}` : '';
-    return `<iframe width="300" height="168.75" src="https://www.youtube.com/embed/${videoId}${startParam}" frameborder="0" allowfullscreen></iframe>`;
-  })
+      const startParam = startTime > 0 ? `?start=${startTime}` : '';
+      return `<iframe width="300" height="168.75" src="https://www.youtube.com/embed/${videoId}${startParam}" frameborder="0" allowfullscreen></iframe>`;
+    })
+  }
 
   // Do Tenor Link Replacements
   // Extract all Tenor GIF IDs
@@ -92,7 +95,7 @@ export default async function ReviewAvatarCard(props) {
           <p className="ml-2 mr-auto">
             <b>Comment:</b>
           </p>
-          <div className="mx-2 my-2 max-w-[320px]" dangerouslySetInnerHTML={{__html: reviewMessage}} />
+          <div className="prose prose-invert mx-2 mb-2 p-1 max-w-[320px] border rounded-xl border-neutral-800 bg-black/20" dangerouslySetInnerHTML={{__html: reviewMessage}} />
           <Conditional showWhen={tenorMatches.length > 0}>
             <div className="w-fit backdrop-blur-2xl px-2 py-1 rounded-2xl border border-neutral-800">
               <p className="text-sm italic my-auto">

@@ -168,7 +168,7 @@ export default function AddAlbumModal(props) {
   return (
     <>
       <div className="flex flex-col lg:flex-row gap-1 justify-center w-full">
-        <div className="flex flex-col">
+        <div className="flex">
           <Button 
             className="p-2 mt-4 mb-1 rounded-lg text-inheret min-w-0 min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline"
             size="lg"
@@ -179,15 +179,6 @@ export default function AddAlbumModal(props) {
           >
             <b>Submit An Album</b>
           </Button>
-          <InfoPopover 
-            triggerText="Odds" 
-            triggerClassName="my-auto mx-auto"
-            triggerTextColor="blue-500"
-            popoverTitle="What are the odds of one of my albums getting picked?"
-            popoverText={`Given current conditions (blocked users, number of AOtD picks you may or may not have, etc) you currently have a selection chance of: ${selectionChance}%`}
-            popoverPlacement="top"
-            showArrow={true}
-          />
         </div>
         <Conditional showWhen={!userAllowedToSubmit && userAllowedToSubmitMessage != ""}>
           <div className="flex gap-1 w-fit mx-2 my-4 backdrop-blur-2xl px-2 py-2 rounded-2xl border border-neutral-800">

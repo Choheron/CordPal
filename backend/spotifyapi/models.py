@@ -88,6 +88,8 @@ class Review(models.Model):
     last_updated = models.DateTimeField(auto_now=True)  # Track the latest update
     first_listen = models.BooleanField(default=None, null=True) # Is this review a result of a first listen?
     aotd_date = models.DateField(null=False) # Attach each review to the aotd date in which it was provided
+    # Add review versioning for display
+    version = models.IntegerField(default=1)
 
     class Meta:
         unique_together = ('album', 'user')  # Prevent duplicate reviews for the same user and album
@@ -101,7 +103,8 @@ class Review(models.Model):
                 review_text=self.review_text,
                 review_date=self.review_date,
                 first_listen=self.first_listen,
-                aotd_date=self.aotd_date
+                aotd_date=self.aotd_date,
+                version=self.version
             )
         super().save(*args, **kwargs)
 
@@ -117,6 +120,8 @@ class ReviewHistory(models.Model):
     review_date = models.DateTimeField()  # Original date of the review
     first_listen = models.BooleanField(default=None, null=True) # Is this review a result of a first listen?
     aotd_date = models.DateField(null=False) # Attach each review to the aotd date in which it was provided
+    # Add review versioning for display
+    version = models.IntegerField(default=1)
 
     recorded_at = models.DateTimeField(auto_now_add=True)  # When the history record was created
 

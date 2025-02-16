@@ -58,6 +58,7 @@ def submitReview(request: HttpRequest):
     reviewObj.score = float(reqBody['score'])
     reviewObj.review_text = reqBody['comment']
     reviewObj.first_listen = reqBody['first_listen']
+    reviewObj.version = 2
     # Save/Update Object
     reviewObj.save()
   except Review.DoesNotExist:
@@ -69,6 +70,7 @@ def submitReview(request: HttpRequest):
       review_text=reqBody['comment'],
       first_listen=reqBody['first_listen'],
       aotd_date=datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d'),
+      version=2
     )
     # Save new Review data
     newReview.save()
@@ -123,6 +125,7 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str, date: str = 
     outObj['review_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
     outObj['last_upated'] = review.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
     outObj['first_listen'] = review.first_listen
+    outObj['version'] = review.version
     # Append to list
     outList.append(outObj)
   # Return list of reviews
@@ -159,6 +162,7 @@ def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str):
   outObj['review_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
   outObj['last_upated'] = review.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
   outObj['first_listen'] = review.first_listen
+  outObj['version'] = review.version
   # Return user review
   return JsonResponse({"review": outObj})
 
