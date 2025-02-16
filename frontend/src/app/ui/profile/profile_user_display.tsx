@@ -1,5 +1,5 @@
 import ClientTimestamp from "../general/client_timestamp"
-import { boolToEmoji, formatDateString } from "@/app/lib/utils"
+import { boolToEmoji, formatDateString, onlineStatusToTailwindBgColor } from "@/app/lib/utils"
 
 // Display user data in a box
 // EXPECTED PROPS:
@@ -9,6 +9,7 @@ export default function ProfileUserDisplay(props) {
   const userData = props.userData
   const last_seen = props.onlineData['last_seen']
   const online = props.onlineData['online']
+  const online_status = props.onlineData['status']
 
   return(
     <div className="w-fit mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
@@ -19,8 +20,8 @@ export default function ProfileUserDisplay(props) {
           alt={`Profile Picture for ${userData['nickname']}`}
         />
         <div className="absolute top-3 left-3 flex bg-black/50 rounded-full pl-2 group-hover:invisible">
-          <p>{(online) ? "Online" : "Offline"}</p>
-          <div className={`w-[10px] h-[10px] mx-2 my-auto rounded-full border-2 border-black ${online ? "bg-green-600" : "bg-red-700"}`}></div>
+          <p>{online_status}</p>
+          <div className={`w-[10px] h-[10px] mx-2 my-auto rounded-full border-2 border-black ${onlineStatusToTailwindBgColor(online_status)}`}></div>
         </div>
       </div>
       <div className="flex flex-col justify-between font-extralight">

@@ -3,6 +3,7 @@
 import { getAllOnlineData, getUserList } from "@/app/lib/user_utils";
 import { useEffect, useState } from "react";
 import { Badge, Spinner, User } from "@nextui-org/react";
+import { onlineStatusToTailwindBgColor } from "@/app/lib/utils";
 
 // List of online users that is updated every 5 seconds
 // Expected Props:
@@ -39,15 +40,6 @@ export default function OnlineUsersBox(props) {
     setLoading(Object.keys(onlineObject).length == 0)
   }, [onlineObject])
 
-  // Get online status or return none if failed
-  function getStatusColor(onlineObj) {
-    if(onlineObj) {
-      return `${onlineObj['online'] ? "bg-green-600" : "bg-red-700"}`
-    } else {
-      return "bg-red-700"
-    }
-  }
-
 
   return(
     <div className="flex flex-row px-2 py-2 min-w-[225px] items-center border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
@@ -71,8 +63,8 @@ export default function OnlineUsersBox(props) {
                       name={userObj['nickname']}
                       description={(
                         <div className="flex">
-                          <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${getStatusColor(onlineObject[discord_id])}`}></div>
-                          <p>{(onlineObject[discord_id] && onlineObject[discord_id]['online']) ? "Online" : `Seen ${(onlineObject[discord_id]) ? onlineObject[discord_id]['last_seen'] : "--"}`}</p>
+                          <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${onlineStatusToTailwindBgColor(onlineObject[discord_id]['status'])}`}></div>
+                          <p>{(onlineObject[discord_id] && onlineObject[discord_id]['online']) ? onlineObject[discord_id]['status'] : `Seen ${(onlineObject[discord_id]) ? onlineObject[discord_id]['last_seen'] : "--"}`}</p>
                         </div>
                       )}
                       avatarProps={{

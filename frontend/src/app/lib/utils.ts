@@ -117,3 +117,15 @@ export function getNextDay(day: Date) {
 export function dateToYYYYMMDD(day: Date) {
   return day.toISOString().split('T')[0];
 }
+
+// Convert online status to a background color
+export function onlineStatusToTailwindBgColor(status: string) {
+  switch(status.toUpperCase()) {
+    case "OFFLINE":
+      return "bg-red-700";
+    case "AWAY": 
+      return "bg-orange-700";
+    case "ONLINE":
+      return "bg-green-600";
+  }
+}

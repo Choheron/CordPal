@@ -4,6 +4,7 @@ import {User} from "@nextui-org/user";
 
 import { getUserData, getUserAvatarURL, isUserOnline } from "@/app/lib/user_utils";
 import { Badge } from "@nextui-org/react";
+import { onlineStatusToTailwindBgColor } from "@/app/lib/utils";
 
 // GUI Representation for a single user
 // Expected Props:
@@ -25,19 +26,19 @@ export default async function UserCard(props) {
     if(showOnlineDot) {
       var onlineObject = await isUserOnline(props.userDiscordID)
     } else {
-      onlineObject = {online: null}
+      onlineObject = {online: null, status: "offline"}
     }
   } catch {
     userData = {"nickname": props.fallbackName}
     userAvatarURL = props.fallbackSrc
-    onlineObject = {online: null}
+    onlineObject = {online: null, status: "offline"}
   }
 
   // Overwrite customDesc if user has passed in online status boolean
   customDesc = (props.onlineStatusDesc) ? (
     <div className="flex">
-      <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${onlineObject['online'] ? "bg-green-600" : "bg-red-700"}`}></div>
-      <p>{(onlineObject['online']) ? "Online" : `Seen ${onlineObject['last_seen']}`}</p>
+      <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${onlineStatusToTailwindBgColor(onlineObject['status'])}`}></div>
+      <p>{(onlineObject['online']) ? (onlineObject['status']) : `Seen ${onlineObject['last_seen']}`}</p>
     </div>
   ) : (
     <div>
@@ -48,7 +49,7 @@ export default async function UserCard(props) {
 
   const user_card = () => (
     <Badge
-      className={`absolute top-1 -left-2 ${onlineObject['online'] ? "bg-green-600" : "bg-red-700"}`}
+      className={`absolute top-1 -left-2 ${onlineStatusToTailwindBgColor(onlineObject['status'])}`}
       size="md"
       content=""
       shape="circle"

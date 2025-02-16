@@ -27,11 +27,13 @@ class LastSeenMiddleware:
       # Get current timestamp
       time = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
       # Update only heartbeat timestamp if its a heartbeat call, otherwise update last_request_timestamp
-      if(full_path == "/users/heartbeat"):
+      heartbeat_endpoint_paths = ["/users/heartbeat", "/users/getAllOnlineData", "/discordapi/checkToken"]
+      if(full_path in heartbeat_endpoint_paths):
         user.last_heartbeat_timestamp = time
         self.logger.debug(f"Setting last_heartbeat_timestamp to {str(time)} for user {user.nickname}")
         user.save()
       else:
+        user.last_heartbeat_timestamp = time # Also update heartbeat, why not
         user.last_request_timestamp = time
         self.logger.debug(f"Setting last_request_timestamp to {str(time)} for user {user.nickname}")
         user.save()

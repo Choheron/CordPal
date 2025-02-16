@@ -185,6 +185,8 @@ def isOnline(request: HttpRequest, user_discord_id: str):
   out = {"online": user.is_online()}
   # Return additional information stating how longs its been since the user has been seen
   out['last_seen'] = user.last_seen()
+  # Return status of online user
+  out['status'] = user.online_status()
   
   # Return success code
   return JsonResponse(out)
@@ -208,6 +210,7 @@ def getAllOnlineData(request: HttpRequest):
     temp = {}
     temp["online"] = user.is_online()
     temp['last_seen'] = user.last_seen()
+    temp['status'] = user.online_status()
     temp['last_request_timestamp'] = user.last_request_timestamp
     temp['last_heartbeat_timestamp'] = user.last_heartbeat_timestamp
     out[user.discord_id] = temp

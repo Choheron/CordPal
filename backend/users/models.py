@@ -43,8 +43,21 @@ class User(models.Model):
     return f"https://cdn.discordapp.com/embed/avatars/{int(self.discord_discriminator) % 5}.png"
 
   def is_online(self):
-    """Return true if the last_request_timestamp is within 1 min ago."""
-    return ((timezone.now() - self.last_request_timestamp) < timedelta(minutes=1))
+    """Return true if the last_heartbeat_timestamp is within 1 min."""
+    try:
+      return ((timezone.now() - self.last_heartbeat_timestamp) < timedelta(minutes=1))
+    except:
+      return False
+  
+  def online_status(self):
+    """Return one of three strings: ONLINE, AWAY, or OFFLINE"""
+    if(not self.is_online()):
+      return "Offline"
+    time_since_request = (timezone.now() - self.last_request_timestamp)
+    if(time_since_request > timedelta(minutes=2)):
+      return "Away"
+    # If we reach this point, they have had a heartbeat and a request within the last two mins, meaning they are online
+    return "Online"
   
   def last_seen(self):
     """Return String stating how long its been since the user was last seen."""
