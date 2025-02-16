@@ -8,6 +8,7 @@ import UserCard from "../../general/userUiItems/user_card";
 import { getTenorGifData } from "@/app/lib/spotify_utils";
 import ClientTimestamp from "../../general/client_timestamp";
 import { Conditional } from "../conditional";
+import { ScrollShadow } from "@nextui-org/react";
 
 // GUI Display for a single review as a popover/avatar combo
 // Expected Props:
@@ -94,7 +95,12 @@ export default async function ReviewAvatarCard(props) {
           <p className="ml-2 mr-auto">
             <b>Comment:</b>
           </p>
-          <div className="prose prose-invert prose-sm mx-2 mb-2 p-1 max-w-[320px] border rounded-xl border-neutral-800 bg-black/20" dangerouslySetInnerHTML={{__html: reviewMessage}} />
+          <ScrollShadow className="w-[330px] max-h-[320px] overflow-y-scroll scrollbar-hide border rounded-xl border-neutral-800 bg-black/20" >
+            <div 
+              className="prose prose-invert prose-sm mx-2 p-1" 
+              dangerouslySetInnerHTML={{__html: reviewMessage}}
+            />
+          </ScrollShadow>
           <Conditional showWhen={tenorMatches.length > 0}>
             <div className="w-fit backdrop-blur-2xl px-2 py-1 rounded-2xl border border-neutral-800">
               <p className="text-sm italic my-auto">

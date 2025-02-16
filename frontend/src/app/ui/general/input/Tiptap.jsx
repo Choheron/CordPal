@@ -245,7 +245,7 @@ export default function ReviewTipTap(props) {
           }}
           editorProps={{
             attributes: {
-              class: "prose prose-invert prose-sm max-w-none p-2 border border-neutral-800 rounded-md focus:outline-none max-h-[200px] overflow-y-scroll",
+              class: "prose prose-invert prose-sm max-w-none focus:outline-none max-h-[200px] overflow-y-scroll",
             }}
           }
         ></EditorProvider>
