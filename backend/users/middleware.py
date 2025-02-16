@@ -28,7 +28,7 @@ class LastSeenMiddleware:
       time = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
       # Update only heartbeat timestamp if its a heartbeat call, otherwise update last_request_timestamp
       if(full_path == "/users/heartbeat"):
-        user.last_request_timestamp = time
+        user.last_heartbeat_timestamp = time
         self.logger.debug(f"Setting last_heartbeat_timestamp to {str(time)} for user {user.nickname}")
         user.save()
       else:
