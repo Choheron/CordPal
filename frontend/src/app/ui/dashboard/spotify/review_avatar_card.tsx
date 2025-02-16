@@ -78,7 +78,6 @@ export default async function ReviewAvatarCard(props) {
             userDiscordID={review['user_id']} 
             customDescription="View profile"
             isProfileLink
-            onlineBadge
           />
           <div className="flex">
             <p className="mx-2 my-2 align-middle">Rating:</p>
@@ -95,7 +94,7 @@ export default async function ReviewAvatarCard(props) {
           <p className="ml-2 mr-auto">
             <b>Comment:</b>
           </p>
-          <div className="prose prose-invert mx-2 mb-2 p-1 max-w-[320px] border rounded-xl border-neutral-800 bg-black/20" dangerouslySetInnerHTML={{__html: reviewMessage}} />
+          <div className="prose prose-invert prose-sm mx-2 mb-2 p-1 max-w-[320px] border rounded-xl border-neutral-800 bg-black/20" dangerouslySetInnerHTML={{__html: reviewMessage}} />
           <Conditional showWhen={tenorMatches.length > 0}>
             <div className="w-fit backdrop-blur-2xl px-2 py-1 rounded-2xl border border-neutral-800">
               <p className="text-sm italic my-auto">
