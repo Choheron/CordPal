@@ -170,7 +170,7 @@ export default function AllAlbumsModal(props) {
     }
     if(aotdFilter) {
       changes = true
-      newAlbumList = newAlbumList.filter(album => (album['last_aotd'] != null))
+      newAlbumList = newAlbumList.filter(album => ((album['last_aotd'] != null)))
     }
     // Set new list if there have been changes
     if(changes) {
