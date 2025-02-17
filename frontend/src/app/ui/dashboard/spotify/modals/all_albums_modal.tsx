@@ -16,7 +16,7 @@ import {
   TableRow,
   TableCell
 } from "@nextui-org/table";
-import { Avatar, Button, Spinner, Input } from "@nextui-org/react";
+import { Avatar, Button, Spinner, Input, Checkbox } from "@nextui-org/react";
 import React from "react";
 import { useRouter } from 'next/navigation';
 import { getAllAlbums, getAllAlbumsNoCache } from "@/app/lib/spotify_utils";
@@ -24,6 +24,7 @@ import { convertToLocalTZString, ratingToTailwindBgColor } from "@/app/lib/utils
 import Link from "next/link";
 import { Conditional } from "../../conditional";
 import ClientTimestamp from "@/app/ui/general/client_timestamp";
+import UserDropdown from "@/app/ui/general/userUiItems/user_dropdown";
 
 
 // Modal to display all submitted albums
@@ -36,6 +37,9 @@ export default function AllAlbumsModal(props) {
   // Sorting variables
   const [sortDescriptor, setSortDescriptor] = React.useState<any>({ column: "rating", direction: "descending"})
   const [titleFilter, setTitleFilter] = React.useState("")
+  const [artistFilter, setArtistFilter] = React.useState("")
+  const [submitterFilter, setSubmitterFilter] = React.useState(new Set([]))
+  const [aotdFilter, setAotdFilter] = React.useState(false);
   // Modal Controller Vars
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
@@ -148,14 +152,33 @@ export default function AllAlbumsModal(props) {
     setListLoading(false)
   }, [albumList])
 
-  // UseEffect for when title filter changes
+  // UseEffect for when filters change
   React.useEffect(() => {
+    let newAlbumList = albumListOriginal;
+    let changes = false;
     if(titleFilter != "") {
-      setAlbumList(albumListOriginal.filter(album => (album['title'] as string).includes(titleFilter)))
+      changes = true
+      newAlbumList = newAlbumList.filter(album => (album['title'] as string).toLowerCase().includes(titleFilter.toLowerCase()))
+    } 
+    if(artistFilter != "") {
+      changes = true
+      newAlbumList = newAlbumList.filter(album => (album['artist']['name'] as string).toLowerCase().includes(artistFilter.toLowerCase()))
+    }
+    if(submitterFilter.size != 0) {
+      changes = true
+      newAlbumList = newAlbumList.filter(album => (album['submitter'] as string) == (Object.values(submitterFilter)[0]))
+    }
+    if(aotdFilter) {
+      changes = true
+      newAlbumList = newAlbumList.filter(album => (album['last_aotd'] != null))
+    }
+    // Set new list if there have been changes
+    if(changes) {
+      setAlbumList(newAlbumList)
     } else {
       setAlbumList(albumListOriginal)
     }
-  }, [titleFilter])
+  }, [titleFilter, artistFilter, submitterFilter, aotdFilter])
 
   // Render Cell dynamically
   const renderCell = React.useCallback((album , columnKey: React.Key) => {
@@ -283,12 +306,34 @@ export default function AllAlbumsModal(props) {
                 Album Data for {(titleFilter == "") ? "all" : ""} {albumList.length} Albums
               </ModalHeader>
               <ModalBody>
-                <Input 
-                  label="Title" 
-                  placeholder="Filter by Title" 
-                  value={titleFilter} 
-                  onValueChange={setTitleFilter}
-                />
+                {/* Filter Inputs */}
+                <div className="flex gap-1">
+                  <Input 
+                    label="Title" 
+                    placeholder="Filter by Title" 
+                    value={titleFilter} 
+                    onValueChange={setTitleFilter}
+                  />
+                  <Input 
+                    label="Artist" 
+                    placeholder="Filter by Artist" 
+                    value={artistFilter} 
+                    onValueChange={setArtistFilter}
+                  />
+                  <UserDropdown 
+                    label={"Submitter"}
+                    setSelectionCallback={setSubmitterFilter}
+                    selectedKeys={submitterFilter}
+                  />
+                </div>
+                <Checkbox 
+                  isSelected={aotdFilter} 
+                  onValueChange={setAotdFilter}
+                  className="w-full ml-1"
+                >
+                  Only Show Albums that have been Album Of the Day
+                </Checkbox>
+                {/* Table displaying Albums */}
                 <Table 
                   aria-label="Album Submissions"
                   sortDescriptor={sortDescriptor}
