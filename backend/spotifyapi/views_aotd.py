@@ -1,5 +1,6 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.forms.models import model_to_dict
+from django.utils import timezone
 
 from .utils import (
   checkSelectionFlag,
@@ -154,7 +155,7 @@ def getAotdDates(request: HttpRequest, album_spotify_id: str):
   # Retrieve album object using spotify_id
   album = Album.objects.get(spotify_id=album_spotify_id)
   # Get list of dates
-  aotd_dates = list(DailyAlbum.objects.filter(album=album).values_list('date', flat=True))
+  aotd_dates = list(DailyAlbum.objects.filter(album=album).filter(date__lt=timezone.now()).values_list('date', flat=True))
   # Create return object and return it
   out = {}
   out['aotd_dates'] = aotd_dates
