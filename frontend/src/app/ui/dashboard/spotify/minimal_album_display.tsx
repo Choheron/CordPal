@@ -24,6 +24,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - showAlbumRating: Boolean - (Optional) [DEFAULT FALSE] Show the average user rating for the album
 //  - showSubmitInfo: Boolean - (Optional) [DEFAULT FALSE] Show the submission info for the album
 //  - rating_override: int - (Optional) Override the rating to show a custom one
+//  - sizingOverride: String - (Optional) Override the image and button sizing tailwind
 export default async function MinimalAlbumDisplay(props) {
   // Configuration Props
   const showAlbumRating = (props.showAlbumRating) ? props.showAlbumRating : false;
@@ -45,19 +46,21 @@ export default async function MinimalAlbumDisplay(props) {
   // Historical props checks
   const historical = (props.historical_date) ? true : false;
   const historical_date = (props.historical_date) ? props.historical_date : "0000-00-00";
+  // Sizing overrides 
+  const sizingOverride = (props.sizingOverride) ? props.sizingOverride : "h-[125px] w-[125px] lg:h-[300px] lg:w-[300px]"
 
   return (
-    <div className="group h-[125px] w-[125px] lg:h-[300px] lg:w-[300px] mx-2 lg:mx-1 my-auto flex flex-row">
+    <div className={`group ${sizingOverride} mx-2 lg:mx-1 my-auto flex flex-row`}>
       <img 
         src={album_img_src}
-        className='h-[125px] w-[125px] lg:h-[300px] lg:w-[300px] rounded-2xl mx-auto group-hover:blur-sm duration-700 ease-in-out group-hover:brightness-50'
+        className={`${sizingOverride} rounded-2xl mx-auto group-hover:blur-sm duration-700 ease-in-out group-hover:brightness-50`}
         alt={`Album Cover for ${title} by ${artist_name}`}
       />
       <Button 
         as={Link}
         href={`/dashboard/spotify/album/${props.album_spotify_id}`}
         radius="lg"
-        className="absolute flex flex-col transition opacity-0 group-hover:opacity-100 ease-in-out h-[125px] w-[125px] lg:h-[300px] lg:w-[300px] lg:gap-2 bg-transparent p-0"
+        className={`absolute flex flex-col transition opacity-0 group-hover:opacity-100 ease-in-out ${sizingOverride} lg:gap-2 bg-transparent p-0`}
       >
         <p className="text-center text-xl lg:text-3xl text-wrap">
           {title}
@@ -109,7 +112,7 @@ export default async function MinimalAlbumDisplay(props) {
               <StarRating 
                 className="text-yellow-400"
                 rating={(rating_override) ? rating_override : avg_rating} 
-                textSize="text-xl lg:text-3xl"
+                textSize="text-xl 3xl:text-3xl"
               />
             </div>
           </div>

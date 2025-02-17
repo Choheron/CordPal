@@ -241,11 +241,12 @@ export default function AllAlbumsModal(props) {
             </p>
         );
       case "last_aotd":
+        const dateArr = ((album['last_aotd'] != null) ? album['last_aotd'].split("-") : null)
         return (
           (album['last_aotd'] != null) ? (
             <Button 
               as={Link}
-              href={"/dashboard/spotify/historical/" + album['last_aotd']}
+              href={`/dashboard/spotify/calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`}
               radius="lg"
               className={`w-full mx-auto hover:underline text-white`}
               variant="solid"

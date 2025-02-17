@@ -644,3 +644,25 @@ export async function getChanceOfAotdSelect(user_discord_id: string = "") {
   const aotdChanceJson = await aotdChanceResponse.json()
   return aotdChanceJson['percentage'];
 }
+
+
+//
+// Get all AOtD Objects for a certian month
+//
+export async function getAOtDByMonth(year: string = "", month: string = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getAOtDByMonth: Sending request to backend '/spotifyapi/getAOtDByMonth/${year}/${month}'`)
+  const aotdMonthResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAOtDByMonth/${year}/${month}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: ['AOtD'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const aotdMonthJson = await aotdMonthResponse.json()
+  return aotdMonthJson;
+}

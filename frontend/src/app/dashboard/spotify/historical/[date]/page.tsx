@@ -14,110 +14,21 @@ export default async function Page({
   params: Promise<{ date: string }>
 }) {
   const date = (await params).date
-  const albumOfTheDayObj = await getAlbumOfTheDayData((await params).date)
-  // Get previous day's date
-  const prevString = dateToYYYYMMDD(getPrevDay(new Date(Date.parse(date))))
-  // Get next day's date (null if next day is in the future)
-  const nextString = dateToYYYYMMDD(getNextDay(new Date(Date.parse(date))))
-  // Boolean to determine if this date is today
-  const isToday = isTodayCheck()
-
-  console.log(albumOfTheDayObj)
-
-  // This may be my ugliest function in this whole thing.... Timezones are really confusing me
-  function isTodayCheck() {
-    const date1String = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0])).toISOString().split('T')[0]
-    const splitDate = date.split("-")
-    const date2String = new Date(Date.parse(new Date(parseInt(splitDate[0]), parseInt(splitDate[1])-1, parseInt(splitDate[2])).toISOString().split('T')[0])).toISOString().split('T')[0]
-    // Return string equals
-    return date1String == date2String;
-  }
-
-  // Pull data from album object, return empty string if not available
-  function albumData(key) {
-    if(key in albumOfTheDayObj) {
-      return albumOfTheDayObj[key]
-    } else { 
-      return ""
-    }
-  }
+  let dateArr = (date as string).split("-")
   
   return (
     <div className="flex min-h-screen flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text={`Historical Album Of the Day Data - ${date}`} />
-      <div className="flex flex-col w-fit justify-center md:w-4/5 gap-2">
-        <p className="mx-auto px-2 py-2 text-small italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
-          You are viewing historical Album Of the Day Data, you cannot make any changes or submit any new data on this page.
+      <div className="flex gap-1 font-extralight">
+        <p>
+          This page has been relocated to: 
         </p>
-        <div className="w-fit mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row">
-          <div className="backdrop-blur-2xl px-3 py-3 my-2 mx-auto rounded-2xl bg-zinc-800/30 border border-neutral-800">
-            <div className="mx-1 mt-1 mb-2 flex justify-between w-full">
-              <Button 
-                as={Link}
-                href={"/dashboard/spotify/historical/" + prevString}
-                radius="lg"
-                className={`w-fit hover:underline text-white`}
-                variant="solid"
-              >
-                <b>Prev Day</b>
-              </Button>
-              <Button 
-                as={Link}
-                href={"/dashboard/spotify/album/" + albumData("album_id")}
-                radius="lg"
-                className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
-                variant="solid"
-                isDisabled={albumData("album_id") == null}
-              >
-                <b>Album Page</b>
-              </Button> 
-              <Button
-                as={Link}
-                href={"/dashboard/spotify/historical/" + nextString}
-                radius="lg"
-                className={`${(isToday) ? 'invisible' : ''} w-fit hover:underline text-white`}
-                variant="solid"
-              >
-                <b>Next Day</b>
-              </Button> 
-            </div>
-            <Badge
-              content={(await getAlbumAvgRating(albumData('album_id'), false)).toFixed(2)} 
-              size="lg" 
-              placement="top-left" 
-              shape="rectangle"
-              showOutline={false}
-              variant="shadow"
-              className={`lg:-ml-4 -mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumData('album_id'), false)).toFixed(2))} lg:text-xl text-black`}
-              isInvisible={albumData("title") == ""}
-            >
-              <AlbumDisplay
-                title={albumData("title")}
-                album_img_src={albumData("album_img_src")}
-                album_src={albumData("album_src")}
-                album_spotify_id={albumData("album_id")}
-                artist={albumData("artist")}
-                submitter={albumData("submitter")}
-                submitter_comment={albumData("submitter_comment")}
-                submission_date={albumData("submission_date")}
-              />
-            </Badge>
-          </div>
-          <div className="backdrop-blur-2xl px-2 py-2 my-2 mx-auto rounded-2xl bg-zinc-800/30 border border-neutral-800">
-            <ReviewDisplay
-              album_id={albumData("album_id")}
-            />
-          </div>
-        </div>
-        <Button 
-          as={Link}
-          href={"/dashboard/spotify"}
-          radius="lg"
-          className="w-fit mx-auto hover:underline" 
-          variant="bordered"
+        <a
+          className="text-blue-600 hover:underline"
+          href={`../calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`}
         >
-          Return to Main Page
-        </Button> 
+          dashboard/spotify/calendar/{dateArr[0]}/{dateArr[1]}/{dateArr[2]}
+        </a>
       </div>
     </div>    
   )

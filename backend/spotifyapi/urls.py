@@ -70,4 +70,6 @@ urlpatterns = [
   # Get chance a certian user's album will be picked given current conditions
   path('getChanceOfAotdSelect/<str:user_discord_id>', views_aotd.getChanceOfAotdSelect),
   path('getChanceOfAotdSelect', views_aotd.getChanceOfAotdSelect),
+  # Get all AOtD Instances for a month
+  path('getAOtDByMonth/<str:year>/<str:month>', views_aotd.getAOtDByMonth),
 ]

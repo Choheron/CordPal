@@ -129,3 +129,21 @@ export function onlineStatusToTailwindBgColor(status: string) {
       return "bg-green-600";
   }
 }
+
+// Pad number if needed
+export function padNumber(number) {
+  return number.toString().padStart(2, "0")
+}
+
+// Turn a month number into a month name (month numbers are in calendar format)
+export function monthToName(monthNum) {
+  const months = [ "January", "February", "March", "April", "May", "June", 
+    "July", "August", "September", "October", "November", "December" ];
+  
+  return months[monthNum - 1];
+}
+
+
+export function daysInMonth(year, month) {
+  return new Date(year, month, 0).getDate();
+}

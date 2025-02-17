@@ -198,3 +198,39 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
   chance = (float(user_eligible_count)/float(total_eligible_count)) * 100.00
   # Return data 
   return JsonResponse({'percentage': chance})
+
+
+###
+# Return an object containing all of the aotd objects and their albums in a specific month
+###
+def getAOtDByMonth(request: HttpRequest, year: str, month: str):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getAOtDByMonth called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get all AOtD Objects for this year and month
+  month_AOtD = DailyAlbum.objects.filter(date__year=year, date__month=month)
+  # Create and populate out object
+  out = {}
+  for aotd in month_AOtD:
+    albumObj = aotd.album
+    # Build album object
+    temp = {}
+    temp['raw_data'] = model_to_dict(albumObj)
+    temp['title'] = albumObj.title
+    temp['album_id'] = albumObj.spotify_id
+    temp['album_img_src'] = albumObj.cover_url
+    temp['album_src'] = albumObj.spotify_url
+    temp['artist'] = {}
+    temp['artist']['name'] = albumObj.artist
+    temp['artist']['href'] = (albumObj.artist_url if albumObj.artist_url != "" else albumObj.raw_data['album']['artists'][0]['external_urls']['spotify'])
+    temp['submitter'] = albumObj.submitted_by.discord_id
+    temp['submitter_comment'] = albumObj.user_comment
+    temp['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+    # Append out object to output
+    out[aotd.date.strftime('%Y-%m-%d')] = temp
+  # Return out object with timestamp
+  out['timestamp'] = timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
+  return JsonResponse(out)

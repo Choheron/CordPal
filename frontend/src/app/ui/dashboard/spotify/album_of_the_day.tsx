@@ -39,7 +39,7 @@ export default async function AlbumOfTheDayBox(props) {
   return (
     <div className="w-full lg:max-w-[1080px] flex flex-col lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
       <div className="w-full flex flex-col">
-        <div className="ml-2 mt-1 mb-1">
+        <div className="flex w-full justify-between px-2 mt-1 mb-1">
           <Button 
             as={Link}
             href={"/dashboard/spotify/historical/" + yesterdayString}
@@ -48,6 +48,15 @@ export default async function AlbumOfTheDayBox(props) {
             variant="solid"
           >
             <b>View Yesterday&apos;s Album</b>
+          </Button> 
+          <Button 
+            as={Link}
+            href={`/dashboard/spotify/calendar/${albumOfTheDayObj['AOD_date'].split("-")[0]}/${albumOfTheDayObj['AOD_date'].split("-")[1]}`}
+            radius="lg"
+            className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+            variant="solid"
+          >
+            <b>Calendar View</b>
           </Button> 
         </div>
         <AlbumDisplay 
