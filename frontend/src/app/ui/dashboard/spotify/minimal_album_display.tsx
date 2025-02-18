@@ -25,6 +25,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - showSubmitInfo: Boolean - (Optional) [DEFAULT FALSE] Show the submission info for the album
 //  - rating_override: int - (Optional) Override the rating to show a custom one
 //  - sizingOverride: String - (Optional) Override the image and button sizing tailwind
+//  - buttonUrlOverride: String - (Optional) Override the link that is accessed when the user clicks on the album display
 export default async function MinimalAlbumDisplay(props) {
   // Configuration Props
   const showAlbumRating = (props.showAlbumRating) ? props.showAlbumRating : false;
@@ -48,6 +49,7 @@ export default async function MinimalAlbumDisplay(props) {
   const historical_date = (props.historical_date) ? props.historical_date : "0000-00-00";
   // Sizing overrides 
   const sizingOverride = (props.sizingOverride) ? props.sizingOverride : "h-[125px] w-[125px] lg:h-[300px] lg:w-[300px]"
+  const buttonUrlOverride = (props.buttonUrlOverride) ? props.buttonUrlOverride : `/dashboard/spotify/album/${props.album_spotify_id}`
 
   return (
     <div className={`group ${sizingOverride} mx-2 lg:mx-1 my-auto flex flex-row`}>
@@ -58,7 +60,7 @@ export default async function MinimalAlbumDisplay(props) {
       />
       <Button 
         as={Link}
-        href={`/dashboard/spotify/album/${props.album_spotify_id}`}
+        href={buttonUrlOverride}
         radius="lg"
         className={`absolute flex flex-col transition opacity-0 group-hover:opacity-100 ease-in-out ${sizingOverride} lg:gap-2 bg-transparent p-0`}
         isDisabled={!props.album_spotify_id}

@@ -54,7 +54,7 @@ export default async function AlbumOfTheDayBox(props) {
             as={Link}
             href={`/dashboard/spotify/calendar/${todayDate.toISOString().split('T')[0].split("-")[0]}/${todayDate.toISOString().split('T')[0].split("-")[1]}`}
             radius="lg"
-            className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+            className={`invisible lg:visible w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
             variant="solid"
           >
             <b>Calendar View</b>

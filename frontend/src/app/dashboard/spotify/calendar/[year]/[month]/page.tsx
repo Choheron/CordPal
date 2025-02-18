@@ -143,6 +143,7 @@ export default async function Page({
           submission_date={albumGet("submission_date")}
           historical_date={albumGet('date')}
           sizingOverride="w-full h-full"
+          buttonUrlOverride={`/dashboard/spotify/calendar/${year}/${month}/${padNumber(dateArr[2])}`}
         />
         <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
           <p>{dateArr[2]}</p>
@@ -183,7 +184,7 @@ export default async function Page({
           <b>Next Month</b>
         </Button>
       </div>
-      <table className="w-4/5 h-full table-fixed mx-auto border-separate border-spacing-1">
+      <table className="w-full xl:w-4/5 h-full table-fixed mx-auto border-separate border-spacing-1">
         <thead>
           <tr>
             <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2">Sunday</th>
