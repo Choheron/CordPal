@@ -37,7 +37,7 @@ export default async function Page({
   // TODO: Make this not such a HUGE call
   const lastMonthAotdData = await getAOtDByMonth(`${lastMonth.getFullYear()}`, padNumber(Number(lastMonth.getMonth() + 1)))
   // If the user isnt supposed to be here, redirect them to the current month's page
-  if((firstDay > today) || ((Object.keys(lastMonthAotdData).length == 1))) {
+  if((firstDay > today) || ((Object.keys(aotdData).length == 1))) {
     redirect(`/dashboard/spotify/calendar/${today.getFullYear()}/${today.getMonth() + 1}`)
   }
 
@@ -119,7 +119,7 @@ export default async function Page({
           <MinimalAlbumDisplay
             showAlbumRating={true}
             title={"Future Album"}
-            album_img_src={"https://www.placemonkeys.com/500?greyscale"}
+            album_img_src={"https://www.placemonkeys.com/500?greyscale&random"}
             artist={{'name': "Monke"}}
             sizingOverride="w-full h-full"
           />
