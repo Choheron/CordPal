@@ -26,6 +26,9 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - rating_override: int - (Optional) Override the rating to show a custom one
 //  - sizingOverride: String - (Optional) Override the image and button sizing tailwind
 //  - buttonUrlOverride: String - (Optional) Override the link that is accessed when the user clicks on the album display
+//  - titleTextOverride: String - (Optional) Override the tailwind css for the title text
+//  - artistTextOverride: String - (Optional) Override the tailwind css for the artist text
+//  - starTextOverride: String - (Optional) Override the tailwind css for the star rating text
 export default async function MinimalAlbumDisplay(props) {
   // Configuration Props
   const showAlbumRating = (props.showAlbumRating) ? props.showAlbumRating : false;
@@ -50,6 +53,9 @@ export default async function MinimalAlbumDisplay(props) {
   // Sizing overrides 
   const sizingOverride = (props.sizingOverride) ? props.sizingOverride : "h-[125px] w-[125px] lg:h-[300px] lg:w-[300px]"
   const buttonUrlOverride = (props.buttonUrlOverride) ? props.buttonUrlOverride : `/dashboard/spotify/album/${props.album_spotify_id}`
+  const titleTextOverride = (props.titleTextOverride) ? props.titleTextOverride : 'text-center text-xl lg:text-3xl text-wrap'
+  const artistTextOverride = (props.artistTextOverride) ? props.artistTextOverride : 'text-center text-sm lg:text-xl italic text-wrap'
+  const starTextOverride = (props.starTextOverride) ? props.starTextOverride : 'text-xl 3xl:text-3xl'
 
   return (
     <div className={`group ${sizingOverride} mx-2 lg:mx-1 my-auto flex flex-row`}>
@@ -65,10 +71,10 @@ export default async function MinimalAlbumDisplay(props) {
         className={`absolute flex flex-col transition opacity-0 group-hover:opacity-100 ease-in-out ${sizingOverride} lg:gap-2 bg-transparent p-0`}
         isDisabled={!props.album_spotify_id}
       >
-        <p className="text-center text-xl lg:text-3xl text-wrap">
+        <p className={titleTextOverride}>
           {title}
         </p>
-        <p className="text-center text-sm lg:text-xl italic text-wrap">
+        <p className={artistTextOverride}>
           {artist_name}
         </p>
         <Conditional showWhen={props.submitter && showSubmitInfo}>
@@ -115,7 +121,7 @@ export default async function MinimalAlbumDisplay(props) {
               <StarRating 
                 className="text-yellow-400"
                 rating={(rating_override) ? rating_override : avg_rating} 
-                textSize="text-xl 3xl:text-3xl"
+                textSize={starTextOverride}
               />
             </div>
           </div>

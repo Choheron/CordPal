@@ -143,7 +143,14 @@ export function monthToName(monthNum) {
   return months[monthNum - 1];
 }
 
-
+// Get number of days in a month
 export function daysInMonth(year, month) {
   return new Date(year, month, 0).getDate();
+}
+
+// Convert date string in YYYY-MM-DD format to a human readable string
+export function dateToString(dateStr: string) {
+  const dateArr = dateStr.split("-")
+
+  return `${monthToName(dateArr[1])} ${dateArr[2]}, ${dateArr[0]}`
 }

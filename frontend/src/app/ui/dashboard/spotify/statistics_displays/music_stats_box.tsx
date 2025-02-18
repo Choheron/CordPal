@@ -6,7 +6,7 @@ import AlbumDisplay from "../album_display";
 
 import {Badge} from "@nextui-org/badge";
 import { Divider, Tooltip } from "@nextui-org/react";
-import { ratingToTailwindBgColor } from "@/app/lib/utils";
+import { dateToString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import ReviewStatsUserCard from "./review_stats_user_card";
 
 // GUI Display for an Album
@@ -16,10 +16,6 @@ export default async function MusicStatsBox(props) {
   const albumStatsJson = await getAlbumsStats();
   const albumLowHighStatsJson = await getLowestHighestAlbumStats();
   const userReviewStatsJson = await getAllUserReviewStats();
-
-  const test = albumStatsJson['user_objs'].map((user, index) => {
-    return {name: user['nickname'], value: user['submission_count']}
-  })
 
   const albumUserStatsTable = albumStatsJson['user_objs'].sort((a, b) => a['submission_count'] < b['submission_count'] ? 1 : -1).map((user, index) => {
     return (
@@ -107,7 +103,7 @@ export default async function MusicStatsBox(props) {
         {/* Album Highest Stats */}
         <div className='min-w-[300px] w-fit mx-auto flex flex-col'>
           <p className="mx-auto text-xl underline mb-2">
-            Highest Album: {albumLowHighStatsJson['highest_album']['date']}
+            Highest Album: {dateToString(albumLowHighStatsJson['highest_album']['date'])}
           </p>
           <Badge 
             content={(await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2)} 
@@ -135,7 +131,7 @@ export default async function MusicStatsBox(props) {
         {/* Album Lowest Stats */}
         <div className='min-w-[300px] w-fit mx-auto flex flex-col'>
           <p className="mx-auto text-xl underline mb-2">
-            Lowest Album: {albumLowHighStatsJson['lowest_album']['date']}
+            Lowest Album: {dateToString(albumLowHighStatsJson['lowest_album']['date'])}
           </p>
           <Badge 
             content={(await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2)} 
