@@ -135,7 +135,7 @@ export default function AlbumReviewBox(props) {
         content={comment}
         updateCallback={setComment}
       />
-      <p className="text-xs mx-2 text-gray-400">
+      <p className="text-xs mx-2 text-gray-400 mb-1">
         Enter an optional comment to go with your review of this album. Tenor links will be updated on the display end.
       </p>
       {/* 
