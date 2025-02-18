@@ -5,6 +5,7 @@ import PageTitle from "@/app/ui/dashboard/page_title"
 import MinimalAlbumDisplay from "@/app/ui/dashboard/spotify/minimal_album_display"
 import { Button } from "@nextui-org/react"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 
 
 
@@ -17,18 +18,28 @@ export default async function Page({
 }) {
   const year = (await params).year
   const month = (await params).month
+  // Get month and day data
   const monthName = monthToName(month)
   const dayCount = daysInMonth(year, month)
-  // Retrieve album data for this month
-  const aotdData = await getAOtDByMonth(year, padNumber(Number(month)))
   // Get this month first day
   const firstDay = new Date(Number(year), Number(month) - 1, 1)
+  // Get Today's Date
+  const today = new Date()
   // Get previous month date 
-  const lastMonth = new Date(new Date(firstDay).setMonth(firstDay.getMonth()));
+  const lastMonth = new Date(new Date(firstDay).setMonth(firstDay.getMonth() - 1));
   // Get next month date
   const nextMonth = new Date(new Date(firstDay).setMonth(firstDay.getMonth() + 1));
   // Boolean to see if the viewed month is the current month
   const currMonth = ((new Date().getMonth() + 1) == Number(month))
+  // Retrieve album data for this month
+  const aotdData = await getAOtDByMonth(year, padNumber(Number(month)))
+  // Get last month's data to see if there are any albums there
+  // TODO: Make this not such a HUGE call
+  const lastMonthAotdData = await getAOtDByMonth(`${lastMonth.getFullYear()}`, padNumber(Number(lastMonth.getMonth() + 1)))
+  // If the user isnt supposed to be here, redirect them to the current month's page
+  if((firstDay > today) || ((Object.keys(lastMonthAotdData).length == 1))) {
+    redirect(`/dashboard/spotify/calendar/${today.getFullYear()}/${today.getMonth() + 1}`)
+  }
 
   // Populate an array containing strings of dates (YYYY-MM-DD) that corresponds to where to place the days in the UI
   // Array will contain subarrays containing data from sat to sun (one week)
@@ -42,7 +53,8 @@ export default async function Page({
     if(dayIndex == 1) {
       let x = 0
       while(x < dayOfWeek) {
-        dates[weekIndex].push("-")
+        // THIS IS UGLY WHAT AM I DOING LOL
+        dates[weekIndex].push(`${lastMonth.getFullYear()}-${padNumber(lastMonth.getMonth() + 1)}-${padNumber((new Date(new Date().setDate(firstDay.getDate() - (dayOfWeek - (x)))).getDate()))}`)
         x++;
       }
     }
@@ -77,34 +89,63 @@ export default async function Page({
   // Generate a day
   const genDay = (dateStr) => {
     const albumObj = aotdData[dateStr]
-    
+    const dateArr = dateStr.split("-")
+
+    // Return a field value from the album object or null
+    function albumGet(field) {
+      if(albumObj) {
+        return albumObj[field]
+      }
+      return null
+    }
+
+    // If the album date is from last month, return a text block
+    if(dateStr.split("-")[1] != (firstDay.getMonth() + 1)) {
+      return (
+        <div className="relative w-full h-full mx-2 p-1">
+          <div className="w-full h-full content-center bg-gray-800/30 rounded-2xl border border-neutral-800">
+            <p className="w-fit m-auto">Previous Month</p>
+          </div>
+          <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
+            <p>{dateArr[2]}</p>
+          </div>
+        </div>
+      )
+    }
+    // If the album date is greater than today, return a special object for future albums
+    if(new Date(Number(dateArr[0]), Number(dateArr[1]) - 1, Number(dateArr[2])) > today) {
+      return (
+        <div className="relative w-full h-full mx-2 p-1">
+          <MinimalAlbumDisplay
+            showAlbumRating={true}
+            title={"Future Album"}
+            album_img_src={"https://www.placemonkeys.com/500?greyscale"}
+            artist={{'name': "Monke"}}
+            sizingOverride="w-full h-full"
+          />
+          <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
+            <p>{dateArr[2]}</p>
+          </div>
+        </div>
+      )
+    }
     return (
       <div className="relative w-full h-full mx-2 p-1">
-        {
-          (!albumObj) ? (
-            <div className="w-full h-full">
-              <p className="w-full h-full text-center align-middle">
-                No Album Of the Day
-              </p>
-            </div>
-          ):(
-            <MinimalAlbumDisplay
-              showAlbumRating={true}
-              title={albumObj["title"]}
-              album_spotify_id={albumObj["album_id"]}
-              album_img_src={albumObj["album_img_src"]}
-              album_src={albumObj["spotify_url"]}
-              artist={albumObj["artist"]}
-              submitter={albumObj["submitter_id"]}
-              submitter_comment={albumObj["submitter_comment"]}
-              submission_date={albumObj["submission_date"]}
-              historical_date={albumObj['date']}
-              sizingOverride="w-full h-full"
-            />
-          )
-        }
+        <MinimalAlbumDisplay
+          showAlbumRating={true}
+          title={albumGet("title")}
+          album_spotify_id={albumGet("album_id")}
+          album_img_src={albumGet("album_img_src")}
+          album_src={albumGet("spotify_url")}
+          artist={albumGet("artist")}
+          submitter={albumGet("submitter_id")}
+          submitter_comment={albumGet("submitter_comment")}
+          submission_date={albumGet("submission_date")}
+          historical_date={albumGet('date')}
+          sizingOverride="w-full h-full"
+        />
         <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
-          <p>{dateStr.split("-")[2]}</p>
+          <p>{dateArr[2]}</p>
         </div>
       </div>
     )
@@ -116,9 +157,9 @@ export default async function Page({
       <div className="flex justify-between w-4/5">
         <Button 
           as={Link}
-          href={`/dashboard/spotify/calendar/${lastMonth.getFullYear()}/${padNumber(Number(lastMonth.getMonth()))}`}
+          href={`/dashboard/spotify/calendar/${lastMonth.getFullYear()}/${padNumber(Number(lastMonth.getMonth()) + 1)}`}
           radius="lg"
-          className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+          className={`${(Object.keys(lastMonthAotdData).length == 1) ? "invisible" : ""} w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
           variant="solid"
         >
           <b>Previous Month</b>

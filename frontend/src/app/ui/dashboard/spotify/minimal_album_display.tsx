@@ -61,6 +61,7 @@ export default async function MinimalAlbumDisplay(props) {
         href={`/dashboard/spotify/album/${props.album_spotify_id}`}
         radius="lg"
         className={`absolute flex flex-col transition opacity-0 group-hover:opacity-100 ease-in-out ${sizingOverride} lg:gap-2 bg-transparent p-0`}
+        isDisabled={!props.album_spotify_id}
       >
         <p className="text-center text-xl lg:text-3xl text-wrap">
           {title}
