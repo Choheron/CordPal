@@ -14,6 +14,7 @@ import {
   RiQuoteText, RiSeparator, RiStrikethrough 
 } from 'react-icons/ri'
 import { getTenorGifData } from '@/app/lib/spotify_utils'
+import { SmilieReplacer } from './replacers/smilie_replacer'
 
 // TipTap Rich editor box
 export default function ReviewTipTap(props) {
@@ -207,6 +208,7 @@ export default function ReviewTipTap(props) {
   // =============================================================================================================================
 
   const extensions = [
+    SmilieReplacer,
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
     TextStyle.configure({ types: [ListItem.name] }),
     StarterKit.configure({
