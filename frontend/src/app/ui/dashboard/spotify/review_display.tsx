@@ -12,7 +12,7 @@ export default async function ReviewDisplay(props) {
   const userCount = await getSpotifyUserCount();
 
   return (
-    <div className="w-full lg:w-fit min-w-[300px] mx-2 lg:mx-1 my-2 flex flex-col gap-2">
+    <div className="w-full lg:w-fit min-w-[250px] mx-2 lg:mx-1 my-2 flex flex-col gap-2">
       <div className="flex mx-auto gap-3">
         <p>User Reviews:</p>
         <p>{reviews.length}/{userCount}</p>
