@@ -6,6 +6,7 @@ import MinimalAlbumDisplay from "@/app/ui/dashboard/spotify/minimal_album_displa
 import { Button } from "@nextui-org/react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { RiArrowLeftCircleLine, RiArrowRightCircleLine } from "react-icons/ri"
 
 
 
@@ -160,10 +161,10 @@ export default async function Page({
           as={Link}
           href={`/dashboard/spotify/calendar/${lastMonth.getFullYear()}/${padNumber(Number(lastMonth.getMonth()) + 1)}`}
           radius="lg"
-          className={`${(Object.keys(lastMonthAotdData).length == 1) ? "invisible" : ""} w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+          className={`${(Object.keys(lastMonthAotdData).length == 1) ? "invisible" : ""} w-fit hover:underline text-white`}
           variant="solid"
         >
-          <b>Previous Month</b>
+          <RiArrowLeftCircleLine className="text-2xl" />
         </Button>
         <Button 
           as={Link}
@@ -178,10 +179,10 @@ export default async function Page({
           as={Link}
           href={`/dashboard/spotify/calendar/${nextMonth.getFullYear()}/${padNumber(nextMonth.getMonth() + 1)}`}
           radius="lg"
-          className={`${(currMonth) ? "invisible" : ""} w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+          className={`${(currMonth) ? "invisible" : ""} w-fit hover:underline text-white `}
           variant="solid"
         >
-          <b>Next Month</b>
+          <RiArrowRightCircleLine className="text-2xl" />
         </Button>
       </div>
       <table className="w-full xl:w-4/5 h-full table-fixed mx-auto border-separate border-spacing-1">

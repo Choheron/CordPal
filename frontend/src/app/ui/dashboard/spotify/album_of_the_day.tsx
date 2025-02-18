@@ -8,6 +8,7 @@ import ReviewDisplay from "./review_display";
 import { getAlbumOfTheDayData, getChanceOfAotdSelect, getSimilarReviewsForRatings, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
 import AddAlbumModal from "./modals/add_album_modal";
 import Link from "next/link";
+import { RiCalendar2Fill} from "react-icons/ri";
 
 // GUI Display for the Album of the Day
 // Expected Props:
@@ -57,7 +58,7 @@ export default async function AlbumOfTheDayBox(props) {
             className={`invisible lg:visible w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
             variant="solid"
           >
-            <b>Calendar View</b>
+            <RiCalendar2Fill className="text-2xl" />
           </Button> 
         </div>
         <AlbumDisplay 
