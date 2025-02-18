@@ -51,7 +51,7 @@ export default async function AlbumOfTheDayBox(props) {
           </Button> 
           <Button 
             as={Link}
-            href={`/dashboard/spotify/calendar/${albumOfTheDayObj['AOD_date'].split("-")[0]}/${albumOfTheDayObj['AOD_date'].split("-")[1]}`}
+            href={`/dashboard/spotify/calendar/${todayDate.toISOString().split('T')[0].split("-")[0]}/${todayDate.toISOString().split('T')[0].split("-")[1]}`}
             radius="lg"
             className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
             variant="solid"
