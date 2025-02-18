@@ -44,6 +44,12 @@ export default async function AlbumDisplay(props) {
   const historical = (props.historical_date) ? true : false;
   const historical_date = (props.historical_date) ? props.historical_date : "0000-00-00";
 
+  const dateToCalUrl = (dateStr) => {
+    const dateArr = dateStr.split("-")
+
+    return `${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`
+  }
+
   return (
     <div className="w-full max-w-[320px] lg:min-w-[650px] lg:max-w-full mx-2 lg:mx-1 my-auto block overflow-hidden text-ellipsis">
       <div className="w-full my-auto flex flex-row">
@@ -109,7 +115,7 @@ export default async function AlbumDisplay(props) {
           <Conditional showWhen={historical}>
             <Button 
               as={Link}
-              href={"/dashboard/spotify/historical/" + historical_date}
+              href={"/dashboard/spotify/calendar/" + dateToCalUrl(historical_date)}
               radius="lg"
               className={`w-fit hover:underline text-white`}
               variant="solid"

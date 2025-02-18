@@ -29,9 +29,9 @@ export default async function ReviewStatsUserCard(props) {
   const lowestReviewData = await getAlbum(reviewData['lowest_score_album'])
   const highestReviewData = await getAlbum(reviewData['highest_score_album'])
 
-  function convertToHistoricalDate(reviewDate: string) {
+  function convertToHistoricalDateUrl(reviewDate: string) {
     const dateArr = reviewDate.split(',')[0].split("/")
-    return (dateArr[2] + "-" + dateArr[0] + "-" + dateArr[1])
+    return (dateArr[2] + "/" + dateArr[0] + "/" + dateArr[1])
   }
 
   return (
@@ -79,7 +79,7 @@ export default async function ReviewStatsUserCard(props) {
           <p className="my-auto mx-auto">Highest Rated Album:</p>
           <Button 
             as={Link}
-            href={"/dashboard/spotify/historical/" + convertToHistoricalDate(reviewData['highest_score_date'])}
+            href={"/dashboard/spotify/calendar/" + convertToHistoricalDateUrl(reviewData['highest_score_date'])}
             radius="lg"
             className={`w-fit hover:underline text-white h-fit py-2 mx-auto ${ratingToTailwindBgColor(reviewData['highest_score_given'])} bg-opacity-50 shadow-lg`}
             variant="bordered"
@@ -102,7 +102,7 @@ export default async function ReviewStatsUserCard(props) {
           <p className="my-auto mx-auto">Lowest Rated Album:</p>
           <Button 
             as={Link}
-            href={"/dashboard/spotify/historical/" + convertToHistoricalDate(reviewData['lowest_score_date'])}
+            href={"/dashboard/spotify/calendar/" + convertToHistoricalDateUrl(reviewData['lowest_score_date'])}
             radius="lg"
             className={`w-fit hover:underline text-white h-fit py-2 mx-auto ${ratingToTailwindBgColor(reviewData['lowest_score_given'])} bg-opacity-50 shadow-lg`}
             variant="bordered"

@@ -1,10 +1,10 @@
 import { getAlbum, getAlbumAvgRating, getAlbumOfTheDayData, getAotdDates } from "@/app/lib/spotify_utils"
-import { ratingToTailwindBgColor } from "@/app/lib/utils"
+import { monthToName, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/spotify/album_display"
 import ReviewDisplay from "@/app/ui/dashboard/spotify/review_display"
-import { Badge, Button } from "@nextui-org/react"
+import { Badge, Button, Divider } from "@nextui-org/react"
 import Link from "next/link"
 
 // Page to display data for a specific album
@@ -31,20 +31,32 @@ export default async function Page({
     return aotd_dates.map((date, index) => {
       const dateArr = date.split("-")
       return (
-        <div key={index} className="backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-          <div className="flex w-full">
-            <p className={`w-fit h-fit my-auto ${ratingToTailwindBgColor(ratingsObj[date])} px-2 py-1 rounded-full text-black`}>
-              <b>{ratingsObj[date]}</b>
-            </p>
-            <p className="w-fit ml-auto text-xl rounded-tr-2xl rounded-bl-2xl bg-zinc-800/30 border border-neutral-800 px-2 -mr-2 py-2 -mt-2">
-              {date}
-            </p>
+          <div 
+            key={index} 
+            className="flex flex-col h-fit backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800"
+          >
+            <div className="flex w-full">
+              <p className={`w-fit h-fit my-auto ${ratingToTailwindBgColor(ratingsObj[date])} px-2 py-1 rounded-full text-black`}>
+                <b>{ratingsObj[date]}</b>
+              </p>
+              <p className="w-fit ml-auto text-xl rounded-tr-2xl rounded-bl-2xl bg-zinc-800/30 border border-neutral-800 px-2 -mr-2 py-2 -mt-2">
+                {monthToName(dateArr[1])} {dateArr[2]}, {dateArr[0]}
+              </p>
+            </div>
+            <ReviewDisplay
+              album_id={albumData("album_id")}
+              date={date}
+            />
+            <Divider className="mb-2" />
+            <Button
+              as={Link}
+              href={`/dashboard/spotify/calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`}
+              className={`bg-gradient-to-br from-green-700/80 to-green-800/80 text-black w-1/2 mx-auto`}
+              variant="solid"
+            >
+              <b>View Day Page</b>
+            </Button>
           </div>
-          <ReviewDisplay
-            album_id={albumData("album_id")}
-            date={date}
-          />
-        </div>
       )
     })
   }

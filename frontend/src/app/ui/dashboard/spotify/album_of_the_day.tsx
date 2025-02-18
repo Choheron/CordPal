@@ -26,6 +26,7 @@ export default async function AlbumOfTheDayBox(props) {
 
   // Get yesterday's date
   const yesterdayString = new Date(new Date().setDate(new Date().getDate()-1)).toISOString().split('T')[0];
+  const yesterdayStringArr = yesterdayString.split("-")
 
   // Pull data from album object, return empty string if not available
   function albumData(key) {
@@ -42,7 +43,7 @@ export default async function AlbumOfTheDayBox(props) {
         <div className="flex w-full justify-between px-2 mt-1 mb-1">
           <Button 
             as={Link}
-            href={"/dashboard/spotify/historical/" + yesterdayString}
+            href={`/dashboard/spotify/calendar/${yesterdayStringArr[0]}/${yesterdayStringArr[1]}/${yesterdayStringArr[2]}`}
             radius="lg"
             className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
             variant="solid"
