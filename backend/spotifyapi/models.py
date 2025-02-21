@@ -74,6 +74,9 @@ class DailyAlbum(models.Model):
     album = models.OneToOneField(Album, on_delete=models.CASCADE)
     date = models.DateField(unique=True)
 
+    def dateToCalString(self):
+      return self.date.strftime('%Y-%m-%d')
+
     def __str__(self):
         return f"Album for {self.date}: {self.album}"
 

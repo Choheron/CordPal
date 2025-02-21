@@ -223,7 +223,7 @@ export default async function Page({
         </tbody>
       </table>
       {/* Monthly Statistics */}
-      <MonthlyStatsBox albumData={aotdData} year={year} month={month}/>
+      <MonthlyStatsBox aotdData={aotdData} year={year} month={month}/>
     </div>
   )
 }

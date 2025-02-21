@@ -1,24 +1,27 @@
 import { padNumber, ratingToTailwindBgColor } from "@/app/lib/utils";
 import MinimalAlbumDisplay from "../minimal_album_display";
 import { Badge } from "@nextui-org/react";
+import UserCard from "@/app/ui/general/userUiItems/user_card";
 
 
 
 // Display monthy statistics for the AOtD
 export default function MonthlyStatsBox(props) {
   // Prop validation
-  const albumData = (props.albumData) ? props.albumData : null;
+  const aotdData = (props.aotdData) ? props.aotdData : null;
+  const aotdStats = (aotdData) ? aotdData['stats'] : null;
   const year = (props.year) ? props.year : null;
   const month = (props.month) ? props.month : null;
   // Data Parsing from props
-  const highest_album = (albumData) ? albumData[albumData['highest_aotd_date']] : "Not Found";
-  const lowest_album = (albumData) ? albumData[albumData['lowest_aotd_date']] : "Not Found";
+  const highest_album = (aotdStats) ? aotdData[aotdStats['highest_aotd_date']] : "Not Found";
+  const lowest_album = (aotdStats) ? aotdData[aotdStats['lowest_aotd_date']] : "Not Found";
+  const selection_counts = (aotdStats) ? aotdStats['selection_counts'] : "Not Found";
 
 
   // Display lowest and highest album of the month, with their ratings
   const lowestHighestAlbum = () => {
-    const highestAlbumDateArr = albumData['highest_aotd_date'].split("-")
-    const lowestAlbumDateArr = albumData['lowest_aotd_date'].split("-")
+    const highestAlbumDateArr = aotdStats['highest_aotd_date'].split("-")
+    const lowestAlbumDateArr = aotdStats['lowest_aotd_date'].split("-")
 
     return (
       <div className="w-full lg:w-[400px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
@@ -100,11 +103,45 @@ export default function MonthlyStatsBox(props) {
     )
   }
 
+  // Display counts of user albums being selected
+  const selectionStats = () => {
+    return (
+      <div className="w-full lg:w-[350px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+        <p className="font-extralight w-full text-center text-xl underline">
+          Selection Counts:
+        </p>
+        <div className="flex flex-col h-full">
+          {selection_counts.sort((a, b) => (a["count"] > b["count"])).map((user, index) => {
+            return (
+              <div 
+                key={`${user['discord_id']}-${user['count']}`}
+                className="flex justify-between w-full my-1"
+              >
+                <UserCard 
+                  isProfileLink
+                  userDiscordID={user['discord_id']}
+                  customDescription={(
+                    <p>{Number(user['percentage']).toFixed(2)}% of Albums Selected.</p>
+                  )}
+                />
+                <p className="my-auto px-2 py-1 bg-gray-800 rounded-full">
+                  {user['count']}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
 
   return (
-    <div className="w-full flex">
+    <div className="w-full flex flex-col lg:flex-row gap-2">
       {/* Lowest and Highest Album of the Month */}
       {lowestHighestAlbum()}
+      {/* Selection Breakdown */}
+      {selectionStats()}
     </div>
   )
 }

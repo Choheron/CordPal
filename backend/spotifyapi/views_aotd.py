@@ -203,6 +203,7 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
 
 ###
 # Return an object containing all of the aotd objects and their albums in a specific month
+# NOTE: This function has been expanded to include statistics for each month, so less loops and DB calls are needed
 ###
 def getAOtDByMonth(request: HttpRequest, year: str, month: str):
   # Make sure request is a get request
@@ -219,6 +220,8 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     highest_aotd_rating = getAlbumRating(highest_aotd.album.spotify_id, rounded=False, date=highest_aotd.date)
     lowest_aotd: DailyAlbum = month_AOtD.first()
     lowest_aotd_rating = getAlbumRating(lowest_aotd.album.spotify_id, rounded=False, date=lowest_aotd.date)
+    # Track counts of submitters selected
+    selection_counts = {}
     # Create and populate out object
     out = {}
     for aotd in month_AOtD:
@@ -233,6 +236,12 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
         if((lowest_aotd_rating != None) and (rating < lowest_aotd_rating)):
           lowest_aotd = aotd
           lowest_aotd_rating = rating
+      # Increment submitter selection count
+      submitter = albumObj.submitted_by.discord_id
+      if(submitter in selection_counts):
+        selection_counts[submitter] += 1
+      else:
+        selection_counts[submitter] = 1
       # Build album object
       temp = {}
       temp['raw_data'] = model_to_dict(albumObj)
@@ -249,10 +258,18 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
       # Attach rating of album
       temp['rating'] = rating
       # Append out object to output
-      out[aotd.date.strftime('%Y-%m-%d')] = temp
+      out[aotd.dateToCalString()] = temp
+    # Provide Statistics
+    out['stats'] = {}
     # Attach lowest and highest album data
-    out['lowest_aotd_date'] = lowest_aotd.date.strftime('%Y-%m-%d')
-    out['highest_aotd_date'] = highest_aotd.date.strftime('%Y-%m-%d')
+    out['stats']['lowest_aotd_date'] = lowest_aotd.dateToCalString()
+    out['stats']['highest_aotd_date'] = highest_aotd.dateToCalString()
+    # Convert submission numbers to array
+    subNumList = []
+    for user in selection_counts.keys():
+      subNumList.append({"discord_id": user, "count": selection_counts[user], "percentage": ((selection_counts[user]/float(len(month_AOtD))) * 100)})
+    # Attach Submission Numbers
+    out['stats']['selection_counts'] = subNumList
   # Return out object with timestamp
   out['timestamp'] = timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
   return JsonResponse(out)
