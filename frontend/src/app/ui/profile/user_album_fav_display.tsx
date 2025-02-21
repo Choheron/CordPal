@@ -86,18 +86,26 @@ export default async function UserAlbumFavDisplay(props) {
               Review Stats
             </p>
             <div className="flex flex-col">
-              <div className="mb-2">
-                <div className="flex w-full justify-center">
-                  <p>Average Rating Given: </p>
-                  <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(reviewStats['average_review_score'])}`}>
-                    <b>{reviewStats['average_review_score'].toFixed(2)}</b>
+              <div className="flex justify-around">
+                <div className="mb-2">
+                  <div className="flex w-full justify-center">
+                    <p>Average Rating Given: </p>
+                    <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(reviewStats['average_review_score'])}`}>
+                      <b>{reviewStats['average_review_score'].toFixed(2)}</b>
+                    </p>
+                  </div>
+                  <StarRating 
+                    className="text-yellow-400"
+                    rating={reviewStats['average_review_score']} 
+                    textSize="text-xl lg:text-3xl"
+                  />
+                </div>
+                <div className="flex flex-col text-center">
+                  <p>Total Reviews: </p>
+                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                    {reviewStats['total_reviews']}
                   </p>
                 </div>
-                <StarRating 
-                  className="text-yellow-400"
-                  rating={reviewStats['average_review_score']} 
-                  textSize="text-xl lg:text-3xl"
-                />
               </div>
               <ReviewCountChartBox 
                 reviewStats={reviewStats}
