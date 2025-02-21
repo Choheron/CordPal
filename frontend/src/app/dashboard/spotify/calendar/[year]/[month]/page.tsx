@@ -4,10 +4,10 @@ import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import MinimalAlbumDisplay from "@/app/ui/dashboard/spotify/minimal_album_display"
 import MonthlyStatsBox from "@/app/ui/dashboard/spotify/statistics_displays/monthly_stats_box"
-import { Button } from "@nextui-org/react"
+import { Button, Tooltip } from "@nextui-org/react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { RiArrowLeftCircleLine, RiArrowRightCircleLine, RiThumbDownFill, RiVipCrownFill } from "react-icons/ri"
+import { RiArrowLeftCircleLine, RiArrowRightCircleLine, RiThumbDownFill, RiThumbUpFill, RiVipCrownFill } from "react-icons/ri"
 
 
 
@@ -157,14 +157,18 @@ export default async function Page({
           <p>{dateArr[2]}</p>
         </div>
         <Conditional showWhen={dateStr == aotdData['highest_aotd_date']}>
-          <div className="absolute -right-1 bg-yellow-500/90 border border-yellow-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl text-3xl">
-            <RiVipCrownFill />
-          </div>
+          <Tooltip content={`Highest Rated Album for ${monthToName(month)} ${year}`}>
+            <div className="absolute -right-1 bg-green-600/90 border border-green-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl text-3xl">
+              <RiThumbUpFill />
+            </div>
+          </Tooltip>
         </Conditional>
         <Conditional showWhen={dateStr == aotdData['lowest_aotd_date']}>
-          <div className="absolute -right-1 bg-red-800/90 border border-red-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl text-3xl">
-            <RiThumbDownFill />
-          </div>
+          <Tooltip content={`Lowest Rated Album for ${monthToName(month)} ${year}`}>
+            <div className="absolute -right-1 bg-red-600/90 border border-red-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl text-3xl">
+              <RiThumbDownFill />
+            </div>
+          </Tooltip>
         </Conditional>
       </div>
     )
