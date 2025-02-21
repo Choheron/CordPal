@@ -157,12 +157,12 @@ export default async function Page({
           <p>{dateArr[2]}</p>
         </div>
         <Conditional showWhen={dateStr == aotdData['highest_aotd_date']}>
-          <div className="absolute -right-1 bg-yellow-500/90 border border-yellow-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl">
+          <div className="absolute -right-1 bg-yellow-500/90 border border-yellow-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl text-3xl">
             <RiVipCrownFill />
           </div>
         </Conditional>
         <Conditional showWhen={dateStr == aotdData['lowest_aotd_date']}>
-          <div className="absolute -right-1 bg-red-800/90 border border-red-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl">
+          <div className="absolute -right-1 bg-red-800/90 border border-red-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl text-3xl">
             <RiThumbDownFill />
           </div>
         </Conditional>
