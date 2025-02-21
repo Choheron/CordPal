@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath, revalidateTag } from "next/cache";
+import { padNumber } from "@/app/lib/utils"
 import { cookies } from "next/headers";
 
 // Below Code allows for serverside computing of cookie stuff!
@@ -342,6 +343,9 @@ export async function submitReviewToBackend(reviewObject) {
   });
   // Revalidate review related calls
   revalidateTag('reviews')
+  // Revalidate AOTD calls for calendar views
+  const now = new Date()
+  revalidateTag(`calendar-${now.getFullYear()}-${padNumber(now.getMonth() + 1)}`)
 }
 
 //
@@ -659,7 +663,7 @@ export async function getAOtDByMonth(year: string = "", month: string = "") {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['AOtD'] },
+    next: { tags: [`calendar-${year}-${month}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
