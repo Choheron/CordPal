@@ -213,27 +213,46 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     return res
   # Get all AOtD Objects for this year and month
   month_AOtD = DailyAlbum.objects.filter(date__year=year, date__month=month)
-  # Create and populate out object
-  out = {}
-  for aotd in month_AOtD:
-    albumObj = aotd.album
-    # Build album object
-    temp = {}
-    temp['raw_data'] = model_to_dict(albumObj)
-    temp['title'] = albumObj.title
-    temp['album_id'] = albumObj.spotify_id
-    temp['album_img_src'] = albumObj.cover_url
-    temp['album_src'] = albumObj.spotify_url
-    temp['artist'] = {}
-    temp['artist']['name'] = albumObj.artist
-    temp['artist']['href'] = (albumObj.artist_url if albumObj.artist_url != "" else albumObj.raw_data['album']['artists'][0]['external_urls']['spotify'])
-    temp['submitter'] = albumObj.submitted_by.discord_id
-    temp['submitter_comment'] = albumObj.user_comment
-    temp['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
-    # Provide rating of album
-    temp['rating'] = getAlbumRating(aotd.album.spotify_id, rounded=False, date=aotd.date)
-    # Append out object to output
-    out[aotd.date.strftime('%Y-%m-%d')] = temp
+  if(len(month_AOtD) != 0):
+    # Track highest and lowest album scores of the month
+    highest_aotd: DailyAlbum = month_AOtD.first()
+    highest_aotd_rating = getAlbumRating(highest_aotd.album.spotify_id, rounded=False, date=highest_aotd.date)
+    lowest_aotd: DailyAlbum = month_AOtD.first()
+    lowest_aotd_rating = getAlbumRating(lowest_aotd.album.spotify_id, rounded=False, date=lowest_aotd.date)
+    # Create and populate out object
+    out = {}
+    for aotd in month_AOtD:
+      albumObj = aotd.album
+      # Get album Rating
+      rating = getAlbumRating(aotd.album.spotify_id, rounded=False, date=aotd.date)
+      # Check highest and lowest ratings if rating is not null
+      if(rating):
+        if((highest_aotd_rating != None) and (rating > highest_aotd_rating)):
+          highest_aotd = aotd
+          highest_aotd_rating = rating
+        if((lowest_aotd_rating != None) and (rating < lowest_aotd_rating)):
+          lowest_aotd = aotd
+          lowest_aotd_rating = rating
+      # Build album object
+      temp = {}
+      temp['raw_data'] = model_to_dict(albumObj)
+      temp['title'] = albumObj.title
+      temp['album_id'] = albumObj.spotify_id
+      temp['album_img_src'] = albumObj.cover_url
+      temp['album_src'] = albumObj.spotify_url
+      temp['artist'] = {}
+      temp['artist']['name'] = albumObj.artist
+      temp['artist']['href'] = (albumObj.artist_url if albumObj.artist_url != "" else albumObj.raw_data['album']['artists'][0]['external_urls']['spotify'])
+      temp['submitter'] = albumObj.submitted_by.discord_id
+      temp['submitter_comment'] = albumObj.user_comment
+      temp['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+      # Attach rating of album
+      temp['rating'] = rating
+      # Append out object to output
+      out[aotd.date.strftime('%Y-%m-%d')] = temp
+    # Attach lowest and highest album data
+    out['lowest_aotd_date'] = lowest_aotd.date.strftime('%Y-%m-%d')
+    out['highest_aotd_date'] = highest_aotd.date.strftime('%Y-%m-%d')
   # Return out object with timestamp
   out['timestamp'] = timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
   return JsonResponse(out)

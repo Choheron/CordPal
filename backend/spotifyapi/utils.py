@@ -174,6 +174,7 @@ def getAlbumRating(album_spotify_id, rounded=True, date=None):
   reviewList = Review.objects.filter(album=albumObj).filter(aotd_date=aotd_date)
   # Return None if the album has not been reviewed
   if(len(reviewList) == 0):
+    logger.info(f"No reviews found for {albumObj.title} on Date: {aotd_date}")
     return None
   review_sum = 0.0
   for review in reviewList:

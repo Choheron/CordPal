@@ -3,10 +3,11 @@ import { daysInMonth, monthToName, padNumber } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import MinimalAlbumDisplay from "@/app/ui/dashboard/spotify/minimal_album_display"
+import MonthlyStatsBox from "@/app/ui/dashboard/spotify/statistics_displays/monthly_stats_box"
 import { Button } from "@nextui-org/react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { RiArrowLeftCircleLine, RiArrowRightCircleLine } from "react-icons/ri"
+import { RiArrowLeftCircleLine, RiArrowRightCircleLine, RiThumbDownFill, RiVipCrownFill } from "react-icons/ri"
 
 
 
@@ -155,14 +156,24 @@ export default async function Page({
         <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
           <p>{dateArr[2]}</p>
         </div>
+        <Conditional showWhen={dateStr == aotdData['highest_aotd_date']}>
+          <div className="absolute -right-1 bg-yellow-500/90 border border-yellow-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl">
+            <RiVipCrownFill />
+          </div>
+        </Conditional>
+        <Conditional showWhen={dateStr == aotdData['lowest_aotd_date']}>
+          <div className="absolute -right-1 bg-red-800/90 border border-red-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl">
+            <RiThumbDownFill />
+          </div>
+        </Conditional>
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center p-3 pb-36 pt-10">
+    <div className="flex flex-col min-h-screen w-full lg:w-3/4 mx-auto items-center p-3 pb-36 pt-10 ">
       <PageTitle text={`Historical Daily Albums for ${monthName} ${year}`} />
-      <div className="flex justify-between w-4/5">
+      <div className="flex w-full justify-between">
         <Button 
           as={Link}
           href={`/dashboard/spotify/calendar/${lastMonth.getFullYear()}/${padNumber(Number(lastMonth.getMonth()) + 1)}`}
@@ -191,7 +202,7 @@ export default async function Page({
           <RiArrowRightCircleLine className="text-2xl" />
         </Button>
       </div>
-      <table className="w-full xl:w-4/5 h-full table-fixed mx-auto border-separate border-spacing-1">
+      <table className="w-full h-full table-fixed mx-auto border-separate border-spacing-1">
         <thead>
           <tr>
             <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2">Sunday</th>
@@ -207,6 +218,8 @@ export default async function Page({
           {genCalendar()}
         </tbody>
       </table>
+      {/* Monthly Statistics */}
+      <MonthlyStatsBox albumData={aotdData} year={year} month={month}/>
     </div>
   )
 }
