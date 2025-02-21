@@ -106,16 +106,16 @@ export default function MonthlyStatsBox(props) {
   // Display counts of user albums being selected
   const selectionStats = () => {
     return (
-      <div className="w-full lg:w-[350px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+      <div className="w-full lg:w-[300px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
         <p className="font-extralight w-full text-center text-xl underline">
           Selection Counts:
         </p>
         <div className="flex flex-col h-full">
-          {selection_counts.sort((a, b) => (a["count"] > b["count"])).map((user, index) => {
+          {selection_counts.sort((a, b) => ((a["count"] < b["count"]) ? 1 : -1)).map((user, index) => {
             return (
               <div 
                 key={`${user['discord_id']}-${user['count']}`}
-                className="flex justify-between w-full my-1"
+                className="flex justify-between w-full my-1 px-3"
               >
                 <UserCard 
                   isProfileLink
