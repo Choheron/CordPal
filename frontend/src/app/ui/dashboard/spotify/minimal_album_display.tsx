@@ -21,7 +21,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - submission_date: String - (Optional) A String representation of the submission date of the Album
 //  - album_spotify_id: String - (Optional) Album Spotify ID for retrieval of average from database
 //  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
-//  - showAlbumRating: Boolean - (Optional) [DEFAULT FALSE] Show the average user rating for the album
+//  - showAlbumRating: Boolean - (Optional) [DEFAULT 0] 0: Show no ratings, 1: Show stars, 2: Show stars and number
 //  - showSubmitInfo: Boolean - (Optional) [DEFAULT FALSE] Show the submission info for the album
 //  - rating_override: int - (Optional) Override the rating to show a custom one
 //  - sizingOverride: String - (Optional) Override the image and button sizing tailwind
@@ -31,7 +31,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - starTextOverride: String - (Optional) Override the tailwind css for the star rating text
 export default async function MinimalAlbumDisplay(props) {
   // Configuration Props
-  const showAlbumRating = (props.showAlbumRating) ? props.showAlbumRating : false;
+  const showAlbumRating = (props.showAlbumRating) ? props.showAlbumRating : 0;
   const showSubmitInfo = (props.showSubmitInfo) ? props.showSubmitInfo : false;
   // Album props checks
   const title = (props.title) ? props.title : "No Album Title Found";
@@ -49,7 +49,7 @@ export default async function MinimalAlbumDisplay(props) {
   const rating_override = (props.ratingOverride) ? props.ratingOverride : false;
   // Historical props checks
   const historical = (props.historical_date) ? true : false;
-  const historical_date = (props.historical_date) ? props.historical_date : "0000-00-00";
+  const historical_date: string = (props.historical_date) ? props.historical_date : "0000-00-00";
   // Sizing overrides 
   const sizingOverride = (props.sizingOverride) ? props.sizingOverride : "h-[125px] w-[125px] lg:h-[300px] lg:w-[300px]"
   const buttonUrlOverride = (props.buttonUrlOverride) ? props.buttonUrlOverride : `/dashboard/spotify/album/${props.album_spotify_id}`
@@ -66,7 +66,7 @@ export default async function MinimalAlbumDisplay(props) {
       />
       <Button 
         as={Link}
-        href={buttonUrlOverride}
+        href={(historical) ? `/dashboard/spotify/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
         radius="lg"
         className={`absolute flex flex-col transition opacity-0 group-hover:opacity-100 ease-in-out ${sizingOverride} lg:gap-2 bg-transparent p-0`}
         isDisabled={!props.album_spotify_id}
@@ -107,17 +107,14 @@ export default async function MinimalAlbumDisplay(props) {
             </div>
           </div>
         </Conditional>
-        <Conditional showWhen={(avg_rating != 0) && ((avg_rating != null) && showAlbumRating)}>
-          <div className="">
-            <Conditional showWhen={rating_override == null} >
-              <div className="flex mb-1">
-                <p>Average User Rating: </p>
-                <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor((rating_override) ? rating_override : avg_rating)}`}>
+        <Conditional showWhen={((avg_rating != null) && showAlbumRating != 0)}>
+          <div className="w-full">
+            <Conditional showWhen={rating_override == false && showAlbumRating == 2} >
+                <p className={`w-fit mx-auto px-2 rounded-xl text-black ${ratingToTailwindBgColor((rating_override) ? rating_override : avg_rating)}`}>
                   <b>{avg_rating.toFixed(2)}</b>
                 </p>
-              </div>
             </Conditional>
-            <div className="w-fit mx-auto">
+            <div className="w-fit mx-auto mt-2">
               <StarRating 
                 className="text-yellow-400"
                 rating={(rating_override) ? rating_override : avg_rating} 
@@ -125,17 +122,6 @@ export default async function MinimalAlbumDisplay(props) {
               />
             </div>
           </div>
-        </Conditional>
-        <Conditional showWhen={historical}>
-          <Button 
-            as={Link}
-            href={"/dashboard/spotify/historical/" + historical_date}
-            radius="lg"
-            className={`w-fit hover:underline text-white`}
-            variant="solid"
-          >
-            <b>All Reviews</b>
-          </Button> 
         </Conditional>
       </Button>
     </div>

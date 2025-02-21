@@ -88,9 +88,11 @@ export default async function AlbumOfTheDayBox(props) {
         className="mx-3" 
         orientation="vertical" 
       />
-      <ReviewDisplay 
-        album_id={albumData("album_id")}
-      />
+      <div className="static w-full lg:w-fit">
+        <ReviewDisplay 
+          album_id={albumData("album_id")}
+        />
+      </div>
     </div>
   )
 }

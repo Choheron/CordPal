@@ -8,6 +8,7 @@ import {Badge} from "@nextui-org/badge";
 import { Divider, Tooltip } from "@nextui-org/react";
 import { dateToString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import ReviewStatsUserCard from "./review_stats_user_card";
+import MinimalAlbumDisplay from "../minimal_album_display";
 
 // GUI Display for an Album
 // Expected Props:
@@ -99,63 +100,71 @@ export default async function MusicStatsBox(props) {
         </table>
       </div>
       {/* Lowest and Highest Album Stats */}
-      <div className="flex flex-col">
+      <div className="w-300 flex flex-col">
         {/* Album Highest Stats */}
-        <div className='min-w-[300px] w-fit mx-auto flex flex-col'>
+        <div className='w-fit mx-auto flex flex-col'>
           <p className="mx-auto text-xl underline mb-2">
             Highest Album: {dateToString(albumLowHighStatsJson['highest_album']['date'])}
           </p>
-          <Badge 
-            content={(await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2)} 
-            size="lg" 
-            placement="top-left" 
-            shape="rectangle"
-            showOutline={false}
-            variant="shadow"
-            className={`lg:-ml-4 -mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2))} lg:text-xl text-black`}
-          >
-            <AlbumDisplay
-              title={albumLowHighStatsJson['highest_album']["title"]}
-              album_spotify_id={albumLowHighStatsJson['highest_album']["spotify_id"]}
-              album_img_src={albumLowHighStatsJson['highest_album']["album_img_src"]}
-              album_src={albumLowHighStatsJson['highest_album']["spotify_url"]}
-              artist={{"name": albumLowHighStatsJson['highest_album']["artist"], "href": albumLowHighStatsJson['highest_album']["artist_url"]}}
-              submitter={albumLowHighStatsJson['highest_album']["submitter_id"]}
-              submitter_comment={albumLowHighStatsJson['highest_album']["submitter_comment"]}
-              submission_date={albumLowHighStatsJson['highest_album']["submission_date"]}
-              historical_date={albumLowHighStatsJson['highest_album']['date']}
-            />
-          </Badge>
+          <div className="mx-auto">
+            <Badge 
+              content={(await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2)} 
+              size="lg" 
+              placement="top-left" 
+              shape="rectangle"
+              showOutline={false}
+              variant="shadow"
+              className={`lg:-ml-2 -mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2))} text-lg lg:text-xl text-black`}
+            >
+              <MinimalAlbumDisplay
+                title={albumLowHighStatsJson['highest_album']["title"]}
+                album_spotify_id={albumLowHighStatsJson['highest_album']["spotify_id"]}
+                album_img_src={albumLowHighStatsJson['highest_album']["album_img_src"]}
+                album_src={albumLowHighStatsJson['highest_album']["spotify_url"]}
+                artist={{"name": albumLowHighStatsJson['highest_album']["artist"], "href": albumLowHighStatsJson['highest_album']["artist_url"]}}
+                submitter={albumLowHighStatsJson['highest_album']["submitter_id"]}
+                submitter_comment={albumLowHighStatsJson['highest_album']["submitter_comment"]}
+                submission_date={albumLowHighStatsJson['highest_album']["submission_date"]}
+                historical_date={albumLowHighStatsJson['highest_album']['date']}
+                sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
+                showAlbumRating={2}
+              />
+            </Badge>
+          </div>
           <Divider className="my-1" />
         </div>
         {/* Album Lowest Stats */}
-        <div className='min-w-[300px] w-fit mx-auto flex flex-col'>
+        <div className='w-fit mx-auto flex flex-col'>
           <p className="mx-auto text-xl underline mb-2">
             Lowest Album: {dateToString(albumLowHighStatsJson['lowest_album']['date'])}
           </p>
-          <Badge 
-            content={(await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2)} 
-            size="lg" 
-            placement="top-left" 
-            shape="rectangle"
-            showOutline={false}
-            variant="shadow"
-            className={`lg:-ml-4 -mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2))} lg:text-xl text-black`}
-          >
-            <AlbumDisplay
-              title={albumLowHighStatsJson['lowest_album']["title"]}
-              album_spotify_id={albumLowHighStatsJson['lowest_album']["spotify_id"]}
-              album_img_src={albumLowHighStatsJson['lowest_album']["album_img_src"]}
-              album_src={albumLowHighStatsJson['lowest_album']["spotify_url"]}
-              artist={{"name": albumLowHighStatsJson['lowest_album']["artist"], "href": albumLowHighStatsJson['lowest_album']["artist_url"]}}
-              submitter={albumLowHighStatsJson['lowest_album']["submitter_id"]}
-              submitter_comment={albumLowHighStatsJson['lowest_album']["submitter_comment"]}
-              submission_date={albumLowHighStatsJson['lowest_album']["submission_date"]}
-              historical_date={albumLowHighStatsJson['lowest_album']['date']}
-            />
-          </Badge>
+          <div className="mx-auto">
+            <Badge 
+              content={(await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2)} 
+              size="lg" 
+              placement="top-left" 
+              shape="rectangle"
+              showOutline={false}
+              variant="shadow"
+              className={`lg:-ml-2 -mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2))} text-lg lg:text-xl text-black`}
+            >
+              <MinimalAlbumDisplay
+                title={albumLowHighStatsJson['lowest_album']["title"]}
+                album_spotify_id={albumLowHighStatsJson['lowest_album']["spotify_id"]}
+                album_img_src={albumLowHighStatsJson['lowest_album']["album_img_src"]}
+                album_src={albumLowHighStatsJson['lowest_album']["spotify_url"]}
+                artist={{"name": albumLowHighStatsJson['lowest_album']["artist"], "href": albumLowHighStatsJson['lowest_album']["artist_url"]}}
+                submitter={albumLowHighStatsJson['lowest_album']["submitter_id"]}
+                submitter_comment={albumLowHighStatsJson['lowest_album']["submitter_comment"]}
+                submission_date={albumLowHighStatsJson['lowest_album']["submission_date"]}
+                historical_date={albumLowHighStatsJson['lowest_album']['date']}
+                sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
+                showAlbumRating={2}
+              />
+            </Badge>
+          </div>
         </div>
-        <div className="max-w-[320px] lg:max-w-[650px] px-2 py-2 mt-2 text-small italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
+        <div className="max-w-[300px] mx-auto px-2 py-2 mt-2 text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
           <p>In order to be considered for highest or lowest album, an album must have 4 or more reviews. Any album with 3 or less reviews will not be counted.</p>
         </div>
       </div>

@@ -68,7 +68,8 @@ export default async function ReviewAvatarCard(props) {
               customDescription={
                 <StarRating
                   rating={review['score']}
-                  className="text-yellow-400 text-lg"
+                  className="text-yellow-400"
+                  textSize="text-xl xl:text-2xl"
                 />
               }
             />

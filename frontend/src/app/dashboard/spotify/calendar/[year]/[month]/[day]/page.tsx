@@ -20,7 +20,7 @@ export default async function Page({
   const date = `${year}-${month}-${day}`
   const albumOfTheDayObj = await getAlbumOfTheDayData(date)
   // Get previous day's date
-  const prevDay =getPrevDay(new Date(Date.parse(date)))
+  const prevDay = getPrevDay(new Date(Date.parse(date)))
   // Get next day's date (null if next day is in the future)
   const nextDay = getNextDay(new Date(Date.parse(date)))
   // Boolean to determine if this date is today

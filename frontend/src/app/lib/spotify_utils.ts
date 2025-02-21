@@ -259,7 +259,8 @@ export async function getAlbumAvgRating(spotify_album_id, rounded = true, date =
   const avgRatingResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumAvgRating/${spotify_album_id}${urlTail}`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'force-cache',
+    next: { tags: ['reviews'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },

@@ -51,7 +51,7 @@ export default async function AlbumDisplay(props) {
   }
 
   return (
-    <div className="w-full lg:min-w-[650px] lg:max-w-full mx-2 lg:mx-1 my-auto block overflow-hidden text-ellipsis">
+    <div className="w-full lg:min-w-[650px] lg:max-w-full mx-auto lg:mx-1 my-auto block overflow-hidden text-ellipsis">
       <div className="w-full my-auto flex flex-row">
         <img 
           src={album_img_src}
@@ -89,10 +89,10 @@ export default async function AlbumDisplay(props) {
                   </PopoverContent>
                 </Popover>
               </div>
-              <div className="flex">
-                <p>Submission Date:</p>
-                <ClientTimestamp className="italic pl-1" timestamp={submission_date} full={false}/>
-              </div>
+            </div>
+            <div className="flex">
+              <p>Submission Date:</p>
+              <ClientTimestamp className="italic pl-1" timestamp={submission_date} full={false}/>
             </div>
           </Conditional>
           <Conditional showWhen={(avg_rating != 0) && ((avg_rating != null) && showAlbumRating)}>

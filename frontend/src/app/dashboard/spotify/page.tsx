@@ -23,7 +23,7 @@ export default async function music() {
       <Conditional showWhen={spot_authenticated}>
         <div className="flex flex-col w-fit justify-center xl:flex-row md:w-4/5 gap-2">
           <AlbumOfTheDayBox title={"Album Of The Day"} />
-          <div className="flex flex-col">
+          <div className="max-w-[350px] flex flex-col">
             <RecentSubmissions 
               albumList={recentSubmissionsResponse['album_list']} 
               timestamp={recentSubmissionsResponse['timestamp']}

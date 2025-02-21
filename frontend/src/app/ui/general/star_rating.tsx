@@ -12,7 +12,7 @@ export default function StarRating(props) {
   // Tailwind configs (Some can be passed in as props, otherwise defaulted)
   const filledColor = 'text-yellow-500'
   const emptyColor = 'text-gray-500'
-  const textSize = (props.textSize) ? props.textSize : 'text-2xl';
+  const textSize = (props.textSize) ? props.textSize : 'text-xl';
 
   // Add full stars
   for (let i = 0; i < fullStars; i++) {
@@ -50,7 +50,7 @@ export default function StarRating(props) {
     );
   }
 
-  return <div className="flex justify-center items-center -mt-[6px]">{stars}</div>;
+  return <div className="flex justify-center flex-shrink-0 items-center -mt-[6px]">{stars}</div>;
 
   // MY FIRST ITERATION 
   // const rating = (props.rating) ? Math.min(props.rating, 10) : 0;
