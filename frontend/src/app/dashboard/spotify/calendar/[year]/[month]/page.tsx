@@ -32,11 +32,13 @@ export default async function Page({
   const nextMonth = new Date(new Date(firstDay).setMonth(firstDay.getMonth() + 1));
   // Boolean to see if the viewed month is the current month
   const currMonth = ((new Date().getMonth() + 1) == Number(month))
+
+  // Data retrieval from backend
   // Retrieve album data for this month
   const aotdData = await getAOtDByMonth(year, padNumber(Number(month)))
-  // Get last month's data to see if there are any albums there
-  // TODO: Make this not such a HUGE call
+  // Get last month's data to see if there are any albums there TODO: Make this not such a HUGE call
   const lastMonthAotdData = await getAOtDByMonth(`${lastMonth.getFullYear()}`, padNumber(Number(lastMonth.getMonth() + 1)))
+
   // If the user isnt supposed to be here, redirect them to the current month's page
   if((firstDay > today) || ((Object.keys(aotdData).length == 1))) {
     redirect(`/dashboard/spotify/calendar/${today.getFullYear()}/${today.getMonth() + 1}`)
@@ -134,6 +136,7 @@ export default async function Page({
       <div className="relative w-full h-full p-1">
         <MinimalAlbumDisplay
           showAlbumRating={true}
+          ratingOverride={albumGet("rating")}
           title={albumGet("title")}
           album_spotify_id={albumGet("album_id")}
           album_img_src={albumGet("album_img_src")}

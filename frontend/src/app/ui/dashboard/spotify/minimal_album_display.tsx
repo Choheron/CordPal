@@ -23,7 +23,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
 //  - showAlbumRating: Boolean - (Optional) [DEFAULT 0] 0: Show no ratings, 1: Show stars, 2: Show stars and number
 //  - showSubmitInfo: Boolean - (Optional) [DEFAULT FALSE] Show the submission info for the album
-//  - rating_override: int - (Optional) Override the rating to show a custom one
+//  - ratingOverride: int - (Optional) Override the rating to show a custom one
 //  - sizingOverride: String - (Optional) Override the image and button sizing tailwind
 //  - buttonUrlOverride: String - (Optional) Override the link that is accessed when the user clicks on the album display
 //  - titleTextOverride: String - (Optional) Override the tailwind css for the title text
@@ -109,7 +109,7 @@ export default async function MinimalAlbumDisplay(props) {
         </Conditional>
         <Conditional showWhen={((avg_rating != null) && showAlbumRating != 0)}>
           <div className="w-full">
-            <Conditional showWhen={rating_override == false && showAlbumRating == 2} >
+            <Conditional showWhen={showAlbumRating == 2} >
                 <p className={`w-fit mx-auto px-2 rounded-xl text-black ${ratingToTailwindBgColor((rating_override) ? rating_override : avg_rating)}`}>
                   <b>{avg_rating.toFixed(2)}</b>
                 </p>

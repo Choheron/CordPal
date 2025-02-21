@@ -4,7 +4,8 @@ from django.utils import timezone
 
 from .utils import (
   checkSelectionFlag,
-  getSpotifyUser
+  getSpotifyUser,
+  getAlbumRating
 )
 from .models import (
   Album,
@@ -229,6 +230,8 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     temp['submitter'] = albumObj.submitted_by.discord_id
     temp['submitter_comment'] = albumObj.user_comment
     temp['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+    # Provide rating of album
+    temp['rating'] = getAlbumRating(aotd.album.spotify_id, rounded=False, date=aotd.date)
     # Append out object to output
     out[aotd.date.strftime('%Y-%m-%d')] = temp
   # Return out object with timestamp
