@@ -128,6 +128,7 @@ export default async function MusicStatsBox(props) {
                 historical_date={albumLowHighStatsJson['highest_album']['date']}
                 sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
                 showAlbumRating={2}
+                starTextOverride="text-3xl"
               />
             </Badge>
           </div>
@@ -160,6 +161,7 @@ export default async function MusicStatsBox(props) {
                 historical_date={albumLowHighStatsJson['lowest_album']['date']}
                 sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
                 showAlbumRating={2}
+                starTextOverride="text-3xl"
               />
             </Badge>
           </div>
