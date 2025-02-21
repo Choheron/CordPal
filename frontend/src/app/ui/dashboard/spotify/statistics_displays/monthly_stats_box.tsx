@@ -121,7 +121,7 @@ export default function MonthlyStatsBox(props) {
                   isProfileLink
                   userDiscordID={user['discord_id']}
                   customDescription={(
-                    <p>{Number(user['percentage']).toFixed(2)}% of Albums Selected.</p>
+                    <p>{Number(user['percentage']).toFixed(2)}%</p>
                   )}
                 />
                 <p className="my-auto px-2 py-1 bg-gray-800 rounded-full">
