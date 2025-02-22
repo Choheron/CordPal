@@ -1,4 +1,4 @@
-import { getAOtDByMonth } from "@/app/lib/spotify_utils"
+import { getAOtDByMonth, getSubmissionsByMonth } from "@/app/lib/spotify_utils"
 import { daysInMonth, monthToName, padNumber } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
@@ -39,6 +39,8 @@ export default async function Page({
   const aotdData = await getAOtDByMonth(year, padNumber(Number(month)))
   // Get last month's data to see if there are any albums there TODO: Make this not such a HUGE call
   const lastMonthAotdData = await getAOtDByMonth(`${lastMonth.getFullYear()}`, padNumber(Number(lastMonth.getMonth() + 1)))
+  // Get album submission numbers for the current month
+  const submissionData = await getSubmissionsByMonth(year, padNumber(Number(month)))
 
   // If the user isnt supposed to be here, redirect them to the current month's page
   if((firstDay > today) || ((Object.keys(aotdData).length == 1))) {
@@ -225,7 +227,7 @@ export default async function Page({
         </tbody>
       </table>
       {/* Monthly Statistics */}
-      <MonthlyStatsBox aotdData={aotdData} year={year} month={month}/>
+      <MonthlyStatsBox aotdData={aotdData} subData={submissionData} year={year} month={month}/>
     </div>
   )
 }

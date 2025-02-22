@@ -671,3 +671,25 @@ export async function getAOtDByMonth(year: string = "", month: string = "") {
   const aotdMonthJson = await aotdMonthResponse.json()
   return aotdMonthJson;
 }
+
+
+//
+// Get submission stats for a certian month
+//
+export async function getSubmissionsByMonth(year: string = "", month: string = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has connected spotify
+  console.log(`getSubmissionsByMonth: Sending request to backend '/spotifyapi/getSubmissionsByMonth/${year}/${month}'`)
+  const submissionsMonthResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getSubmissionsByMonth/${year}/${month}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: [`calendar-${year}-${month}`] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const submissionsMonthJson = await submissionsMonthResponse.json()
+  return submissionsMonthJson;
+}

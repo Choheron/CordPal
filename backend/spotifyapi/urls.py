@@ -40,6 +40,7 @@ urlpatterns = [
   # Statistics Endpoints
   path('getAlbumsStats', views_album.getAlbumsStats),
   path('getLowestHighestAlbumStats', views_album.getLowestHighestAlbumStats), 
+  path('getSubmissionsByMonth/<str:year>/<str:month>', views_album.getSubmissionsByMonth),
   ## ============================================================================================================
   ## Review Views
   ## ============================================================================================================

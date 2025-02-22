@@ -1,14 +1,19 @@
-import { padNumber, ratingToTailwindBgColor } from "@/app/lib/utils";
+import { monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils";
 import MinimalAlbumDisplay from "../minimal_album_display";
-import { Badge } from "@nextui-org/react";
+import { Badge, Divider, Tooltip } from "@nextui-org/react";
 import UserCard from "@/app/ui/general/userUiItems/user_card";
+import { RiQuestionMark } from "react-icons/ri";
 
 
 
 // Display monthy statistics for the AOtD
+// Expected Props:
+//  - atodData: Object - AOTD data for the month
+//  - subData: Object - Submission data for the month
 export default function MonthlyStatsBox(props) {
   // Prop validation
   const aotdData = (props.aotdData) ? props.aotdData : null;
+  const subData = (props.subData) ? props.subData : null;
   const aotdStats = (aotdData) ? aotdData['stats'] : null;
   const year = (props.year) ? props.year : null;
   const month = (props.month) ? props.month : null;
@@ -106,12 +111,17 @@ export default function MonthlyStatsBox(props) {
   }
 
   // Display counts of user albums being selected
-  const selectionStats = () => {
+  const selectionCounts = () => {
     return (
-      <div className="w-full lg:w-[300px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-        <p className="font-extralight w-full text-center text-xl underline">
-          Selection Counts:
+      <div className="relative w-full lg:w-[300px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+        <p className="font-extralight w-full text-center text-xl underline mb-1">
+          Number Selected:
         </p>
+        <div className="flex justify-between w-full px-3 font-extralight">
+          <p>Total Selected:</p>
+          <p>{aotdStats['selection_total']}</p>
+        </div>
+        <Divider />
         <div className="flex flex-col h-full">
           {selection_counts.sort((a, b) => ((a["count"] < b["count"]) ? 1 : -1)).map((user, index) => {
             return (
@@ -133,6 +143,58 @@ export default function MonthlyStatsBox(props) {
             )
           })}
         </div>
+        {/* Top Left Tooltip */}
+        <Tooltip content={`Breakdown of number of selected albums, by submitter, for ${monthToName(month)} ${year}.`} >
+          <div className="absolute top-0 left-0 p-1 border-b border-r border-neutral-800 rounded-br-2xl rounded-tl-2xl bg-zinc-800/30 text-blue-800">
+            <RiQuestionMark className="text-xl" />
+          </div>
+        </Tooltip>
+      </div>
+    )
+  }
+
+  // Display counts of album submissions
+  const submissionCount = () => {
+    const submission_counts = subData['submission_counts']
+    const submission_total = subData['submission_total']
+
+    return (
+      <div className="w-full lg:w-[300px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+        <p className="font-extralight w-full text-center text-xl underline mb-1">
+          Submission Counts:
+        </p>
+        <div className="flex justify-between w-full px-3 font-extralight">
+          <p>Total Submitted:</p>
+          <p>{submission_total}</p>
+        </div>
+        <Divider />
+        <div className="flex flex-col h-full">
+          {submission_counts.sort((a, b) => ((a["count"] < b["count"]) ? 1 : -1)).map((user, index) => {
+            return (
+              <div 
+                key={`${user['discord_id']}-${user['count']}`}
+                className="flex justify-between w-full my-1 px-3"
+              >
+                <UserCard 
+                  isProfileLink
+                  userDiscordID={user['discord_id']}
+                  customDescription={(
+                    <p>{Number(user['percentage']).toFixed(2)}%</p>
+                  )}
+                />
+                <p className="my-auto px-2 py-1 bg-gray-800 rounded-full">
+                  {user['count']}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+        {/* Top Left Tooltip */}
+        <Tooltip content={`Breakdown of number of albums submitted, by user, for ${monthToName(month)} ${year}`} >
+          <div className="absolute top-0 left-0 p-1 border-b border-r border-neutral-800 rounded-br-2xl rounded-tl-2xl bg-zinc-800/30 text-blue-800">
+            <RiQuestionMark className="text-xl" />
+          </div>
+        </Tooltip>
       </div>
     )
   }
@@ -143,7 +205,9 @@ export default function MonthlyStatsBox(props) {
       {/* Lowest and Highest Album of the Month */}
       {lowestHighestAlbum()}
       {/* Selection Breakdown */}
-      {selectionStats()}
+      {selectionCounts()}
+      {/* Submission Breakdown */}
+      {submissionCount()}
     </div>
   )
 }

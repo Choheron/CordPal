@@ -270,6 +270,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
       subNumList.append({"discord_id": user, "count": selection_counts[user], "percentage": ((selection_counts[user]/float(len(month_AOtD))) * 100)})
     # Attach Submission Numbers
     out['stats']['selection_counts'] = subNumList
+    out['stats']['selection_total'] = len(month_AOtD)
   # Return out object with timestamp
   out['timestamp'] = timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
   return JsonResponse(out)

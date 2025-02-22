@@ -371,3 +371,32 @@ def getLowestHighestAlbumStats(request: HttpRequest):
   out['highest_album']['date'] = highest_album_date
   # Return Object
   return JsonResponse(out)
+
+
+###
+# Get Submission count per user by month
+###
+def getSubmissionsByMonth(request: HttpRequest, year: str, month: str):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getSubmissionsByMonth called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Declare out object
+  out = {}
+  # Get all submissions this month
+  submissions = Album.objects.filter(submission_date__year=year, submission_date__month=month)
+  users = submissions.values_list('submitted_by__discord_id', flat=True).distinct()
+  # Iterate through and get counts
+  out['submission_counts'] = []
+  for user_id in users:
+    out['submission_counts'].append({
+        "discord_id": user_id, 
+        "count": submissions.filter(submitted_by__discord_id=user_id).count(),
+        "percentage": ((submissions.filter(submitted_by__discord_id=user_id).count()/float(len(submissions))) * 100)
+      })
+  # Mark single value of all submissions
+  out['submission_total'] = submissions.count()
+  # Return Object
+  return JsonResponse(out)
