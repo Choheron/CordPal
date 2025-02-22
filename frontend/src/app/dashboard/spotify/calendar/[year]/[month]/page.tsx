@@ -153,7 +153,7 @@ export default async function Page({
           buttonUrlOverride={`/dashboard/spotify/calendar/${year}/${month}/${padNumber(dateArr[2])}`}
           titleTextOverride="text-center text-xl 2xl:text-2xl text-wrap line-clamp-2"
           artistTextOverride="text-center text-sm 2xl:text-xl italic text-wrap"
-          starTextOverride="text-base 2xl:text-3xl"
+          starTextOverride="text-base 2xl:text-2xl"
         />
         <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
           <p>{dateArr[2]}</p>
