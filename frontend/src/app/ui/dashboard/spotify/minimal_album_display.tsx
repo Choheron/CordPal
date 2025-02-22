@@ -3,10 +3,9 @@ import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
 import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
-import { Badge, Button } from "@nextui-org/react";
+import { Badge, Button, Tooltip } from "@nextui-org/react";
 import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
-import ClientTimestamp from "../../general/client_timestamp";
 
 // MINIMAL GUI Display for an Album
 // Expected Props:
@@ -58,10 +57,10 @@ export default async function MinimalAlbumDisplay(props) {
   const starTextOverride = (props.starTextOverride) ? props.starTextOverride : 'text-xl 3xl:text-3xl'
 
   return (
-    <div className={`group ${sizingOverride} mx-2 lg:mx-1 my-auto flex flex-row`}>
+    <div className={`relative group ${sizingOverride} mx-2 lg:mx-1 my-auto flex flex-row`}>
       <img 
         src={album_img_src}
-        className={`${sizingOverride} rounded-2xl mx-auto group-hover:blur-sm duration-700 ease-in-out group-hover:brightness-50`}
+        className={`${sizingOverride} rounded-2xl mx-auto group-hover:blur-sm duration-700 ease-in-out group-hover:brightness-[.25]`}
         alt={`Album Cover for ${title} by ${artist_name}`}
       />
       <Button 
@@ -77,35 +76,31 @@ export default async function MinimalAlbumDisplay(props) {
         <p className={artistTextOverride}>
           {artist_name}
         </p>
-        <Conditional showWhen={props.submitter && showSubmitInfo}>
-          <div className="">
-            <p>Submitter: </p>
-            <div className="ml-2 -mb-1">
-              <Popover placement="left" showArrow={true} className="w-fit">
-                <Badge 
-                  content=" " 
-                  size="sm" 
-                  placement="top-left"
-                  isInvisible={submitter_comment == "No Comment Provided"}
-                  shape="circle"
-                  className="bg-blue-300 -ml-2"
-                >
-                  <PopoverTrigger>
-                    <div>
-                      <UserCard userDiscordID={submitter} fallbackName={"User Not Found"}/>
-                    </div>
-                  </PopoverTrigger>
-                </Badge>
-                <PopoverContent>
-                  <p>{submitter_comment}</p>
-                </PopoverContent>
-              </Popover>
+        <Conditional showWhen={(submitter && showSubmitInfo)}>
+          <Tooltip content={submitter_comment} className={`w-fit ${(submitter_comment != "No Comment Provided") ? "opacity-100" : "opacity-0"}`}>
+            <div className="-mb-4">
+              <Badge 
+                content=" " 
+                size="sm" 
+                placement="top-left"
+                isInvisible={submitter_comment == "No Comment Provided"}
+                shape="circle"
+                className="bg-blue-300 -ml-2"
+              >
+                <div>
+                  <UserCard 
+                    userDiscordID={submitter} 
+                    fallbackName={"User Not Found"}
+                    customDescription={(
+                      <p>
+                        Submitter
+                      </p>
+                    )}
+                  />
+                </div>
+              </Badge>
             </div>
-            <div className="flex">
-              <p>Submission Date:</p>
-              <ClientTimestamp className="italic pl-1" timestamp={submission_date} full={false}/>
-            </div>
-          </div>
+          </Tooltip>
         </Conditional>
         <Conditional showWhen={((avg_rating != null) && showAlbumRating != 0)}>
           <div className="w-full">

@@ -136,6 +136,7 @@ export default async function Page({
     return (
       <div className="relative w-full h-full p-1">
         <MinimalAlbumDisplay
+          showSubmitInfo={albumGet("submitter") != null}
           showAlbumRating={true}
           ratingOverride={albumGet("rating")}
           title={albumGet("title")}
@@ -143,7 +144,7 @@ export default async function Page({
           album_img_src={albumGet("album_img_src")}
           album_src={albumGet("spotify_url")}
           artist={albumGet("artist")}
-          submitter={albumGet("submitter_id")}
+          submitter={albumGet("submitter")}
           submitter_comment={albumGet("submitter_comment")}
           submission_date={albumGet("submission_date")}
           historical_date={albumGet('date')}

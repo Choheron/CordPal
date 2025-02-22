@@ -40,6 +40,7 @@ export default function MonthlyStatsBox(props) {
         >
           <div className="relative w-full h-full p-1">
             <MinimalAlbumDisplay
+              showSubmitInfo
               showAlbumRating={true}
               ratingOverride={highest_album["rating"]}
               title={highest_album["title"]}
@@ -47,7 +48,7 @@ export default function MonthlyStatsBox(props) {
               album_img_src={highest_album["album_img_src"]}
               album_src={highest_album["spotify_url"]}
               artist={highest_album["artist"]}
-              submitter={highest_album["submitter_id"]}
+              submitter={highest_album["submitter"]}
               submitter_comment={highest_album["submitter_comment"]}
               submission_date={highest_album["submission_date"]}
               historical_date={highest_album['date']}
@@ -77,6 +78,7 @@ export default function MonthlyStatsBox(props) {
         >
           <div className="relative w-full h-full p-1">
             <MinimalAlbumDisplay
+              showSubmitInfo
               showAlbumRating={true}
               ratingOverride={lowest_album["rating"]}
               title={lowest_album["title"]}
@@ -84,7 +86,7 @@ export default function MonthlyStatsBox(props) {
               album_img_src={lowest_album["album_img_src"]}
               album_src={lowest_album["spotify_url"]}
               artist={lowest_album["artist"]}
-              submitter={lowest_album["submitter_id"]}
+              submitter={lowest_album["submitter"]}
               submitter_comment={lowest_album["submitter_comment"]}
               submission_date={lowest_album["submission_date"]}
               historical_date={lowest_album['date']}
