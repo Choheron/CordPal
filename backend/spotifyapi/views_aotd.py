@@ -214,6 +214,8 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     return res
   # Get all AOtD Objects for this year and month
   month_AOtD = DailyAlbum.objects.filter(date__year=year, date__month=month)
+  # Create out object
+  out = {}
   if(len(month_AOtD) != 0):
     # Track highest and lowest album scores of the month
     highest_aotd: DailyAlbum = month_AOtD.first()
@@ -222,8 +224,6 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     lowest_aotd_rating = getAlbumRating(lowest_aotd.album.spotify_id, rounded=False, date=lowest_aotd.date)
     # Track counts of submitters selected
     selection_counts = {}
-    # Create and populate out object
-    out = {}
     for aotd in month_AOtD:
       albumObj = aotd.album
       # Get album Rating
