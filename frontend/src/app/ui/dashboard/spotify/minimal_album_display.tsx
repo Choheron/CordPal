@@ -77,7 +77,11 @@ export default async function MinimalAlbumDisplay(props) {
           {artist_name}
         </p>
         <Conditional showWhen={(submitter && showSubmitInfo)}>
-          <Tooltip content={submitter_comment} className={`w-fit ${(submitter_comment != "No Comment Provided") ? "opacity-100" : "opacity-0"}`}>
+          <Tooltip 
+            content={submitter_comment} 
+            className={`w-fit`}
+            isDisabled={submitter_comment == "No Comment Provided"}
+          >
             <div className="-mb-4">
               <Badge 
                 content=" " 

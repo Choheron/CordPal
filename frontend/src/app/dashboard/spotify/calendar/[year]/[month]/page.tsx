@@ -94,6 +94,7 @@ export default async function Page({
   const genDay = (dateStr) => {
     const albumObj = aotdData[dateStr]
     const dateArr = dateStr.split("-")
+    const sizingTailwind = "relative w-full h-full p-1"
 
     // Return a field value from the album object or null
     function albumGet(field) {
@@ -106,7 +107,7 @@ export default async function Page({
     // If the album date is from last month, return a text block
     if(dateStr.split("-")[1] != (firstDay.getMonth() + 1)) {
       return (
-        <div className="relative w-full h-full p-1">
+        <div className={sizingTailwind}>
           <div className="w-full h-full content-center bg-gray-800/30 rounded-2xl border border-neutral-800">
             <p className="w-fit m-auto">Previous Month</p>
           </div>
@@ -119,7 +120,7 @@ export default async function Page({
     // If the album date is greater than today, return a special object for future albums
     if(new Date(Number(dateArr[0]), Number(dateArr[1]) - 1, Number(dateArr[2])) > today) {
       return (
-        <div className="relative w-full h-full p-1">
+        <div className={sizingTailwind}>
           <MinimalAlbumDisplay
             showAlbumRating={true}
             title={"Future Album"}
@@ -134,7 +135,7 @@ export default async function Page({
       )
     }
     return (
-      <div className="relative w-full h-full p-1">
+      <div className={sizingTailwind}>
         <MinimalAlbumDisplay
           showSubmitInfo={albumGet("submitter") != null}
           showAlbumRating={true}
