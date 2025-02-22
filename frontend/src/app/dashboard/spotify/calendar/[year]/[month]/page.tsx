@@ -157,14 +157,14 @@ export default async function Page({
         <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
           <p>{dateArr[2]}</p>
         </div>
-        <Conditional showWhen={dateStr == aotdData['highest_aotd_date']}>
+        <Conditional showWhen={dateStr == aotdData['stats']['highest_aotd_date']}>
           <Tooltip content={`Highest Rated Album for ${monthToName(month)} ${year}`}>
             <div className="absolute -right-1 bg-green-600/90 border border-green-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl text-3xl">
               <RiThumbUpFill />
             </div>
           </Tooltip>
         </Conditional>
-        <Conditional showWhen={dateStr == aotdData['lowest_aotd_date']}>
+        <Conditional showWhen={dateStr == aotdData['stats']['lowest_aotd_date']}>
           <Tooltip content={`Lowest Rated Album for ${monthToName(month)} ${year}`}>
             <div className="absolute -right-1 bg-red-600/90 border border-red-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl text-3xl">
               <RiThumbDownFill />
