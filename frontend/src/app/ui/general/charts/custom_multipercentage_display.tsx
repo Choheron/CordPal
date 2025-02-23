@@ -18,11 +18,16 @@ export default function CustomMultipercentageDisplay(props) {
   const [hoverIndex, setHoverIndex] = useState(-1)
 
   const mapPercentageBars = () => {
+    let percentageSum = 0
+    
     return props.percentages.map((percent, index) => {
+      let currSum = percentageSum
+      percentageSum += percent['percent']
+
       return (
         <div
           key={index}
-          className={`h-full ${percent['color']} transition-all duration-300`}
+          className={`relative h-full ${percent['color']} transition-all duration-300`}
           style={{ width: `${percent['percent']}%`, minWidth: ((hoverIndex == index) ? "fit-content" : "") }}
           onMouseEnter={() => setHoverIndex(index)}
           onMouseLeave={() => setHoverIndex(-1)}
@@ -30,6 +35,25 @@ export default function CustomMultipercentageDisplay(props) {
           <p className={`w-full text-center overflow-hidden text-black font-normal ${(hoverIndex == index || hoverIndex == -1) ? "opacity-100" : "opacity-0"} transition-all duration-300 ${(hoverIndex == index) ? "px-10" : "px-auto"}`}>
             {percent['label']}
           </p>
+          <div
+            key={index}
+            className={`absolute top-6`}
+            style={{ left: `${currSum}%`, width: `${percent['percent']}%` }}
+            onMouseEnter={() => setHoverIndex(index)}
+            onMouseLeave={() => setHoverIndex(-1)}
+          >
+            <div 
+              className="relative flex flex-col w-full" 
+            >
+              <div className={`w-full h-4 border-b border-l border-r rounded-b-lg`}></div>
+              <p 
+                className={`mx-auto w-fit text-sm ${rotateLabels ? "absolute rotate-45 top-8" : ""} ${(hoverIndex == index || hoverIndex == -1) ? "opacity-100" : "opacity-0"} transition-all duration-300 `}
+                style={{ left: (rotateLabels ? `40%` : "") }}  
+              >
+                <b>{percent['data']}</b>
+              </p>
+            </div>
+          </div>
         </div>
       )
     })
@@ -83,13 +107,6 @@ export default function CustomMultipercentageDisplay(props) {
         </div>
         {/* Percentage Pointer */}
         {mapPercentagePointers()}
-        {/* Over Number Display */}
-        <div
-          className={`absolute top-0 right-0 overflow-hidden`}
-          style={{ width: `${100 - props.percentage}%` }}
-        >
-          <p className="w-full text-center text-black font-normal"><b>{props.overLabel}</b></p>
-        </div>
       </div>
     </div>
   )
