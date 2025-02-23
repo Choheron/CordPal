@@ -242,28 +242,28 @@ export default async function MonthlyStatsBox(props) {
     const rawScoresTable = () => {
       return (
         <table className="w-full text-center bg-gray-800 rounded-2xl">
-          <thead className="text-lg border-b border-gray-950">
+          <thead className="sticky top-0 text-lg border-b border-gray-950 bg-gray-800">
             <tr>
               <td><b>Score</b></td>
               <td><b>Count</b></td>
               <td><b>Percentage</b></td>
             </tr>
           </thead>
-          <tbody>
-            {reviewData['score_stats'].map((data, index) => {
-              return(
-                <tr key={index} className="border-b border-gray-950">
-                  <td>
-                    <p className={`w-fit mx-auto my-1 px-2 rounded-full ${ratingToTailwindBgColor(data['score'])} text-black`}>
-                      <b>{Number(data['score']).toFixed(2)}</b>
-                    </p>
-                  </td>
-                  <td>{data['count']}</td>
-                  <td>{data['percent']}%</td>
-                </tr>
-              )
-            })}
-          </tbody>
+            <tbody>
+              {reviewData['score_stats'].map((data, index) => {
+                return(
+                  <tr key={index} className="border-b border-gray-950">
+                    <td>
+                      <p className={`w-fit mx-auto my-1 px-2 rounded-full ${ratingToTailwindBgColor(data['score'])} text-black`}>
+                        <b>{Number(data['score']).toFixed(2)}</b>
+                      </p>
+                    </td>
+                    <td>{data['count']}</td>
+                    <td>{Number(data['percent']).toFixed(2)}%</td>
+                  </tr>
+                )
+              })}
+            </tbody>
         </table>
       )
     }
