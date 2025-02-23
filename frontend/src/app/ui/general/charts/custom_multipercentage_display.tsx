@@ -85,7 +85,7 @@ export default function CustomMultipercentageDisplay(props) {
           >
             <div className={`w-full h-4 border-b border-l border-r rounded-b-lg`}></div>
             <p 
-              className={`mx-auto w-fit text-sm ${rotateLabels ? "absolute rotate-45 top-8" : ""} ${(hoverIndex == index || hoverIndex == -1) ? "opacity-100" : "opacity-0"} transition-all duration-300 `}
+              className={`mx-auto w-fit text-sm ${rotateLabels ? "absolute rotate-45 top-9" : "mt-1"} ${(hoverIndex == index || hoverIndex == -1) ? "opacity-100" : "opacity-0"} transition-all duration-300 bg-gray-600 px-2 rounded-lg`}
               style={{ left: (rotateLabels ? `40%` : "") }}  
             >
               <b>{percent['data']}</b>
