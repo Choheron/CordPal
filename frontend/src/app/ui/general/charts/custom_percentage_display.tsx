@@ -11,7 +11,7 @@ import { RiArrowUpFill } from "react-icons/ri"
 export default function CustomPercentageDisplay(props) {
 
   return (
-    <div className="w-full">
+    <div className="w-full mb-7">
       <p>{props.title}</p>
       <div className={`relative w-full`}>
         {/* Bar Container */}
@@ -29,7 +29,7 @@ export default function CustomPercentageDisplay(props) {
           className={`absolute top-6`}
           style={{ left: `${props.percentage}%` }}
         >
-          <div className="w-fit -ml-[50%]" >
+          <div className="w-fit -ml-[50%] text-sm" >
             <RiArrowUpFill className="mx-auto"/>
             <p>
               <b>{props.percentage}%</b>

@@ -418,7 +418,8 @@ def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
   while score <= 10.0:
     stat_reviewScoreBreakdown.append({
       "score": f"{score + 0.0}",
-      "count": monthReviews.filter(score=score).count()
+      "count": monthReviews.filter(score=score).count(),
+      "percent": (monthReviews.filter(score=score).count()/float(stat_reviewTotal) * 100)
     })
     # Increment score
     score += 0.5

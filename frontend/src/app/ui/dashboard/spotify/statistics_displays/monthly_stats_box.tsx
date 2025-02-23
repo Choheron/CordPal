@@ -1,3 +1,5 @@
+"use server"
+
 import { monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils";
 import MinimalAlbumDisplay from "../minimal_album_display";
 import { Badge, Divider, Tooltip, User } from "@nextui-org/react";
@@ -5,13 +7,14 @@ import UserCard from "@/app/ui/general/userUiItems/user_card";
 import { RiQuestionMark } from "react-icons/ri";
 import StarRating from "@/app/ui/general/star_rating";
 import CustomPercentageDisplay from "@/app/ui/general/charts/custom_percentage_display";
+import CustomMultipercentageDisplay from "@/app/ui/general/charts/custom_multipercentage_display";
 
 // Display monthy statistics for the AOtD
 // Expected Props:
 //  - atodData: Object - AOTD data for the month
 //  - subData: Object - Submission data for the month
 //  - reviewData: Object - Review data for the month
-export default function MonthlyStatsBox(props) {
+export default async function MonthlyStatsBox(props) {
   // Prop validation
   const aotdData = (props.aotdData) ? props.aotdData : null;
   const subData = (props.subData) ? props.subData : null;
@@ -23,6 +26,25 @@ export default function MonthlyStatsBox(props) {
   const highest_album = (aotdStats) ? aotdData[aotdStats['highest_aotd_date']] : "Not Found";
   const lowest_album = (aotdStats) ? aotdData[aotdStats['lowest_aotd_date']] : "Not Found";
   const selection_counts = (aotdStats) ? aotdStats['selection_counts'] : "Not Found";
+  // Map score breakdown to percentage bar list
+  const score_breakdown_percentages_list = reviewData['score_stats'].map((scoreObj, index) => {
+    return(
+      {
+        "label": scoreObj['score'],
+        "percent": scoreObj['percent'],
+        "data": `${scoreObj['percent'].toFixed(2)}%`,
+        "color": ratingToTailwindBgColor(scoreObj['score'])
+      }
+  )})
+  const score_breakdown_counts_list = reviewData['score_stats'].map((scoreObj, index) => {
+    return(
+      {
+        "label": scoreObj['score'],
+        "percent": scoreObj['percent'],
+        "data": scoreObj['count'],
+        "color": ratingToTailwindBgColor(scoreObj['score'])
+      }
+  )})
 
 
   // Display lowest and highest album of the month, with their ratings
@@ -304,6 +326,13 @@ export default function MonthlyStatsBox(props) {
             overColor="bg-green-900"
             overLabel={reviewData['total_reviews'] - reviewData['all_first_listen_count']} 
           />
+          {/* Score Breakdown */}
+          <div className="h-fit w-full">
+            <CustomMultipercentageDisplay title={"Review Score Counts by Percentage"} percentages={score_breakdown_percentages_list} />
+          </div>
+          <div className="h-fit w-full">
+            <CustomMultipercentageDisplay title={"Review Score Counts by Count"} percentages={score_breakdown_counts_list} />
+          </div>
         </div>
         {/* Top Left Tooltip */}
         <Tooltip content={`Month review stats for ${monthToName(month)} ${year}.`} >
