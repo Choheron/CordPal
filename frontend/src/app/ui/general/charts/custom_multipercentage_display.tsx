@@ -10,7 +10,9 @@ import { RiArrowUpFill } from "react-icons/ri"
 //    "data": <count or another quantity>,
 //    "color": <Color Tailwind Screen>
 //  }
+//  - rotateLabels: Boolean - Should the data labels be rotated to make it easier to see?
 export default function CustomMultipercentageDisplay(props) {
+  const rotateLabels = (props.rotateLabels) ? props.rotateLabels : false;
 
   const mapPercentageBars = () => {
     return props.percentages.map((percent, index) => {
@@ -48,11 +50,11 @@ export default function CustomMultipercentageDisplay(props) {
           <div 
             className="relative flex flex-col w-full" 
           >
-            <div className="w-full h-4 border-b rounded-b-lg">
-              <RiArrowUpFill className="absolute -left-2 text-base"/>
-              <RiArrowUpFill className="absolute -right-2 text-base"/>
-            </div>
-            <p className="mx-auto w-fit text-sm">
+            <div className="w-full h-4 border-b border-l border-r rounded-b-lg"></div>
+            <p 
+              className={`mx-auto w-fit text-sm ${rotateLabels ? "absolute rotate-45 top-8" : ""}`}
+              style={{ left: (rotateLabels ? `40%` : "") }}  
+            >
               <b>{percent['data']}</b>
             </p>
           </div>
@@ -62,7 +64,7 @@ export default function CustomMultipercentageDisplay(props) {
   }
 
   return (
-    <div className="relative w-full mb-9">
+    <div className={`relative w-full ${rotateLabels ? "mb-16" : "mb-9"}`}>
       <p>{props.title}</p>
       <div className={`relative w-full`}>
         {/* Bar Container */}

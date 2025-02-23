@@ -328,7 +328,7 @@ export default async function MonthlyStatsBox(props) {
           />
           {/* Score Breakdown */}
           <div className="h-fit w-full">
-            <CustomMultipercentageDisplay title={"Review Score Counts by Percentage"} percentages={score_breakdown_percentages_list} />
+            <CustomMultipercentageDisplay title={"Review Score Counts by Percentage"} percentages={score_breakdown_percentages_list} rotateLabels/>
           </div>
           <div className="h-fit w-full">
             <CustomMultipercentageDisplay title={"Review Score Counts by Count"} percentages={score_breakdown_counts_list} />
