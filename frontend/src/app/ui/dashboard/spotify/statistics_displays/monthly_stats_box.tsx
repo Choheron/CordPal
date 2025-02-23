@@ -239,6 +239,35 @@ export default async function MonthlyStatsBox(props) {
     const starSize="text-base"
     const biggestXBoxShared = "w-full text-center border border-zinc-800 rounded-xl p-2 bg-slate-400/10"
 
+    const rawScoresTable = () => {
+      return (
+        <table className="w-full text-center bg-gray-800 rounded-2xl">
+          <thead className="text-lg border-b border-gray-950">
+            <tr>
+              <td><b>Score</b></td>
+              <td><b>Count</b></td>
+              <td><b>Percentage</b></td>
+            </tr>
+          </thead>
+          <tbody>
+            {reviewData['score_stats'].map((data, index) => {
+              return(
+                <tr key={index} className="border-b border-gray-950">
+                  <td>
+                    <p className={`w-fit mx-auto my-1 px-2 rounded-full ${ratingToTailwindBgColor(data['score'])} text-black`}>
+                      <b>{Number(data['score']).toFixed(2)}</b>
+                    </p>
+                  </td>
+                  <td>{data['count']}</td>
+                  <td>{data['percent']}%</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      )
+    }
+
     return (
       <div className="w-full md:w-[300px] lg:w-[475px] flex flex-col backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
         <p className="w-full text-center text-xl mb-1">
@@ -332,6 +361,13 @@ export default async function MonthlyStatsBox(props) {
           </div>
           <div className="h-fit w-full">
             <CustomMultipercentageDisplay title={"Review Score Counts by Count"} percentages={score_breakdown_counts_list} />
+          </div>
+          {/* Score Breakdown Raw Table */}
+          <div className="flex flex-col h-[175px]">
+            <p>Review Score Counts Raw</p>
+            <div className="h-full rounded-2xl overflow-y-auto">
+              {rawScoresTable()}
+            </div>
           </div>
         </div>
         {/* Top Left Tooltip */}
