@@ -27,7 +27,7 @@ export default function CustomMultipercentageDisplay(props) {
           onMouseEnter={() => setHoverIndex(index)}
           onMouseLeave={() => setHoverIndex(-1)}
         >
-          <p className={`w-full text-center overflow-hidden text-black font-normal`}>{percent['label']}</p>
+          <p className={`w-full text-center overflow-hidden px-auto text-black font-normal ${(hoverIndex == index || hoverIndex == -1) ? "opacity-100" : "opacity-0"}`}>{percent['label']}</p>
         </div>
       )
     })
