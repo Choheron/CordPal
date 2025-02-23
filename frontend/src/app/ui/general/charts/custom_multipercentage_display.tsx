@@ -97,7 +97,7 @@ export default function CustomMultipercentageDisplay(props) {
   }
 
   return (
-    <div className={`relative w-full ${rotateLabels ? "mb-16" : "mb-9"}`}>
+    <div className={`relative w-full ${rotateLabels ? "mb-[4.5rem]" : "mb-9"}`}>
       <p>{props.title}</p>
       <div className={`relative w-full`}>
         {/* Bar Container */}
