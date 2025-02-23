@@ -1,4 +1,6 @@
-import { RiArrowUpFill } from "react-icons/ri"
+"use client"
+
+import { useState } from "react";
 
 // Display a dynamic percentage
 // Expected Props:
@@ -13,6 +15,7 @@ import { RiArrowUpFill } from "react-icons/ri"
 //  - rotateLabels: Boolean - Should the data labels be rotated to make it easier to see?
 export default function CustomMultipercentageDisplay(props) {
   const rotateLabels = (props.rotateLabels) ? props.rotateLabels : false;
+  const [hoverIndex, setHoverIndex] = useState(-1)
 
   const mapPercentageBars = () => {
     return props.percentages.map((percent, index) => {
@@ -21,6 +24,7 @@ export default function CustomMultipercentageDisplay(props) {
           key={index}
           className={`h-full ${percent['color']} transition-all duration-300`}
           style={{ width: `${percent['percent']}%` }}
+          onMouseEnter={() => setHoverIndex(index)}
         >
           <p className="w-full text-center overflow-hidden text-black font-normal">{percent['label']}</p>
         </div>
@@ -46,13 +50,14 @@ export default function CustomMultipercentageDisplay(props) {
           key={index}
           className={`absolute top-6`}
           style={{ left: `${currSum}%`, width: `${percent['percent']}%` }}
+          onMouseEnter={() => setHoverIndex(index)}
         >
           <div 
             className="relative flex flex-col w-full" 
           >
             <div className="w-full h-4 border-b border-l border-r rounded-b-lg"></div>
             <p 
-              className={`mx-auto w-fit text-sm ${rotateLabels ? "absolute rotate-45 top-8" : ""}`}
+              className={`mx-auto w-fit text-sm ${rotateLabels ? "absolute rotate-45 top-8" : ""} ${(hoverIndex == index) ? "opacity-100" : "opacity-0"} transition-all duration-300`}
               style={{ left: (rotateLabels ? `40%` : "") }}  
             >
               <b>{percent['data']}</b>
