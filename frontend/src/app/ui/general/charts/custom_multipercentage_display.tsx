@@ -23,10 +23,11 @@ export default function CustomMultipercentageDisplay(props) {
         <div
           key={index}
           className={`h-full ${percent['color']} transition-all duration-300`}
-          style={{ width: `${percent['percent']}%` }}
+          style={{ width: `${percent['percent']}%`, minWidth: ((hoverIndex == index) ? "fit-content" : "") }}
           onMouseEnter={() => setHoverIndex(index)}
+          onMouseLeave={() => setHoverIndex(-1)}
         >
-          <p className="w-full text-center overflow-hidden text-black font-normal">{percent['label']}</p>
+          <p className={`w-full text-center overflow-hidden text-black font-normal`}>{percent['label']}</p>
         </div>
       )
     })
@@ -51,13 +52,14 @@ export default function CustomMultipercentageDisplay(props) {
           className={`absolute top-6`}
           style={{ left: `${currSum}%`, width: `${percent['percent']}%` }}
           onMouseEnter={() => setHoverIndex(index)}
+          onMouseLeave={() => setHoverIndex(-1)}
         >
           <div 
             className="relative flex flex-col w-full" 
           >
             <div className="w-full h-4 border-b border-l border-r rounded-b-lg"></div>
             <p 
-              className={`mx-auto w-fit text-sm ${rotateLabels ? "absolute rotate-45 top-8" : ""} ${(hoverIndex == index) ? "opacity-100" : "opacity-0"} transition-all duration-300`}
+              className={`mx-auto w-fit text-sm ${rotateLabels ? "absolute rotate-45 top-8" : ""} ${(hoverIndex == index || hoverIndex == -1) ? "opacity-100" : "opacity-0"} transition-all duration-300`}
               style={{ left: (rotateLabels ? `40%` : "") }}  
             >
               <b>{percent['data']}</b>
