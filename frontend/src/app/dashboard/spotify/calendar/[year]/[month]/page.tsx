@@ -1,4 +1,4 @@
-import { getAOtDByMonth, getSubmissionsByMonth } from "@/app/lib/spotify_utils"
+import { getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/app/lib/spotify_utils"
 import { daysInMonth, monthToName, padNumber } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
@@ -41,6 +41,8 @@ export default async function Page({
   const lastMonthAotdData = await getAOtDByMonth(`${lastMonth.getFullYear()}`, padNumber(Number(lastMonth.getMonth() + 1)))
   // Get album submission numbers for the current month
   const submissionData = await getSubmissionsByMonth(year, padNumber(Number(month)))
+  // Get review data for current month
+  const reviewData = await getReviewStatsByMonth(year, padNumber(Number(month)))
 
   // If the user isnt supposed to be here, redirect them to the current month's page
   if((firstDay > today) || ((Object.keys(aotdData).length == 1))) {
@@ -227,7 +229,7 @@ export default async function Page({
         </tbody>
       </table>
       {/* Monthly Statistics */}
-      <MonthlyStatsBox aotdData={aotdData} subData={submissionData} year={year} month={month}/>
+      <MonthlyStatsBox aotdData={aotdData} subData={submissionData} reviewData={reviewData} year={year} month={month}/>
     </div>
   )
 }

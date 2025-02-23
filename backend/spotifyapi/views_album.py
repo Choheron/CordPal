@@ -398,5 +398,8 @@ def getSubmissionsByMonth(request: HttpRequest, year: str, month: str):
       })
   # Mark single value of all submissions
   out['submission_total'] = submissions.count()
+   # Attach timestamp
+  out['metadata'] = {}
+  out['metadata']['timestamp'] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
   # Return Object
   return JsonResponse(out)

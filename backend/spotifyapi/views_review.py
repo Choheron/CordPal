@@ -1,5 +1,6 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Sum
 
 from users.utils import getSpotifyUser
 
@@ -359,6 +360,80 @@ def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
     outObj['first_listen'] = review.first_listen
     # Append to list
     out['reviews'].append(outObj)
+  # Attach timestamp
+  out['metadata'] = {}
+  out['metadata']['timestamp'] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+  # Return data 
+  return JsonResponse(out)
+
+
+###
+# Get Review statistics for a passed in month
+###
+def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getReviewStatsByMonth called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Retrieve all reviews for the passed in month
+  monthReviews = Review.objects.filter(review_date__year=year, review_date__month=month)
+  # Get overall review data
+  stat_reviewTotal = monthReviews.count()
+  stat_reviewScoreSum = monthReviews.aggregate(Sum('score'))['score__sum']
+  stat_reviewAverage = stat_reviewScoreSum/float(stat_reviewTotal)
+  stat_totalFirstListens = monthReviews.filter(first_listen=True).count()
+  stat_firstListenPercentage = (stat_totalFirstListens/float(stat_reviewTotal) * 100)
+  # Get stats related to user
+  users = monthReviews.values_list('user__discord_id', flat=True).distinct()
+  # Track user's total review count and sum of reviews, get user averages
+  stat_userStats = {}
+  stat_biggestHater = (None, None)
+  stat_biggestLover = (None, None)
+  for user_id in users:
+    userReviews = monthReviews.filter(user__discord_id=user_id)
+    reviewCount = userReviews.count()
+    reviewSum = userReviews.aggregate(Sum('score'))['score__sum']
+    averageScore = reviewSum/float(reviewCount)
+    firstListenCount = userReviews.filter(first_listen=True).count()
+    # Only check biggest lover and hater if the user has a review count of at least a third of the overall album count
+    if(reviewCount > (monthReviews.values_list('album').distinct().count() / 3)):
+      if((stat_biggestLover[0] == None) or (stat_biggestLover[1] < averageScore)):
+        stat_biggestLover = (user_id, averageScore)
+      if((stat_biggestHater[0] == None) or (stat_biggestHater[1] > averageScore)):
+        stat_biggestHater = (user_id, averageScore)
+    # Add user data to userStats
+    stat_userStats[user_id] = {
+      "discord_id": user_id,
+      "review_count": reviewCount,
+      "review_sum": reviewSum,
+      "review_average": averageScore,
+      "first_listen_count": firstListenCount,
+      "first_listen_percentage": (firstListenCount/float(reviewCount) * 100)
+    }
+  # Get breakdown of all scores by count and data
+  stat_reviewScoreBreakdown = []
+  score = 0.0
+  while score <= 10.0:
+    stat_reviewScoreBreakdown.append({
+      "score": f"{score + 0.0}",
+      "count": monthReviews.filter(score=score).count()
+    })
+    # Increment score
+    score += 0.5
+  # Create and populate out object
+  out = {}
+  # Attach stats
+  out['total_reviews'] = stat_reviewTotal
+  out['all_review_sum'] = stat_reviewScoreSum
+  out['all_review_average'] = stat_reviewAverage
+  out['biggest_lover_id'] = stat_biggestLover[0]
+  out['biggest_hater_id'] = stat_biggestHater[0]
+  out['all_first_listen_count'] = stat_totalFirstListens
+  out['all_first_listen_percentage'] = stat_firstListenPercentage
+  out['user_stats'] = stat_userStats
+  out['score_stats'] = stat_reviewScoreBreakdown
   # Attach timestamp
   out['metadata'] = {}
   out['metadata']['timestamp'] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")

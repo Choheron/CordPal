@@ -2,6 +2,7 @@
 // Expected Props:
 // - rating: Float - Number rating out of 10 (incrments of 0.5)
 // - textSize: String - Tailwind text size indicator
+// - symbolOverride: String - A symbol to display instead of the star
 export default function StarRating(props) {
   const rating = (props.rating) ? Math.min(props.rating, 10) : 0;
   // Determine star ratios
@@ -9,15 +10,17 @@ export default function StarRating(props) {
   const partialStar = rating - fullStars; // Fractional part of the rating
   // Star array for display
   const stars: any = [];
+  // Override for character to display (must be in a html element)
+  const symbol = (props.symbolOverride) ? props.symbolOverride : <>&#9733;</>
   // Tailwind configs (Some can be passed in as props, otherwise defaulted)
-  const filledColor = 'text-yellow-500'
+  const filledColor = (props.symbolColor) ? props.symbolColor : 'text-yellow-500'
   const emptyColor = 'text-gray-500'
   const textSize = (props.textSize) ? props.textSize : 'text-xl';
 
   // Add full stars
   for (let i = 0; i < fullStars; i++) {
     stars.push(
-      <span key={`full-${i}`} className={`${filledColor} ${textSize}`}>&#9733;</span>
+      <span key={`full-${i}`} className={`${filledColor} ${textSize}`}>{symbol}</span>
     )
   }
 
@@ -35,9 +38,9 @@ export default function StarRating(props) {
               color: 'transparent'
             }}
           >
-            &#9733;
+            {symbol}
           </span>
-          <span className={`${emptyColor}`}>&#9733;</span> {/* Empty part */}
+          <span className={`${emptyColor}`}>{symbol}</span> {/* Empty part */}
         </span>
       </>
     );
@@ -46,7 +49,7 @@ export default function StarRating(props) {
   // Add empty stars for the remaining stars to reach 10
   for (let i = fullStars + (partialStar > 0 ? 1 : 0); i < 10; i++) {
     stars.push(
-      <span key={`empty-${i}`} className={`${emptyColor} ${textSize}`}>&#9733;</span>
+      <span key={`empty-${i}`} className={`${emptyColor} ${textSize}`}>{symbol}</span>
     );
   }
 
