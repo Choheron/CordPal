@@ -394,7 +394,7 @@ def getSubmissionsByMonth(request: HttpRequest, year: str, month: str):
     out['submission_counts'].append({
         "discord_id": user_id, 
         "count": submissions.filter(submitted_by__discord_id=user_id).count(),
-        "percentage": ((submissions.filter(submitted_by__discord_id=user_id).count()/float(len(submissions))) * 100)
+        "percent": ((submissions.filter(submitted_by__discord_id=user_id).count()/float(len(submissions))) * 100)
       })
   # Mark single value of all submissions
   out['submission_total'] = submissions.count()

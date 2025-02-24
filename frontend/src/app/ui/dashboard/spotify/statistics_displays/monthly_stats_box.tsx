@@ -9,6 +9,7 @@ import StarRating from "@/app/ui/general/star_rating";
 import CustomPercentageDisplay from "@/app/ui/general/charts/custom_percentage_display";
 import CustomMultipercentageDisplay from "@/app/ui/general/charts/custom_multipercentage_display";
 import { RosenBarChartHorizontal } from "@/app/ui/general/charts/rosen_barchart_horizontal";
+import { RosenPieChart } from "@/app/ui/general/charts/rosen_pie_chart";
 
 // Display monthy statistics for the AOtD
 // Expected Props:
@@ -27,6 +28,26 @@ export default async function MonthlyStatsBox(props) {
   const highest_album = (aotdStats) ? aotdData[aotdStats['highest_aotd_date']] : "Not Found";
   const lowest_album = (aotdStats) ? aotdData[aotdStats['lowest_aotd_date']] : "Not Found";
   const selection_counts = (aotdStats) ? aotdStats['selection_counts'] : "Not Found";
+  // Map Submission Counts to Pie Chart Readable List 
+  const submission_pie_chart_data = subData['submission_counts'].sort((a, b) => ((a["count"] < b["count"]) ? 1 : -1)).map((subObj, index) => {
+    return(
+      {
+        "name": subObj['discord_id'],
+        "nameType": 1,
+        "value": subObj['count'],
+        "percent": `${Number(subObj['percent']).toFixed(2)}%`,
+      }
+  )})
+  // Map Selection Counts to Pie Chart Readable List 
+  const selection_pie_chart_data = selection_counts.sort((a, b) => ((a["count"] < b["count"]) ? 1 : -1)).map((subObj, index) => {
+    return(
+      {
+        "name": subObj['discord_id'],
+        "nameType": 1,
+        "value": subObj['count'],
+        "percent": `${Number(subObj['percent']).toFixed(2)}%`,
+      }
+  )})
   // Map score breakdown to percentage bar list
   const score_breakdown_percentages_list = reviewData['score_stats'].map((scoreObj, index) => {
     return(
@@ -132,7 +153,7 @@ export default async function MonthlyStatsBox(props) {
   // Display counts of user albums being selected
   const selectionCounts = () => {
     return (
-      <div className="relative w-full md:w-[250px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+      <div className="relative h-full w-full md:w-[500px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
         <p className="font-extralight w-full text-center text-xl mb-1">
           Number Selected:
         </p>
@@ -142,26 +163,8 @@ export default async function MonthlyStatsBox(props) {
           <p>{aotdStats['selection_total']}</p>
         </div>
         <Divider />
-        <div className="flex flex-col h-full">
-          {selection_counts.sort((a, b) => ((a["count"] < b["count"]) ? 1 : -1)).map((user, index) => {
-            return (
-              <div 
-                key={`${user['discord_id']}-${user['count']}`}
-                className="flex justify-between w-full my-1 px-3"
-              >
-                <UserCard 
-                  isProfileLink
-                  userDiscordID={user['discord_id']}
-                  customDescription={(
-                    <p>{Number(user['percentage']).toFixed(2)}%</p>
-                  )}
-                />
-                <p className="my-auto px-2 py-1 bg-gray-800 rounded-full">
-                  {user['count']}
-                </p>
-              </div>
-            )
-          })}
+        <div className="flex flex-col h-full mt-3">
+          <RosenPieChart data={selection_pie_chart_data} />
         </div>
         {/* Top Left Tooltip */}
         <Tooltip content={`Breakdown of number of selected albums, by submitter, for ${monthToName(month)} ${year}.`} >
@@ -175,11 +178,10 @@ export default async function MonthlyStatsBox(props) {
 
   // Display counts of album submissions
   const submissionCount = () => {
-    const submission_counts = subData['submission_counts']
     const submission_total = subData['submission_total']
 
     return (
-      <div className="w-full md:w-[250px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+      <div className="w-full h-full md:w-[500px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
         <p className="font-extralight w-full text-center text-xl mb-1">
           Submission Counts:
         </p>
@@ -189,26 +191,8 @@ export default async function MonthlyStatsBox(props) {
           <p>{submission_total}</p>
         </div>
         <Divider />
-        <div className="flex flex-col h-full">
-          {submission_counts.sort((a, b) => ((a["count"] < b["count"]) ? 1 : -1)).map((user, index) => {
-            return (
-              <div 
-                key={`${user['discord_id']}-${user['count']}`}
-                className="flex justify-between w-full my-1 px-3"
-              >
-                <UserCard 
-                  isProfileLink
-                  userDiscordID={user['discord_id']}
-                  customDescription={(
-                    <p>{Number(user['percentage']).toFixed(2)}%</p>
-                  )}
-                />
-                <p className="my-auto px-2 py-1 bg-gray-800 rounded-full">
-                  {user['count']}
-                </p>
-              </div>
-            )
-          })}
+        <div className="flex flex-col h-full mt-3">
+          <RosenPieChart data={submission_pie_chart_data} />
         </div>
         {/* Top Left Tooltip */}
         <Tooltip content={`Breakdown of number of albums submitted, by user, for ${monthToName(month)} ${year}`} >
@@ -231,35 +215,6 @@ export default async function MonthlyStatsBox(props) {
     // Tailwind
     const starSize="text-base"
     const biggestXBoxShared = "w-full text-center border border-zinc-800 rounded-xl p-2 bg-slate-400/10"
-
-    const rawScoresTable = () => {
-      return (
-        <table className="w-full text-center bg-gray-800 rounded-2xl">
-          <thead className="sticky top-0 text-lg border-b border-gray-950 bg-gray-800">
-            <tr>
-              <td><b>Score</b></td>
-              <td><b>Count</b></td>
-              <td><b>Percentage</b></td>
-            </tr>
-          </thead>
-            <tbody>
-              {reviewData['score_stats'].map((data, index) => {
-                return(
-                  <tr key={index} className="border-b border-gray-950">
-                    <td>
-                      <p className={`w-fit mx-auto my-1 px-2 rounded-full ${ratingToTailwindBgColor(data['score'])} text-black`}>
-                        <b>{Number(data['score']).toFixed(2)}</b>
-                      </p>
-                    </td>
-                    <td>{data['count']}</td>
-                    <td>{Number(data['percent']).toFixed(2)}%</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-        </table>
-      )
-    }
 
     return (
       <div className="w-full md:w-[300px] lg:w-[475px] flex flex-col backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
@@ -367,10 +322,12 @@ export default async function MonthlyStatsBox(props) {
     <div className="w-full flex flex-row flex-wrap justify-center gap-2">
       {/* Lowest and Highest Album of the Month */}
       {lowestHighestAlbum()}
-      {/* Selection Breakdown */}
-      {selectionCounts()}
-      {/* Submission Breakdown */}
-      {submissionCount()}
+      <div className="flex flex-col justify-between">
+        {/* Selection Breakdown */}
+        {selectionCounts()}
+        {/* Submission Breakdown */}
+        {submissionCount()}
+      </div>
       {/* Review stats for the Month */}
       {monthReviewStats()}
     </div>

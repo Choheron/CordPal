@@ -267,7 +267,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     # Convert submission numbers to array
     subNumList = []
     for user in selection_counts.keys():
-      subNumList.append({"discord_id": user, "count": selection_counts[user], "percentage": ((selection_counts[user]/float(len(month_AOtD))) * 100)})
+      subNumList.append({"discord_id": user, "count": selection_counts[user], "percent": ((selection_counts[user]/float(len(month_AOtD))) * 100)})
     # Attach Submission Numbers
     out['stats']['selection_counts'] = subNumList
     out['stats']['selection_total'] = len(month_AOtD)
