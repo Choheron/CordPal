@@ -8,6 +8,7 @@ import { RiQuestionMark } from "react-icons/ri";
 import StarRating from "@/app/ui/general/star_rating";
 import CustomPercentageDisplay from "@/app/ui/general/charts/custom_percentage_display";
 import CustomMultipercentageDisplay from "@/app/ui/general/charts/custom_multipercentage_display";
+import { RosenBarChartHorizontal } from "@/app/ui/general/charts/rosen_barchart_horizontal";
 
 // Display monthy statistics for the AOtD
 // Expected Props:
@@ -30,18 +31,10 @@ export default async function MonthlyStatsBox(props) {
   const score_breakdown_percentages_list = reviewData['score_stats'].map((scoreObj, index) => {
     return(
       {
-        "label": scoreObj['score'],
-        "percent": scoreObj['percent'],
-        "data": `${scoreObj['percent'].toFixed(2)}%`,
-        "color": ratingToTailwindBgColor(scoreObj['score'])
-      }
-  )})
-  const score_breakdown_counts_list = reviewData['score_stats'].map((scoreObj, index) => {
-    return(
-      {
-        "label": scoreObj['score'],
-        "percent": scoreObj['percent'],
-        "data": scoreObj['count'],
+        "key_label": "Score",
+        "key": scoreObj['score'],
+        "percent": `${scoreObj['percent'].toFixed(2)}%`,
+        "value": scoreObj['count'],
         "color": ratingToTailwindBgColor(scoreObj['score'])
       }
   )})
@@ -356,19 +349,8 @@ export default async function MonthlyStatsBox(props) {
             overLabel={reviewData['total_reviews'] - reviewData['all_first_listen_count']} 
           />
           {/* Score Breakdown */}
-          <div className="h-fit w-full">
-            <CustomMultipercentageDisplay title={"Review Score Counts by Percentage"} percentages={score_breakdown_percentages_list} rotateLabels/>
-          </div>
-          <div className="h-fit w-full">
-            <CustomMultipercentageDisplay title={"Review Score Counts by Count"} percentages={score_breakdown_counts_list} />
-          </div>
-          {/* Score Breakdown Raw Table */}
-          <div className="flex flex-col h-[175px]">
-            <p>Review Score Counts Raw</p>
-            <div className="h-full rounded-2xl overflow-y-auto">
-              {rawScoresTable()}
-            </div>
-          </div>
+          <p>Review Scores/Percentages Chart:</p>
+          <RosenBarChartHorizontal data={score_breakdown_percentages_list} />
         </div>
         {/* Top Left Tooltip */}
         <Tooltip content={`Month review stats for ${monthToName(month)} ${year}.`} >
