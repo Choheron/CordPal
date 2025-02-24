@@ -13,7 +13,7 @@ export function RosenBarChartHorizontal(props) {
     .padding(0.175);
 
   const xScale = scaleLinear()
-    .domain([0, max(data.map((d) => d.value)) ?? 0])
+    .domain([0, Number(max(data.map((d) => d.value))) ?? 0])
     .range([0, 100]);
 
   const longestWord: any = max(data.map((d) => d.key.length)) || 1;
