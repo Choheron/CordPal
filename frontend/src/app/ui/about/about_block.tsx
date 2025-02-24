@@ -96,7 +96,8 @@ export default async function AboutBlock(props) {
           <li><a href="https://nextjs.org/" className="text-blue-500 hover:underline">NextJS</a> - Frontend</li>
           <li><a href="https://nextui.org/" className="text-blue-500 hover:underline">NextUI</a> - Frontend UI library to make my life as a DevOps guy easier</li>
           <li><a href="https://remixicon.com/" className="text-blue-500 hover:underline">RemixIcons</a> - Open source icons.</li>
-          <li><a href="" className="text-blue-500 hover:underline">TipTap</a> - Rich text editor, made it much easier to implement rich text editing for users.</li>
+          <li><a href="https://tiptap.dev/" className="text-blue-500 hover:underline">TipTap</a> - Rich text editor, made it much easier to implement rich text editing for users.</li>
+          <li><a href="https://rosencharts.com/" className="text-blue-500 hover:underline">Rosen Charts</a> - SSR Chart Library that is extremely easily extensible.</li>
           <li>
             <a href="https://developer.spotify.com/documentation/web-api" className="text-blue-500 hover:underline">Spotify API</a> - All songs and artist related 
             media is property of spotify and/or the respective artist.
