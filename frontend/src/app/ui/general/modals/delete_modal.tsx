@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation'
 //   - tooltipContent: String - Text to show on button hover
 //   - titleText: String - Text to display in modal title
 //   - bodyText: String - Text to display in modal body
+//   - redirectText: String - Url to redirect to after successful delete (OPTIONAL)
 export default function DeleteModal(props) {
   const cancelCallback = props.cancelCallback
   // Props
