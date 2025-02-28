@@ -12,6 +12,9 @@ import { Button, Spinner, Checkbox, Tooltip } from "@nextui-org/react";
 import React from "react";
 import { RiDeleteBin2Line, RiErrorWarningFill } from "react-icons/ri";
 import { Conditional } from "../../dashboard/conditional";
+import { useRouter } from 'next/navigation'
+
+
 
 
 // Modal to display a confirmation window for deletion
@@ -36,6 +39,8 @@ export default function DeleteModal(props) {
   const [errorText, setErrorText] = React.useState("")
   // Modal Controller Vars
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
+  // Router
+  const router = useRouter()
 
   const handleDelete = async () => {
     setProcessing(true)
@@ -45,7 +50,8 @@ export default function DeleteModal(props) {
       setConfirmed(false)
       return
     }
-    handleCancel()
+    // Redirect user to AOtD Page after successful delete
+    router.push('/dashboard/spotify')
   }
 
   const handleCancel = () => {
