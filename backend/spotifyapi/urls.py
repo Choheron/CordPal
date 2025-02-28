@@ -27,6 +27,7 @@ urlpatterns = [
   ## ============================================================================================================
   path('checkIfAlbumAlreadyExists/<str:album_spotify_id>', views_album.checkIfAlbumAlreadyExists),
   path('submitAlbum', views_album.submitAlbum),
+  path('deleteAlbum', views_album.deleteAlbum),
   path('getAlbum/<str:album_spotify_id>', views_album.getAlbum),
   path('getAllAlbums', views_album.getAllAlbums),
   path('getLastXAlbums/<int:count>', views_album.getLastXAlbums),
@@ -41,6 +42,9 @@ urlpatterns = [
   path('getAlbumsStats', views_album.getAlbumsStats),
   path('getLowestHighestAlbumStats', views_album.getLowestHighestAlbumStats), 
   path('getSubmissionsByMonth/<str:year>/<str:month>', views_album.getSubmissionsByMonth),
+  # Below URL has two variations (one for lack of URL Param)
+  path('isUserAlbumUploader/<str:album_spotify_id>/<str:user_discord_id>', views_album.isUserAlbumUploader),
+  path('isUserAlbumUploader/<str:album_spotify_id>', views_album.isUserAlbumUploader),
   ## ============================================================================================================
   ## Review Views
   ## ============================================================================================================

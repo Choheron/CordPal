@@ -83,7 +83,7 @@ class Album(models.Model):
         action_type="DELETE",
         entity_type="ALBUM",
         entity_id=self.id,
-        details={"reason": reason, "deleted_album": self.title, "raw_data": model_to_dict(self) }
+        details={"reason": reason, "deleted_album": self.title, "album_raw_data": model_to_dict(self) }
       )
       # Call Django's default delete method
       super().delete(*args, **kwargs)

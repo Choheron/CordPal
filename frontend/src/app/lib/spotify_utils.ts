@@ -200,6 +200,32 @@ export async function submitAlbumToBackend(albumObject) {
   revalidateTag('album_submissions')
 }
 
+
+//
+// Delete an album from the backend pool
+// - RETURN: HttpResponse
+//
+export async function deleteAlbumFromBackend(album_spotify_id) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make request to delete album
+  console.log("deleteAlbumFromBackend: Sending request to backend '/spotifyapi/deleteAlbum'")
+  const deleteAlbumResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/deleteAlbum`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+    body: JSON.stringify({"album_id": album_spotify_id})
+  });
+  const status = deleteAlbumResponse.status
+  // Revalidate requests to ensure no data is lost
+  revalidateTag('album_submissions')
+  return status
+}
+
+
 //
 // Get album of the day data
 // - RETURN: object containing album of the day data

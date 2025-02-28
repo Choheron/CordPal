@@ -126,6 +126,33 @@ export async function isUserAdmin(discord_id = "") {
   return avatarUrlJSON['admin_status'];
 }
 
+
+//
+// Retrieve boolean on if a user is an admin
+// Params:
+// - Discord ID String (Conditional on if we are searching for a different user)
+// RETURN: boolean
+//
+export async function isUserAlbumUploader(album_spotify_id: string, discord_id: string = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const isUserUploaderResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/isUserAlbumUploader/${album_spotify_id}${(discord_id === "") ? '' : '/' + discord_id}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const isUserUploaderJson = await isUserUploaderResponse.json()
+  return isUserUploaderJson['uploader'];
+}
+
+
 //
 // Retrieve user data using session info
 // Params:
