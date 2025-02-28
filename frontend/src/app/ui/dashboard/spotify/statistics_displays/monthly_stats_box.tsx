@@ -70,7 +70,7 @@ export default async function MonthlyStatsBox(props) {
       <div className="w-full md:w-[300px] lg:w-[400px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
         {/* Highest Album */}
         <p className="font-extralight w-full text-center text-xl">
-          Highest:
+          {monthToName(month)}&lsquo;s Highest:
         </p>
         <Divider className="mb-1" />
         <Badge
@@ -109,7 +109,7 @@ export default async function MonthlyStatsBox(props) {
         </Badge>
         {/* Lowest Album */}
         <p className="font-extralight w-full text-center text-xl">
-          Lowest:
+          {monthToName(month)}&lsquo;s Lowest:
         </p>
         <Divider className="mb-1" />
         <Badge
@@ -232,6 +232,7 @@ export default async function MonthlyStatsBox(props) {
             <p>Biggest Lover:</p>
             <Divider className="mb-1" />
             <UserCard
+              isProfileLink
               userDiscordID={biggest_lover_id}
               customDescription={
                 <StarRating
@@ -254,6 +255,7 @@ export default async function MonthlyStatsBox(props) {
             <p>Biggest Hater:</p>
             <Divider className="mb-1" />
             <UserCard
+              isProfileLink
               userDiscordID={biggest_hater_id}
               customDescription={
                 <StarRating

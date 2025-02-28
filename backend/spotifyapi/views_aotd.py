@@ -96,7 +96,7 @@ def setAlbumOfDay(request: HttpRequest):
   albumOfTheDay = None
   # Get list of all users who are currently AOtD selection blocked
   blocked_users = list(SpotifyUserData.objects.filter(selection_blocked_flag=True).values_list('user__discord_id', flat=True))
-  logger.warning(blocked_users)
+  logger.warning(f"Blocked Users: {blocked_users}")
   while(not selected):
     # Filter out blocked users albums
     tempAlbum = random.choice(Album.objects.all().exclude(submitted_by__discord_id__in=blocked_users))
@@ -134,7 +134,8 @@ def setAlbumOfDayADMIN(request: HttpRequest, date: str, album_spotify_id: str):
   # Create an album of the day object
   albumOfTheDayObj = DailyAlbum(
     album=albumOfTheDay,
-    date=day
+    date=day,
+    manual=True
   )
   # Save object
   albumOfTheDayObj.save()
@@ -196,7 +197,10 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
     temp_eligible_count = temp_submission_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=spot_user.user).count())
     total_eligible_count += temp_eligible_count
   # Do math for percentage
-  chance = (float(user_eligible_count)/float(total_eligible_count)) * 100.00
+  try:
+    chance = round((float(user_eligible_count)/float(total_eligible_count)) * 100.00, 2)
+  except:
+    chance = round(0, 2)
   # Return data 
   return JsonResponse({'percentage': chance})
 

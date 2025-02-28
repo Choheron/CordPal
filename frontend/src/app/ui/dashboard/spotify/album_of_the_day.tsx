@@ -79,9 +79,7 @@ export default async function AlbumOfTheDayBox(props) {
           similar_review_data={similarReviewData}
         />
         <div className="w-full flex">
-          <AddAlbumModal
-            userSelectChance={userSelectChance.toFixed(2)}
-          />
+          <AddAlbumModal />
         </div>
       </div>
       <Divider 

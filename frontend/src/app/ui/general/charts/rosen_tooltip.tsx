@@ -147,7 +147,7 @@ const TooltipContent = React.forwardRef<HTMLDivElement, { children: React.ReactN
     ) : (
       <div
         ref={tooltipRef}
-        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3.5 py-2 rounded-sm fixed z-50"
+        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3.5 py-2 rounded-lg fixed z-50"
         style={getTooltipPosition()}
       >
         {children}

@@ -165,6 +165,39 @@ def submitAlbum(request: HttpRequest):
     # Save new album data
     newAlbum.save()
     return HttpResponse(200)
+
+
+###
+# Attempt to Delete an Album from the AOtD Pool.
+###
+def deleteAlbum(request: HttpRequest):
+  # Make sure request is a post request
+  if(request.method != "POST"):
+    logger.warning("deleteAlbum called with a non-POST method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get data from request
+  reqBody = json.loads(request.body)
+  # Ensure that album exists in the database and has been submitted by this user
+  try:
+    albumObject = Album.objects.get(spotify_id = reqBody['album']['id'])
+    # Get user object from request
+    user = getSpotifyUser(request.session['discord_id'])
+    # If user has not submitted the attempted delete, throw an error (Does not apply to admins)
+    if((albumObject.submitted_by != user) and (not user.is_staff)):
+      logger.warning(f"deleteAlbum: User {user.discord_id}/{user.nickname} attempted to delete Album {reqBody['album']['id']}, however did not submit said Album!")
+      return HttpResponse(403)
+    # Check if the album has been AOtD
+    if(DailyAlbum.objects.filter(album=albumObject).count() > 0):
+      logger.warning(f"deleteAlbum: User {user.discord_id}/{user.nickname} attempted to delete Album {reqBody['album']['id']}, FAILED due to Album having been AOtD!")
+      return HttpResponse(403)
+    # Delete album object from database
+    albumObject.delete()
+  except ObjectDoesNotExist as e:
+    # Throw error if the album is not in the database
+    logger.warning(f"deleteAlbum: Album {reqBody['album']['id']} does not exist in Albums DB")
+    return HttpResponse(404)
   
 
 ###
