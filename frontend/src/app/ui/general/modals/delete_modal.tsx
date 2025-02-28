@@ -33,6 +33,7 @@ export default function DeleteModal(props) {
   const tooltipContent = (props.tooltipContent) ? props.tooltipContent : "";
   const titleText = (props.titleText) ? props.titleText : "Delete?";
   const bodyText = (props.bodyText) ? props.bodyText : "Are you sure you would like to delete?";
+  const redirectText = (props.redirectText) ? props.redirectText : null;
   // Functionality states
   const [confirmed, setConfirmed] = React.useState(false)
   const [processing, setProcessing] = React.useState(false)
@@ -50,8 +51,12 @@ export default function DeleteModal(props) {
       setConfirmed(false)
       return
     }
-    // Redirect user to AOtD Page after successful delete
-    router.push('/dashboard/spotify')
+    if(redirectText) {
+      // Redirect user to AOtD Page after successful delete
+      router.push(redirectText)
+    } else {
+      handleCancel()
+    }
   }
 
   const handleCancel = () => {

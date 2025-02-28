@@ -109,6 +109,7 @@ export default async function Page({
                 tooltipContent={(aotd_dates.length > 0) ? "Album cannot be deleted, it has been AOtD!" : "Delete Album"}
                 titleText={`Delete "${albumData('title')}"?`}
                 bodyText={`Are you sure you want to delete "${albumData('title')}"? You cannot undo this action.`}
+                redirectText={'/dashboard/spotify'}
               />
             </div>
           </Conditional>
