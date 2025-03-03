@@ -123,6 +123,8 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, album_spotify_id: str):
     if(albumObject):
       logger.info(f"Album does already exist, name: {albumObject.title}!")
     out['exists'] = True
+    out['submitter_id'] = albumObject.submitted_by.discord_id
+    out['submitter_nickname'] = albumObject.submitted_by.nickname
   except ObjectDoesNotExist as e:
     out['exists'] = False
   # Return Spotify Response

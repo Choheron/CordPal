@@ -174,8 +174,7 @@ export async function checkIfAlbumAlreadyExists(album_spotify_id) {
     }
   });
   const existsResponse = await spotifyAlbumExistsResponse.json()
-  const exists = existsResponse['exists']
-  return exists;
+  return existsResponse;
 }
 
 //

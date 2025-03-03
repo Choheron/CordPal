@@ -8,7 +8,7 @@ import {
   ModalFooter,
   useDisclosure
 } from "@nextui-org/modal";
-import { Button, Divider, select } from "@nextui-org/react";
+import { Button, Divider, Link, select } from "@nextui-org/react";
 import {Input} from "@nextui-org/react";
 import {Textarea} from "@nextui-org/input";
 import React from "react";
@@ -30,6 +30,7 @@ export default function AddAlbumModal(props) {
   const [commentValue, setCommentValue] = React.useState("");
   const [selectedAlbum, setSelectedAlbum] = React.useState(null);
   const [albumError, setAlbumError] = React.useState(false)
+  const [albumErrorData, setAlbumErrorData] = React.useState({})
   // Search Dynamic Values
   const [searchTitle, setSearchTitle] = React.useState("");
   const [searchArtist, setSearchArtist] = React.useState("");
@@ -113,13 +114,16 @@ export default function AddAlbumModal(props) {
     getSearchResults()
   }, [searchQuery])
 
+
   // UseEffect to map album data from spotify to a selectable listItem
   React.useEffect(() => {
     const checkIfAlbumAlreadySubmitted = async () => {
       if(selectedValue == "") {
         return;
       }
-      setAlbumError(await checkIfAlbumAlreadyExists(selectedValue))
+      const albumErrData = await checkIfAlbumAlreadyExists(selectedValue)
+      setAlbumErrorData(albumErrData)
+      setAlbumError(albumErrData['exists'])
     }
     checkIfAlbumAlreadySubmitted()
     if(searchAlbumsResponse['items']) {
@@ -135,6 +139,7 @@ export default function AddAlbumModal(props) {
       }
     }
   }, [selectedValue])
+
 
   // Send request to upload the submitted image
   const submitPress = () => {
@@ -298,7 +303,18 @@ export default function AddAlbumModal(props) {
               </ModalBody>
               <ModalFooter>
                 <Conditional showWhen={albumError}>
-                  <p className="text-red-500 underline mx-auto">Album has already been submitted!</p>
+                  <div className="text-red-500 my-auto">
+                    <p className="underline mx-auto">Album has already been submitted!</p>
+                    <div className="flex w-full">
+                      <p className="my-auto">Submitted by:</p>
+                      <Link 
+                        isBlock 
+                        href={`/profile/${albumErrorData['submitter_id']}`}
+                      >
+                        {albumErrorData['submitter_nickname']}
+                      </Link>
+                    </div>
+                  </div>
                 </Conditional>
                 <Button color="danger" variant="light" onPress={cancelPress}>
                   Cancel
