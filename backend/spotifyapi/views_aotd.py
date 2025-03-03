@@ -208,6 +208,7 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
 ###
 # Return an object containing all of the aotd objects and their albums in a specific month
 # NOTE: This function has been expanded to include statistics for each month, so less loops and DB calls are needed
+# NOTE 2: This function has been updated to only include AOtD selections up to todays date.
 ###
 def getAOtDByMonth(request: HttpRequest, year: str, month: str):
   # Make sure request is a get request
@@ -217,7 +218,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     res.status_code = 405
     return res
   # Get all AOtD Objects for this year and month
-  month_AOtD = DailyAlbum.objects.filter(date__year=year, date__month=month)
+  month_AOtD = DailyAlbum.objects.filter(date__year=year, date__month=month).filter(date__lte=timezone.now())
   # Create out object
   out = {}
   if(len(month_AOtD) != 0):
@@ -234,10 +235,10 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
       rating = getAlbumRating(aotd.album.spotify_id, rounded=False, date=aotd.date)
       # Check highest and lowest ratings if rating is not null
       if(rating):
-        if((highest_aotd_rating != None) and (rating > highest_aotd_rating)):
+        if((highest_aotd_rating == None) or (rating > highest_aotd_rating)):
           highest_aotd = aotd
           highest_aotd_rating = rating
-        if((lowest_aotd_rating != None) and (rating < lowest_aotd_rating)):
+        if((lowest_aotd_rating == None) or (rating < lowest_aotd_rating)):
           lowest_aotd = aotd
           lowest_aotd_rating = rating
       # Increment submitter selection count

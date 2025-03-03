@@ -102,14 +102,14 @@ export const isDecember = () => {
 // Get day before passed in date
 export function getPrevDay(day: Date) {
   let dateObj = new Date(day);
-  dateObj.setDate(dateObj.getDate() - 1);
+  dateObj.setDate(dateObj.getDate());
   return dateObj
 }
 
 // Get day before passed in date
 export function getNextDay(day: Date) {
   let dateObj = new Date(day);
-  dateObj.setDate(dateObj.getDate() + 1);
+  dateObj.setDate(dateObj.getDate() + 2);
   return dateObj
 }
 

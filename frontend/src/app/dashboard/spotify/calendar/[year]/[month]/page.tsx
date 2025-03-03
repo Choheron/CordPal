@@ -51,7 +51,7 @@ export default async function Page({
 
   // Populate an array containing strings of dates (YYYY-MM-DD) that corresponds to where to place the days in the UI
   // Array will contain subarrays containing data from sat to sun (one week)
-  let dates: any = [[],[],[],[],[]]
+  let dates: any = [[],[],[],[],[],[]]
   let weekIndex = 0
   let dayIndex = 1
   for(dayIndex; dayIndex <= dayCount; dayIndex++) {

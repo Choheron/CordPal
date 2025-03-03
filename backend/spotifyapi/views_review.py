@@ -382,9 +382,9 @@ def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
   # Get overall review data
   stat_reviewTotal = monthReviews.count()
   stat_reviewScoreSum = monthReviews.aggregate(Sum('score'))['score__sum']
-  stat_reviewAverage = stat_reviewScoreSum/float(stat_reviewTotal)
+  stat_reviewAverage = (stat_reviewScoreSum/float(stat_reviewTotal)) if (stat_reviewTotal != 0) else 0
   stat_totalFirstListens = monthReviews.filter(first_listen=True).count()
-  stat_firstListenPercentage = (stat_totalFirstListens/float(stat_reviewTotal) * 100)
+  stat_firstListenPercentage = (stat_totalFirstListens/float(stat_reviewTotal) * 100) if (stat_reviewTotal != 0) else 0
   # Get stats related to user
   users = monthReviews.values_list('user__discord_id', flat=True).distinct()
   # Track user's total review count and sum of reviews, get user averages
@@ -395,7 +395,7 @@ def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
     userReviews = monthReviews.filter(user__discord_id=user_id)
     reviewCount = userReviews.count()
     reviewSum = userReviews.aggregate(Sum('score'))['score__sum']
-    averageScore = reviewSum/float(reviewCount)
+    averageScore = (reviewSum/float(reviewCount)) if (reviewCount != 0) else 0
     firstListenCount = userReviews.filter(first_listen=True).count()
     # Only check biggest lover and hater if the user has a review count of at least a third of the overall album count
     if(reviewCount > (monthReviews.values_list('album').distinct().count() / 3)):
@@ -410,7 +410,7 @@ def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
       "review_sum": reviewSum,
       "review_average": averageScore,
       "first_listen_count": firstListenCount,
-      "first_listen_percentage": (firstListenCount/float(reviewCount) * 100)
+      "first_listen_percentage": (firstListenCount/float(reviewCount) * 100) if (reviewCount != 0) else 0
     }
   # Get breakdown of all scores by count and data
   stat_reviewScoreBreakdown = []
@@ -419,7 +419,7 @@ def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
     stat_reviewScoreBreakdown.append({
       "score": f"{score + 0.0}",
       "count": monthReviews.filter(score=score).count(),
-      "percent": (monthReviews.filter(score=score).count()/float(stat_reviewTotal) * 100)
+      "percent": (monthReviews.filter(score=score).count()/float(stat_reviewTotal) * 100) if (stat_reviewTotal != 0) else 0
     })
     # Increment score
     score += 0.5

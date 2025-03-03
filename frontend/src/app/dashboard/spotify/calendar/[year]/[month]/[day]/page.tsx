@@ -54,15 +54,17 @@ export default async function Page({
         <div className="w-fit mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row">
           <div className="backdrop-blur-2xl px-3 py-3 my-2 mx-auto rounded-2xl bg-zinc-800/30 border border-neutral-800">
             <div className="mx-1 mt-1 mb-4 flex justify-between w-full">
+              {/* Previous Day Button */}
               <Button 
                 as={Link}
-                href={`/dashboard/spotify/calendar/${prevDay.getFullYear()}/${padNumber(prevDay.getMonth() + 1)}/${padNumber(prevDay.getDate() + 1)}`}
+                href={`/dashboard/spotify/calendar/${prevDay.getFullYear()}/${padNumber(prevDay.getMonth() + 1)}/${padNumber(prevDay.getDate())}`}
                 radius="full"
                 className={`w-fit hover:underline text-white`}
                 variant="solid"
               >
                 <RiArrowLeftCircleLine className="text-2xl" />
               </Button>
+              {/* Month View Button */}
               <Button 
                 as={Link}
                 href={`/dashboard/spotify/calendar/${year}/${month}`}
@@ -72,9 +74,10 @@ export default async function Page({
               >
                 <RiCalendar2Fill className="text-2xl"/>
               </Button>
+              {/* Next Day Button */}
               <Button
                 as={Link}
-                href={`/dashboard/spotify/calendar/${nextDay.getFullYear()}/${padNumber(nextDay.getMonth() + 1)}/${padNumber(nextDay.getDate() + 1)}`}
+                href={`/dashboard/spotify/calendar/${nextDay.getFullYear()}/${padNumber(nextDay.getMonth() + 1)}/${padNumber(nextDay.getDate())}`}
                 radius="full"
                 className={`${(isToday) ? 'invisible' : ''} w-fit hover:underline text-white`}
                 variant="solid"

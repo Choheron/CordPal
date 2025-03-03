@@ -66,6 +66,20 @@ export default async function MonthlyStatsBox(props) {
     const highestAlbumDateArr = aotdStats['highest_aotd_date'].split("-")
     const lowestAlbumDateArr = aotdStats['lowest_aotd_date'].split("-")
 
+    const highestAlbumRating = (highest_album['rating'] != null) ? highest_album['rating'].toFixed(2) : 0;
+    const lowestAlbumRating = (lowest_album['rating'] != null) ? lowest_album['rating'].toFixed(2) : 0;
+
+    // If No review data is in, return an empty box with a warning 
+    if(reviewData['total_reviews'] == 0) {
+      return (
+        <div className="w-full md:w-[300px] lg:w-[400px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+          <div className="max-w-full mx-auto px-2 py-2 my-auto text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
+            <p>No review data for {monthToName(month)} {year}</p>
+          </div>
+        </div>
+      )
+    }
+    // Otherwise do normal data display
     return (
       <div className="w-full md:w-[300px] lg:w-[400px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
         {/* Highest Album */}
@@ -74,13 +88,14 @@ export default async function MonthlyStatsBox(props) {
         </p>
         <Divider className="mb-1" />
         <Badge
-          content={highest_album['rating'].toFixed(2)} 
+          isInvisible={highest_album['rating'] == null}
+          content={highestAlbumRating} 
           size="lg" 
           placement="top-right" 
           shape="rectangle"
           showOutline={false}
           variant="shadow"
-          className={`-mt-1  ${ratingToTailwindBgColor(highest_album["rating"].toFixed(2))} lg:text-xl text-black`}
+          className={`-mt-1  ${ratingToTailwindBgColor(highestAlbumRating)} lg:text-xl text-black`}
         >
           <div className="relative w-full h-full p-1">
             <MinimalAlbumDisplay
@@ -113,13 +128,14 @@ export default async function MonthlyStatsBox(props) {
         </p>
         <Divider className="mb-1" />
         <Badge
-          content={lowest_album['rating'].toFixed(2)} 
+          isInvisible={lowest_album['rating'] == null}
+          content={lowestAlbumRating} 
           size="lg" 
           placement="top-right" 
           shape="rectangle"
           showOutline={false}
           variant="shadow"
-          className={`-mt-1 ${ratingToTailwindBgColor(lowest_album["rating"].toFixed(2))} lg:text-xl text-black`}
+          className={`-mt-1 ${ratingToTailwindBgColor(lowestAlbumRating)} lg:text-xl text-black`}
         >
           <div className="relative w-full h-full p-1">
             <MinimalAlbumDisplay
@@ -216,6 +232,17 @@ export default async function MonthlyStatsBox(props) {
     const starSize="text-base"
     const biggestXBoxShared = "w-full text-center border border-zinc-800 rounded-xl p-2 bg-slate-400/10"
 
+    // If No review data is in, return an empty box with a warning 
+    if(reviewData['total_reviews'] == 0) {
+      return (
+        <div className="w-full md:w-[300px] lg:w-[400px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+          <div className="max-w-full mx-auto px-2 py-2 my-auto text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
+            <p>No review data for {monthToName(month)} {year}</p>
+          </div>
+        </div>
+      )
+    }
+    // Otherwise do normal data display
     return (
       <div className="w-full md:w-[300px] lg:w-[475px] flex flex-col backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
         <p className="w-full text-center text-xl mb-1">
@@ -330,7 +357,7 @@ export default async function MonthlyStatsBox(props) {
         {/* Submission Breakdown */}
         {submissionCount()}
       </div>
-      {/* Review stats for the Month */}
+      {/* Review stats for the Month - NOTE: Only show when reviews have been left for this month*/}
       {monthReviewStats()}
     </div>
   )
