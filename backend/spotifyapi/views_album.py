@@ -228,6 +228,7 @@ def getAlbum(request: HttpRequest, album_spotify_id: str):
   out['artist']['name'] = albumObj.artist
   out['artist']['href'] = (albumObj.artist_url if albumObj.artist_url != "" else albumObj.raw_data['album']['artists'][0]['external_urls']['spotify'])
   out['submitter'] = albumObj.submitted_by.discord_id
+  out['submitter_nickname'] = albumObj.submitted_by.nickname
   out['submitter_comment'] = albumObj.user_comment
   out['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
   # Return final object
