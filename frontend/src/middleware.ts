@@ -16,10 +16,17 @@ export async function middleware(request: NextRequest) {
   if(!(await verifyAuth())) {
     return NextResponse.redirect(new URL('/', request.url));
   }
+  // If this is a heartbeat call, skip it
+  if((request.headers.get("X-Heartbeat")) || (request.headers.get("X-Member-Check"))) {
+    console.log("MIDDLEWARE: Skipping middleware for heartbeat or isMember call.")
+    return NextResponse.next();
+  }
+  // If this page is an allowed page for non-member users, return
+  if(checkNonUserAccess(request)) {
+    return NextResponse.next();
+  }
   // Check if user is a member of the server, if not, redirect to homepage (As a way of ensuring no one mantually enters a url)
-  // NOTE: This should run only if on a page that isnt publically accessible
-  console.log("MIDDLEWARE: Checking if user is allowed to access this page...")
-  if((!checkNonUserAccess(request)) && (!await isMember())) {
+  if(!(await isMember())) {
     console.log("MIDDLEWARE: User is not a member of the server... redirecting.")
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
@@ -28,5 +35,9 @@ export async function middleware(request: NextRequest) {
  
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/dashboard/'],
+  matcher: [
+    {
+      source: '/dashboard/:page*'
+    }
+  ],
 }

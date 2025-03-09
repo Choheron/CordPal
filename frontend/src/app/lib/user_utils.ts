@@ -250,7 +250,8 @@ export async function heartbeat() {
     credentials: "include",
     cache: 'no-cache',
     headers: {
-      Cookie: `sessionid=${sessionCookie};`
+      Cookie: `sessionid=${sessionCookie};`,
+      'X-Heartbeat': 'true'
     }
   });
 }

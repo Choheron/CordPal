@@ -7,8 +7,17 @@ import { heartbeat } from "../lib/user_utils";
 export default function Heartbeat(props) {
   // UseEffect to implement heartbeat functionality
   useEffect(() => {
+    let isMounted = true
+
     const beatHeart = async() => {
-      await heartbeat()
+      try {
+        if(isMounted) {
+          await heartbeat();
+          console.log("Heartbeat sent");
+        }
+      } catch(error) {
+        console.error("Heartbeat failed:", error);
+      }
     }
     beatHeart();
 
@@ -16,11 +25,12 @@ export default function Heartbeat(props) {
       beatHeart();
     }, (30 * 1000));
 
-    return () => clearInterval(intervalId); // Clean up the interval on component unmount
+    return () => {
+      isMounted = false; // Prevents updates after unmounting
+      clearInterval(intervalId); // Clean up the interval on component unmount
+    }
   }, [])
 
   // Return nothing as this is just a heartbeat function
-  return (
-    <></>
-  );
+  return null;
 }

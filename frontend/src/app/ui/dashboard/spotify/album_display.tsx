@@ -9,7 +9,6 @@ import { Badge, Button } from "@nextui-org/react";
 import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";
-import { isMember } from "@/app/lib/discord_utils";
 
 // GUI Display for an Album
 // Expected Props:
@@ -25,6 +24,7 @@ import { isMember } from "@/app/lib/discord_utils";
 //  - album_spotify_id: String - (Optional) Album Spotify ID for retrieval of average from database
 //  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
 //  - showAlbumRating: Boolean - (Optional) [DEFAULT TRUE] Show the average user rating for the album
+//  - member_status: Boolean - (Optional) Is the user a member of the desired server?
 export default async function AlbumDisplay(props) {
   // Configuration Props
   const showAlbumRating = (props.showAlbumRating == false) ? props.showAlbumRating : true;
@@ -45,7 +45,7 @@ export default async function AlbumDisplay(props) {
   const historical = (props.historical_date) ? true : false;
   const historical_date = (props.historical_date) ? props.historical_date : "0000-00-00";
   // Check that user is authenticated (This should be the only server call to ensure no changes are made)
-  const userAuth = (await isMember())
+  const userAuth = (props.member_status) ? props.member_status : true;
 
   const dateToCalUrl = (dateStr) => {
     const dateArr = dateStr.split("-")

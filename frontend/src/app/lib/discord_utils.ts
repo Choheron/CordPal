@@ -21,7 +21,8 @@ export async function isMember() {
     credentials: "include",
     cache: 'force-cache',
     headers: {
-      Cookie: `sessionid=${sessionCookie};`
+      Cookie: `sessionid=${sessionCookie};`,
+      'X-Member-Check': `true`
     }
   });
   const responseObj = await memberResponse.json()

@@ -49,6 +49,7 @@ export default async function Page() {
             submitter={albumData("submitter")}
             submitter_comment={albumData("submitter_comment")}
             submission_date={albumData("submission_date")}
+            member_status={memberStatus}
           />
         </div>
         <Conditional showWhen={(memberStatus)}>

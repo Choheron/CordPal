@@ -14,6 +14,8 @@ from .utils import (
 
 import logging
 import requests
+from datetime import datetime
+from datetime import timedelta
 from dotenv import load_dotenv
 import os
 import json
@@ -136,38 +138,53 @@ def validateServerMember(request: HttpRequest):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  # Cookie datetime format
+  cookie_time_fmt = "%d/%m/%y %H:%M:%S"
   # Ensure user is logged in
   if(isDiscordTokenExpired(request)):
     refreshDiscordToken(request)
-  # Prep headers to discord api
-  reqHeaders = { 
-    'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
-  }
-  # Send Request to API
-  logger.info("Making request to discord api for server member object to check member and role...")
-  try:
-    discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me/guilds/{os.getenv('CORD_SERVER_ID')}/member", headers=reqHeaders)
-    # NOTE: Not handling error code response here due to the nature of how im handling validation
-  except:
-    return HttpResponse(status=500)
-  # Convert response to List
-  discordResList: dict = discordRes.json()
-  # Determine if user has been given an error response, meaning they are not a member of the guild
-  logger.info("Checking if user is in server...")
-  member = not('message' in discordResList.keys())
-  # print message
-  if(not member):
-    logger.info(discordResList)
-  # If user IS a member of the server, check that they have the required role
-  hasRole = False
-  if(member):
-    hasRole = os.getenv('CORD_ROLE_ID') in discordResList['roles']
+  # Check if member status already exists in session store
+  if(("server_member" in request.session) and (datetime.strptime(request.session.get("server_member_expiry"), cookie_time_fmt) < datetime.now())):
+    status = request.session.get("server_member")
+    logger.info(f"Session has cached membership value of: {status}")
+    member = status
+    hasRole = status
+  else:
+    # Prep headers to discord api
+    reqHeaders = { 
+      'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
+    }
+    # Send Request to API
+    logger.info("Making request to discord api for server member object to check member and role...")
+    try:
+      discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me/guilds/{os.getenv('CORD_SERVER_ID')}/member", headers=reqHeaders)
+      # NOTE: Not handling error code response here due to the nature of how im handling validation
+    except:
+      return HttpResponse(status=500)
+    # Convert response to List
+    discordResList: dict = discordRes.json()
+    # Determine if user has been given an error response, meaning they are not a member of the guild
+    logger.info("Checking if user is in server...")
+    member = not('message' in discordResList.keys())
+    # print message
+    if(not member):
+      logger.info(discordResList)
+    # If user IS a member of the server, check that they have the required role
+    hasRole = False
+    if(member):
+      hasRole = os.getenv('CORD_ROLE_ID') in discordResList['roles']
+    # Store member status in session to skip this process for 5 mins
+    logger.info(f"Setting session storage to avoid discordapi calls for 5 mins...")
+    request.session['server_member'] = (member and hasRole)
+    request.session['server_member_expiry'] = (datetime.now() + timedelta(minutes=5)).strftime(cookie_time_fmt) 
   # Return JsonResponse containing true or false in body
   logger.info("Returning member status...")
   out = {}
   out['member'] = member
   out['role'] = hasRole
-  return JsonResponse(out)
+  # Return response
+  response =JsonResponse(out)
+  return response
 
 
 ###

@@ -234,5 +234,7 @@ def heartbeat(request: HttpRequest):
     logger.info(f"Heartbeat received from {user.nickname}...")
   except:
     logger.warning(f"HEARTBEAT RECIEVED FROM UNKNOWN USER!")
-  # Yeah
-  return HttpResponse(200)
+  # Return heartbest response with header to skip frontend middleware
+  response = HttpResponse(200)
+  response['X-Heartbeat'] = "true"
+  return response
