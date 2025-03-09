@@ -11,8 +11,6 @@ import Link from "next/link";
 import { RiCalendar2Fill} from "react-icons/ri";
 
 // GUI Display for the Album of the Day
-// Expected Props:
-//  - title: Title of the list
 export default async function AlbumOfTheDayBox(props) {
   let albumOfTheDayObj = await getAlbumOfTheDayData()
   const albumReview = await getUserReviewForAlbum(albumData("album_id"))

@@ -9,6 +9,7 @@ import { Badge, Button } from "@nextui-org/react";
 import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";
+import { isMember } from "@/app/lib/discord_utils";
 
 // GUI Display for an Album
 // Expected Props:
@@ -43,6 +44,8 @@ export default async function AlbumDisplay(props) {
   // Historical props checks
   const historical = (props.historical_date) ? true : false;
   const historical_date = (props.historical_date) ? props.historical_date : "0000-00-00";
+  // Check that user is authenticated (This should be the only server call to ensure no changes are made)
+  const userAuth = (await isMember())
 
   const dateToCalUrl = (dateStr) => {
     const dateArr = dateStr.split("-")
@@ -65,7 +68,7 @@ export default async function AlbumDisplay(props) {
           <a href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline italic">
             {artist_name}
           </a>
-          <Conditional showWhen={props.submitter}>
+          <Conditional showWhen={userAuth && props.submitter}>
             <div className="">
               <p>Submitter: </p>
               <div className="ml-2 -mb-1">
@@ -98,7 +101,7 @@ export default async function AlbumDisplay(props) {
           <Conditional showWhen={(avg_rating != 0) && ((avg_rating != null) && showAlbumRating)}>
             <div className="">
               <div className="flex mb-1">
-                <p>Average User Rating: </p>
+                <p>Average {(userAuth) ? "User":"Member"} Rating: </p>
                 <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(avg_rating)}`}>
                   <b>{avg_rating.toFixed(2)}</b>
                 </p>

@@ -3,10 +3,13 @@
 import { Conditional } from "../ui/dashboard/conditional";
 import { isMember, getDiscordUserData } from "../lib/discord_utils";
 import { getAllOnlineData, getUserData, getUserList } from "../lib/user_utils";
-import { boolToString } from "../lib/utils";
 import PageTitle from "../ui/dashboard/page_title";
-import { Divider } from "@nextui-org/react";
 import LiveOnlineUsersBox from "../ui/dashboard/live_online_users_box";
+import CurrentTime from "../ui/general/current_time";
+import AlbumDisplay from "../ui/dashboard/spotify/album_display";
+import { getAlbumOfTheDayData } from "../lib/spotify_utils";
+import Link from "next/link";
+import { Button } from "@nextui-org/react";
 
 export default async function Page() {
   const discordUserData = await getDiscordUserData();
@@ -15,52 +18,40 @@ export default async function Page() {
   // Inital props for passing to client list
   const userList = await getUserList();
   const onlineData = await getAllOnlineData();
+  // Get Album of the day data
+  let albumOfTheDayObj = await getAlbumOfTheDayData()
+
+  // Pull data from album object, return empty string if not available
+  function albumData(key) {
+    if(key in albumOfTheDayObj) {
+      return albumOfTheDayObj[key]
+    } else { 
+      return ''
+    }
+  }
+
   
   return (
-    <main className="flex min-h-screen flex-col items-center p-24 pt-10">
+    <main className="flex min-h-screen flex-col items-center lg:p-24 pt-10">
       <PageTitle text="Homepage" />
       <div className="flex flex-col w-full lg:justify-center gap-3 lg:w-10/12 lg:flex-row" >
-        <div className="flex flex-col w-full px-2 py-2 md:flex-row items-center border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
-          <div className="mx-2 mb-auto">
-            <p>Here is your discord user data:</p>
-            <p className="pt-10 pb-2">
-              ID: {discordUserData['id']}<br/>
-              Username: {discordUserData['username']}<br/>
-              Avatar Hash: {discordUserData['avatar']}<br/>
-              Discriminator: {discordUserData['discriminator']}<br/>
-              Public Flags: {discordUserData['public_flags']}<br/>
-              Flags: {discordUserData['flags']}<br/>
-              Accent Color: {discordUserData['accent_color']}<br/>
-              Global Name: {discordUserData['global_name']}<br/>
-              Banner Color: {discordUserData['banner_color']}<br/>
-              Discord Verified: {boolToString(discordUserData['verified'])}<br/>
-              MFA Enabled: {boolToString(discordUserData['mfa_enabled'])}<br/>
-              Locale: {discordUserData['locale']}<br/>
-              Premium Type: {discordUserData['premium_type']}<br/>
-              <br/>
-              EMAIL: {discordUserData['email']}<br/>
-              <br/>
-              Click <a href="https://discord.com/developers/docs/resources/user" target="_blank" className="underline italic"><b>here</b></a> for more info on what all of this means!
-            </p>
-          </div>
-          <Divider orientation="vertical" className="mx-3"/>
-          <div className="mx-2 mb-auto">
-            <p>Here is the data this site has stored in the DB:</p>
-            <p className="pt-10 pb-2">
-              Discord ID: {userData['discord_id']}<br/>
-              Username: {userData['username']}<br/>
-              Nickname: {userData['nickname']}<br/>
-              Avatar Hash: {userData['discord_avatar']}<br/>
-              Discriminator: {userData['discord_discriminator']}<br/>
-              Discord Verified: {boolToString(userData['discord_is_verified'])}<br/>
-              Email: {userData['email']}<br/>
-              <br/>
-              Last Updated Timestamp: {userData['last_updated_timestamp']}<br/>
-              Creation Timestamp: {userData['creation_timestamp']}<br/>
-              Is Active: {boolToString(userData['is_active'])}<br/>
-              Is Staff: {boolToString(userData['is_staff'])}<br/>
-            </p>
-          </div>
+        <div className="flex flex-col w-fit">
+          <CurrentTime />
+        </div>
+        <div className="flex flex-col h-fit w-full max-w-[800px] px-2 py-2 lg:p-4 items-center border-neutral-800 bg-zinc-800/30 from-inherit rounded-xl border">
+          <p className="text-2xl pb-2 underline font-extralight">
+            Today's Album of the Day:
+          </p>
+          <AlbumDisplay 
+            title={albumData("title")}
+            album_img_src={albumData("album_img_src")}
+            album_src={albumData("album_src")}
+            album_spotify_id={albumData("album_id")}
+            artist={albumData("artist")}
+            submitter={albumData("submitter")}
+            submitter_comment={albumData("submitter_comment")}
+            submission_date={albumData("submission_date")}
+          />
         </div>
         <Conditional showWhen={(memberStatus)}>
           <LiveOnlineUsersBox 
