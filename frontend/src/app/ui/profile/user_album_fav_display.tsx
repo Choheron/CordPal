@@ -28,9 +28,9 @@ export default async function UserAlbumFavDisplay(props) {
   //   highest_score_album: '3TSMSh5dai7WEnEGOoMXBZ',
   //   highest_score_date: '12/05/2024, 18:20:59'
   // }
-  const reviewStats = await getUserReviewStats(userId); 
+  const reviewStats = (spotifyConnected) ? await getUserReviewStats(userId) : null ; 
   // Get a object of all user reviews for this profile
-  const userReviewsObj = await getAllUserReviews(userId);
+  const userReviewsObj = (spotifyConnected) ? await getAllUserReviews(userId) : null;
 
   return (
     <div className="w-full mx-auto flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">

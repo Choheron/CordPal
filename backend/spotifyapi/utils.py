@@ -209,18 +209,16 @@ def albumToDict(album: Album):
 
 # Check and set a user's aotd "selection_blocked_flag"
 def checkSelectionFlag(spotify_user: SpotifyUserData):
-  # Update users to check if they need to be blocked from submitting
-  logger.info("Updating selection blocked flags based on most recent review timestamp...")
+  # Update user to check if they need to be blocked from submitting
+  logger.info(f"Updating selection blocked flag for user {spotify_user.user.nickname}...")
   three_days_ago = now() - timedelta(days=3)
   # Get list of reviews from the past 3 days
   recent_review_users = list(Review.objects.filter(review_date__gte=three_days_ago).values_list('user__discord_id', flat=True).distinct())
-  # Update users based on if they have reviewed an album in the last 3 days
-  for spotify_user in SpotifyUserData.objects.all():
-    logger.info(f"Checking selection blocked flag for user: {spotify_user.user.nickname} [Flag is currently: {spotify_user.selection_blocked_flag}]...")
-    # Check if user is in the list of recent reviewers
-    blocked = spotify_user.user.discord_id not in recent_review_users
-    # If value is different, update it
-    if(spotify_user.selection_blocked_flag != blocked):
-      spotify_user.selection_blocked_flag = blocked
-      logger.info(f"Changing `selection_blocked_flag` to {blocked} for {spotify_user.user.nickname}...")
-      spotify_user.save()
+  logger.info(f"Checking selection blocked flag for user: {spotify_user.user.nickname} [Flag is currently: {spotify_user.selection_blocked_flag}]...")
+  # Check if user is in the list of recent reviewers
+  blocked = spotify_user.user.discord_id not in recent_review_users
+  # If value is different, update it
+  if(spotify_user.selection_blocked_flag != blocked):
+    spotify_user.selection_blocked_flag = blocked
+    logger.info(f"Changing `selection_blocked_flag` to {blocked} for {spotify_user.user.nickname}...")
+    spotify_user.save()
