@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     {
-      source: '/dashboard/:page*'
+      source: '/dashboard'
     }
   ],
 }
