@@ -4,6 +4,7 @@ import { Color } from '@tiptap/extension-color'
 import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
 import Youtube from '@tiptap/extension-youtube'
+import Link from '@tiptap/extension-link'
 import { EditorProvider, useCurrentEditor, Extension } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { useEffect, useState } from 'react'
@@ -228,6 +229,9 @@ export default function ReviewTipTap(props) {
       width: 300,
       height: 168.75
     }),
+    Link.configure({
+      defaultProtocol: 'https',
+    })
   ]
 
   // =============================================================================================================================
