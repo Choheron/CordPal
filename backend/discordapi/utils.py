@@ -135,7 +135,7 @@ def checkPreviousAuthorization(request: HttpRequest):
   logger.info("Checking if sessionid exists...")
   try:
     # Get user instance and data
-    user = User.objects.get(discord_id = request.session['discord_id'])
+    user = User.objects.get(discord_id = request.session.get('discord_id'))
     tokenData = DiscordTokens.objects.get(user = user)
     return True
   except ObjectDoesNotExist as e:

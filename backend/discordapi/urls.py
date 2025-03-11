@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
   path('token', views.getDiscordToken),
   path('validateMember', views.validateServerMember),
+  path('userData', views.getDiscordUserData),
   path('checkToken', views.checkIfPrevAuth),
   path('logout', views.revokeDiscordToken),
 ]

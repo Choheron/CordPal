@@ -94,6 +94,45 @@ def getDiscordToken(request: HttpRequest):
 
 
 ###
+# Retrieve basic info about the user and create a user instance
+###
+def getDiscordUserData(request: HttpRequest):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getDiscordUserData called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get user token data
+  tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get("discord_id"))
+  # Ensure user is logged in
+  if(isDiscordTokenExpired(request)):
+    refreshDiscordToken(request)
+  # Prep request data and headers to discord api
+  reqHeaders = { 
+    'Authorization': f"{tokenData.token_type} {tokenData.access_token}"
+  }
+  # Send Request to API
+  logger.info("Making request to discord api...")
+  try:
+    discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
+    if(discordRes.status_code != 200):
+      print("Error in request:\n" + str(discordRes.json()))
+      discordRes.raise_for_status()
+  except:
+    return HttpResponse(status=500)
+  # Convert response to Json
+  discordResJSON = discordRes.json()
+  # Store discord ID in session for user data retrieval
+  request.session['discord_id'] = discordResJSON['id']
+  # Check if user's data exists as a user in the database
+  if(not(doesUserExist(discordResJSON['id']))):
+    createUserFromDiscordJSON(discordResJSON)
+  # Return JsonResponse containing user data
+  return JsonResponse(discordResJSON)
+
+
+###
 # Validate that the user is a member of the discord server (TODO: Improve this flow, make it dynamic)
 ###
 def validateServerMember(request: HttpRequest):
@@ -105,6 +144,8 @@ def validateServerMember(request: HttpRequest):
     return res
   # Cookie datetime format
   cookie_time_fmt = "%d/%m/%y %H:%M:%S"
+  # Retrieve user token data
+  tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get("discord_id"))
   # Ensure user is logged in
   if(isDiscordTokenExpired(request)):
     refreshDiscordToken(request)
@@ -117,7 +158,7 @@ def validateServerMember(request: HttpRequest):
   else:
     # Prep headers to discord api
     reqHeaders = { 
-      'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
+      'Authorization': f"{tokenData.token_type} {tokenData.access_token}"
     }
     # Send Request to API
     logger.info("Making request to discord api for server member object to check member and role...")
