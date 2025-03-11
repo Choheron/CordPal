@@ -4,13 +4,15 @@ from users.utils import (
   doesUserExist,
   createUserFromDiscordJSON,
 )
+from users.models import User
 
 from .utils import (
   isDiscordTokenExpired, 
   refreshDiscordToken, 
-  storeDiscordTokenInSession,
+  storeDiscordTokenInDatabase,
   checkPreviousAuthorization,
 )
+from .models import DiscordTokens
 
 import logging
 import requests
@@ -62,11 +64,9 @@ def getDiscordToken(request: HttpRequest):
   # Convert response to Json
   logger.info("Discord api returned, converting to json...")
   discordResJSON = discordRes.json()
-  # Store discord data in session data
-  storeDiscordTokenInSession(request, discordResJSON)
   # Retrieving discord data to create a user account
   reqHeaders = { 
-    'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
+    'Authorization': f"{discordResJSON['token_type']} {discordResJSON['access_token']}"
   }
   # Send Request to API
   logger.info("Making request to discord api...")
@@ -78,54 +78,19 @@ def getDiscordToken(request: HttpRequest):
   except:
     return HttpResponse(status=500)
   # Convert response to Json
-  discordResJSON = discordRes.json()
+  discordResJSON.update(discordRes.json())
   # Store discord ID in session for user data retrieval
   request.session['discord_id'] = discordResJSON['id']
   # Check if user's data exists as a user in the database
   if(not(doesUserExist(discordResJSON['id']))):
     createUserFromDiscordJSON(discordResJSON)
+  # Store discord data in database (This takes place after the user is created so we can associate token data with user)
+  storeDiscordTokenInDatabase(request, discordResJSON)
   # Write success message
   messageOut = { 'message': "Success" }
   # Return Code
   logger.info("Returning HTTP 200 Response...")
   return HttpResponse(content=messageOut, content_type='text/json', status=200)
-
-
-###
-# Retrieve basic info about the user and create a user instance
-###
-def getDiscordUserData(request: HttpRequest):
-  # Make sure request is a get request
-  if(request.method != "GET"):
-    logger.warning("getDiscordUserData called with a non-GET method, returning 405.")
-    res = HttpResponse("Method not allowed")
-    res.status_code = 405
-    return res
-  # Ensure user is logged in
-  if(isDiscordTokenExpired(request)):
-    refreshDiscordToken(request)
-  # Prep request data and headers to discord api
-  reqHeaders = { 
-    'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
-  }
-  # Send Request to API
-  logger.info("Making request to discord api...")
-  try:
-    discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
-    if(discordRes.status_code != 200):
-      print("Error in request:\n" + str(discordRes.json()))
-      discordRes.raise_for_status()
-  except:
-    return HttpResponse(status=500)
-  # Convert response to Json
-  discordResJSON = discordRes.json()
-  # Store discord ID in session for user data retrieval
-  request.session['discord_id'] = discordResJSON['id']
-  # Check if user's data exists as a user in the database
-  if(not(doesUserExist(discordResJSON['id']))):
-    createUserFromDiscordJSON(discordResJSON)
-  # Return JsonResponse containing user data
-  return JsonResponse(discordResJSON)
 
 
 ###
