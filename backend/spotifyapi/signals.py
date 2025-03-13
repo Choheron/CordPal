@@ -3,7 +3,8 @@ from django.dispatch import receiver
 from django.forms.models import model_to_dict
 from .models import ( 
   Album,
-  Review
+  Review,
+  UserAlbumOutage
 )
 from users.models import UserAction
 
@@ -28,4 +29,15 @@ def log_review_creation(sender, instance: Review, created, **kwargs):
       entity_id=instance.pk,
       timestamp=instance.review_date,
       details={"album_pk": instance.album.pk, "review_pk": instance.pk}
+    )
+
+@receiver(post_save, sender=UserAlbumOutage)
+def log_album_selection_outage_creation(sender, instance: UserAlbumOutage, created, **kwargs):
+  if created:  # Ensure it runs only on first creation
+    UserAction.objects.create(
+      user=(instance.admin_enactor if (instance.admin_enacted) else instance.user),
+      action_type="CREATE",
+      entity_type="ALBUM_SELECTION_OUTAGE",
+      entity_id=instance.pk,
+      details={"affected_user": instance.user, "reason": instance.reason}
     )

@@ -97,7 +97,7 @@ class UserAction(models.Model):
 
   user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
   action_type = models.CharField(max_length=10, choices=ACTION_TYPES)
-  entity_type = models.CharField(max_length=50)  # Examples: "REVIEW", "ALBUM", "PHOTOSHOP"
+  entity_type = models.CharField(max_length=50)  # Examples: "REVIEW", "ALBUM", "PHOTOSHOP", "ALBUM_SELECTION_OUTAGE"
   entity_id = models.IntegerField()
   timestamp = models.DateTimeField(default=timezone.now, blank=True, null=True)
   details = models.JSONField(null=True, blank=True)  # Store extra details (e.g., old vs. new values)

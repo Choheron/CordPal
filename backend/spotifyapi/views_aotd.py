@@ -11,7 +11,8 @@ from .models import (
   Album,
   DailyAlbum,
   SpotifyUserData,
-  Review
+  Review,
+  UserAlbumOutage
 )
 
 import logging
@@ -181,9 +182,16 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
   user = (getSpotifyUser(request.session.get('discord_id')) if (user_discord_id=="") else (getSpotifyUser(user_discord_id)))
   # Check if user's selections are currently blocked, return 0% chance
   if(SpotifyUserData.objects.get(user=user).selection_blocked_flag):
-    return JsonResponse({'percentage': 0.00})
+    return JsonResponse({'percentage': 0.00, 'block_type': "INACTIVITY", 'reason': "User's albums are currently blocked from selection due to inactivity."})
   # Get current date
   day = datetime.date.today()
+  # Check if user is currently under an outage
+  try:
+    outage = UserAlbumOutage.objects.filter(start_date__lte=day, end_date__gte=day).get(user=user)
+    if(outage):
+      return JsonResponse({'percentage': 0.00, 'block_type': "OUTAGE", 'reason': {outage.reason}, "admin_outage": {outage.admin_enacted}})
+  except:
+    logger.info(f"User {user.nickname} is not currently under an outage.")
   # Get Date a year ago to filter by
   one_year_ago = day - datetime.timedelta(days=365)
   # Get counts needed to determine percentage

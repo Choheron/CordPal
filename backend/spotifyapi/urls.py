@@ -1,11 +1,14 @@
 from django.contrib import admin
 from django.urls import path
 
-from . import views_aotd
-from . import views_review
-from . import views_album
-from . import views_user
-from . import views_oauth
+from . import (
+  views_aotd,
+  views_review,
+  views_album,
+  views_user,
+  views_oauth,
+  views_outage
+)
 
 urlpatterns = [
   ## ============================================================================================================
@@ -78,4 +81,14 @@ urlpatterns = [
   path('getChanceOfAotdSelect', views_aotd.getChanceOfAotdSelect),
   # Get all AOtD Instances for a month
   path('getAOtDByMonth/<str:year>/<str:month>', views_aotd.getAOtDByMonth),
+  ## ============================================================================================================
+  ## User Selection Outage Views
+  ## ============================================================================================================
+  path('createOutage', views_outage.createOutage),
+  path('deleteOutage', views_outage.deleteOutage),
+  # Below URL has two variations (one for lack of URL Param)
+  path('getOutages/<str:user_discord_id>', views_outage.getOutages),
+  path('getOutages', views_outage.getOutages),
+  path('getCurrentOutages', views_outage.getCurrentOutages),
+  path('getOutagesByDate/<str:date>', views_outage.getOutagesByDate),
 ]
