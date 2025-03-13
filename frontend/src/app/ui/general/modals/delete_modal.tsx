@@ -8,7 +8,7 @@ import {
   ModalFooter,
   useDisclosure
 } from "@nextui-org/modal";
-import { Button, Spinner, Checkbox, Tooltip } from "@nextui-org/react";
+import { Button, Spinner, Checkbox, Tooltip, Textarea } from "@nextui-org/react";
 import React from "react";
 import { RiDeleteBin2Line, RiErrorWarningFill } from "react-icons/ri";
 import { Conditional } from "../../dashboard/conditional";
@@ -27,6 +27,8 @@ import { useRouter } from 'next/navigation'
 //   - titleText: String - Text to display in modal title
 //   - bodyText: String - Text to display in modal body
 //   - redirectText: String - Url to redirect to after successful delete (OPTIONAL)
+//   - textboxDescription: String - Description to show over text input box. If a this is provided, the callback will assume to have a text field
+//   - textboxPlaceholder: String - Default text in the textbox.
 export default function DeleteModal(props) {
   const cancelCallback = props.cancelCallback
   // Props
@@ -35,10 +37,13 @@ export default function DeleteModal(props) {
   const titleText = (props.titleText) ? props.titleText : "Delete?";
   const bodyText = (props.bodyText) ? props.bodyText : "Are you sure you would like to delete?";
   const redirectText = (props.redirectText) ? props.redirectText : null;
+  const textboxDescription = (props.textboxDescription) ? props.textboxDescription : null;
+  const textboxPlaceholder = (props.textboxPlaceholder) ? props.textboxPlaceholder : null;
   // Functionality states
   const [confirmed, setConfirmed] = React.useState(false)
   const [processing, setProcessing] = React.useState(false)
   const [errorText, setErrorText] = React.useState("")
+  const [textboxText, setTextboxText] = React.useState("")
   // Modal Controller Vars
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   // Router
@@ -46,7 +51,7 @@ export default function DeleteModal(props) {
 
   const handleDelete = async () => {
     setProcessing(true)
-    const status = await props.confirmCallback()
+    const status = (((textboxDescription != null) && (textboxPlaceholder != null)) ? await props.confirmCallback(textboxText) : await props.confirmCallback())
     if(status != 200) {
       setErrorText(`An error occured when attempting to delete the album, please contact system Admins! Error Code: ${status}`)
       setConfirmed(false)
@@ -120,6 +125,14 @@ export default function DeleteModal(props) {
                 >
                   I&apos;m Sure!
                 </Checkbox>
+                <Conditional showWhen={(textboxDescription != null) && (textboxPlaceholder != null)} >
+                  <Textarea 
+                    className="max-w-xs" 
+                    label={textboxDescription} 
+                    placeholder={textboxPlaceholder} 
+                    onValueChange={setTextboxText}
+                  />
+                </Conditional>
               </ModalBody>
               <ModalFooter>
                 <div className="flex w-full justify-between">

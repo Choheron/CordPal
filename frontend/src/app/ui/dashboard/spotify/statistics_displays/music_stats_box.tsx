@@ -29,7 +29,13 @@ export default async function MusicStatsBox(props) {
             customDescription={(
               <div className="flex">
                 <Tooltip 
-                  content={`${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.`}
+                  content={
+                    `${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.
+                     ${(user['selection_blocked']) ? `Reason: ${user['reason']}.` : ""} 
+                     ${(user['admin_outage']) ? `This outage was placed by admins.` : ""}
+                    `
+                  }
+                  className="max-w-[300px]"
                 >
                   {(user['selection_blocked']) ? (<p>&#9940;</p>) : (<p>&#9989;</p>)}
                 </Tooltip>

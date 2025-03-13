@@ -180,7 +180,7 @@ export default function AddAlbumModal(props) {
             onPress={onOpen}
             radius="none"
             variant="solid"
-            isDisabled={!userAllowedToSubmit}
+            isDisabled={userAllowedToSubmit}
           >
             <b>Submit An Album</b>
           </Button>

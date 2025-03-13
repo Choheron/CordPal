@@ -204,7 +204,7 @@ export async function submitAlbumToBackend(albumObject) {
 // Delete an album from the backend pool
 // - RETURN: HttpResponse
 //
-export async function deleteAlbumFromBackend(album_spotify_id) {
+export async function deleteAlbumFromBackend(album_spotify_id, reason = null) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Make request to delete album
@@ -216,7 +216,7 @@ export async function deleteAlbumFromBackend(album_spotify_id) {
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
-    body: JSON.stringify({"album_id": album_spotify_id})
+    body: JSON.stringify({"album_id": album_spotify_id, "reason": reason})
   });
   const status = deleteAlbumResponse.status
   // Revalidate requests to ensure no data is lost

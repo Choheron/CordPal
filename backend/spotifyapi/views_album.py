@@ -195,7 +195,7 @@ def deleteAlbum(request: HttpRequest):
       logger.warning(f"deleteAlbum: User {user.discord_id}/{user.nickname} attempted to delete Album: {reqBody['album_id']}, FAILED due to Album having been AOtD!")
       return HttpResponse(status=403)
     # Delete album object from database
-    albumObject.delete(deleter=user)
+    albumObject.delete(deleter=user, reason=reqBody['reason'])
     logger.info(f"Album {reqBody['album_id']} has been deleted...")
     return HttpResponse(status=200)
   except ObjectDoesNotExist as e:
@@ -353,9 +353,12 @@ def getAlbumsStats(request: HttpRequest):
     userData['aotd_count'] = DailyAlbum.objects.filter(album__submitted_by=user.user).count()
     userData['discord_id'] = user.user.discord_id
     userData['nickname'] = user.user.nickname
-    userData['selection_blocked'] = user.selection_blocked_flag
     chance_view_response = json.loads(getChanceOfAotdSelect(request, user.user.discord_id).content)
+    userData['selection_blocked'] = (chance_view_response['block_type'] != None)
     userData['selection_chance'] = chance_view_response['percentage']
+    userData['block_type'] = chance_view_response['block_type']
+    userData['reason'] = chance_view_response['reason']
+    userData['admin_outage'] = chance_view_response['admin_outage'] if (userData['block_type'] == "OUTAGE") else None
     # Append to List
     userStatsList.append(userData)
   # Add list to out

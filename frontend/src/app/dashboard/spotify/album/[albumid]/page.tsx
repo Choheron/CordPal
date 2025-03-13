@@ -79,10 +79,10 @@ export default async function Page({
   }
 
   // Handle deletion of album by making a backend request to delete the album
-  const handleDelete = async () => {
+  const handleDelete = async (reason) => {
     "use server"
     console.log(`Delete confimed for album ${albumid}...`)
-    const status = deleteAlbumFromBackend(albumid)
+    const status = deleteAlbumFromBackend(albumid, reason)
     return status
   }
   
@@ -110,6 +110,8 @@ export default async function Page({
                 titleText={`Delete "${albumData('title')}"?`}
                 bodyText={`Are you sure you want to delete "${albumData('title')}"? You cannot undo this action.`}
                 redirectText={'/dashboard/spotify'}
+                textboxDescription={"Reason for deletion (Optional)"}
+                textboxPlaceholder="(Optional) Input a reason for deleting the album."
               />
             </div>
           </Conditional>

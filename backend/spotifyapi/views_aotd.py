@@ -210,7 +210,7 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
   except:
     chance = round(0, 2)
   # Return data 
-  return JsonResponse({'percentage': chance})
+  return JsonResponse({'percentage': chance, 'block_type': None, 'reason': None})
 
 
 ###
