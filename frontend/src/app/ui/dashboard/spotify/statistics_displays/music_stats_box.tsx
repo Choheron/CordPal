@@ -122,7 +122,7 @@ export default async function MusicStatsBox(props) {
               shape="rectangle"
               showOutline={false}
               variant="shadow"
-              className={`lg:-ml-2 -mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2))} text-lg lg:text-xl text-black`}
+              className={`-mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2))} text-lg lg:text-xl text-black`}
             >
               <MinimalAlbumDisplay
                 title={albumLowHighStatsJson['highest_album']["title"]}
@@ -155,7 +155,7 @@ export default async function MusicStatsBox(props) {
               shape="rectangle"
               showOutline={false}
               variant="shadow"
-              className={`lg:-ml-2 -mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2))} text-lg lg:text-xl text-black`}
+              className={`-mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2))} text-lg lg:text-xl text-black`}
             >
               <MinimalAlbumDisplay
                 title={albumLowHighStatsJson['lowest_album']["title"]}
