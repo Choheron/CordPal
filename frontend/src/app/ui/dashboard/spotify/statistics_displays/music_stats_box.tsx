@@ -32,7 +32,7 @@ export default async function MusicStatsBox(props) {
                 <Tooltip 
                   content={
                     `${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.
-                     ${(user['admin_outage'] == "true") ? `This outage was placed by admins.` : `This is an outage placed by ${user['nickname']}.`}
+                     ${(user['block_type'] == "OUTAGE") ? (user['admin_outage'] == "true") ? `This outage was placed by admins.` : `This is an outage placed by ${user['nickname']}.` : ""}
                      ${(user['selection_blocked']) ? `Reason: ${user['reason']}.` : ""}
                     `
                   }
