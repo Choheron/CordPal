@@ -13,7 +13,6 @@ export default function Heartbeat(props) {
       try {
         if(isMounted) {
           await heartbeat();
-          console.log("Heartbeat sent");
         }
       } catch(error) {
         console.error("Heartbeat failed:", error);

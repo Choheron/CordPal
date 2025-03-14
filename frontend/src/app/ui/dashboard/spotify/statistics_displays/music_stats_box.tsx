@@ -9,6 +9,7 @@ import { Divider, Tooltip } from "@nextui-org/react";
 import { dateToString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import ReviewStatsUserCard from "./review_stats_user_card";
 import MinimalAlbumDisplay from "../minimal_album_display";
+import CreateOutageModal from "../modals/create_outage_modal";
 
 // GUI Display for an Album
 // Expected Props:
@@ -31,13 +32,13 @@ export default async function MusicStatsBox(props) {
                 <Tooltip 
                   content={
                     `${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.
-                     ${(user['selection_blocked']) ? `Reason: ${user['reason']}.` : ""} 
-                     ${(user['admin_outage']) ? `This outage was placed by admins.` : ""}
+                     ${(user['admin_outage'] == "true") ? `This outage was placed by admins.` : `This is an outage placed by ${user['nickname']}.`}
+                     ${(user['selection_blocked']) ? `Reason: ${user['reason']}.` : ""}
                     `
                   }
                   className="max-w-[300px]"
                 >
-                  {(user['selection_blocked']) ? (<p>&#9940;</p>) : (<p>&#9989;</p>)}
+                  {(user['selection_blocked']) ? ((user['block_type'] == "OUTAGE") ? (<p>⛱️</p>) : (<p>&#9940;</p>)) : (<p>&#9989;</p>)}
                 </Tooltip>
                 <p>{user['selection_chance'].toFixed(2)}%</p>
               </div>
@@ -104,6 +105,7 @@ export default async function MusicStatsBox(props) {
             {albumUserStatsTable}
           </tbody>
         </table>
+        <CreateOutageModal />
       </div>
       {/* Lowest and Highest Album Stats */}
       <div className="w-300 flex flex-col">

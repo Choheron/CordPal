@@ -39,5 +39,5 @@ def log_album_selection_outage_creation(sender, instance: UserAlbumOutage, creat
       action_type="CREATE",
       entity_type="ALBUM_SELECTION_OUTAGE",
       entity_id=instance.pk,
-      details={"affected_user": instance.user, "reason": instance.reason}
+      details={"affected_user": instance.user.pk, "reason": instance.reason}
     )

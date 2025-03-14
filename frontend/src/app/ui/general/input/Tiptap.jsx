@@ -212,6 +212,10 @@ export default function ReviewTipTap(props) {
     SmilieReplacer,
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
     TextStyle.configure({ types: [ListItem.name] }),
+    // Below is commented out because it causes conflicts with the tenor gif integration
+    // Link.configure({
+    //   defaultProtocol: 'https',
+    // }),
     StarterKit.configure({
       bulletList: {
         keepMarks: true,
@@ -228,9 +232,6 @@ export default function ReviewTipTap(props) {
       nocookie: false,
       width: 300,
       height: 168.75
-    }),
-    Link.configure({
-      defaultProtocol: 'https',
     })
   ]
 

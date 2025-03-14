@@ -666,7 +666,7 @@ export async function getChanceOfAotdSelect(user_discord_id: string = "") {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['AOtD', 'reviews', 'album_submissions'] },
+    next: { tags: ['AOtD', 'reviews', 'album_submissions', `calendar-outages`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -739,4 +739,53 @@ export async function getReviewStatsByMonth(year: string = "", month: string = "
   });
   const reviewMonthJson = await reviewMonthResponse.json()
   return reviewMonthJson;
+}
+
+
+//
+// Get outage dates for a user
+//
+export async function getUserOutages(user_discord_id = null) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Determine URL tail
+  const urlTail = (user_discord_id) ? `/${user_discord_id}` : ""
+  // Make backend request
+  console.log(`getOutages: Sending request to backend '/spotifyapi/getUserOutages${urlTail}'`)
+  const getOutagesResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getUserOutages${urlTail}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: [`calendar-outages`] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const getOutagesJson = await getOutagesResponse.json()
+  return getOutagesJson['outages'];
+}
+
+
+//
+// Submit a new outage to the backend for the user
+//
+export async function createOutage(outageObj: object) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`createOutage: Sending request to backend '/spotifyapi/createOutage'`)
+  const createOutageResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/createOutage`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+    body: JSON.stringify(outageObj)
+  });
+  // Revalidate outage tag
+  revalidateTag("calendar-outages")
+  const createOutageMessage = await createOutageResponse.text()
+  const createOutageStatus = await createOutageResponse.status
+  return {"status": createOutageStatus, "message": createOutageMessage};
 }

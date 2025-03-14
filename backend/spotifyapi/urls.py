@@ -87,8 +87,8 @@ urlpatterns = [
   path('createOutage', views_outage.createOutage),
   path('deleteOutage', views_outage.deleteOutage),
   # Below URL has two variations (one for lack of URL Param)
-  path('getOutages/<str:user_discord_id>', views_outage.getOutages),
-  path('getOutages', views_outage.getOutages),
+  path('getUserOutages/<str:user_discord_id>', views_outage.getUserOutages),
+  path('getUserOutages', views_outage.getUserOutages),
   path('getCurrentOutages', views_outage.getCurrentOutages),
   path('getOutagesByDate/<str:date>', views_outage.getOutagesByDate),
 ]

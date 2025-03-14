@@ -98,7 +98,7 @@ export default async function ReviewAvatarCard(props) {
           </p>
           <ScrollShadow className="w-[330px] max-h-[320px] overflow-y-scroll scrollbar-hide border rounded-xl border-neutral-800 bg-black/20" >
             <div 
-              className="prose prose-invert prose-sm mx-2 p-1" 
+              className="prose prose-invert prose-sm mx-2 p-1 pb-5" 
               dangerouslySetInnerHTML={{__html: reviewMessage}}
             />
           </ScrollShadow>

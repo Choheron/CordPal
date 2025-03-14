@@ -44,7 +44,7 @@ export default async function AlbumDisplay(props) {
   // Historical props checks
   const historical = (props.historical_date) ? true : false;
   const historical_date = (props.historical_date) ? props.historical_date : "0000-00-00";
-  // Check that user is authenticated (This should be the only server call to ensure no changes are made)
+  // Check that user is authenticated
   const userAuth = (props.member_status) ? props.member_status : true;
 
   const dateToCalUrl = (dateStr) => {

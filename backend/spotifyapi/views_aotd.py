@@ -95,12 +95,21 @@ def setAlbumOfDay(request: HttpRequest):
   selected = False
   # Define Album Object
   albumOfTheDay = None
+  # Get all users currently in an outage
+  outage_users = list(UserAlbumOutage.objects.filter(start_date__lte=day, end_date__gte=day).values_list('user__discord_id', flat=True))
+  logger.warning(f"Outage Users: {outage_users}")
   # Get list of all users who are currently AOtD selection blocked
   blocked_users = list(SpotifyUserData.objects.filter(selection_blocked_flag=True).values_list('user__discord_id', flat=True))
   logger.warning(f"Blocked Users: {blocked_users}")
+  # Get set of all eligible albums
+  albumPool = Album.objects.all().exclude(submitted_by__discord_id__in=blocked_users).exclude(submitted_by__discord_id__in=outage_users)
+  print(len(albumPool))
+  if(len(albumPool) < 1):
+    logger.error(f"WARNING! NO ELIGIBLE ALBUMS FOR SELECTION! NO ALBUM WILL BE SELECTED")
+    return HttpResponse(f'No albums eligible for selection!', status=404)
   while(not selected):
     # Filter out blocked users albums
-    tempAlbum = random.choice(Album.objects.all().exclude(submitted_by__discord_id__in=blocked_users))
+    tempAlbum = random.choice(albumPool)
     try:
       albumCheck = DailyAlbum.objects.filter(date__gte=one_year_ago).get(album=tempAlbum)
     except DailyAlbum.DoesNotExist:
@@ -182,16 +191,16 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
   user = (getSpotifyUser(request.session.get('discord_id')) if (user_discord_id=="") else (getSpotifyUser(user_discord_id)))
   # Check if user's selections are currently blocked, return 0% chance
   if(SpotifyUserData.objects.get(user=user).selection_blocked_flag):
-    return JsonResponse({'percentage': 0.00, 'block_type': "INACTIVITY", 'reason': "User's albums are currently blocked from selection due to inactivity."})
+    return JsonResponse({'percentage': 0.00, 'block_type': "INACTIVITY", 'reason': "Inactivity, user has not reviewed in over three days."})
   # Get current date
   day = datetime.date.today()
+  tomorrow = datetime.date.today() + datetime.timedelta(days=1)
   # Check if user is currently under an outage
   try:
-    outage = UserAlbumOutage.objects.filter(start_date__lte=day, end_date__gte=day).get(user=user)
-    if(outage):
-      return JsonResponse({'percentage': 0.00, 'block_type': "OUTAGE", 'reason': {outage.reason}, "admin_outage": {outage.admin_enacted}})
-  except:
-    logger.info(f"User {user.nickname} is not currently under an outage.")
+    outage = UserAlbumOutage.objects.filter(user=user).get(start_date__lte=tomorrow, end_date__gte=tomorrow)
+    return JsonResponse({'percentage': 0.00, 'block_type': "OUTAGE", 'reason': f"{outage.reason}", "admin_outage": f"{outage.admin_enacted}"})
+  except Exception as e:
+    logger.info(f"User {user.nickname} is not currently under an outage. {e}")
   # Get Date a year ago to filter by
   one_year_ago = day - datetime.timedelta(days=365)
   # Get counts needed to determine percentage

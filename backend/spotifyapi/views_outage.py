@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 import json
 from datetime import datetime, timedelta
+import pytz
 
 from .models import UserAlbumOutage as Outages
 from users.models import User
@@ -34,17 +35,18 @@ def createOutage(request: HttpRequest):
   # Get data from request
   reqBody = json.loads(request.body)
   # Retreive expected items from request body (Also grab objects where needed)
-  user = User.objects.get(reqBody['user_discord_id'])
-  start_date = datetime.strptime(reqBody['start_date'])
-  end_date = datetime.strptime(reqBody['end_date'])
+  userID = reqBody['user_discord_id'] if ('user_discord_id' in reqBody) else request.session['discord_id']
+  user = User.objects.get(discord_id = userID)
+  start_date = datetime.strptime(reqBody['start_date'], '%Y-%m-%d').replace(tzinfo=pytz.timezone('America/Chicago'))
+  end_date = datetime.strptime(reqBody['end_date'], '%Y-%m-%d').replace(tzinfo=pytz.timezone('America/Chicago'))
   reason = reqBody['reason']
   admin_enacted = (reqBody['admin_enacted'] if ('admin_enacted' in reqBody) else False)
   admin_enactor = (User.objects.get(reqBody['admin_discord_id']) if ('admin_discord_id' in reqBody) else None)
   # Ensure that start_date is over three days away from the current date
-  earlist_start = timezone.now() + timedelta(days=3)
+  earlist_start = datetime.now(pytz.timezone('America/Chicago')) + timedelta(days=2)
   if(start_date < earlist_start):
     logger.warning("Request for creation of an outage had a date within 3 days... Rejecting and returning error message.")
-    return HttpResponse("Creation Failed. Start Date cannot be within 3 days of current time.", status_code=400, content_type="text/plain")
+    return HttpResponse("Creation Failed. Start Date cannot be within 3 days of current time.", status=400, content_type="text/plain")
   # Store new outage in database
   outage = Outages(
     user = user,
@@ -56,6 +58,7 @@ def createOutage(request: HttpRequest):
   )
   # Save outage
   outage.save()
+  return HttpResponse("Outage Created.", status=200, content_type="text/plain")
 
 
 ###
@@ -77,39 +80,38 @@ def deleteOutage(request: HttpRequest):
     outage = Outages.objects.get(pk=reqBody['outageId'])
   except User.DoesNotExist as e:
     logger.warning(f"Unable to find user with provided data in request body!")
-    return HttpResponse("User with passed in Discord ID not found.", status_code=404, content_type="text/plain")
+    return HttpResponse("User with passed in Discord ID not found.", status=404, content_type="text/plain")
   except Outages.DoesNotExist as e:
     logger.warning(f"Unable to find outage with passed in ID of: {reqBody['outageId']}")
-    return HttpResponse("User Outage with passed in ID not found.", status_code=404, content_type="text/plain")
+    return HttpResponse("User Outage with passed in ID not found.", status=404, content_type="text/plain")
   except Exception as e:
     logger.warning(f"Failiure to delete outage, request body lacking required information...")
     logger.debug(f"Request Body: {reqBody}")
-    return HttpResponse("Unable to delete user outage, this is most likely the result of an internal error. Please contact Admins...", status_code=400, content_type="text/plain")
+    return HttpResponse("Unable to delete user outage, this is most likely the result of an internal error. Please contact Admins...", status=400, content_type="text/plain")
   # Delete outage
   try:
     outage.delete(deleter, reason)
   except:
     logger.error(f"FAILIURE WHEN DELETING OUTAGE: {outage.pk}")
-    return HttpResponse("Unable to delete user outage, this is most likely the result of an internal error. Please contact Admins...", status_code=400, content_type="text/plain")
+    return HttpResponse("Unable to delete user outage, this is most likely the result of an internal error. Please contact Admins...", status=400, content_type="text/plain")
   # Return status 200
-  return HttpResponse("Deletion Complete", status_code=200, content_type="text/plain")
+  return HttpResponse("Deletion Complete", status=200, content_type="text/plain")
 
 
 ###
-# Get Outages by passed in user ID or get all outages if no user ID is provided
+# Get Outages by passed in user ID or from request object
 ###
-def getOutages(request: HttpRequest, user_discord_id: str = None):
+def getUserOutages(request: HttpRequest, user_discord_id: str = None):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getOutages called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Get all outages
-  outages = Outages.objects.all()
-  # Get user data
-  if(user_discord_id):
-    outages = outages.filter(user__discord_id=user_discord_id)
+  # Get user
+  user = User.objects.get(discord_id=(user_discord_id if user_discord_id else request.session['discord_id']))
+  # Get outages for user that are upcoming
+  outages = Outages.objects.filter(user=user, end_date__gte=timezone.now().date())
   # Return a list of outages, converting each outage to a dict
   outList = []
   for outage in outages:
@@ -159,7 +161,7 @@ def getOutagesByDate(request: HttpRequest, date: str = None):
     date = datetime.strptime(date, "%Y-%m-%d")
   except:
     logger.error(f"Failure parsing date: {date}.")
-    return HttpResponse("Invalid request, a date must be provided in YYYY-MM-DD format.", status_code=400)
+    return HttpResponse("Invalid request, a date must be provided in YYYY-MM-DD format.", status=400)
   # Get all outages that apply to the provided date
   outages = Outages.objects.filter(start_date__lte=date, end_date__gte=date)
   # Return a list of outages, converting each outage to a dict

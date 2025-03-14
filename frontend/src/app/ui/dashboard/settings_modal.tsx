@@ -135,12 +135,14 @@ export default function SettingsModal(props) {
           {() => (
             <>
               <ModalHeader className="flex flex-col flex-wrap w-full gap-1 content-center">
-                <img src={props.avatarURL} className="rounded-lg w-20 mx-auto" />
-                {props.userInfo['nickname'] + "'s Settings"}
+                <a href={`/profile/${userInfo['discord_id']}`}>
+                  <img src={props.avatarURL} className="rounded-lg w-20 mx-auto" />
+                  {props.userInfo['nickname'] + "'s Settings"}
+                </a>
               </ModalHeader>
-              <ModalBody>
+              <ModalBody className="font-extralight">
                 <p> 
-                  This page allows you to view and update the data stored in the database and shown on the webpages.
+                  This page allows you to view and update the data stored in the database and shown on the webpages. Click on your profile picture above to go to your profile!
                 </p>
                 <p>User Information:</p>
                 <div>

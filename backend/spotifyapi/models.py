@@ -189,7 +189,7 @@ class UserAlbumOutage(models.Model):
 
   # Return True if outage is currently in effect or False if not
   def isActive(self):
-    return ((self.start_date < timezone.now()) and (timezone.now() < self.end_date))
+    return ((self.start_date < timezone.now().date()) and (timezone.now().date() < self.end_date))
 
   # Convert to a dict
   def dict(self):
@@ -207,6 +207,8 @@ class UserAlbumOutage(models.Model):
       out['admin_enactor_nickname'] = self.admin_enactor.nickname
     out['creation_timestamp'] = self.creation_timestamp.strftime('%m/%d/%Y, %H:%M:%S')
     out['active'] = self.isActive()
+    # Return outage as a dict
+    return out
 
   # Custom delete function to log the user action
   def delete(self, deleter=None, delete_reason=None, *args, **kwargs):
