@@ -164,7 +164,7 @@ export default function CreateOutageModal(props) {
                 <div className="max-w-[320px] lg:max-w-[650px] px-2 py-2 text-small border border-neutral-800 rounded-2xl bg-zinc-800/30">
                   <p>
                     Select dates on the below calendar to submit an outage. In order to submit an outage you will need to submit it at least 3 days before the desired start date, 
-                    so as to avoid abuse. During your outage period, your albums will not be available for selection, however you will still be able to review if you so chose. An outage
+                    so as to avoid abuse. During your outage period, your albums will not be available for selection, however you will still be able to review if you so choose. An outage
                     can be cancelled in your profile page.
                   </p>
                 </div>
