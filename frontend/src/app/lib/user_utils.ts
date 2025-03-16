@@ -238,7 +238,7 @@ export async function isUserOnline(discord_id) {
 //
 // Make POST request to backend to implement heartbeat online status
 //
-export async function heartbeat() {
+export async function heartbeat(timezoneStr: string = "") {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Reurn false if cookie is missing
@@ -252,6 +252,7 @@ export async function heartbeat() {
     headers: {
       Cookie: `sessionid=${sessionCookie};`,
       'X-Heartbeat': 'true'
-    }
+    },
+    body: JSON.stringify({"heartbeat": {'timezone': timezoneStr}})
   });
 }

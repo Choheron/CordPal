@@ -7,6 +7,7 @@ from users.models import (
 import logging
 import datetime
 import pytz
+import json
 
 class LastSeenMiddleware:
 
@@ -29,6 +30,10 @@ class LastSeenMiddleware:
       # Update only heartbeat timestamp if its a heartbeat call, otherwise update last_request_timestamp
       heartbeat_endpoint_paths = ["/users/heartbeat", "/users/getAllOnlineData", "/discordapi/checkToken"]
       if(full_path in heartbeat_endpoint_paths):
+        if(full_path in "/users/heartbeat"):
+          # Update timezone if timezone is in request
+          user.timezone_string = json.loads(request.body)['heartbeat']['timezone']
+          self.logger.debug(f"Setting timezone to {str(user.timezone_string)} for user {user.nickname}")
         user.last_heartbeat_timestamp = time
         self.logger.debug(f"Setting last_heartbeat_timestamp to {str(time)} for user {user.nickname}")
         user.save()

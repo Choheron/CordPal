@@ -46,6 +46,11 @@ export default function ProfileUserDisplay(props) {
             <p>Spotify Connected:</p>
             <div dangerouslySetInnerHTML={{__html: boolToEmoji(userData['spotify_connected'])}}></div>
           </div>
+          <div className="w-full flex justify-between font-extralight">
+            <p>Current Timezone:</p>
+            <p>{userData['timezone_string']}</p>
+          </div>
+          
         </div>
       </div>
     </div>

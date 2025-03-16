@@ -7,6 +7,7 @@ import { padNumber } from "@/app/lib/utils"
 // This will need to run on the clientside
 // Expected Props:
 //  - military: Boolean - Show 24 hour clock if true or 12 hour clock if false, defaults to FALSE.
+//  - timezone: String - Timezone string for the clock time, if not provided will use client timezone
 export default function CurrentTime(props) {
   const [time, setTime] = useState(new Date())
   const militaryTime = (props.military) ? props.military : false;

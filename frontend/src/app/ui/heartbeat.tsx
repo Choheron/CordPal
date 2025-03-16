@@ -12,7 +12,8 @@ export default function Heartbeat(props) {
     const beatHeart = async() => {
       try {
         if(isMounted) {
-          await heartbeat();
+          const time = new Date()
+          await heartbeat(new Intl.DateTimeFormat().resolvedOptions().timeZone);
         }
       } catch(error) {
         console.error("Heartbeat failed:", error);

@@ -35,6 +35,9 @@ class User(models.Model):
   # Track any and all API calls that come through with this user's session cookie
   last_request_timestamp = models.DateTimeField(null = True)
   last_heartbeat_timestamp = models.DateTimeField(null = True)
+  # Last timezone
+  timezone_string = models.CharField(max_length=255, default="America/Chicago")
+
 
   def get_avatar_url(self):
     """Construct the avatar URL from Discord's CDN."""
