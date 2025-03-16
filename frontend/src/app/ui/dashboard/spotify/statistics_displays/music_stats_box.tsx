@@ -34,6 +34,7 @@ export default async function MusicStatsBox(props) {
                     `${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.
                      ${(user['block_type'] == "OUTAGE") ? (user['admin_outage'] == "true") ? `This outage was placed by admins.` : `This is an outage placed by ${user['nickname']}.` : ""}
                      ${(user['selection_blocked']) ? `Reason: ${user['reason']}.` : ""}
+                     ${(user['block_type'] == "OUTAGE") ? `This outage lasts until: ${user['outage_start']}` : ``}
                     `
                   }
                   className="max-w-[300px]"
