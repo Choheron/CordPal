@@ -359,7 +359,7 @@ def getAlbumsStats(request: HttpRequest):
     userData['block_type'] = chance_view_response['block_type']
     userData['reason'] = chance_view_response['reason']
     userData['admin_outage'] = chance_view_response['admin_outage'] if (userData['block_type'] == "OUTAGE") else None
-    if(userData['blockm_type'] == "OUTAGE"):
+    if(userData['block_type'] == "OUTAGE"):
       userData['outage_start'] = chance_view_response['outage_start']
       userData['outage_end'] = chance_view_response['outage_end']
     # Append to List

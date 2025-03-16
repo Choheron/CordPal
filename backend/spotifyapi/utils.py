@@ -208,10 +208,13 @@ def albumToDict(album: Album):
 
 
 # Check and set a user's aotd "selection_blocked_flag"
+# NOTE: This works on the idea that at midnight of the next day the user will be blocked, this is so it can be seen earlier on the website when that happens
+#       so a user is marked as blocked from selection if there will have been three days since their last review at the upcoming midnight.
 def checkSelectionFlag(spotify_user: SpotifyUserData):
   # Update user to check if they need to be blocked from submitting
   logger.info(f"Updating selection blocked flag for user {spotify_user.user.nickname}...")
-  three_days_ago = now() - timedelta(days=3)
+  # Get the next midnight, then subtract 3 days to determine validity of user
+  three_days_ago = (now().date() + timedelta(days=1)) - timedelta(days=3)
   # Get list of reviews from the past 3 days
   recent_review_users = list(Review.objects.filter(review_date__gte=three_days_ago).values_list('user__discord_id', flat=True).distinct())
   logger.info(f"Checking selection blocked flag for user: {spotify_user.user.nickname} [Flag is currently: {spotify_user.selection_blocked_flag}]...")

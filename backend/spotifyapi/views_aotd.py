@@ -187,6 +187,9 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  # Iterate all users and update the selection blocked flag
+  for user in SpotifyUserData.objects.all():
+    checkSelectionFlag(user)
   # Get user (use request cookie if user is not passed in)
   user = (getSpotifyUser(request.session.get('discord_id')) if (user_discord_id=="") else (getSpotifyUser(user_discord_id)))
   # Check if user's selections are currently blocked, return 0% chance

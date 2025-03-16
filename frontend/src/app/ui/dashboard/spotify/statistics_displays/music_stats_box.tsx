@@ -94,19 +94,21 @@ export default async function MusicStatsBox(props) {
           </p>
         </div>
         <Divider className="my-1" />
-        <table className="table-fixed w-fit">
-          <thead>
-            <tr>
-              <th className="w-1/2">User</th>
-              <th className="w-1/4 px-1">Submitted</th>
-              <th className="w-1/4 pl-1">AOtD</th>
-            </tr>
-          </thead>
-          <tbody>
-            {albumUserStatsTable}
-          </tbody>
-        </table>
-        <CreateOutageModal />
+        <div className="flex flex-col justify-between h-full">
+          <table className="table-fixed w-fit">
+            <thead>
+              <tr>
+                <th className="w-1/2">User</th>
+                <th className="w-1/4 px-1">Submitted</th>
+                <th className="w-1/4 pl-1">AOtD</th>
+              </tr>
+            </thead>
+            <tbody>
+              {albumUserStatsTable}
+            </tbody>
+          </table>
+          <CreateOutageModal />
+        </div>
       </div>
       {/* Lowest and Highest Album Stats */}
       <div className="w-300 flex flex-col">
