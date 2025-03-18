@@ -238,7 +238,9 @@ def getUsersByTimezone(request: HttpRequest):
     if(user.timezone_string in timezones.keys()):
       timezones[user.timezone_string].append(model_to_dict(user))
     else:
-      timezones[user.timezone_string] = [model_to_dict(user)]
+      userDict = model_to_dict(user)
+      userDict['avatar_url'] = user.get_avatar_url()
+      timezones[user.timezone_string] = [userDict]
   # Convert timezones to a list
   timezonesOut = []
   for key in timezones.keys():
