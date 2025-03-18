@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import CurrentTime from "../general/current_time";
-import { Avatar } from "@nextui-org/react";
+import { Avatar, Tooltip } from "@nextui-org/react";
 
 // Display all user timezone data in a vertically stacked block
 // Expected Props:
@@ -25,13 +25,19 @@ export default function AllTimezonesBlock(props) {
   const constInsetUsersMap = (usersList) => {
     return usersList.map((user, index) => {
       return (
-        <div key={index} className={`absolute top-2 right-1 mr-${(index == 0) ? 0 : index+2} z-[${index}]`}>
-          <Avatar 
-            key={index+2}
-            src={user['avatar_url']}
-            name={user['nickname']}
-            size="sm"
-          />
+        <div 
+          key={index} 
+          className={`absolute top-2 right-1`}
+          style={{ marginRight: (index*12)}}
+        >
+          <Tooltip content={user['nickname']}>
+            <Avatar 
+              key={index+2}
+              src={user['avatar_url']}
+              name={user['nickname']}
+              size="sm"
+            />
+          </Tooltip>
         </div>
       )
     })
