@@ -236,6 +236,31 @@ export async function isUserOnline(discord_id) {
 
 
 //
+// Get a list of users grouped by timezone
+//
+export async function getUsersByTimezone() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const usersByTimezoneResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUsersByTimezone`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  // Get online status JSON
+  const usersByTimezoneJson = await usersByTimezoneResponse.json();
+  // Return json
+  return usersByTimezoneJson['users']
+}
+
+
+//
 // Make POST request to backend to implement heartbeat online status
 //
 export async function heartbeat(timezoneStr: string = "") {

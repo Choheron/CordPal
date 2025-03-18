@@ -1,5 +1,6 @@
 import ClientTimestamp from "../general/client_timestamp"
 import { boolToEmoji, formatDateString, onlineStatusToTailwindBgColor } from "@/app/lib/utils"
+import CurrentTime from "../general/current_time"
 
 // Display user data in a box
 // EXPECTED PROPS:
@@ -50,7 +51,10 @@ export default function ProfileUserDisplay(props) {
             <p>Current Timezone:</p>
             <p>{userData['timezone_string']}</p>
           </div>
-          
+          <div className="w-full flex justify-between font-extralight">
+            <p>Current Time:</p>
+            <CurrentTime basic={true} timezone={userData['timezone_string']} />
+          </div>
         </div>
       </div>
     </div>

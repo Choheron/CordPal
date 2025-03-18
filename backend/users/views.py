@@ -1,5 +1,6 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.utils import timezone
+from django.forms.models import model_to_dict
 
 from .models import User
 
@@ -215,6 +216,36 @@ def getAllOnlineData(request: HttpRequest):
     temp['last_heartbeat_timestamp'] = user.last_heartbeat_timestamp
     out[user.discord_id] = temp
   # Return users and timestamp
+  out['timestamp'] = timezone.now()
+  return JsonResponse(out)
+
+
+###
+# Get a list of users grouped by timezone
+###
+def getUsersByTimezone(request: HttpRequest):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getUsersByTimezone called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get all users
+  users = User.objects.all().order_by("timezone_string")
+  # Iterate through and build return object
+  timezones = {}
+  for user in users:
+    if(user.timezone_string in timezones.keys()):
+      timezones[user.timezone_string].append(model_to_dict(user))
+    else:
+      timezones[user.timezone_string] = [model_to_dict(user)]
+  # Convert timezones to a list
+  timezonesOut = []
+  for key in timezones.keys():
+    timezonesOut.append({"timezone": key, "users": timezones[key]})
+  # Return users and timestamp
+  out = {}
+  out['users'] = timezonesOut
   out['timestamp'] = timezone.now()
   return JsonResponse(out)
 
