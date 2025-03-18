@@ -19,7 +19,7 @@ export default function CurrentTime(props) {
   const titleOverride = (props.titleOverride) ? props.titleOverride : null;
   // Time object
   const [time, setTime] = useState(((props.dateOverride) ? 
-                          props.dateOverride.toLocaleString(formatString, { timeZone: timezone}) : 
+                          "" :  /* This is empty because later in this file I reference the prop directly so that the children update with the passed in date. */
                           new Date().toLocaleString(formatString, { timeZone: timezone})
                         ))
   // Broken Down Objects
@@ -30,7 +30,7 @@ export default function CurrentTime(props) {
   const [postFix, setPostFix] = useState("AM")
 
   useEffect(() => {
-    if(props.dateOverride != null) {
+    if(props.dateOverride == null) {
       var timer = setInterval(() => setTime(new Date().toLocaleString(formatString, { timeZone: timezone})), 1000);
 
       // Cleanup Function
@@ -42,7 +42,7 @@ export default function CurrentTime(props) {
 
   // Second useEffect to update time every time a new time is set
   useEffect(() => {
-    const arr1 = time.split(" ")
+    const arr1 = (props.dateOverride) ? props.dateOverride.toLocaleString(formatString, { timeZone: timezone}).split(" ") : time.split(" ")
     const arr2 = arr1[1].split(":")
 
     setDate(arr1[0].substring(0, arr1[0].length - 1))
@@ -50,7 +50,7 @@ export default function CurrentTime(props) {
     setMins(arr2[1])
     setSeconds(arr2[2])
     setPostFix(arr1[2])
-  }, [time])
+  }, [time, props.dateOverride])
 
   if(basic) {
     return (
