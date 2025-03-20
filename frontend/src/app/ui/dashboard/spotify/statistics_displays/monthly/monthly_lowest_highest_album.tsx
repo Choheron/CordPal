@@ -1,3 +1,5 @@
+"use server"
+
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import MinimalAlbumDisplay from "../../minimal_album_display";
 import { Badge, Divider } from "@nextui-org/react";
@@ -11,7 +13,7 @@ import { Badge, Divider } from "@nextui-org/react";
 //  - monthName: String - Human readable month name
 //  - highestAlbum: Obj - Object containing highest album of the month data
 //  - lowestAlbum: Obj - Object containing lowest album of the month data
-export default function MonthlyLowestHighestAlbum(props) {
+export default async function MonthlyLowestHighestAlbum(props) {
   // Retrieve props from parent component
   const aotdStats = (props.aotdStats) ? props.aotdStats : null;
   const reviewData = (props.reviewData) ? props.reviewData : null;

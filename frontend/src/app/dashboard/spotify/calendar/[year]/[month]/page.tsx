@@ -98,7 +98,7 @@ export default async function Page({
   const genDay = (dateStr) => {
     const albumObj = aotdData[dateStr]
     const dateArr = dateStr.split("-")
-    const sizingTailwind = "relative w-full h-full p-1"
+    const sizingTailwind = "relative w-full h-full sm:p-1"
 
     // Return a field value from the album object or null
     function albumGet(field) {
@@ -113,9 +113,9 @@ export default async function Page({
       return (
         <div className={sizingTailwind}>
           <div className="w-full h-full content-center bg-gray-800/30 rounded-2xl border border-neutral-800">
-            <p className="w-fit m-auto">Previous Month</p>
+            <p className="hidden sm:visible w-fit m-auto">Previous Month</p>
           </div>
-          <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
+          <div className="absolute bg-zinc-800/90 border border-neutral-800 top-0 p-[2px] sm:p-2 rounded-tl-2xl rounded-br-2xl text-xs sm:text-base">
             <p>{dateArr[2]}</p>
           </div>
         </div>
@@ -132,7 +132,7 @@ export default async function Page({
             artist={{'name': "Monke"}}
             sizingOverride="w-full h-full"
           />
-          <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
+          <div className="absolute sm:left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-[2px] sm:p-2 rounded-tl-2xl rounded-br-2xl text-xs sm:text-base">
             <p>{dateArr[2]}</p>
           </div>
         </div>
@@ -159,19 +159,19 @@ export default async function Page({
           artistTextOverride="text-center text-sm 2xl:text-xl italic text-wrap"
           starTextOverride="text-base 2xl:text-2xl"
         />
-        <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
+        <div className="absolute sm:left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-[2px] sm:p-2 rounded-tl-2xl rounded-br-2xl text-xs sm:text-base">
           <p>{dateArr[2]}</p>
         </div>
         <Conditional showWhen={dateStr == aotdData['stats']['highest_aotd_date']}>
           <Tooltip content={`Highest Rated Album for ${monthToName(month)} ${year}`}>
-            <div className="absolute -right-1 bg-green-600/90 border border-green-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl text-3xl">
+            <div className="absolute right-0 sm:-right-1 bg-green-600/90 border border-green-800 top-0 p-[2px] sm:p-2 rounded-tr-2xl rounded-bl-2xl text-xs sm:text-2xl">
               <RiThumbUpFill />
             </div>
           </Tooltip>
         </Conditional>
         <Conditional showWhen={dateStr == aotdData['stats']['lowest_aotd_date']}>
           <Tooltip content={`Lowest Rated Album for ${monthToName(month)} ${year}`}>
-            <div className="absolute -right-1 bg-red-600/90 border border-red-800 top-0 p-2 rounded-tr-2xl rounded-bl-2xl text-3xl">
+            <div className="absolute right-0 sm:-right-1 bg-red-600/90 border border-red-800 top-0 p-[2px] sm:p-2 rounded-tr-2xl rounded-bl-2xl text-xs sm:text-2xl">
               <RiThumbDownFill />
             </div>
           </Tooltip>
@@ -182,7 +182,7 @@ export default async function Page({
 
 
   return (
-    <div className="flex flex-col min-h-screen w-full 2xl:w-3/4 mx-auto items-center p-3 pb-36 pt-10 ">
+    <div className="flex flex-col min-h-screen w-full max-w-full 2xl:w-3/4 mx-auto items-center p-3 pb-36 pt-10 ">
       <PageTitle text={`Historical Daily Albums for ${monthName} ${year}`} />
       <div className="flex w-full justify-between">
         <Button 
@@ -213,16 +213,16 @@ export default async function Page({
           <RiArrowRightCircleLine className="text-2xl" />
         </Button>
       </div>
-      <table className="w-full h-full table-fixed mx-auto border-separate border-spacing-1">
+      <table className="w-full h-full table-fixed mx-auto sm:border-separate">
         <thead>
           <tr>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2">Sunday</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2">Monday</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2">Tuesday</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2">Wednesday</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2">Tursday</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2">Friday</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2">Saturday</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Sunday</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Monday</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Tuesday</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Wednesday</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Tursday</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Friday</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Saturday</th>
           </tr>
         </thead>
         <tbody>

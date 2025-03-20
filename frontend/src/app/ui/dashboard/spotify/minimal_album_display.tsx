@@ -57,7 +57,7 @@ export default async function MinimalAlbumDisplay(props) {
   const starTextOverride = (props.starTextOverride) ? props.starTextOverride : 'text-xl 3xl:text-3xl'
 
   return (
-    <div className={`relative group ${sizingOverride} mx-2 lg:mx-1 my-auto flex flex-row`}>
+    <div className={`relative group ${sizingOverride} sm:mx-2 lg:mx-1 my-auto flex flex-row`}>
       <img 
         src={album_img_src}
         className={`${sizingOverride} rounded-2xl mx-auto group-hover:blur-sm duration-700 ease-in-out group-hover:brightness-[.25]`}

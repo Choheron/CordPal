@@ -1,3 +1,5 @@
+"use server"
+
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import CustomPercentageDisplay from "@/app/ui/general/charts/custom_percentage_display";
 import { RosenBarChartHorizontal } from "@/app/ui/general/charts/rosen_barchart_horizontal";
@@ -12,7 +14,7 @@ import { RiQuestionMark } from "react-icons/ri";
 //  - reviewData: Obj - Object containing review data for that month
 //  - year: String - Year of month
 //  - monthName: String - Human readable month name
-export default function MonthlyReviewStats(props) {
+export default async function MonthlyReviewStats(props) {
   // Get data from props
   const reviewData = (props.reviewData) ? props.reviewData : null;
   const year = (props.year) ? props.year : null;
