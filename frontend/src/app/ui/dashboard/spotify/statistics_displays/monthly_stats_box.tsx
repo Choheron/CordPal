@@ -22,6 +22,7 @@ export default async function MonthlyStatsBox(props) {
   // Data Parsing from props
   const highest_album = (aotdStats) ? aotdData[aotdStats['highest_aotd_date']] : "Not Found";
   const lowest_album = (aotdStats) ? aotdData[aotdStats['lowest_aotd_date']] : "Not Found";
+  const month_name = monthToName(month)
 
 
   return (
@@ -32,7 +33,7 @@ export default async function MonthlyStatsBox(props) {
         reviewData={reviewData}
         year={year}
         month={month}
-        monthName={monthToName(month)}
+        monthName={month_name}
         highestAlbum={highest_album}
         lowestAlbum={lowest_album}
       />
@@ -40,20 +41,20 @@ export default async function MonthlyStatsBox(props) {
         {/* Selection Breakdown */}
         <MonthlySelectionCountsPie 
           aotdStats={aotdStats}
-          monthName={monthToName(month)}
+          monthName={month_name}
           year={year}
         />
         {/* Submission Breakdown */}
         <MonthlySubmissionCountsPie 
           subData={subData}
-          monthName={monthToName(month)}
+          monthName={month_name}
           year={year}
         />
       </div>
       {/* Review stats for the Month - NOTE: Only show when reviews have been created for this month*/}
       <MonthlyReviewStats 
         reviewData={reviewData}
-        monthName={monthToName(month)}
+        monthName={month_name}
         year={year}
       />
     </div>

@@ -44,7 +44,7 @@ export default function MonthlyLowestHighestAlbum(props) {
     <div className="w-full lg:w-[400px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
       {/* Highest Album */}
       <p className="font-extralight w-full text-center text-xl">
-        {monthName}&lsquo;s Highest:
+        {monthName} {year}&lsquo;s Highest:
       </p>
       <Divider className="mb-1" />
       <Badge
@@ -84,7 +84,7 @@ export default function MonthlyLowestHighestAlbum(props) {
       </Badge>
       {/* Lowest Album */}
       <p className="font-extralight w-full text-center text-xl">
-        {monthName}&lsquo;s Lowest:
+        {monthName} {year}&lsquo;s Lowest:
       </p>
       <Divider className="mb-1" />
       <Badge
