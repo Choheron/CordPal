@@ -52,6 +52,29 @@ def getSpotifyUsersObj(request: HttpRequest):
     out[tempDict['discord_id']] = tempDict
   return JsonResponse(out)
 
+###
+# Get a list of users who have connected spotify as a raw list
+###
+def getSpotifyUsersList(request: HttpRequest):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getSpotifyUsersList called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Iterate and retrieve SpotifyUserData entries
+  spotUserList = SpotifyUserData.objects.all()
+  # Declare and populate out dict
+  out = []
+  for spotUser in spotUserList:
+    tempDict = model_to_dict(spotUser)
+    tempDict['discord_id'] = spotUser.user.discord_id
+    tempDict['avatar_src'] = spotUser.user.get_avatar_url()
+    tempDict['nickname'] = spotUser.user.nickname
+    # Store tempDict in out json
+    out.append(tempDict)
+  return JsonResponse({"users": out})
+
 
 ###
 # Get a count of all users in the Spotify DB

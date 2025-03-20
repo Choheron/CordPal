@@ -410,17 +410,27 @@ def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
       "review_sum": reviewSum,
       "review_average": averageScore,
       "first_listen_count": firstListenCount,
-      "first_listen_percentage": (firstListenCount/float(reviewCount) * 100) if (reviewCount != 0) else 0
+      "first_listen_percentage": ((firstListenCount/float(reviewCount) * 100) if (reviewCount != 0) else 0),
+      "score_breakdown": []
     }
   # Get breakdown of all scores by count and data
   stat_reviewScoreBreakdown = []
   score = 0.0
   while score <= 10.0:
+    # Query all reviews of this score
+    reviews = monthReviews.filter(score=score)
     stat_reviewScoreBreakdown.append({
       "score": f"{score + 0.0}",
-      "count": monthReviews.filter(score=score).count(),
-      "percent": (monthReviews.filter(score=score).count()/float(stat_reviewTotal) * 100) if (stat_reviewTotal != 0) else 0
+      "count": reviews.count(),
+      "percent": (reviews.filter(score=score).count()/float(stat_reviewTotal) * 100) if (stat_reviewTotal != 0) else 0
     })
+    # Add count of reviews for individual user breakdown
+    for user_id in users:
+      stat_userStats[user_id]['score_breakdown'].append({
+        "score": f"{score + 0.0}",
+        "count": reviews.filter(user__discord_id=user_id).count(),
+        "percent": ((reviews.filter(score=score).filter(user__discord_id=user_id).count()/float(stat_userStats[user_id]['review_count']) * 100) if (stat_userStats[user_id]['review_count'] != 0) else 0)
+      })
     # Increment score
     score += 0.5
   # Create and populate out object

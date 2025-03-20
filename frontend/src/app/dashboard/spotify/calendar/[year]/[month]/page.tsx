@@ -39,10 +39,6 @@ export default async function Page({
   const aotdData = await getAOtDByMonth(year, padNumber(Number(month)))
   // Get last month's data to see if there are any albums there TODO: Make this not such a HUGE call
   const lastMonthAotdData = await getAOtDByMonth(`${lastMonth.getFullYear()}`, padNumber(Number(lastMonth.getMonth() + 1)))
-  // Get album submission numbers for the current month
-  const submissionData = await getSubmissionsByMonth(year, padNumber(Number(month)))
-  // Get review data for current month
-  const reviewData = await getReviewStatsByMonth(year, padNumber(Number(month)))
 
   // If the user isnt supposed to be here, redirect them to the current month's page
   if((firstDay > today) || ((Object.keys(aotdData).length == 1))) {
@@ -113,7 +109,7 @@ export default async function Page({
       return (
         <div className={sizingTailwind}>
           <div className="w-full h-full content-center bg-gray-800/30 rounded-2xl border border-neutral-800">
-            <p className="hidden sm:visible w-fit m-auto">Previous Month</p>
+            <p className="invisible sm:visible w-fit m-auto">Previous Month</p>
           </div>
           <div className="absolute bg-zinc-800/90 border border-neutral-800 top-0 p-[2px] sm:p-2 rounded-tl-2xl rounded-br-2xl text-xs sm:text-base">
             <p>{dateArr[2]}</p>
@@ -230,7 +226,7 @@ export default async function Page({
         </tbody>
       </table>
       {/* Monthly Statistics */}
-      <MonthlyStatsBox aotdData={aotdData} subData={submissionData} reviewData={reviewData} year={year} month={month}/>
+      <MonthlyStatsBox aotdData={aotdData} year={year} month={month}/>
     </div>
   )
 }

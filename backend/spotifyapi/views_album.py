@@ -440,6 +440,22 @@ def getSubmissionsByMonth(request: HttpRequest, year: str, month: str):
         "count": submissions.filter(submitted_by__discord_id=user_id).count(),
         "percent": ((submissions.filter(submitted_by__discord_id=user_id).count()/float(len(submissions))) * 100)
       })
+  # Also build out an object containing all of the users submissions for the month and that users stats for the month
+  out['user_stats'] = {}
+  for user_id in users:
+    # Temp stats dict
+    user_stats = {}
+    # Get submissions by this user
+    submissions_temp = submissions.filter(submitted_by__discord_id=user_id)
+    # Populate stats object
+    user_stats['discord_id'] = f"{user_id}", 
+    user_stats["count"] = submissions_temp.count(),
+    user_stats["percent"] = ((submissions_temp.count()/float(len(submissions))) * 100) if (len(submissions_temp) != 0) else 0
+    user_stats["submissions"] = []
+    for album in submissions_temp:
+      user_stats["submissions"].append(model_to_dict(album))
+    # Attach stats object to user_stats dict
+    out['user_stats'][user_id] = user_stats
   # Mark single value of all submissions
   out['submission_total'] = submissions.count()
    # Attach timestamp

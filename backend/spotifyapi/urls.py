@@ -21,6 +21,7 @@ urlpatterns = [
   ## ============================================================================================================
   path('getSpotifyData', views_user.getSpotifyData),
   path('getSpotifyUsersObj', views_user.getSpotifyUsersObj),
+  path('getSpotifyUsersList', views_user.getSpotifyUsersList),
   path('getSpotifyUserCount', views_user.getSpotifyUserCount),
   path('getTopItems/<str:item_type>/<str:time_range>/<str:limit>/<str:offset>', views_user.getTopItems),
   path('spotifySearch/<str:item_type>/<str:query>/<str:limit>/<str:offset>', views_user.spotifySearch),
