@@ -264,7 +264,7 @@ def heartbeat(request: HttpRequest):
     return res
   try:
     user = User.objects.get(discord_id=request.session['discord_id'])
-    logger.info(f"Heartbeat received from {user.nickname}...")
+    logger.debug(f"Heartbeat received from {user.nickname}...")
   except:
     logger.warning(f"HEARTBEAT RECIEVED FROM UNKNOWN USER!")
   # Return heartbest response with header to skip frontend middleware

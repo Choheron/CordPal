@@ -19,12 +19,12 @@ class LastSeenMiddleware:
   def __call__(self, request: HttpRequest):
     # Get Request Path
     full_path = request.get_full_path()
-    # Log method call
-    self.logger.info(f"Incoming Request: {full_path}")
     # Get session data from request
     try:
       # Get user object 
       user = User.objects.all().get(discord_id=request.session['discord_id'])
+      # Log method call (With username)
+      self.logger.info(f"Incoming Request from user \"{user.nickname}\": {full_path}")
       # Get current timestamp
       time = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
       # Update only heartbeat timestamp if its a heartbeat call, otherwise update last_request_timestamp
@@ -43,7 +43,8 @@ class LastSeenMiddleware:
         self.logger.debug(f"Setting last_request_timestamp to {str(time)} for user {user.nickname}")
         user.save()
     except:
-      self.logger.warning(f"Middleware called with no session cookie")
+      # Log method call (With username)
+      self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}")
     
     # Code above this line is executed before the view is called
     # Retrieving the response 
