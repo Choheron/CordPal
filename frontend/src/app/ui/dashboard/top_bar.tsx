@@ -33,7 +33,7 @@ export default function TopBar(props) {
   ];
 
   return (
-    <div className="flex flex-col items-center justify-between px-4 lg:px-24 pt-20 lg:pt-10 pb-0">
+    <div className="flex flex-col items-center justify-between max-w-full sm:px-4 lg:px-24 pt-20 lg:pt-10 pb-0">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex flex-col lg:flex-row">
         <div>
           {/* Santa Hat on User Avatar, because its festive :) */}
@@ -64,7 +64,7 @@ export default function TopBar(props) {
         </div>
         <Link 
           href="/logout"
-          className="z-0 fixed lg:static right-0 top-0 flex w-full justify-end lg:justify-center pb-6 pt-8 pr-4 backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit lg:w-auto lg:rounded-xl lg:border lg:p-4 hover:underline"
+          className="z-0 fixed lg:static right-0 top-0 flex w-full justify-end lg:justify-center pb-6 pt-8 pr-4 backdrop-blur-2xl border border-neutral-800 bg-zinc-800/30 lg:w-auto lg:rounded-xl lg:p-4 hover:underline"
         >
           Logout
         </Link>

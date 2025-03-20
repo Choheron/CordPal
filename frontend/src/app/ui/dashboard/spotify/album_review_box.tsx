@@ -102,7 +102,7 @@ export default function AlbumReviewBox(props) {
               className="group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
             >
               <Tooltip 
-                className="bg-transparent/70 border-gray-600"
+                className="bg-transparent/80 border-gray-600"
                 content={
                   <SimilarRatingsBox 
                     rating={rating} 

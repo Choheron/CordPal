@@ -1,7 +1,7 @@
 'use client'
 
 import ClientTimestamp from "@/app/ui/general/client_timestamp";
-import { Avatar, Button, Divider } from "@nextui-org/react";
+import { Avatar, Button, Divider, Tooltip } from "@nextui-org/react";
 import Link from "next/link";
 
 // GUI Display for albums that the user has rated similarly
@@ -25,20 +25,23 @@ export default function SimilarRatingsBox(props) {
     // If there are albums for this rating
     return albumObj.map((album, index) => {
       return (
+        
         <div key={index} className={`py-2`}>
-          <Button 
-            as={Link}
-            href={"/dashboard/spotify/album/" + album['spotify_id']}
-            radius="full"
-            className={`h-fit w-fit text-white px-0 hover:scale-110`}
-            variant="light"
-          >
-            <Avatar 
-              src={album['album_img_src']} 
-              name={album['title']}
-              className="w-20 h-20 text-large -mx-1"
-            />
-          </Button>
+          <Tooltip content={album['title']} >
+            <Button 
+              as={Link}
+              href={"/dashboard/spotify/album/" + album['spotify_id']}
+              radius="full"
+              className={`h-fit w-fit text-white px-0 hover:scale-110`}
+              variant="light"
+            >
+              <Avatar 
+                src={album['album_img_src']} 
+                name={album['title']}
+                className="w-20 h-20 text-large -mx-1"
+              />
+            </Button>
+          </Tooltip>
         </div>
       )
     })
