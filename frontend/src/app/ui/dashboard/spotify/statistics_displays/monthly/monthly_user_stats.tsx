@@ -57,7 +57,7 @@ export default function MonthlyUserStats(props) {
             albumsList.map((album, index) => {
               return (
                 <div 
-                  className="group relative flex h-[125px] w-[125px] m-1"
+                  className="group relative flex h-[40%] md:h-[30%] w-[40%] md:w-[30%] m-1"
                   key={index}
                 >
                   <img 
@@ -115,7 +115,7 @@ export default function MonthlyUserStats(props) {
 
 
   return (
-    <div className="w-full h-full mx-auto border bg-zinc-800/30 border-neutral-800 rounded-2xl py-2">
+    <div className="w-full 2xl:w-3/4 h-full mx-auto border bg-zinc-800/30 border-neutral-800 rounded-2xl py-2">
       <Tabs
         isVertical={true}
         items={users}

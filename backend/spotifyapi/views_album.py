@@ -231,6 +231,8 @@ def getAlbum(request: HttpRequest, album_spotify_id: str):
   out['submitter_nickname'] = albumObj.submitted_by.nickname
   out['submitter_comment'] = albumObj.user_comment
   out['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+  out['release_date_precision'] = albumObj.release_date_precision
+  out['release_date'] = albumObj.release_date.strftime("%m/%d/%Y, %H:%M:%S")
   # Return final object
   return JsonResponse(out)
 
@@ -265,6 +267,8 @@ def getAllAlbums(request: HttpRequest):
     albumObj['submitter_nickname'] = album.submitted_by.nickname
     albumObj['submitter_comment'] = album.user_comment
     albumObj['submission_date'] = album.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+    albumObj['release_date_precision'] = album.release_date_precision
+    albumObj['release_date'] = album.release_date.strftime("%m/%d/%Y, %H:%M:%S")
     # Check if album has been aotd
     try:
       # Get most recent AOtD date

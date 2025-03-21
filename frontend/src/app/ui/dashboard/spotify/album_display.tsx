@@ -21,6 +21,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - submitter: String - (Optional) The discord id of the user that submitted this album, not applicable in all use cases
 //  - submitter_comment: String - (Optional) An optional comment that the album submitter may have left with this album
 //  - submission_date: String - (Optional) A String representation of the submission date of the Album
+//  - release_date: String - (Optional) A String representation of the release date of the Album
 //  - album_spotify_id: String - (Optional) Album Spotify ID for retrieval of average from database
 //  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
 //  - showAlbumRating: Boolean - (Optional) [DEFAULT TRUE] Show the average user rating for the album
@@ -39,6 +40,7 @@ export default async function AlbumDisplay(props) {
   const submitter = (props.submitter) ? props.submitter : "Not Provided";
   const submitter_comment = (props.submitter_comment) ? props.submitter_comment : "No Comment Provided";
   const submission_date: string = (props.submission_date) ? props.submission_date : "Not Provided";
+  const release_date: string = (props.release_date) ? props.release_date : "Unknown";
   // Rating props check
   const avg_rating = (props.album_spotify_id && showAlbumRating) ? await getAlbumAvgRating(props.album_spotify_id, false): 0.0;
   // Historical props checks
@@ -54,7 +56,7 @@ export default async function AlbumDisplay(props) {
   }
 
   return (
-    <div className="w-full lg:min-w-[650px] lg:max-w-full mx-auto lg:mx-1 my-auto block overflow-hidden text-ellipsis">
+    <div className="w-full lg:min-w-[650px] lg:max-w-full mx-auto lg:mx-1 my-auto block overflow-hidden text-ellipsis font-extralight">
       <div className="w-full my-auto flex flex-row">
         <img 
           src={album_img_src}
@@ -63,11 +65,22 @@ export default async function AlbumDisplay(props) {
         />
         <div className="w-full max-w-full flex flex-col lg:gap-2 pl-2 lg:pl-5 pt-1 lg:pt-2 my-auto">
           <a href={album_url} target="_noreferrer" className="text-xl lg:text-3xl hover:underline">
-            {title}
+            <b>{title}</b>
           </a>
-          <a href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline italic">
+          <a href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline italic -mt-2">
             {artist_name}
           </a>
+          <Conditional showWhen={release_date != "Unknown"}>
+            <div className="flex text-sm -mt-2">
+              <p>Released:</p>
+              <ClientTimestamp 
+                className="pl-1" 
+                timestamp={release_date} 
+                full={false} 
+                maintainUTC={true}
+              />
+            </div>
+          </Conditional>
           <Conditional showWhen={userAuth && props.submitter}>
             <div className="">
               <p>Submitter: </p>
@@ -93,8 +106,8 @@ export default async function AlbumDisplay(props) {
                 </Popover>
               </div>
             </div>
-            <div className="flex">
-              <p>Submission Date:</p>
+            <div className="flex text-sm -mt-2">
+              <p>Submitted:</p>
               <ClientTimestamp className="italic pl-1" timestamp={submission_date} full={false}/>
             </div>
           </Conditional>

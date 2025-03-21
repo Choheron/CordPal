@@ -7,6 +7,7 @@ import { generateDateFromUTCString, zeroPad, formatDateString } from "@/app/lib/
 //  - timestamp: String - UTC Timestamp
 //  - className: String - classname to pass to p block
 //  - full: Boolean - return full timestamp or shortened one
+//  - maintainUTC: Boolean - Dont convert to local timestamp (Default False)
 export default function ClientTimestamp(props) {
   const full = (props.full) ? props.full : false;
   var utcDate = new Date()
@@ -15,14 +16,14 @@ export default function ClientTimestamp(props) {
   } catch {
     utcDate = generateDateFromUTCString(formatDateString(props.timestamp))
   }
-  const adjustedTimestamp = convertToLocalTZString(utcDate, full)
+  const adjustedTimestamp = (props.maintainUTC == true) ? convertToLocalTZString(utcDate, "Etc/UTC") : convertToLocalTZString(utcDate);
   
   // Convert passed in date object to local timezone
-  function convertToLocalTZString(date, full: boolean = false) {
+  function convertToLocalTZString(date, timezoneOverride: string = "") {
     // Use client to get proper times
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     // Convert timezone
-    const adjustedDate = new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: timezone}));
+    const adjustedDate = new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: ((timezoneOverride != "") ? timezoneOverride : timezone)}));
     // Get in String
     const adjDateString = adjustedDate.toString();
     // Trim down string as needed

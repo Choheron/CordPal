@@ -99,6 +99,7 @@ export default async function Page({
             submitter={albumData("submitter")}
             submitter_comment={albumData("submitter_comment")}
             submission_date={albumData("submission_date")}
+            release_date={albumData('release_date')}
           />
           <Conditional showWhen={isAdmin || isUploader}>
             <div className="absolute -top-1 right-1 ">

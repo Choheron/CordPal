@@ -64,10 +64,22 @@ class Album(models.Model):
   )
   user_comment = models.TextField(null=True, blank=True)  # User's comment on the album
   submission_date = models.DateTimeField(auto_now_add=True) 
+  release_date = models.DateField(default=None, null=True) # Track release date of album
+  release_date_precision = models.CharField(max_length=10, default="unknown") # Should be one of the following values: "year", "month", "day", "unknown"
   raw_data = models.JSONField(null=True) # JSON field to store all data returned from the frontend
 
   def subDateToCalString(self):
     return self.submission_date.strftime('%Y-%m-%d')
+  
+  def relDateToCalString(self):
+    if(self.release_date_precision == "year"):
+      return self.release_date.strftime("%Y")
+    elif(self.release_date_precision == "month"):
+      return self.release_date.strftime("%Y-%m")
+    elif(self.release_date_precision == "day"):
+      return self.release_date.strftime("%Y-%m-%d")
+    else:
+      return "Not Available"
 
   # Custom delete function to log the user action
   def delete(self, deleter=None, reason=None, *args, **kwargs):

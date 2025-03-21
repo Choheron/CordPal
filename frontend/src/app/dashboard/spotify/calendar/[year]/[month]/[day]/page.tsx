@@ -104,6 +104,7 @@ export default async function Page({
                 submitter={albumData("submitter")}
                 submitter_comment={albumData("submitter_comment")}
                 submission_date={albumData("submission_date")}
+                release_date={albumData("release_date")}
               />
             </Badge>
             <div className="flex justify-around mt-4">

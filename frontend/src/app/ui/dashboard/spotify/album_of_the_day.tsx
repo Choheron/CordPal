@@ -68,6 +68,7 @@ export default async function AlbumOfTheDayBox(props) {
           submitter={albumData("submitter")}
           submitter_comment={albumData("submitter_comment")}
           submission_date={albumData("submission_date")}
+          release_date={albumData("release_date")}
         />
         <AlbumReviewBox 
           album_id={albumData("album_id")}
