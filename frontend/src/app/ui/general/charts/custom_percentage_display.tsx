@@ -8,7 +8,9 @@ import { RiArrowUpFill } from "react-icons/ri"
 //  - underLabel: String - Label for data under the percentage
 //  - overColor:  Tailwind String - Color to use for the first half of the bar
 //  - overLabel: String - Label for data over the percentage
+//  - animated: Boolean - (Default True) Animate elements of this bar, for more visual flair
 export default function CustomPercentageDisplay(props) {
+  const animated = (props.animated) ? props.animated : true;
 
   return (
     <div className="w-full mb-8">
@@ -30,7 +32,7 @@ export default function CustomPercentageDisplay(props) {
           style={{ left: `${props.percentage}%` }}
         >
           <div className="w-fit -ml-[50%] text-sm" >
-            <RiArrowUpFill className="mx-auto"/>
+            <RiArrowUpFill className={`mx-auto ${(animated) ? "animate-bounce" : ""}`}/>
             <p className={`${(props.percentage > 95) ? "-ml-[95%]" : ((props.percentage < 5) ? "ml-[50%]" : "")}`}>
               <b>{props.percentage}%</b>
             </p>

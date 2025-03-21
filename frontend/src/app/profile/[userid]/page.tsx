@@ -1,3 +1,4 @@
+import { isMember } from "@/app/lib/discord_utils";
 import { getUserData, isUserOnline } from "@/app/lib/user_utils";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import ProfileUserDisplay from "@/app/ui/profile/profile_user_display";

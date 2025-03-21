@@ -11,6 +11,12 @@ import ReviewStatsUserCard from "./review_stats_user_card";
 import MinimalAlbumDisplay from "../minimal_album_display";
 import CreateOutageModal from "../modals/create_outage_modal";
 
+// `${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.
+//  ${(user['block_type'] == "OUTAGE") ? (user['admin_outage'] == "true") ? `This outage was placed by admins.` : `This is an outage placed by ${user['nickname']}.` : ""}
+//  ${(user['selection_blocked']) ? `Reason: "${user['reason']}".` : ""}
+//  ${(user['block_type'] == "OUTAGE") ? `This outage lasts until: ${user['outage_start']}` : ``}
+// `
+
 // GUI Display for an Album
 // Expected Props:
 //   - NONE YET
@@ -28,21 +34,23 @@ export default async function MusicStatsBox(props) {
           <UserCard
             userDiscordID={user['discord_id']}
             customDescription={(
-              <div className="flex">
-                <Tooltip 
-                  content={
-                    `${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.
-                     ${(user['block_type'] == "OUTAGE") ? (user['admin_outage'] == "true") ? `This outage was placed by admins.` : `This is an outage placed by ${user['nickname']}.` : ""}
-                     ${(user['selection_blocked']) ? `Reason: ${user['reason']}.` : ""}
-                     ${(user['block_type'] == "OUTAGE") ? `This outage lasts until: ${user['outage_start']}` : ``}
-                    `
-                  }
-                  className="max-w-[300px]"
-                >
-                  {(user['selection_blocked']) ? ((user['block_type'] == "OUTAGE") ? (<p>⛱️</p>) : (<p>&#9940;</p>)) : (<p>&#9989;</p>)}
-                </Tooltip>
-                <p>{user['selection_chance'].toFixed(2)}%</p>
-              </div>
+              <Tooltip 
+                content={
+                  <div className="flex flex-col">
+                    <p>{`${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.`}</p>
+                    {(user['block_type']) ? (<p><b>Block Type:</b> {user['block_type']}</p>) : <></>}
+                    {(user['selection_blocked']) ? (<p><b>Reason:</b> <i>{user['reason']}</i></p>) : <></>}
+                    <p>{`${(user['block_type'] == "OUTAGE") ? (user['admin_outage'] == "true") ? `Outage placed by admins.` : `Outage placed by ${user['nickname']}.` : ""}`}</p>
+                    <p>{(user['block_type'] == "OUTAGE") ? `This outage lasts until: ${user['outage_start']}` : ``}</p>
+                  </div>
+                }
+                className="max-w-[300px]"
+              >
+                <div className="flex">
+                  {(user['selection_blocked']) ? ((user['block_type'] == "OUTAGE") ? (<p>✖️</p>) : (<p>&#9940;</p>)) : (<p>&#9989;</p>)}
+                  <p>{user['selection_chance'].toFixed(2)}%</p>
+                </div>
+              </Tooltip>
             )}
             isProfileLink
           />

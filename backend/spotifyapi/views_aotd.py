@@ -192,6 +192,7 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
     checkSelectionFlag(user)
   # Get user (use request cookie if user is not passed in)
   user = (getSpotifyUser(request.session.get('discord_id')) if (user_discord_id=="") else (getSpotifyUser(user_discord_id)))
+  logger.info(f"Checking chance of AOTD selection for user: {user.nickname}")
   # Check if user's selections are currently blocked, return 0% chance
   if(SpotifyUserData.objects.get(user=user).selection_blocked_flag):
     return JsonResponse({'percentage': 0.00, 'block_type': "INACTIVITY", 'reason': "Inactivity, user has not reviewed in over three days."})
@@ -201,15 +202,19 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
   # Check if user is currently under an outage
   try:
     outage = UserAlbumOutage.objects.filter(user=user).get(start_date__lte=tomorrow, end_date__gte=tomorrow)
-    return JsonResponse({
-      'percentage': 0.00, 
-      'block_type': "OUTAGE", 
-      'reason': f"{outage.reason}", 
-      "admin_outage": f"{outage.admin_enacted}", 
-      "outage_start": {outage.start_date.strftime('%Y-%m-%d')},
-      "outage_end": {outage.end_date.strftime('%Y-%m-%d')}
-      })
-  except Exception as e:
+    logger.info(f"User {user.nickname} is currently under an outage, lasts until {outage.end_date.strftime('%Y-%m-%d')}!")
+    # Create outage return json
+    outageOut = {}
+    outageOut["target_user"] = outage.user.discord_id
+    outageOut["percentage"] = 0.00
+    outageOut["block_type"] = "OUTAGE"
+    outageOut["reason"] = f"{outage.reason}"
+    outageOut["admin_outage"] = f"{outage.admin_enacted}"
+    outageOut["outage_start"] = outage.start_date.strftime('%Y-%m-%d')
+    outageOut["outage_end"] = outage.end_date.strftime('%Y-%m-%d')
+    # Return outage object
+    return JsonResponse(outageOut)
+  except UserAlbumOutage.DoesNotExist as e:
     logger.info(f"User {user.nickname} is not currently under an outage. {e}")
   # Get Date a year ago to filter by
   one_year_ago = day - datetime.timedelta(days=365)
@@ -218,7 +223,7 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
   user_eligible_count = user_submissions_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=user).count())
   total_eligible_count = 0
   for spot_user in SpotifyUserData.objects.all():
-    if((spot_user.selection_blocked_flag) or (len(UserAlbumOutage.objects.filter(user=spot_user.user).filter(start_date__lte=tomorrow, end_date__gte=tomorrow)) > 0)):
+    if((spot_user.selection_blocked_flag) or ((len(UserAlbumOutage.objects.filter(user=spot_user.user).filter(start_date__lte=tomorrow, end_date__gte=tomorrow)) > 0))):
       continue
     temp_submission_count = Album.objects.filter(submitted_by=spot_user.user).count()
     temp_eligible_count = temp_submission_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=spot_user.user).count())
