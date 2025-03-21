@@ -31,7 +31,7 @@ export default function CustomPercentageDisplay(props) {
         >
           <div className="w-fit -ml-[50%] text-sm" >
             <RiArrowUpFill className="mx-auto"/>
-            <p className={`${(props.percentage > 90) ? "-ml-[95%]" : ((props.percentage < 10) ? "ml-[50%]" : "")}`}>
+            <p className={`${(props.percentage > 95) ? "-ml-[95%]" : ((props.percentage < 5) ? "ml-[50%]" : "")}`}>
               <b>{props.percentage}%</b>
             </p>
           </div>

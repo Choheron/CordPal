@@ -291,18 +291,30 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
       temp['rating'] = rating
       # Append out object to output
       out[aotd.dateToCalString()] = temp
+    # Convert submission numbers to array
+    subNumList = []
+    subNumObj = {}
+    for user in selection_counts.keys():
+      datesList = list(date for date in out.keys() if (out[date]['submitter'] == user))
+      tempObj = {
+        "discord_id": user, 
+        "count": selection_counts[user], 
+        "percent": ((selection_counts[user]/float(len(month_AOtD))) * 100), 
+        "selection_dates": datesList
+      }
+      subNumList.append(tempObj)
+      # Provide the above list as a object as well
+      subNumObj[user] = tempObj
     # Provide Statistics
     out['stats'] = {}
     # Attach lowest and highest album data
     out['stats']['lowest_aotd_date'] = lowest_aotd.dateToCalString()
     out['stats']['highest_aotd_date'] = highest_aotd.dateToCalString()
-    # Convert submission numbers to array
-    subNumList = []
-    for user in selection_counts.keys():
-      subNumList.append({"discord_id": user, "count": selection_counts[user], "percent": ((selection_counts[user]/float(len(month_AOtD))) * 100)})
     # Attach Submission Numbers
     out['stats']['selection_counts'] = subNumList
     out['stats']['selection_total'] = len(month_AOtD)
+    # Attach submission numbers object to out JSON 
+    out['stats']['user_stats'] = subNumObj
   # Return out object with timestamp
   out['timestamp'] = timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
   return JsonResponse(out)

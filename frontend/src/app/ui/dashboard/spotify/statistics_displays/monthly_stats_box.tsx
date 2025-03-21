@@ -71,7 +71,7 @@ export default async function MonthlyStatsBox(props) {
         year={year}
         reviewData={reviewData}
         subData={subData}
-        aotdStats={aotdStats}
+        aotdData={aotdData}
       />
   </>
   )
