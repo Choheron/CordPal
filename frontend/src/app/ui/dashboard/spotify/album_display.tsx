@@ -22,6 +22,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - submitter_comment: String - (Optional) An optional comment that the album submitter may have left with this album
 //  - submission_date: String - (Optional) A String representation of the submission date of the Album
 //  - release_date: String - (Optional) A String representation of the release date of the Album
+//  - release_date_precision: String - (Optional) Preciseness of release date string. Must be "year", "month" or "day". Defaults to "day"
 //  - album_spotify_id: String - (Optional) Album Spotify ID for retrieval of average from database
 //  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
 //  - showAlbumRating: Boolean - (Optional) [DEFAULT TRUE] Show the average user rating for the album
@@ -41,6 +42,7 @@ export default async function AlbumDisplay(props) {
   const submitter_comment = (props.submitter_comment) ? props.submitter_comment : "No Comment Provided";
   const submission_date: string = (props.submission_date) ? props.submission_date : "Not Provided";
   const release_date: string = (props.release_date) ? props.release_date : "Unknown";
+  const release_date_precision: string = (props.release_date_precision) ? props.release_date_precision : "day";
   // Rating props check
   const avg_rating = (props.album_spotify_id && showAlbumRating) ? await getAlbumAvgRating(props.album_spotify_id, false): 0.0;
   // Historical props checks
@@ -67,17 +69,17 @@ export default async function AlbumDisplay(props) {
           <a href={album_url} target="_noreferrer" className="text-xl lg:text-3xl hover:underline">
             <b>{title}</b>
           </a>
-          <a href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline italic -mt-2">
+          <a href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline italic -mt-1">
             {artist_name}
           </a>
           <Conditional showWhen={release_date != "Unknown"}>
-            <div className="flex text-sm -mt-2">
-              <p>Released:</p>
+            <div className="text-xs lg:text-sm lg:-mt-2">
               <ClientTimestamp 
-                className="pl-1" 
+                className="" 
                 timestamp={release_date} 
                 full={false} 
                 maintainUTC={true}
+                datePrecision={release_date_precision}
               />
             </div>
           </Conditional>

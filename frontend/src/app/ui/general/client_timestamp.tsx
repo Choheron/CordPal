@@ -8,8 +8,10 @@ import { generateDateFromUTCString, zeroPad, formatDateString } from "@/app/lib/
 //  - className: String - classname to pass to p block
 //  - full: Boolean - return full timestamp or shortened one
 //  - maintainUTC: Boolean - Dont convert to local timestamp (Default False)
+//  - datePrecision: String - Date precision, will be overwritten if "full" prop is true, defaults to "day"
 export default function ClientTimestamp(props) {
   const full = (props.full) ? props.full : false;
+  const datePrecision = (props.datePrecision) ? props.datePrecision : "day";
   var utcDate = new Date()
   try {
     utcDate = generateDateFromUTCString(props.timestamp)
@@ -39,7 +41,21 @@ export default function ClientTimestamp(props) {
     return `${splitString[0]} ${zeroPad(splitString[1],2)} ${zeroPad(splitString[2],2)}` + ((full) ? ` ${zeroPad(hours,2)}:${zeroPad(adjustedDate.getMinutes(),2)}:${zeroPad(adjustedDate.getSeconds(),2)} ${suffix}` : "")
   }
 
+  function applyPrecision(formattedString, precision = "day") {
+    const splitString = formattedString.split(" ")
+
+    if(precision == "day" || full) {
+      return formattedString
+    } else if(precision == "month") {
+      return `${splitString[0]} ${zeroPad(splitString[2],2)}`
+    } else if(precision == "year") {
+      return `${zeroPad(splitString[2],2)}`
+    } else {
+      return formattedString
+    }
+  }
+
   return (
-    <p className={props.className}>{adjustedTimestamp}</p>
+    <p className={props.className}>{applyPrecision(adjustedTimestamp, datePrecision)}</p>
   );
 }

@@ -152,6 +152,19 @@ def submitAlbum(request: HttpRequest):
   except ObjectDoesNotExist as e:
     # Get user from database
     user = getSpotifyUser(request.session.get('discord_id'))
+    # Get precision data
+    release_date = None
+    raw_release_date = reqBody['album']['release_date']
+    raw_release_precision = reqBody['album']['release_date_precision']
+    # Parse date from release date based on precision
+    if(raw_release_precision == "year"):
+      release_date = datetime.datetime.strptime(raw_release_date, "%Y")
+    elif(raw_release_precision == "month"):
+      release_date = datetime.datetime.strptime(raw_release_date, "%Y-%m")
+    elif(raw_release_precision == "day"):
+      release_date = datetime.datetime.strptime(raw_release_date, "%Y-%m-%d")
+    else:
+      release_date = None
     # Declare new album object
     newAlbum = Album(
       spotify_id=reqBody['album']['id'],
@@ -162,6 +175,8 @@ def submitAlbum(request: HttpRequest):
       spotify_url=reqBody['album']['external_urls']['spotify'],
       submitted_by=user,
       user_comment=(reqBody['user_comment'] if reqBody['user_comment'] != "" else "No Comment Provided"),
+      release_date=release_date,
+      release_date_precision=raw_release_precision,
       raw_data=reqBody,
     )
     # Save new album data
