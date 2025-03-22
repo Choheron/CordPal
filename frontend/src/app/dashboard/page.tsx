@@ -5,7 +5,6 @@ import { isMember, getDiscordUserData } from "../lib/discord_utils";
 import { getAllOnlineData, getUserData, getUserList, getUsersByTimezone } from "../lib/user_utils";
 import PageTitle from "../ui/dashboard/page_title";
 import LiveOnlineUsersBox from "../ui/dashboard/live_online_users_box";
-import CurrentTime from "../ui/general/current_time";
 import AlbumDisplay from "../ui/dashboard/spotify/album_display";
 import { getAlbumOfTheDayData } from "../lib/spotify_utils";
 import AllTimezonesBlock from "../ui/dashboard/allTimezonesBlock";
@@ -50,6 +49,8 @@ export default async function Page() {
             submitter={albumData("submitter")}
             submitter_comment={albumData("submitter_comment")}
             submission_date={albumData("submission_date")}
+            release_date={albumData("release_date")}
+            release_date_precision={albumData("release_date_precision")}
             member_status={memberStatus}
           />
         </div>

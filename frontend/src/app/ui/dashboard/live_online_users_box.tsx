@@ -40,6 +40,29 @@ export default function OnlineUsersBox(props) {
     setLoading(Object.keys(onlineObject).length == 0)
   }, [onlineObject])
 
+  // Custom sort method for users
+  function userSort(a, b) {
+    let sum = 0
+
+    // Online users 
+    if(a["online"] == "true") {
+      sum -= 2
+    }
+    if(b["online"] == "true") {
+      sum -= 2
+    }
+    // Away Users
+    if(a["status"] == "Away") {
+      sum -= 1
+    }
+    if(b["status"] == "Away") {
+      sum -= 1
+    }
+    (a['last_request_timestamp'] < b['last_request_timestamp']) ? sum += 1 : sum -= 1;
+
+    return sum
+  }
+
 
   return(
     <div className="flex flex-row px-2 py-2 min-w-[225px] items-center border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
@@ -51,7 +74,7 @@ export default function OnlineUsersBox(props) {
           { (loading) ? (
             <Spinner className="w-full h-full" />
           ):(
-              userList.sort((a, b) => (onlineObject[a['discord_id']]['last_request_timestamp'] < onlineObject[b['discord_id']]['last_request_timestamp']) ? 1 : -1).map((userObj, index) => {
+              userList.sort((a, b) => userSort(a, b)).map((userObj, index) => {
                 const discord_id = userObj['discord_id']
                 return (
                   <a 
