@@ -142,6 +142,7 @@ def checkPreviousAuthorization(request: HttpRequest):
     # Get user instance and data
     user = User.objects.get(discord_id = request.session.get('discord_id'))
     tokenData = DiscordTokens.objects.get(user = user)
+    refreshDiscordProfilePic(request)
     return True
   except DiscordTokens.DoesNotExist as e:
     return False
