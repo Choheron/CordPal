@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { heartbeat } from "../lib/user_utils";
+import { redirect } from "next/navigation";
 
 // Makes a POST request to the backend heartbeat endpoint every 30 seconds to maintain online status
 export default function Heartbeat(props) {
@@ -13,7 +14,10 @@ export default function Heartbeat(props) {
       try {
         if(isMounted) {
           const time = new Date()
-          await heartbeat(new Intl.DateTimeFormat().resolvedOptions().timeZone);
+          const result: any = await heartbeat(new Intl.DateTimeFormat().resolvedOptions().timeZone);
+          if(result['status'] == 302) {
+            redirect("/")
+          }
         }
       } catch(error) {
         console.error("Heartbeat failed:", error);

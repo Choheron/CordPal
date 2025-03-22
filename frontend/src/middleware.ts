@@ -13,7 +13,11 @@ function checkNonUserAccess(request: NextRequest) {
 export async function middleware(request: NextRequest) {
   console.log("MIDDLEWARE: Running for Path: " + request.nextUrl.pathname)
   // Check if user is authorized, if not, redirect to login
-  if(!(await verifyAuth())) {
+  try {
+    if(!(await verifyAuth())) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  } catch {
     return NextResponse.redirect(new URL('/', request.url));
   }
   // If this is a heartbeat call, skip it

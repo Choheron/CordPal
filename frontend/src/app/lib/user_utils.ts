@@ -270,7 +270,7 @@ export async function heartbeat(timezoneStr: string = "") {
   if(sessionCookie === "") {
     return false;
   }
-  const userOnlineResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/heartbeat`, {
+  const heartbeatResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/heartbeat`, {
     method: "POST",
     credentials: "include",
     cache: 'no-cache',
@@ -280,4 +280,7 @@ export async function heartbeat(timezoneStr: string = "") {
     },
     body: JSON.stringify({"heartbeat": {'timezone': timezoneStr}})
   });
+  const heartbeatStatus = await heartbeatResponse.status;
+  const heartbeatMessage = await heartbeatResponse.text();
+  return {"status": heartbeatStatus, "body": heartbeatMessage}
 }

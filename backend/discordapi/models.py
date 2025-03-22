@@ -19,3 +19,12 @@ class DiscordTokens(models.Model):
   expiry_date = models.DateTimeField(null = True)
   refresh_token = models.CharField(null=True, max_length=512)
   scope = models.CharField(null=True, max_length=512)
+
+  # Clear token data
+  def clearTokens(self):
+    self.access_token = None
+    self.token_type = None
+    self.expiry_date = None
+    self.refresh_token = None
+    self.scope = None
+    self.save()

@@ -31,7 +31,7 @@ def storeDiscordTokenInDatabase(request: HttpRequest, token_data: json):
       # Update token data
       tokenData.access_token = (token_data['access_token'])
       tokenData.token_type = (token_data['token_type'])
-      tokenData.expiry_date = (timezone.now() + datetime.timedelta(seconds=token_data['expires_in']))
+      tokenData.expiry_date = (datetime.datetime.now() + datetime.timedelta(seconds=token_data['expires_in']))
       tokenData.refresh_token = (token_data['refresh_token'])
       tokenData.scope = (token_data['scope'])
     except ObjectDoesNotExist as e:
@@ -41,7 +41,7 @@ def storeDiscordTokenInDatabase(request: HttpRequest, token_data: json):
         user = user,
         access_token = (token_data['access_token']),
         token_type = (token_data['token_type']),
-        expiry_date = (timezone.now() + datetime.timedelta(seconds=token_data['expires_in'])),
+        expiry_date = (datetime.datetime.now() + datetime.timedelta(seconds=token_data['expires_in'])),
         refresh_token = (token_data['refresh_token']),
         scope = (token_data['scope'])
       )
@@ -99,8 +99,13 @@ def refreshDiscordToken(request: HttpRequest):
 
 
 def refreshDiscordProfilePic(request: HttpRequest):
-  # Check if user profile photo is still accurate, if not update data
-  user = User.objects.get(discord_id=request.session['discord_id'])
+  try:
+    # Check if user profile photo is still accurate, if not update data
+    user = User.objects.get(discord_id=request.session['discord_id'])
+    # Get user token data from DB
+    tokenData = DiscordTokens.objects.get(user = user)
+  except Exception as e:
+    return False
   # Call avatar url
   avatar_res = requests.get(user.get_avatar_url())
   # If 404, refresh avatar data
@@ -111,7 +116,7 @@ def refreshDiscordProfilePic(request: HttpRequest):
       refreshDiscordToken(request)
     # Prep request data and headers to discord api
     reqHeaders = { 
-      'Authorization': f"{request.session['discord_token_type']} {request.session['discord_access_token']}"
+      'Authorization': f"{tokenData.token_type} {tokenData.access_token}"
     }
     # Send Request to API
     logger.info("Making request to discord api...")
@@ -138,6 +143,6 @@ def checkPreviousAuthorization(request: HttpRequest):
     user = User.objects.get(discord_id = request.session.get('discord_id'))
     tokenData = DiscordTokens.objects.get(user = user)
     return True
-  except ObjectDoesNotExist as e:
+  except DiscordTokens.DoesNotExist as e:
     return False
 

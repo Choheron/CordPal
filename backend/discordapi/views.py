@@ -145,7 +145,14 @@ def validateServerMember(request: HttpRequest):
   # Cookie datetime format
   cookie_time_fmt = "%d/%m/%y %H:%M:%S"
   # Retrieve user token data
-  tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get("discord_id"))
+  try:
+    tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get("discord_id"))
+  except DiscordTokens.DoesNotExist as e:
+    logger.error("Discord token does not exist for this user, will need to revalidate.")
+    out = {}
+    out['member'] = False
+    out['role'] = False
+    return JsonResponse(out)
   # Ensure user is logged in
   if(isDiscordTokenExpired(request)):
     refreshDiscordToken(request)
@@ -189,7 +196,7 @@ def validateServerMember(request: HttpRequest):
   out['member'] = member
   out['role'] = hasRole
   # Return response
-  response =JsonResponse(out)
+  response = JsonResponse(out)
   return response
 
 
@@ -206,6 +213,11 @@ def checkIfPrevAuth(request: HttpRequest):
   # Check if session is still valid
   validSession = (request.session.get_expiry_age() != 0)
   logger.info(f"Valid Session After Expiry Check: {validSession}")
+  # If session is invalid, return false
+  if(not validSession):
+    out = {}
+    out['valid'] = validSession
+    return JsonResponse(out)
   # Check if user sessionid token is valid
   logger.info("Ensuring sessionid is valid...")
   # Set output var if session exists
@@ -234,6 +246,8 @@ def revokeDiscordToken(request: HttpRequest):
   # Ensure user is logged in
   if(isDiscordTokenExpired(request)):
     refreshDiscordToken(request)
+  # Get token data from session
+  tokenData = DiscordTokens.objects.get(user = request.session.get('discord_id'))
   # Prep request data and headers to discord api
   reqHeaders = { 
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -241,7 +255,7 @@ def revokeDiscordToken(request: HttpRequest):
   reqData = {
     'client_id': os.getenv('DISCORD_CLIENT_ID'),
     'client_secret': os.getenv('DISCORD_CLIENT_SECRET'),
-    'token': request.session['discord_access_token']
+    'token': tokenData.access_token
   }
   # Make API request to discord to revoke user token
   logger.info("Making token revoke request to discord api...")
@@ -252,6 +266,8 @@ def revokeDiscordToken(request: HttpRequest):
       discordRes.raise_for_status()
   except:
     return HttpResponse(status=500)
+  # Delete key data from database
+  tokenData.clearTokens()
   # Clear session data
   logger.info("Flushing session...")
   request.session.flush()
