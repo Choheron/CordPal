@@ -16,7 +16,8 @@ from .models import (
   SpotifyUserData,
   Album,
   Review,
-  DailyAlbum
+  DailyAlbum,
+  UserAlbumOutage
 )
 
 from users.utils import (
@@ -211,6 +212,17 @@ def albumToDict(album: Album):
 # NOTE: This works on the idea that at midnight of the next day the user will be blocked, this is so it can be seen earlier on the website when that happens
 #       so a user is marked as blocked from selection if there will have been three days since their last review at the upcoming midnight.
 def checkSelectionFlag(spotify_user: SpotifyUserData):
+  # Get user
+  user = spotify_user.user
+  # Get tomorrow date
+  tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+  # Check if user is going to be under an outage
+  try:
+    outage = UserAlbumOutage.objects.filter(start_date__lte=tomorrow, end_date__gte=tomorrow).get(user = user)
+    logger.info(f"User {user.nickname} is under an outage until {outage.end_date.strftime('%m/%d/%Y')}")
+    return
+  except UserAlbumOutage.DoesNotExist as e:
+    logger.debug(f"User {user.nickname} is not under an outage")
   # Get the next midnight, then subtract 3 days to determine validity of user
   three_days_ago = (now().date() + timedelta(days=1)) - timedelta(days=3)
   # Get list of reviews from the past 3 days
