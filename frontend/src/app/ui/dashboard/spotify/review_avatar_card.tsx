@@ -63,6 +63,7 @@ export default async function ReviewAvatarCard(props) {
       <Popover 
         placement="bottom" 
         showArrow={true}
+        shouldCloseOnScroll={false}
       >
         <PopoverTrigger>
           <div>
