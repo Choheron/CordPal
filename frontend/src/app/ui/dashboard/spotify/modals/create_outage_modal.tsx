@@ -8,7 +8,7 @@ import {
   ModalFooter,
   useDisclosure
 } from "@heroui/modal";
-import { Button, Divider, RangeCalendar, Spinner } from "@heroui/react";
+import { addToast, Button, Divider, RangeCalendar, Spinner } from "@heroui/react";
 import {
   today, 
   getLocalTimeZone, 
@@ -89,6 +89,12 @@ export default function CreateOutageModal(props) {
     if((responseObj['status'] != 200)) {
       setProcessing(false)
     } else {
+      // Alert User of success
+      addToast({
+        title: `Successfully submitted outage for: ${outageBody.start_date} -> ${outageBody.end_date}!`,
+        description: `The requested outage has been sucessfully recorded on the backend. Outage Reason: ${outageBody.reason}`,
+        color: "success",
+      })
       // Call cancel functionality to clear systems
       cancelPress()
     }

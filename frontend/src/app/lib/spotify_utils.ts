@@ -216,6 +216,8 @@ export async function submitAlbumToBackend(albumObject) {
   });
   // Revalidate requests to see recent submissions
   revalidateTag('album_submissions')
+  // Return Status
+  return submitAlbumResponse.status
 }
 
 

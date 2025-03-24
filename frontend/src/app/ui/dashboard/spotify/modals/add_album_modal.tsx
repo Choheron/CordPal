@@ -8,7 +8,7 @@ import {
   ModalFooter,
   useDisclosure
 } from "@heroui/modal";
-import { Button, Divider, Link, select } from "@heroui/react";
+import { addToast, Button, Divider, Link, select } from "@heroui/react";
 import {Input} from "@heroui/react";
 import {Textarea} from "@heroui/input";
 import React from "react";
@@ -49,13 +49,16 @@ export default function AddAlbumModal(props) {
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
 
-   // UseEffect to check if a user is allowed to submit albums
-   React.useEffect(() => {
-    const getUserSubmissionValidity = async () => {
-      const canSubmitObj: {} = await checkIfUserCanSubmit();
-      setUserAllowedToSubmit(canSubmitObj['canSubmit']);
-      setUserAllowedToSubmitMessage(canSubmitObj['reason']);
-    }
+  // Check if the user is allowed to submit
+  // Moved outside of useEffect to allow function to be called externally 
+  const getUserSubmissionValidity = async () => {
+    const canSubmitObj: {} = await checkIfUserCanSubmit();
+    setUserAllowedToSubmit(canSubmitObj['canSubmit']);
+    setUserAllowedToSubmitMessage(canSubmitObj['reason']);
+  }
+
+  // UseEffect to check if a user is allowed to submit albums
+  React.useEffect(() => {
     getUserSubmissionValidity()
   }, [])
 
@@ -142,13 +145,29 @@ export default function AddAlbumModal(props) {
 
 
   // Send request to upload the submitted image
-  const submitPress = () => {
+  const submitPress = async () => {
     // Create payload to send data to backend
     let albumData = {}
     albumData['user_comment'] = commentValue
     albumData['album'] = selectedAlbum
     // Call backend to submit album
-    submitAlbumToBackend(albumData)
+    const status = await submitAlbumToBackend(albumData)
+    // Alert user of action status
+    if((status == 200) && (selectedAlbum != null)) {
+      addToast({
+        title: `Successfully submitted "${selectedAlbum['name']}"!`,
+        description: `${selectedAlbum['name']} has been added to the Album of the Day Selecton Pool!`,
+        color: "success",
+      })
+    } else {
+      addToast({
+        title: `Failed to submit album!`,
+        description: `Album failiure submitted with the following error code: ${status}. Please contact server administrators.`,
+        color: "danger",
+      })
+    }
+    // Check user submission validity
+    getUserSubmissionValidity()
     // Call cancel functionality to clear systems
     cancelPress()
   }
@@ -166,8 +185,6 @@ export default function AddAlbumModal(props) {
     setAlbumError(false)
     
     onClose()
-    // Reload page
-    location.reload()
   }
   
   return (

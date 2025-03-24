@@ -8,7 +8,7 @@ import {
   ModalFooter,
   useDisclosure
 } from "@heroui/modal";
-import { Button, Spinner, Checkbox, Tooltip, Textarea } from "@heroui/react";
+import { Button, Spinner, Checkbox, Tooltip, Textarea, addToast } from "@heroui/react";
 import React from "react";
 import { RiDeleteBin2Line, RiErrorWarningFill } from "react-icons/ri";
 import { Conditional } from "../../dashboard/conditional";
@@ -60,6 +60,11 @@ export default function DeleteModal(props) {
     if(redirectText) {
       // Redirect user to AOtD Page after successful delete
       router.push(redirectText)
+      addToast({
+        title: "Deletion Complete!",
+        description: `Successfully completed delete action for "${titleText}"`,
+        color: "success",
+      })
     } else {
       handleCancel()
     }

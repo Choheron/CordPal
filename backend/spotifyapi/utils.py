@@ -203,6 +203,8 @@ def albumToDict(album: Album):
   albumObj['submitter'] = album.submitted_by.nickname
   albumObj['submitter_id'] = album.submitted_by.discord_id
   albumObj['submission_date'] = album.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+  albumObj['release_date'] = album.release_date.strftime("%m/%d/%Y, %H:%M:%S")
+  albumObj['release_date_precision'] = album.release_date_precision
   albumObj['user_comment'] = album.user_comment
   albumObj['raw_album'] = album.raw_data
   return albumObj

@@ -148,7 +148,7 @@ def submitAlbum(request: HttpRequest):
     albumObject = Album.objects.get(spotify_id = reqBody['album']['id'])
     if(albumObject):
       logger.info(f"Album already exists, name: {albumObject.title}!")
-    return HttpResponse(400)
+    return HttpResponse(status=400)
   except ObjectDoesNotExist as e:
     # Get user from database
     user = getSpotifyUser(request.session.get('discord_id'))
@@ -181,7 +181,7 @@ def submitAlbum(request: HttpRequest):
     )
     # Save new album data
     newAlbum.save()
-    return HttpResponse(200)
+    return HttpResponse(status=200)
 
 
 ###

@@ -5,6 +5,8 @@ from django.utils import timezone
 
 from users.models import User
 
+import json
+
 logger = logging.getLogger(__name__)
 
 # Model for spotify data that corresponds to a user
@@ -85,6 +87,7 @@ class Album(models.Model):
   def delete(self, deleter=None, reason=None, *args, **kwargs):
     # Log the action before actually deleting
     from users.models import UserAction  # Import inside to avoid circular import
+    from spotifyapi.utils import albumToDict
 
     # If deleter is not provided, log critical log and do not delete album
     if( deleter == None):
@@ -96,7 +99,7 @@ class Album(models.Model):
       action_type="DELETE",
       entity_type="ALBUM",
       entity_id=self.id,
-      details={"reason": reason, "deleted_album": self.title, "album_raw_data": model_to_dict(self) }
+      details={"reason": reason, "deleted_album": self.title, "album_raw_data": albumToDict(self) }
     )
     # Call Django's default delete method
     super().delete(*args, **kwargs)
@@ -237,7 +240,7 @@ class UserAlbumOutage(models.Model):
       action_type="DELETE",
       entity_type="ALBUM_SELECTION_OUTAGE",
       entity_id=self.pk,
-      details={"delete_reason": delete_reason, "deleted_outage": self.pk, "outage_raw_data": model_to_dict(self) }
+      details={"delete_reason": delete_reason, "deleted_outage": self.pk, "outage_raw_data": json.dumps(model_to_dict(self)) }
     )
     # Call Django's default delete method
     super().delete(*args, **kwargs)
