@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { getSpotifyTopItems } from "@/app/lib/spotify_utils";
 import { Conditional } from "../conditional";
-import {Spinner} from "@nextui-org/spinner";
+import {Spinner} from "@heroui/spinner";
 
 
 // Gui Column mapping passed in song data and displaying the passed in title

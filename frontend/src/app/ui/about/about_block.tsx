@@ -1,7 +1,7 @@
 import { Conditional } from "../dashboard/conditional";
 import Image from 'next/image';
 import AboutAccordion from "./about_accordion";
-import { Divider } from "@nextui-org/divider";
+import { Divider } from "@heroui/divider";
 
 
 // Display an about page

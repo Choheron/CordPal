@@ -2,7 +2,7 @@
 
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import MinimalAlbumDisplay from "../../minimal_album_display";
-import { Badge, Divider } from "@nextui-org/react";
+import { Badge, Divider } from "@heroui/react";
 
 // Display the highest and lowest album stats for a month, should only be called with the following props (to properly work)
 // Expected Props:

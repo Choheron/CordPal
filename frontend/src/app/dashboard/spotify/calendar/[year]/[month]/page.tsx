@@ -1,10 +1,12 @@
+"use server"
+
 import { getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/app/lib/spotify_utils"
 import { daysInMonth, monthToName, padNumber } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import MinimalAlbumDisplay from "@/app/ui/dashboard/spotify/minimal_album_display"
 import MonthlyStatsBox from "@/app/ui/dashboard/spotify/statistics_displays/monthly_stats_box"
-import { Button, Tooltip } from "@nextui-org/react"
+import { Button, Tooltip } from "@heroui/react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { RiArrowLeftCircleLine, RiArrowRightCircleLine, RiThumbDownFill, RiThumbUpFill, RiVipCrownFill } from "react-icons/ri"

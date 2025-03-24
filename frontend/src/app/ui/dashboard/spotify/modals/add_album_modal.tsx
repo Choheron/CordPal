@@ -7,13 +7,13 @@ import {
   ModalBody, 
   ModalFooter,
   useDisclosure
-} from "@nextui-org/modal";
-import { Button, Divider, Link, select } from "@nextui-org/react";
-import {Input} from "@nextui-org/react";
-import {Textarea} from "@nextui-org/input";
+} from "@heroui/modal";
+import { Button, Divider, Link, select } from "@heroui/react";
+import {Input} from "@heroui/react";
+import {Textarea} from "@heroui/input";
 import React from "react";
 import { useRouter } from 'next/navigation';
-import { Listbox,  ListboxItem} from "@nextui-org/listbox";
+import { Listbox,  ListboxItem} from "@heroui/listbox";
 
 import { checkIfAlbumAlreadyExists, checkIfUserCanSubmit, spotifySearch, submitAlbumToBackend } from "@/app/lib/spotify_utils";
 import { Conditional } from "../../conditional";

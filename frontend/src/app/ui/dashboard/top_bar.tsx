@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { Conditional } from "./conditional";
 import { usePathname } from 'next/navigation';
-import {Divider} from "@nextui-org/divider";
-import {User} from "@nextui-org/user";
+import {Divider} from "@heroui/divider";
+import {User} from "@heroui/user";
 
 import clsx from 'clsx';
 

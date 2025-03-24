@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Button, Tooltip } from "@nextui-org/react";
-import { Textarea } from "@nextui-org/input";
+import { Button, Tooltip } from "@heroui/react";
+import { Textarea } from "@heroui/input";
 import ReviewTipTap from "../../general/input/Tiptap";
-import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@nextui-org/react";
+import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@heroui/react";
 import { submitReviewToBackend } from "@/app/lib/spotify_utils";
 import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 

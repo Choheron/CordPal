@@ -1,7 +1,7 @@
 'use server'
 
 import Image from "next/image"
-import {Divider} from "@nextui-org/divider";
+import {Divider} from "@heroui/divider";
 
 export default async function SpotifyLoginBox(props) {
 

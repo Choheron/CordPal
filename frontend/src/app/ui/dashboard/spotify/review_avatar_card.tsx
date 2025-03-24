@@ -1,6 +1,6 @@
 "use server"
 
-import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
+import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
 
 import StarRating from "../../general/star_rating";
 import UserCard from "../../general/userUiItems/user_card";
@@ -8,7 +8,7 @@ import UserCard from "../../general/userUiItems/user_card";
 import { getTenorGifData } from "@/app/lib/spotify_utils";
 import ClientTimestamp from "../../general/client_timestamp";
 import { Conditional } from "../conditional";
-import { ScrollShadow } from "@nextui-org/react";
+import { ScrollShadow } from "@heroui/react";
 
 // GUI Display for a single review as a popover/avatar combo
 // Expected Props:
@@ -60,7 +60,10 @@ export default async function ReviewAvatarCard(props) {
 
   return (
     <div className="mx-auto" key={props.index}>
-      <Popover placement="bottom" showArrow={true}>
+      <Popover 
+        placement="bottom" 
+        showArrow={true}
+      >
         <PopoverTrigger>
           <div>
             <UserCard

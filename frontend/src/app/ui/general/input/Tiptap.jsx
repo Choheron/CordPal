@@ -4,7 +4,6 @@ import { Color } from '@tiptap/extension-color'
 import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
 import Youtube from '@tiptap/extension-youtube'
-import Link from '@tiptap/extension-link'
 import { EditorProvider, useCurrentEditor, Extension } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { useEffect, useState } from 'react'
@@ -14,8 +13,8 @@ import {
   RiListOrdered2, RiListUnordered, RiPageSeparator, RiParagraph, 
   RiQuoteText, RiSeparator, RiStrikethrough 
 } from 'react-icons/ri'
-import { getTenorGifData } from '@/app/lib/spotify_utils'
 import { SmilieReplacer } from './replacers/smilie_replacer'
+import EmojiMartButton from './emoji_mart_popover'
 
 // TipTap Rich editor box
 export default function ReviewTipTap(props) {
@@ -236,14 +235,38 @@ export default function ReviewTipTap(props) {
   ]
 
   // =============================================================================================================================
+  // EXTENSIONS
+  // =============================================================================================================================
+  
+  const EmojiPicker = () => {
+    const { editor } = useCurrentEditor()
+
+    const addEmoji = (emojiObj) => {
+      if (!editor) return
+      // Set editor to content + new emoji
+      // setContent(content + `${emojiObj.native}`)
+      editor.commands.insertContent(`${emojiObj.native}`)
+    }
+
+    return (
+      <div className="absolute -bottom-5 -right-2">
+        <EmojiMartButton 
+          selectionCallback={addEmoji}
+        />
+      </div>
+    )
+  }
+
+  // =============================================================================================================================
   // RETURN STATEMENT
   // =============================================================================================================================
 
   return (
     <>
-      <div className="mt-3 p-2 rounded-2xl border border-neutral-800">
+      <div className="relative mt-3 p-2 rounded-2xl border border-neutral-800">
         <EditorProvider 
           slotBefore={<MenuBar />}
+          slotAfter={<EmojiPicker />}
           extensions={extensions} 
           content={content}
           onUpdate={({ editor }) => {
@@ -256,6 +279,7 @@ export default function ReviewTipTap(props) {
             }}
           }
         ></EditorProvider>
+        
       </div>
     </>
   )

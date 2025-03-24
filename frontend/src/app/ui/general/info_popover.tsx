@@ -1,5 +1,5 @@
 
-import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
+import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
 
 // Popover to display information over text
 // Expected Props:

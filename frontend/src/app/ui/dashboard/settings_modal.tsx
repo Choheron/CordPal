@@ -5,10 +5,10 @@ import {
   ModalBody, 
   ModalFooter,
   useDisclosure
-} from "@nextui-org/modal";
-import {User} from "@nextui-org/user";
-import { Button } from "@nextui-org/react";
-import {Input} from "@nextui-org/react";
+} from "@heroui/modal";
+import {User} from "@heroui/user";
+import { Button } from "@heroui/react";
+import {Input} from "@heroui/react";
 import React from "react";
 import { useRouter } from 'next/navigation';
 

@@ -1,6 +1,6 @@
 "use server"
 
-import { Button, Divider } from "@nextui-org/react";
+import { Button, Divider } from "@heroui/react";
 
 import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";

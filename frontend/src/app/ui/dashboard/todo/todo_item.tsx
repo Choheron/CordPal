@@ -3,8 +3,8 @@
 import React from "react";
 import { useRouter } from 'next/navigation';
 
-import {Accordion, AccordionItem} from "@nextui-org/react";
-import {Select, SelectItem} from "@nextui-org/react";
+import {Accordion, AccordionItem} from "@heroui/react";
+import {Select, SelectItem} from "@heroui/react";
 import clsx from "clsx";
 import { Conditional } from "../conditional";
 import { updateToDoItem } from "@/app/lib/todo_uils";

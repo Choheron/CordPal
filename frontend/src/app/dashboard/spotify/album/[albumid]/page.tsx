@@ -8,7 +8,7 @@ import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/spotify/album_display"
 import ReviewDisplay from "@/app/ui/dashboard/spotify/review_display"
 import DeleteModal from "@/app/ui/general/modals/delete_modal"
-import { Badge, Button, Divider, Tooltip } from "@nextui-org/react"
+import { Badge, Button, Divider, Tooltip } from "@heroui/react"
 import Link from "next/link"
 
 // Page to display data for a specific album

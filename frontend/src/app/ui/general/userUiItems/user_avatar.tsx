@@ -1,9 +1,9 @@
 'use server'
 
-import {User} from "@nextui-org/user";
+import {User} from "@heroui/user";
 
 import { getUserData, getUserAvatarURL, isUserOnline } from "@/app/lib/user_utils";
-import { Avatar, Badge } from "@nextui-org/react";
+import { Avatar, Badge } from "@heroui/react";
 import { onlineStatusToTailwindBgColor } from "@/app/lib/utils";
 
 // GUI Representation for a single user

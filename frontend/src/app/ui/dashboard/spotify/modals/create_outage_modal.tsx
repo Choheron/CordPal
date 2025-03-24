@@ -7,16 +7,16 @@ import {
   ModalBody, 
   ModalFooter,
   useDisclosure
-} from "@nextui-org/modal";
-import { Button, Divider, RangeCalendar, Spinner } from "@nextui-org/react";
+} from "@heroui/modal";
+import { Button, Divider, RangeCalendar, Spinner } from "@heroui/react";
 import {
   today, 
   getLocalTimeZone, 
   parseDate, 
   DateDuration
 } from "@internationalized/date";
-import {Input} from "@nextui-org/react";
-import {Textarea} from "@nextui-org/input";
+import {Input} from "@heroui/react";
+import {Textarea} from "@heroui/input";
 
 import { Conditional } from "../../conditional";
 import { useEffect, useState } from "react";

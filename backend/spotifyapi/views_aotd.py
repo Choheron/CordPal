@@ -103,15 +103,17 @@ def setAlbumOfDay(request: HttpRequest):
   logger.warning(f"Blocked Users: {blocked_users}")
   # Get set of all eligible albums
   albumPool = Album.objects.all().exclude(submitted_by__discord_id__in=blocked_users).exclude(submitted_by__discord_id__in=outage_users)
-  print(len(albumPool))
-  if(len(albumPool) < 1):
-    logger.error(f"WARNING! NO ELIGIBLE ALBUMS FOR SELECTION! NO ALBUM WILL BE SELECTED")
-    return HttpResponse(f'No albums eligible for selection!', status=404)
   while(not selected):
+    # If no eligible albums, error out..
+    if(len(albumPool) == 0):
+      logger.error(f"WARNING! NO ELIGIBLE ALBUMS FOR SELECTION! NO ALBUM WILL BE SELECTED")
+      return HttpResponse(f'No albums eligible for selection!', status=404)
     # Filter out blocked users albums
     tempAlbum = random.choice(albumPool)
+    logger.info(f"Temp album selected: {tempAlbum.title}")
     try:
       albumCheck = DailyAlbum.objects.filter(date__gte=one_year_ago).get(album=tempAlbum)
+      albumPool = albumPool.exclude(spotify_id=tempAlbum.spotify_id)
     except DailyAlbum.DoesNotExist:
       albumOfTheDay = tempAlbum
       selected = True

@@ -1,7 +1,7 @@
 'use server'
 
-import {User} from "@nextui-org/user";
-import { Button } from "@nextui-org/react";
+import {User} from "@heroui/user";
+import { Button } from "@heroui/react";
 
 import { convertToLocalTZString } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";

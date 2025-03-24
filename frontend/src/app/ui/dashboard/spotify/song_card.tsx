@@ -1,9 +1,9 @@
 'use client'
 
-import {Badge} from "@nextui-org/badge";
-import {Card, CardHeader } from "@nextui-org/card";
-import {Avatar, Button} from "@nextui-org/react";
-import { Image } from "@nextui-org/react";
+import {Badge} from "@heroui/badge";
+import {Card, CardHeader } from "@heroui/card";
+import {Avatar, Button} from "@heroui/react";
+import { Image } from "@heroui/react";
 
 import { useRef, useEffect, useState } from "react";
 import { Conditional } from "../conditional";

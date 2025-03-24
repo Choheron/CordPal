@@ -1,6 +1,6 @@
 'use client'
 
-import {Accordion, AccordionItem} from "@nextui-org/accordion";
+import {Accordion, AccordionItem} from "@heroui/accordion";
 import Image from 'next/image'
 
 export default function AboutAccordion(props) {

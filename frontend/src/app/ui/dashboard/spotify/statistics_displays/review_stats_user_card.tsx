@@ -1,7 +1,7 @@
 'use server'
 
-import { Popover, PopoverTrigger, PopoverContent, Divider} from "@nextui-org/react"
-import { Button, Link } from "@nextui-org/react"
+import { Popover, PopoverTrigger, PopoverContent, Divider} from "@heroui/react"
+import { Button, Link } from "@heroui/react"
 
 import UserCard from "@/app/ui/general/userUiItems/user_card"
 import StarRating from "@/app/ui/general/star_rating"

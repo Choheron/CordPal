@@ -2,7 +2,7 @@
 
 import { getAllOnlineData, getUserList } from "@/app/lib/user_utils";
 import { useEffect, useState } from "react";
-import { Badge, Spinner, User } from "@nextui-org/react";
+import { Badge, Spinner, User } from "@heroui/react";
 import { onlineStatusToTailwindBgColor } from "@/app/lib/utils";
 
 // List of online users that is updated every 5 seconds

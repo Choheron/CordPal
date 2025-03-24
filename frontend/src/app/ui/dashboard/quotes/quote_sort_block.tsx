@@ -1,7 +1,7 @@
 "use client";
 
-import {Select, SelectItem} from "@nextui-org/select";
-import {Checkbox} from "@nextui-org/checkbox";
+import {Select, SelectItem} from "@heroui/select";
+import {Checkbox} from "@heroui/checkbox";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 

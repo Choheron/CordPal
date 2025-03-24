@@ -4,7 +4,7 @@ import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/spotify/album_display"
 import ReviewDisplay from "@/app/ui/dashboard/spotify/review_display"
-import { Badge, Button } from "@nextui-org/react"
+import { Badge, Button } from "@heroui/react"
 import Link from "next/link"
 
 // Page to display historial data for an specific date

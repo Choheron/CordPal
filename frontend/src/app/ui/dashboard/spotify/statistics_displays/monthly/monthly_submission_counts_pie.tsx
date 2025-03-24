@@ -1,7 +1,7 @@
 "use server"
 
 import { RosenPieChart } from "@/app/ui/general/charts/rosen_pie_chart";
-import { Divider, Tooltip } from "@nextui-org/react";
+import { Divider, Tooltip } from "@heroui/react";
 import { RiQuestionMark } from "react-icons/ri";
 
 // Display the submission stats for a month in a pie chart, should only be called with the following props (to properly work)

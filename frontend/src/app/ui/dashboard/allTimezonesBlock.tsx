@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import CurrentTime from "../general/current_time";
-import { Avatar, Tooltip } from "@nextui-org/react";
+import { Avatar, Tooltip } from "@heroui/react";
 
 // Display all user timezone data in a vertically stacked block
 // Expected Props:

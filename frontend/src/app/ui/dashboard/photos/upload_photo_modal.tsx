@@ -7,10 +7,10 @@ import {
   ModalBody, 
   ModalFooter,
   useDisclosure
-} from "@nextui-org/modal";
-import { Button } from "@nextui-org/react";
-import {Input} from "@nextui-org/react";
-import {Textarea} from "@nextui-org/input";
+} from "@heroui/modal";
+import { Button } from "@heroui/react";
+import {Input} from "@heroui/react";
+import {Textarea} from "@heroui/input";
 import React from "react";
 import { useRouter } from 'next/navigation';
 import UserDropdown from "../../general/userUiItems/user_dropdown";

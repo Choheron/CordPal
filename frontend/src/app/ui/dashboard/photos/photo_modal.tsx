@@ -1,23 +1,23 @@
 'use client'
 
-import { Card } from "@nextui-org/card";
-import { Image } from "@nextui-org/image";
+import { Card } from "@heroui/card";
+import { Image } from "@heroui/image";
 import {
   Modal, 
   ModalContent, 
   ModalHeader, 
   ModalBody, 
   ModalFooter,
-} from "@nextui-org/modal";
-import { Button } from "@nextui-org/button";
-import { useDisclosure } from "@nextui-org/react";
+} from "@heroui/modal";
+import { Button } from "@heroui/button";
+import { useDisclosure } from "@heroui/react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getImageData } from "@/app/lib/photos_utils";
-import {User} from "@nextui-org/user";
+import {User} from "@heroui/user";
 import { getUserData } from "@/app/lib/user_utils";
 import { Conditional } from "../conditional";
-import {Spinner} from "@nextui-org/spinner";
+import {Spinner} from "@heroui/spinner";
 import { convertToLocalTZString } from "@/app/lib/utils";
 
 // Expected props:

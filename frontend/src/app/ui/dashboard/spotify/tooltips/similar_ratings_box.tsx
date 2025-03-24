@@ -1,7 +1,7 @@
 'use client'
 
 import ClientTimestamp from "@/app/ui/general/client_timestamp";
-import { Avatar, Button, Divider, Tooltip } from "@nextui-org/react";
+import { Avatar, Button, Divider, Tooltip } from "@heroui/react";
 import Link from "next/link";
 
 // GUI Display for albums that the user has rated similarly

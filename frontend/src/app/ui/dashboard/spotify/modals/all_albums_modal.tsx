@@ -7,7 +7,7 @@ import {
   ModalBody, 
   ModalFooter,
   useDisclosure
-} from "@nextui-org/modal";
+} from "@heroui/modal";
 import {
   Table,
   TableHeader,
@@ -15,8 +15,8 @@ import {
   TableColumn,
   TableRow,
   TableCell
-} from "@nextui-org/table";
-import { Avatar, Button, Spinner, Input, Checkbox } from "@nextui-org/react";
+} from "@heroui/table";
+import { Avatar, Button, Spinner, Input, Checkbox } from "@heroui/react";
 import React from "react";
 import { useRouter } from 'next/navigation';
 import { getAllAlbums, getAllAlbumsNoCache } from "@/app/lib/spotify_utils";
@@ -31,9 +31,9 @@ import UserDropdown from "@/app/ui/general/userUiItems/user_dropdown";
 export default function AllAlbumsModal(props) {
   const [updateTimestamp, setUpdateTimestamp] = React.useState<any>("")
   const [albumListOriginal, setAlbumListOriginal] = React.useState([])
-  const [albumList, setAlbumList] = React.useState([])
+  const [albumList, setAlbumList] = React.useState((props.albumList) ? props.albumList : [])
   // Album List Loading vars
-  const [listLoading, setListLoading] = React.useState(true)
+  const [listLoading, setListLoading] = React.useState((props.albumList) ? false : true )
   // Sorting variables
   const [sortDescriptor, setSortDescriptor] = React.useState<any>({ column: "rating", direction: "descending"})
   const [titleFilter, setTitleFilter] = React.useState("")
@@ -137,14 +137,16 @@ export default function AllAlbumsModal(props) {
 
   // UseEffect to pull Album Data
   React.useEffect(() => {
-    const ingestData = async () => {
-      let albumData = await getAllAlbums()
-      setAlbumList(albumData['albums_list'].sort((a,b) => {return b['rating'] - a['rating']}))
-      setAlbumListOriginal(albumData['albums_list'])
-      setUpdateTimestamp(albumData['timestamp'])
+    if(!props.albumList) {
+      const ingestData = async () => {
+        let albumData = await getAllAlbums()
+        setAlbumList(albumData['albums_list'].sort((a,b) => {return b['rating'] - a['rating']}))
+        setAlbumListOriginal(albumData['albums_list'])
+        setUpdateTimestamp(albumData['timestamp'])
+      }
+      ingestData()
+      setListLoading(false)
     }
-    ingestData()
-    setListLoading(false)
   }, [])
 
   // UseEffect for when list changes
@@ -214,7 +216,7 @@ export default function AllAlbumsModal(props) {
         return (
           <div className="flex gap-2">
             <Avatar
-              src={album['submitter_avatar_url']}
+              src={`${album['submitter_avatar_url']}`}
             />
             <p className="my-auto">
               {album['submitter_nickname']}
@@ -350,7 +352,7 @@ export default function AllAlbumsModal(props) {
                     items={albumList}
                     emptyContent={"No rows to display."}
                   >
-                    {(item) => (
+                    {(item: any) => (
                       <TableRow key={`${item['title']} - ${item['artist']['name']} - ${item['submitter_nickname']}`}>
                         {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                       </TableRow>

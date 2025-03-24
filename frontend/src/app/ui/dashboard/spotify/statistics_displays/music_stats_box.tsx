@@ -4,8 +4,8 @@ import UserCard from "@/app/ui/general/userUiItems/user_card";
 import { getAlbumAvgRating, getAlbumsStats, getAllUserReviewStats, getChanceOfAotdSelect, getLowestHighestAlbumStats } from "@/app/lib/spotify_utils";
 import AlbumDisplay from "../album_display";
 
-import {Badge} from "@nextui-org/badge";
-import { Divider, Tooltip } from "@nextui-org/react";
+import {Badge} from "@heroui/badge";
+import { Divider, Tooltip } from "@heroui/react";
 import { dateToString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import ReviewStatsUserCard from "./review_stats_user_card";
 import MinimalAlbumDisplay from "../minimal_album_display";

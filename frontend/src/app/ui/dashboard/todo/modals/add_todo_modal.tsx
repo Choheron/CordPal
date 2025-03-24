@@ -7,13 +7,13 @@ import {
   ModalBody, 
   ModalFooter,
   useDisclosure
-} from "@nextui-org/modal";
-import { Button } from "@nextui-org/react";
-import {Input} from "@nextui-org/react";
-import {Textarea} from "@nextui-org/input";
+} from "@heroui/modal";
+import { Button } from "@heroui/react";
+import {Input} from "@heroui/react";
+import {Textarea} from "@heroui/input";
 import React from "react";
 import { useRouter } from 'next/navigation';
-import {Select, SelectItem, Selection } from "@nextui-org/react";
+import {Select, SelectItem, Selection } from "@heroui/react";
 import { createToDoItem } from "@/app/lib/todo_uils";
 
 // Modal to allow a user to create a new todo item

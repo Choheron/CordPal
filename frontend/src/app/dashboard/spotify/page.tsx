@@ -3,7 +3,7 @@
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { Conditional } from "@/app/ui/dashboard/conditional";
 import SpotifyLoginBox from "@/app/ui/dashboard/spotify/spotify_login_box";
-import { getLastXSubmissions, getSpotifyData, isSpotifyLinked } from "@/app/lib/spotify_utils";
+import { getAllAlbums, getLastXSubmissions, getSpotifyData, isSpotifyLinked } from "@/app/lib/spotify_utils";
 import AlbumOfTheDayBox from "@/app/ui/dashboard/spotify/album_of_the_day";
 import RecentSubmissions from "@/app/ui/dashboard/spotify/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/spotify/statistics_displays/music_stats_box";
@@ -13,6 +13,8 @@ import AllTopSongsBox from "@/app/ui/dashboard/spotify/all_top_songs_box";
 export default async function music() {
   const spot_authenticated = await isSpotifyLinked();
   const recentSubmissionsResponse = await getLastXSubmissions(10);
+  // Fetch all albums on the serverside to reduce loading time of modal
+  const allAlbumsList = await getAllAlbums()
 
   return (
     <div className="flex min-h-screen flex-col items-center p-3 pb-36 pt-10">
@@ -34,7 +36,9 @@ export default async function music() {
         <MusicStatsBox />
       </Conditional>
       <Conditional showWhen={spot_authenticated}>
-        <AllTopSongsBox />
+        <AllTopSongsBox 
+          albumList={allAlbumsList}
+        />
       </Conditional>
     </div>
   );

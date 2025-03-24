@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-import {Select, SelectItem, SelectedItems} from "@nextui-org/select";
+import {Select, SelectItem, SelectedItems} from "@heroui/select";
 
 import { getUserList } from "@/app/lib/user_utils";
-import {User} from "@nextui-org/user";
+import {User} from "@heroui/user";
 
 // Dropdown menu displaying users for selection.
 // Expected Props:

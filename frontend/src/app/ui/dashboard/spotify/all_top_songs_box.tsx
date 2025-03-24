@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Conditional } from "../conditional";
 import TopSongsList from "./top_songs_list";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 
 
 // Conditional display of all top songs items

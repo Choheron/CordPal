@@ -1,11 +1,11 @@
 'use server'
 
 import { Conditional } from "../conditional"
-import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
+import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
 import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
-import { Badge, Button } from "@nextui-org/react";
+import { Badge, Button } from "@heroui/react";
 import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";
