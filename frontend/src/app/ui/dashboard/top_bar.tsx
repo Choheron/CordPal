@@ -28,7 +28,7 @@ export default function TopBar(props) {
     { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'], disabled: false },
     { name: 'Quotes', href: '/dashboard/quotes', conditional: props['isMember'], disabled: false },
     { name: 'Album Of the Day (Spotify)', href: '/dashboard/spotify', conditional: props['isMember'], disabled: false },
-    { name: 'Todo List', href: '/dashboard/todo', conditional: props['isMember'], disabled: false },
+    { name: 'Functionality Requests', href: '/dashboard/fr', conditional: props['isMember'], disabled: false },
     { name: 'About', href: '/dashboard/about', conditional: true, disabled: false },
   ];
 

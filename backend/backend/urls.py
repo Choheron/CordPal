@@ -23,7 +23,6 @@ urlpatterns = [
     # All other URLs
     path('discordapi/', include('discordapi.urls')),
     path('botInteraction/', include('botInteraction.urls')),
-    path("todo/", include('todo.urls')),
     path("users/", include('users.urls')),
     path("photos/", include('photos.urls')),
     path("spotifyapi/", include('spotifyapi.urls')),

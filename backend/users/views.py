@@ -49,6 +49,7 @@ def getUserList(request: HttpRequest):
   userList = User.objects.all()
   # Declare and populate out dict
   out = {}
+  out['users'] = {}
   for user in userList:
     tempDict = {}
     tempDict['discord_id'] = user.discord_id
@@ -56,7 +57,7 @@ def getUserList(request: HttpRequest):
     tempDict['nickname'] = user.nickname
     tempDict['last_request_timestamp'] = user.last_request_timestamp
     # Store tempDict in out json
-    out[user.guid] = tempDict
+    out['users'][user.guid] = tempDict
   # Return dict response
   return JsonResponse(out)
 

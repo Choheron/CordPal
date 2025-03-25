@@ -49,7 +49,7 @@ export async function getUserList() {
     }
   });
   const userListJSON = await userListResponse.json()
-  return Object.values(userListJSON);
+  return Object.values(userListJSON['users']);
 }
 
 

@@ -27,22 +27,20 @@ export default function StarRating(props) {
   // Add partial star (with gradient) if there's a decimal value
   if (partialStar > 0) {
     stars.push(
-      <>
-        <span key="partial" className={`relative ${textSize}`}>
-          <span 
-            className={`absolute inset-0 ${filledColor}`} 
-            style={{
-              width: `${partialStar * 100}%`,
-              background: `linear-gradient(to right, #eab308, #eab308)`,
-              WebkitBackgroundClip: 'text',
-              color: 'transparent'
-            }}
-          >
-            {symbol}
-          </span>
-          <span className={`${emptyColor}`}>{symbol}</span> {/* Empty part */}
+      <span key="partial" className={`relative ${textSize}`}>
+        <span 
+          className={`absolute inset-0 ${filledColor}`} 
+          style={{
+            width: `${partialStar * 100}%`,
+            background: `linear-gradient(to right, #eab308, #eab308)`,
+            WebkitBackgroundClip: 'text',
+            color: 'transparent'
+          }}
+        >
+          {symbol}
         </span>
-      </>
+        <span className={`${emptyColor}`}>{symbol}</span> {/* Empty part */}
+      </span>
     );
   }
 
