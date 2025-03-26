@@ -41,7 +41,7 @@ export default async function MusicStatsBox(props) {
                     {(user['block_type']) ? (<p><b>Block Type:</b> {user['block_type']}</p>) : <></>}
                     {(user['selection_blocked']) ? (<p><b>Reason:</b> <i>{user['reason']}</i></p>) : <></>}
                     <p>{`${(user['block_type'] == "OUTAGE") ? (user['admin_outage'] == "true") ? `Outage placed by admins.` : `Outage placed by ${user['nickname']}.` : ""}`}</p>
-                    <p>{(user['block_type'] == "OUTAGE") ? `This outage lasts until: ${user['outage_start']}` : ``}</p>
+                    <p>{(user['block_type'] == "OUTAGE") ? `This outage lasts until: ${user['outage_end']}` : ``}</p>
                   </div>
                 }
                 className="max-w-[300px]"

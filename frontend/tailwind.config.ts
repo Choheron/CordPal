@@ -16,7 +16,43 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       typography: ({ theme }) => ({
-        DEFAULT: {
+        sm: {  // This is for small prose class
+          css: {
+            p: {
+              marginBottom: "0rem",
+            },
+            h1: {
+              marginTop: "1rem",
+              marginBottom: ".25rem",
+              borderBottom: "1px solid grey",
+            },
+            h2: {
+              marginTop: "1rem",
+              marginBottom: ".25rem",
+              borderBottom: "1px solid grey",
+            },
+            h3: {
+              marginTop: "1rem",
+              marginBottom: ".25rem",
+              borderBottom: "1px solid grey",
+            },
+            img: {
+              marginTop: ".5rem",
+              marginBottom: ".5rem",
+            },
+            li: {
+              p: {
+                marginTop: "0rem",
+                marginBottom: "0rem",
+              },
+              img: {
+                marginTop: ".1rem",
+                marginBottom: ".1rem",
+              },
+            },
+          }
+        },
+        DEFAULT: { // This is for default prose class
           css: {
             // Override specific Prose styles
             "div[data-youtube-video]": {
