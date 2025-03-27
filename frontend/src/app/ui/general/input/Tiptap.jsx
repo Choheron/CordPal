@@ -17,9 +17,11 @@ import { SmilieReplacer } from './replacers/smilie_replacer'
 import EmojiMartButton from './emoji_mart_popover'
 
 // TipTap Rich editor box
-export default function ReviewTipTap(props) {
+export default function TipTap(props) {
   // Track text content
   const [content, setContent] = useState((props.content) ? props.content : (`<p>You shouldnt see this</p>`))
+  // Read props for textarea size
+  const textAreaClassName = (props.textAreaClassName) ? props.textAreaClassName : "max-h-[200px]";
 
   // useEffect to update content on editor change
   useEffect(() => {
@@ -263,7 +265,7 @@ export default function ReviewTipTap(props) {
 
   return (
     <>
-      <div className="relative mt-3 p-2 rounded-2xl border border-neutral-800">
+      <div className="relative h-full mt-3 p-2 rounded-2xl border border-neutral-800">
         <EditorProvider 
           slotBefore={<MenuBar />}
           slotAfter={<EmojiPicker />}
@@ -275,11 +277,10 @@ export default function ReviewTipTap(props) {
           }}
           editorProps={{
             attributes: {
-              class: "prose prose-invert prose-sm max-w-none focus:outline-none max-h-[200px] overflow-y-scroll",
+              class: `prose prose-invert prose-sm max-w-none focus:outline-none overflow-y-scroll ${textAreaClassName}`,
             }}
           }
         ></EditorProvider>
-        
       </div>
     </>
   )

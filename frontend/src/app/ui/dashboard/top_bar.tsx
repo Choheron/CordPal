@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Conditional } from "./conditional";
 import { usePathname } from 'next/navigation';
 import {Divider} from "@heroui/divider";
@@ -11,6 +10,7 @@ import clsx from 'clsx';
 import SettingsModal from "./settings_modal";
 import Image from "next/image";
 import { isDecember } from "@/app/lib/utils";
+import { Link } from "@heroui/react";
 
 // Expected props:
 //  - isMember: Boolean indicating if the current session user is a member of the desired server
@@ -28,7 +28,7 @@ export default function TopBar(props) {
     { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'], disabled: false },
     { name: 'Quotes', href: '/dashboard/quotes', conditional: props['isMember'], disabled: false },
     { name: 'Album Of the Day (Spotify)', href: '/dashboard/spotify', conditional: props['isMember'], disabled: false },
-    { name: 'Functionality Requests', href: '/dashboard/fr', conditional: props['isMember'], disabled: false },
+    { name: 'Functionality Requests', href: '/dashboard/fr', conditional: props['isMember'], disabled: true },
     { name: 'About', href: '/dashboard/about', conditional: true, disabled: false },
   ];
 
@@ -63,8 +63,9 @@ export default function TopBar(props) {
           />
         </div>
         <Link 
+          size="sm"
           href="/logout"
-          className="z-0 fixed lg:static right-0 top-0 flex w-full justify-end lg:justify-center pb-6 pt-8 pr-4 backdrop-blur-2xl border border-neutral-800 bg-zinc-800/30 lg:w-auto lg:rounded-xl lg:p-4 hover:underline"
+          className="z-0 fixed lg:static text-white right-0 top-0 flex w-full justify-end lg:justify-center pb-6 pt-8 pr-4 backdrop-blur-2xl border border-neutral-800 bg-zinc-800/30 lg:w-auto lg:rounded-xl lg:p-4 hover:underline"
         >
           Logout
         </Link>
@@ -85,13 +86,16 @@ export default function TopBar(props) {
             return(
               <Conditional 
                 key={index}
-                showWhen={link.conditional && !link.disabled}
+                showWhen={link.conditional}
               >
                 <Link 
                   key={index}
                   href={link.href}
-                  className={clsx("px-8 py-1 text-center rounded-full",
-                    {'text-decoration-line: underline bg-gradient-to-r from-neutral-900/0 via-neutral-900 to-neutral-900/0': pathname === link.href})}
+                  isDisabled={link.disabled}
+                  size="sm"
+                  className={clsx("px-8 py-1 text-center rounded-full text-white",
+                    {'text-decoration-line: underline bg-gradient-to-r from-neutral-900/0 via-neutral-900 to-neutral-900/0': pathname === link.href},
+                    {'line-through': link.disabled})}
                 >
                   {link.name}
                 </Link>

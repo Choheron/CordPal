@@ -31,7 +31,7 @@ class FunctionalityRequest(models.Model):
   STATUS_DESCRIPTIONS = {
     'pending': "Your request has been submitted and is awaiting review.",
     'under_review': "Your request is being evaluated by the team.",
-    'approved': "Your request has been approved and will be worked on.",
+    'approved': "Your request has been approved and will be worked on when prioritized.",
     'in_progress': "Development is in progress for this request.",
     'implemented': "The requested feature has been successfully implemented.",
     'rejected': "The request was reviewed but will not be implemented.",

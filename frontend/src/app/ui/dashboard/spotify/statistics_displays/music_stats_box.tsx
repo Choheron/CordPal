@@ -2,7 +2,6 @@
 
 import UserCard from "@/app/ui/general/userUiItems/user_card";
 import { getAlbumAvgRating, getAlbumsStats, getAllUserReviewStats, getChanceOfAotdSelect, getLowestHighestAlbumStats } from "@/app/lib/spotify_utils";
-import AlbumDisplay from "../album_display";
 
 import {Badge} from "@heroui/badge";
 import { Divider, Tooltip } from "@heroui/react";
@@ -10,12 +9,6 @@ import { dateToString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import ReviewStatsUserCard from "./review_stats_user_card";
 import MinimalAlbumDisplay from "../minimal_album_display";
 import CreateOutageModal from "../modals/create_outage_modal";
-
-// `${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.
-//  ${(user['block_type'] == "OUTAGE") ? (user['admin_outage'] == "true") ? `This outage was placed by admins.` : `This is an outage placed by ${user['nickname']}.` : ""}
-//  ${(user['selection_blocked']) ? `Reason: "${user['reason']}".` : ""}
-//  ${(user['block_type'] == "OUTAGE") ? `This outage lasts until: ${user['outage_start']}` : ``}
-// `
 
 // GUI Display for an Album
 // Expected Props:
@@ -28,7 +21,7 @@ export default async function MusicStatsBox(props) {
   const albumUserStatsTable = albumStatsJson['user_objs'].sort((a, b) => a['submission_count'] < b['submission_count'] ? 1 : -1).map((user, index) => {
     return (
       <tr 
-        key={user['submission_count']}
+        key={`${user['submission_count']} ${user['nickname']}`}
       >
         <td className="line-clamp-1 mx-2">
           <UserCard
@@ -89,7 +82,7 @@ export default async function MusicStatsBox(props) {
   return (
     <div className="w-fill min-w-[340px] mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row gap-10 backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
       {/* Album Submission Stats */}
-      <div className='min-w-[320px] w-400 mx-auto flex flex-col'>
+      <div className='min-w-[320px] w-[320px] mx-auto flex flex-col'>
         <p className="mx-auto text-xl underline mb-1">
           Album Submission Stats: 
         </p>
@@ -99,6 +92,11 @@ export default async function MusicStatsBox(props) {
           </p>
           <p>
             {albumStatsJson['total_albums']}
+          </p>
+        </div>
+        <div className="border py-1 px-2 border-neutral-800 bg-black/40 rounded-xl text-center max-w-[400px] my-1 text-sm italic font-extralight">
+          <p>
+            Selection status is shown as it would be for each user at midnight tonight, Central Time.
           </p>
         </div>
         <Divider className="my-1" />
