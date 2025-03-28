@@ -1,7 +1,6 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
+from users.models import User
 
 class Vote(models.Model):
   UPVOTE = 1

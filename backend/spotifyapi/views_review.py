@@ -116,15 +116,7 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str, date: str = 
   # Declare outlist and populate
   outList = []
   for review in reviewsObj:
-    outObj = {}
-    outObj['user_id'] = review.user.discord_id
-    outObj['album_id'] = review.album.spotify_id
-    outObj['score'] = review.score
-    outObj['comment'] = review.review_text
-    outObj['review_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
-    outObj['last_upated'] = review.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
-    outObj['first_listen'] = review.first_listen
-    outObj['version'] = review.version
+    outObj = review.toJSON()
     # Append to list
     outList.append(outObj)
   # Return list of reviews
@@ -152,15 +144,7 @@ def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str):
   except ObjectDoesNotExist:
     return JsonResponse({"review": None})
   # Declare out object and populate
-  outObj = {}
-  outObj['user_id'] = review.user.discord_id
-  outObj['album_id'] = review.album.spotify_id
-  outObj['score'] = review.score
-  outObj['comment'] = review.review_text
-  outObj['review_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
-  outObj['last_upated'] = review.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
-  outObj['first_listen'] = review.first_listen
-  outObj['version'] = review.version
+  outObj = review.toJSON()
   # Return user review
   return JsonResponse({"review": outObj})
 
@@ -349,15 +333,7 @@ def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
   out = {}
   out['reviews'] = []
   for review in reviewsObj:
-    outObj = {}
-    outObj['user_id'] = review.user.discord_id
-    outObj['album_id'] = review.album.spotify_id
-    outObj['album'] = albumToDict(review.album)
-    outObj['score'] = review.score
-    outObj['comment'] = review.review_text
-    outObj['review_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
-    outObj['last_upated'] = review.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
-    outObj['first_listen'] = review.first_listen
+    outObj = review.toJSON()
     # Append to list
     out['reviews'].append(outObj)
   # Attach timestamp

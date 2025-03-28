@@ -1,9 +1,12 @@
 from django.db import models
-import logging
+from django.contrib.contenttypes.fields import GenericRelation
 from django.forms.models import model_to_dict
 from django.utils import timezone
 
+import logging
+
 from users.models import User
+from reactions.models import Reaction
 
 import json
 
@@ -134,11 +137,46 @@ class Review(models.Model):
     aotd_date = models.DateField(null=False) # Attach each review to the aotd date in which it was provided
     # Add review versioning for display
     version = models.IntegerField(default=1)
+    # Add reactions relationship for easy query
+    reactions = GenericRelation(Reaction)
 
     class Meta:
-        unique_together = ('album', 'user')  # Prevent duplicate reviews for the same user and album
+      unique_together = ('album', 'user')  # Prevent duplicate reviews for the same user and album
+
+
+    def toJSON(self):
+      """Return a review as a JSON. (For HTTP JSON Responses)"""
+      outObj = {}
+      outObj['id'] = self.pk
+      outObj['user_id'] = self.user.discord_id
+      outObj['album_id'] = self.album.spotify_id
+      outObj['score'] = self.score
+      outObj['comment'] = self.review_text
+      outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")
+      outObj['last_upated'] = self.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
+      outObj['first_listen'] = self.first_listen
+      outObj['version'] = self.version
+      # Get all reactions, group by reaction, and store a list 
+      reactions = self.reactions.all()
+      rObj = {}
+      reaction: Reaction
+      for reaction in reactions:
+        if(reaction.emoji in rObj.keys()):
+          rObj[reaction.emoji]['count'] += 1
+          rObj[reaction.emoji]['objects'].append(reaction)
+        else:
+          rObj[reaction.emoji] = {
+            "count": 1,
+            "emoji": reaction.emoji,
+            "objects": [reaction]
+          }
+      # Convert to list and attach to out obj
+      outObj['reactions'] = list(rObj.values())
+      return outObj
+
 
     def save(self, *args, **kwargs):
+      """Save override, will create a history object and user action."""
       from users.models import UserAction
       # Create a history record before updating the review
       if self.pk:  # Only if this is an update, not a new review
