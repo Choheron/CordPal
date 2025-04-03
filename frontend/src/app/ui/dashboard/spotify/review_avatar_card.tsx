@@ -10,6 +10,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 import { Conditional } from "../conditional";
 import { ScrollShadow, Tooltip } from "@heroui/react";
 import ReviewEmojiMartClientWrapper from "./reviewsWrappers/client_review_reacton_emoji_wrapper.tsx";
+import { getUserData } from "@/app/lib/user_utils";
 
 // GUI Display for a single review as a popover/avatar combo
 // Expected Props:
@@ -20,6 +21,8 @@ export default async function ReviewAvatarCard(props) {
   var reviewMessage = review['comment'];
   const reviewVersion = props.review_obj['version']
   const reactionsList = props.review_obj['reactions']
+  // Get user data for the current user
+  const userData = await getUserData()
 
   // Regex for youtube video embedding
   const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\?[\w=&%-]*)?(?:&t=(\d+h)?(\d+m)?(\d+s)?)?/g;
@@ -110,7 +113,9 @@ export default async function ReviewAvatarCard(props) {
               />
             </ScrollShadow>
           </div>
+          {/* Emoji Reactions Display */}
           <ReviewEmojiMartClientWrapper 
+            userData={userData}
             reviewId={review['id']}
             reactionsList={reactionsList}
           />

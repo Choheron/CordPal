@@ -1,6 +1,7 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.forms.models import model_to_dict
 from django.utils import timezone
+from django.core import management
 
 from .utils import (
   checkSelectionFlag,
@@ -71,6 +72,8 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
 # Set a new album of the day. Returns an HTTPResponse
 ###
 def setAlbumOfDay(request: HttpRequest):
+  # Sneak in a session table cleanup call here
+  management.call_command("clearsessions", verbosity=0)
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("setAlbumOfDay called with a non-POST method, returning 405.")

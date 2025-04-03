@@ -262,8 +262,8 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
   # Calculate average review score
   out['average_review_score'] = out['review_score_sum']/out['total_reviews']
   # Get final data on lowest and highest albums
-  out['highest_album'] = albumToDict(Album.objects.get(spotify_id=out['highest_score_album']))
-  out['lowest_album'] = albumToDict(Album.objects.get(spotify_id=out['lowest_score_album']))
+  out['highest_album'] = Album.objects.get(spotify_id=out['highest_score_album']).toJSON()
+  out['lowest_album'] = Album.objects.get(spotify_id=out['lowest_score_album']).toJSON()
   # Return out object
   return JsonResponse(out)
 
@@ -306,7 +306,7 @@ def getSimilarReviewsForRatings(request: HttpRequest):
     user_reviews = Review.objects.filter(user=user).filter(score=score).order_by('-last_updated')[:3]
     albums_for_score = []
     for review in user_reviews:
-      albums_for_score.append(albumToDict(review.album))
+      albums_for_score.append(review.album.toJSON())
     # Attach to out object
     out[f"{score + 0.0}"] = albums_for_score
     # Increment score
@@ -336,7 +336,7 @@ def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
   out = {}
   out['reviews'] = []
   for review in reviewsObj:
-    outObj = review.toJSON()
+    outObj = review.toJSON(full = True)
     # Append to list
     out['reviews'].append(outObj)
   # Attach timestamp
@@ -438,7 +438,7 @@ def submitReviewReaction(request: HttpRequest):
   from reactions.models import Reaction
   # Make sure request is a POST request
   if(request.method != "POST"):
-    logger.warning("addReaction called with a non-POST method, returning 405.")
+    logger.warning("submitReviewReaction called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -461,6 +461,39 @@ def submitReviewReaction(request: HttpRequest):
     return HttpResponse(status=200)
   except Exception as e:
     logger.error(f"Error when submitting review reaction. Error: {e}")
+    return HttpResponse(status=500)
+  
+
+###
+# Add a Reaction to a review
+###
+def deleteReviewReaction(request: HttpRequest):
+  from reactions.models import Reaction
+  # Make sure request is a POST request
+  if(request.method != "POST"):
+    logger.warning("deleteReviewReaction called with a non-POST method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  try:
+    # Get data from request
+    reqBody = json.loads(request.body)
+    # Retrieve user from session cookie
+    user = getSpotifyUser(request.session.get('discord_id'))
+    # Get review from the database
+    review = Review.objects.get(pk=reqBody['id'])
+    # Attempt to get reaction if it already exists
+    try:
+      reaction: Reaction = review.reactions.get(user = user)
+      # Delete reaction
+      reaction.delete()
+    except Reaction.DoesNotExist as e:
+      logger.error(f"Could not delete, no reaction found!")
+      raise e
+    # Return success object 
+    return HttpResponse(status=200)
+  except Exception as e:
+    logger.error(f"Error when deleting review reaction. Error: {e}")
     return HttpResponse(status=500)
   
   

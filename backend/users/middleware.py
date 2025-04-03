@@ -48,7 +48,7 @@ class LastSeenMiddleware:
         user.save()
     except Exception as e:
       # Dont log metrics calls as they cause false errors
-      if((full_path not in self.no_user_validation_paths) and (self.APP_ENV != "DEV")):
+      if((full_path not in self.no_user_validation_paths) and (self.APP_ENV != "DEV") and (not full_path.startswith("/tenor/getGifUrl"))):
         # Log method call (With username)
         self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}")
         # If this is a nonexistent user, return a redirect

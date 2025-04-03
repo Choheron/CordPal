@@ -85,6 +85,26 @@ class Album(models.Model):
       return self.release_date.strftime("%Y-%m-%d")
     else:
       return "Not Available"
+    
+  
+  def toJSON(self):
+    """Return an Album as a JSON. (For HTTP JSON Responses)"""
+    out = {}
+    out['spotify_id'] = self.spotify_id
+    out['title'] = self.title
+    out['artist'] = self.artist
+    out['artist_url'] = self.artist_url
+    out['album_img_src'] = self.cover_url
+    out['spotify_url'] = self.spotify_url
+    out['submitter'] = self.submitted_by.nickname
+    out['submitter_id'] = self.submitted_by.discord_id
+    out['submission_date'] = self.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+    out['release_date'] = self.release_date.strftime("%m/%d/%Y, %H:%M:%S")
+    out['release_date_precision'] = self.release_date_precision
+    out['user_comment'] = self.user_comment
+    out['raw_album'] = self.raw_data
+    return out
+
 
   # Custom delete function to log the user action
   def delete(self, deleter=None, reason=None, *args, **kwargs):
@@ -144,12 +164,19 @@ class Review(models.Model):
       unique_together = ('album', 'user')  # Prevent duplicate reviews for the same user and album
 
 
-    def toJSON(self):
-      """Return a review as a JSON. (For HTTP JSON Responses)"""
+    def toJSON(self, full: bool = False):
+      """
+      Return a review as a JSON. (For HTTP JSON Responses)
+      Parameters:
+      - full: Boolean - Include all data from album and any other related objects
+      
+      """
       outObj = {}
       outObj['id'] = self.pk
       outObj['user_id'] = self.user.discord_id
       outObj['album_id'] = self.album.spotify_id
+      if(full):
+        outObj['album'] = self.album.toJSON()
       outObj['score'] = self.score
       outObj['comment'] = self.review_text
       outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")

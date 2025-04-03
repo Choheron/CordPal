@@ -832,13 +832,40 @@ export async function addReviewReaction(reactObj) {
     },
     body: JSON.stringify(reactObj)
   });
-  const reviewReactStatus = await reviewReactResponse.status
+  const reviewReactStatus = reviewReactResponse.status
   // If status was a success, revalidate review tag 
   if(reviewReactStatus == 200) {
     revalidateTag(`review-${reactObj['id']}`)
   }
   // Return Status
-  return {"status": reviewReactStatus};
+  return reviewReactStatus;
+}
+
+
+//
+// Submit a reaction for a review to the backend
+//
+export async function deleteReviewReaction(reactObj) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`deleteReviewReaction: Sending request to backend '/spotifyapi/deleteReviewReaction'`)
+  const reviewReactDeleteResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/deleteReviewReaction`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+    body: JSON.stringify(reactObj)
+  });
+  const reviewReactDeleteStatus = reviewReactDeleteResponse.status
+  // If status was a success, revalidate review tag 
+  if(reviewReactDeleteStatus == 200) {
+    revalidateTag(`review-${reactObj['id']}`)
+  }
+  // Return Status
+  return reviewReactDeleteStatus;
 }
 
 
