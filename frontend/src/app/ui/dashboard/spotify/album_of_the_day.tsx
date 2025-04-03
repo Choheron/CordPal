@@ -5,7 +5,7 @@ import { Button, Divider } from "@heroui/react";
 import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
 import ReviewDisplay from "./review_display";
-import { getAlbumOfTheDayData, getChanceOfAotdSelect, getSimilarReviewsForRatings, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
+import { getAlbumOfTheDayData, getChanceOfAotdSelect, getReviewsForAlbum, getSimilarReviewsForRatings, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
 import AddAlbumModal from "./modals/add_album_modal";
 import Link from "next/link";
 import { RiCalendar2Fill} from "react-icons/ri";
@@ -15,7 +15,8 @@ export default async function AlbumOfTheDayBox(props) {
   let albumOfTheDayObj = await getAlbumOfTheDayData()
   const albumReview = await getUserReviewForAlbum(albumData("album_id"))
   const similarReviewData = await getSimilarReviewsForRatings()
-  const userSelectChance = await getChanceOfAotdSelect()
+  // Retrieve review data on this level instead of at reviewbox level
+  let reviewList = await getReviewsForAlbum(albumData("album_id"));
 
   // Check if album of the day is outdated
   let todayDate = new Date()
@@ -88,7 +89,7 @@ export default async function AlbumOfTheDayBox(props) {
       />
       <div className="static w-full lg:w-fit">
         <ReviewDisplay 
-          album_id={albumData("album_id")}
+          review_list={reviewList}
         />
       </div>
     </div>

@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import { verifyAuth, isMember } from './app/lib/discord_utils';
 
 // List of pages that nonusers are allowed to visit
-const nonUserPages = ["/dashboard", "/dashboard/about"];
+const nonUserPages = ["/dashboard", "/dashboard/about", "/"];
 
 // Check if path is in allowed pages for nonusers
 function checkNonUserAccess(request: NextRequest) {

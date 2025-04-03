@@ -1,4 +1,4 @@
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponseRedirect
 
 from users.models import (
   User
@@ -8,6 +8,7 @@ import logging
 import datetime
 import pytz
 import json
+import os
 
 class LastSeenMiddleware:
 
@@ -15,6 +16,10 @@ class LastSeenMiddleware:
     self.get_response = get_response
     # Declare logging
     self.logger = logging.getLogger('django')
+    self.heartbeat_endpoint_paths = ["/users/heartbeat", "/users/getAllOnlineData", "/discordapi/checkToken"]
+    self.no_user_validation_paths = ["/metrics", "/discordapi/checkToken", "/discordapi/token"]
+    # Determine runtime enviornment
+    self.APP_ENV = os.getenv('APP_ENV') or 'DEV'
 
   def __call__(self, request: HttpRequest):
     # Get Request Path
@@ -28,8 +33,7 @@ class LastSeenMiddleware:
       # Get current timestamp
       time = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
       # Update only heartbeat timestamp if its a heartbeat call, otherwise update last_request_timestamp
-      heartbeat_endpoint_paths = ["/users/heartbeat", "/users/getAllOnlineData", "/discordapi/checkToken"]
-      if(full_path in heartbeat_endpoint_paths):
+      if(full_path in self.heartbeat_endpoint_paths):
         if(full_path in "/users/heartbeat"):
           # Update timezone if timezone is in request
           user.timezone_string = json.loads(request.body)['heartbeat']['timezone']
@@ -42,9 +46,18 @@ class LastSeenMiddleware:
         user.last_request_timestamp = time
         self.logger.debug(f"Setting last_request_timestamp to {str(time)} for user {user.nickname}")
         user.save()
-    except:
-      # Log method call (With username)
-      self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}")
+    except Exception as e:
+      # Dont log metrics calls as they cause false errors
+      if((full_path not in self.no_user_validation_paths) and (self.APP_ENV != "DEV")):
+        # Log method call (With username)
+        self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}")
+        # If this is a nonexistent user, return a redirect
+        if(isinstance(e, (User.DoesNotExist, KeyError))):
+          self.logger.warning(f"Expiring session from unknown user and returning 401.")
+          request.session.delete()
+          responseOverride = HttpResponseRedirect("/")
+          responseOverride.set_cookie('sessionid', request.COOKIES.get('sessionid'), max_age=1)
+          return responseOverride
     
     # Code above this line is executed before the view is called
     # Retrieving the response 

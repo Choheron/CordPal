@@ -16,6 +16,9 @@ from .utils import (
   albumToDict,
   checkSelectionFlag
 )
+from reactions.utils import (
+  createReaction
+)
 
 import logging
 from dotenv import load_dotenv
@@ -426,3 +429,52 @@ def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
   out['metadata']['timestamp'] = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
   # Return data 
   return JsonResponse(out)
+
+
+###
+# Add a Reaction to a review
+###
+def submitReviewReaction(request: HttpRequest):
+  from reactions.models import Reaction
+  # Make sure request is a POST request
+  if(request.method != "POST"):
+    logger.warning("addReaction called with a non-POST method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  try:
+    # Get data from request
+    reqBody = json.loads(request.body)
+    # Retrieve user from session cookie
+    user = getSpotifyUser(request.session.get('discord_id'))
+    # Get review from the database
+    review = Review.objects.get(pk=reqBody['id'])
+    # Attempt to get reaction if it already exists
+    try:
+      reaction: Reaction = review.reactions.get(user = user)
+      reaction.emoji = reqBody['emoji']
+      reaction.save()
+    except:
+      # Create a new review
+      createReaction(review, user, reqBody['emoji'])
+    # Return success object 
+    return HttpResponse(status=200)
+  except Exception as e:
+    logger.error(f"Error when submitting review reaction. Error: {e}")
+    return HttpResponse(status=500)
+  
+  
+###
+# Get a review by its id
+###
+def getReviewByID(request: HttpRequest, id: int):
+   # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getReviewByID called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get review by passed in ID
+  review = Review.objects.get(pk=id)
+  # Return
+  return JsonResponse(review.toJSON())

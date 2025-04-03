@@ -144,6 +144,10 @@ def checkPreviousAuthorization(request: HttpRequest):
     tokenData = DiscordTokens.objects.get(user = user)
     refreshDiscordProfilePic(request)
     return True
-  except DiscordTokens.DoesNotExist as e:
+  except Exception as e:
+    if(isinstance(e, (User.DoesNotExist, DiscordTokens.DoesNotExist))):
+      logger.debug(f"User not found, returning false.")
+    else:
+      logger.warning(f"Error when checking previous auth! WORTH INVESTIGATING!! Error: {e}")
     return False
 

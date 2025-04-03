@@ -307,7 +307,7 @@ export async function getAlbumAvgRating(spotify_album_id, rounded = true, date =
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['reviews'] },
+    next: { tags: ['review_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -335,7 +335,7 @@ export async function getReviewsForAlbum(album_spotify_id, date = null) {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['reviews'] },
+    next: { tags: ['review_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -369,6 +369,7 @@ export async function getUserReviewForAlbum(album_spotify_id) {
   return reviewRes['review'];
 }
 
+
 //
 // Submit a review to the backend
 // - RETURN: HttpResponse
@@ -388,10 +389,12 @@ export async function submitReviewToBackend(reviewObject) {
     body: JSON.stringify(reviewObject)
   });
   // Revalidate review related calls
-  revalidateTag('reviews')
+  revalidateTag('review_submissions')
   // Revalidate AOTD calls for calendar views
   const now = new Date()
   revalidateTag(`calendar-${now.getFullYear()}-${padNumber(now.getMonth() + 1)}`)
+  // Return callback code
+  return submitReviewResponse.status
 }
 
 //
@@ -433,7 +436,7 @@ export async function getAlbumsStats() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['album_submissions', 'reviews'] },
+    next: { tags: ['album_submissions', 'review_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -455,7 +458,7 @@ export async function getLowestHighestAlbumStats() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['reviews'] },
+    next: { tags: ['review_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -477,7 +480,7 @@ export async function getAllAlbums() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['reviews', 'album_submissions'] },
+    next: { tags: ['review_submissions', 'album_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -541,7 +544,7 @@ export async function getAllUserReviewStats() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['reviews'] },
+    next: { tags: ['review_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -566,7 +569,7 @@ export async function getUserReviewStats(userId: string = "") {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['reviews'] },
+    next: { tags: ['review_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -591,7 +594,7 @@ export async function getAllUserReviews(userId: string = "") {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['reviews'] },
+    next: { tags: ['review_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -642,7 +645,7 @@ export async function getSimilarReviewsForRatings() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['reviews'] },
+    next: { tags: ['review_submissions'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -687,7 +690,7 @@ export async function getChanceOfAotdSelect(user_discord_id: string = "") {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['AOtD', 'reviews', 'album_submissions', `calendar-outages`] },
+    next: { tags: ['AOtD', 'review_submissions', 'album_submissions', `calendar-outages`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -809,4 +812,52 @@ export async function createOutage(outageObj: object) {
   const createOutageMessage = await createOutageResponse.text()
   const createOutageStatus = await createOutageResponse.status
   return {"status": createOutageStatus, "message": createOutageMessage};
+}
+
+
+//
+// Submit a reaction for a review to the backend
+//
+export async function addReviewReaction(reactObj) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`addReviewReaction: Sending request to backend '/spotifyapi/submitReviewReaction'`)
+  const reviewReactResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/submitReviewReaction`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+    body: JSON.stringify(reactObj)
+  });
+  const reviewReactStatus = await reviewReactResponse.status
+  // If status was a success, revalidate review tag 
+  if(reviewReactStatus == 200) {
+    revalidateTag(`review-${reactObj['id']}`)
+  }
+  // Return Status
+  return {"status": reviewReactStatus};
+}
+
+
+//
+// Get a review by its backend PK id
+//
+export async function getReviewByID(review_id) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`getReviewByID: Sending request to backend '/spotifyapi/getReviewByID/${review_id}`)
+  const getReviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getReviewByID/${review_id}`, {
+    method: "GET",
+    credentials: "include",
+    next: { tags: [`review-${review_id}`] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const getReviewJson = await getReviewResponse.json()
+  return getReviewJson;
 }

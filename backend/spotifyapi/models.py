@@ -163,12 +163,12 @@ class Review(models.Model):
       for reaction in reactions:
         if(reaction.emoji in rObj.keys()):
           rObj[reaction.emoji]['count'] += 1
-          rObj[reaction.emoji]['objects'].append(reaction)
+          rObj[reaction.emoji]['objects'].append(reaction.toJSON())
         else:
           rObj[reaction.emoji] = {
             "count": 1,
             "emoji": reaction.emoji,
-            "objects": [reaction]
+            "objects": [reaction.toJSON()]
           }
       # Convert to list and attach to out obj
       outObj['reactions'] = list(rObj.values())

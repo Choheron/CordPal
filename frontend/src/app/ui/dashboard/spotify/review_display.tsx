@@ -6,8 +6,8 @@ import ReviewAvatarCard from "./review_avatar_card";
 //  - album_id: String - Spotify Album ID to retrieve review
 //  - date: String - Date in which the album provided was AOTD (Historical Support)
 export default async function ReviewDisplay(props) {
-  // Setup Props
-  const reviews = await getReviewsForAlbum(props.album_id, props.date)
+  // Setup Props (Query backend if no reviewlist is passed in)
+  const reviews = (props.review_list != null) ? props.review_list : await getReviewsForAlbum(props.album_id, props.date);
   // Get count of users in website
   const userCount = await getSpotifyUserCount();
 

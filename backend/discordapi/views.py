@@ -107,7 +107,11 @@ def getDiscordUserData(request: HttpRequest):
   tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get("discord_id"))
   # Ensure user is logged in
   if(isDiscordTokenExpired(request)):
-    refreshDiscordToken(request)
+    try:
+      refreshDiscordToken(request)
+    except Exception as e:
+      logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}")
+      return HttpResponse("/", status=302)
   # Prep request data and headers to discord api
   reqHeaders = { 
     'Authorization': f"{tokenData.token_type} {tokenData.access_token}"
@@ -155,7 +159,11 @@ def validateServerMember(request: HttpRequest):
     return JsonResponse(out)
   # Ensure user is logged in
   if(isDiscordTokenExpired(request)):
-    refreshDiscordToken(request)
+    try:
+      refreshDiscordToken(request)
+    except Exception as e:
+      logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}")
+      return HttpResponse("/", status=302)
   # Check if member status already exists in session store
   if(("server_member" in request.session) and (datetime.strptime(request.session.get("server_member_expiry"), cookie_time_fmt) < datetime.now())):
     status = request.session.get("server_member")
@@ -225,7 +233,11 @@ def checkIfPrevAuth(request: HttpRequest):
     validSession = checkPreviousAuthorization(request)
   # Ensure user is logged in
   if(validSession and isDiscordTokenExpired(request)):
-    refreshDiscordToken(request)
+    try:
+      refreshDiscordToken(request)
+    except Exception as e:
+      logger.error(f"Filed to refresh discord token! Returning False. Error: {e}")
+      validSession = False
   # Return JsonResponse containing true or false in body
   logger.info(f"Returning prevAuth status of: {validSession}...")
   out = {}
@@ -245,7 +257,11 @@ def revokeDiscordToken(request: HttpRequest):
     return res
   # Ensure user is logged in
   if(isDiscordTokenExpired(request)):
-    refreshDiscordToken(request)
+    try:
+      refreshDiscordToken(request)
+    except Exception as e:
+      logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}")
+      return HttpResponse("/", status=302)
   # Get token data from session
   tokenData = DiscordTokens.objects.get(user = request.session.get('discord_id'))
   # Prep request data and headers to discord api

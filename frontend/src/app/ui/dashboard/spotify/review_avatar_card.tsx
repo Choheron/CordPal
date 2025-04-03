@@ -8,7 +8,8 @@ import UserCard from "../../general/userUiItems/user_card";
 import { getTenorGifData } from "@/app/lib/spotify_utils";
 import ClientTimestamp from "../../general/client_timestamp";
 import { Conditional } from "../conditional";
-import { ScrollShadow } from "@heroui/react";
+import { ScrollShadow, Tooltip } from "@heroui/react";
+import ReviewEmojiMartClientWrapper from "./reviewsWrappers/client_review_reacton_emoji_wrapper.tsx";
 
 // GUI Display for a single review as a popover/avatar combo
 // Expected Props:
@@ -18,6 +19,7 @@ export default async function ReviewAvatarCard(props) {
   const review = props.review_obj;
   var reviewMessage = review['comment'];
   const reviewVersion = props.review_obj['version']
+  const reactionsList = props.review_obj['reactions']
 
   // Regex for youtube video embedding
   const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\?[\w=&%-]*)?(?:&t=(\d+h)?(\d+m)?(\d+s)?)?/g;
@@ -79,39 +81,47 @@ export default async function ReviewAvatarCard(props) {
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent>
+        <PopoverContent
+          className="relative"
+        >
           <UserCard 
             userDiscordID={review['user_id']} 
             customDescription="View profile"
             isProfileLink
           />
           <div className="flex">
-            <p className="mx-2 my-2 align-middle">Rating:</p>
             <StarRating
               rating={review['score']}
-              className="text-yellow-400 text-lg my-auto"
+              className="text-yellow-400 my-auto"
+              textSize="text-2xl"
             />
           </div>
           <Conditional showWhen={review['first_listen'] == true}>
-            <p className="bg-green-500 rounded-xl px-2 py-1 border border-black text-black font-bold italic text-xs">
+            <p className="bg-green-700/90 rounded-xl px-2 py-1 border border-green-500 text-black font-bold italic text-xs">
               First Time Listen
             </p>
           </Conditional>
-          <p className="ml-2 mr-auto">
-            <b>Comment:</b>
-          </p>
-          <ScrollShadow className="w-[330px] max-h-[320px] overflow-y-scroll scrollbar-hide border rounded-xl border-neutral-800 bg-black/20" >
-            <div 
-              className="prose prose-invert prose-sm mx-2 p-1 pb-5" 
-              dangerouslySetInnerHTML={{__html: reviewMessage}}
-            />
-          </ScrollShadow>
+          {/* Review Text */}
+          <div className="mt-[6px]">
+            <ScrollShadow className="w-[330px] max-h-[320px] overflow-y-scroll scrollbar-hide border rounded-xl border-neutral-800 bg-black/20" >
+              <div 
+                className="prose prose-invert prose-sm mx-2 p-1 pb-5" 
+                dangerouslySetInnerHTML={{__html: reviewMessage}}
+              />
+            </ScrollShadow>
+          </div>
+          <ReviewEmojiMartClientWrapper 
+            reviewId={review['id']}
+            reactionsList={reactionsList}
+          />
+          {/* Tenor Disclaimer Display */}
           <Conditional showWhen={tenorMatches.length > 0}>
             <div className="w-fit backdrop-blur-2xl px-2 py-1 rounded-2xl border border-neutral-800">
               <p className="text-sm italic my-auto">
                 Gifs Provided via Tenor 
               </p>
             </div>
+          {/* Timestamp Display */}
           </Conditional>
           <div className="flex justify-between w-full px-2 mt-2 align-middle gap-1">
             Submitted: <ClientTimestamp timestamp={review['review_date']} full={true} />

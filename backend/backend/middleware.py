@@ -17,7 +17,7 @@ class metadataMiddleware:
 
   def __call__(self, request: HttpRequest):
 
-    # Do nothing beforehand, so far...
+    # Do nothing beforehand, so far... (NOTE: There are some actions in the users middlewware.)
     
     # Code above this line is executed before the view is called
     # Retrieving the response 

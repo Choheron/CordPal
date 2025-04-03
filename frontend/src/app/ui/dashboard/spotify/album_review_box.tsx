@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Router from "next/router"
 
 import { Button, Tooltip } from "@heroui/react";
-import { Textarea } from "@heroui/input";
 import ReviewTipTap from "../../general/input/Tiptap";
 import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@heroui/react";
 import { submitReviewToBackend } from "@/app/lib/spotify_utils";
@@ -59,8 +59,30 @@ export default function AlbumReviewBox(props) {
     }
   }, [rating, comment, isFirstListen])
 
+
+  // UseEffect to stop users from navigating away if they have unsaved changes
+  useEffect(() => {
+    if (isReviewUpdated) {
+      const routeChangeStart = () => {
+        const ok = () => {
+          return confirm("Warning! You have unsaved review changes that will be lost. Are you sure you would like to leave this page?")
+        }
+        if (!ok) {
+          Router.events.emit("routeChangeError")
+          throw "Abort route change. Please ignore this error."
+        }
+      }
+      Router.events.on("routeChangeStart", routeChangeStart)
+
+      return () => {
+        Router.events.off("routeChangeStart", routeChangeStart)
+      }
+    }
+  }, [isReviewUpdated])
+
+  
   // Send request to upload the submitted image
-  const submitReview = () => {
+  const submitReview = async () => {
     // Build out object
     let out = {}
     out['album_id'] = props.album_id
@@ -68,12 +90,12 @@ export default function AlbumReviewBox(props) {
     out['comment'] = comment 
     out['first_listen'] = isFirstListen
 
-    submitReviewToBackend(out)
+    await submitReviewToBackend(out)
     // Turn off review ready checkmark
     setIsReady(false)
     setIsReviewUpdated(false)
-    // Reload page
-    router.push("spotify")
+    // Refresh page
+    router.refresh();
   }
 
   // Handle slider moving

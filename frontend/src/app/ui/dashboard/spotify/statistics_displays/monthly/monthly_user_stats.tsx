@@ -215,7 +215,7 @@ export default function MonthlyUserStats(props) {
                     overLabel={subData['submission_total'] - getUserSubData(item.discord_id, 'count')} 
                   />
                   <Divider className="my-1" />
-                  {displayAlbums(item.discord_id, "Albums Submitted:", getUserSubData(item.discord_id, 'submissions'))}
+                  {displayAlbums(item.discord_id, "Albums Submitted:", ((getUserSubData(item.discord_id, 'submissions')) ? getUserSubData(item.discord_id, 'submissions') : []))}
                 </div>
                 {/* Selection Stats for User */}
                 <div className="flex flex-col w-full mt-2 text-center border border-zinc-800 rounded-xl p-2 px-3 bg-slate-400/10">

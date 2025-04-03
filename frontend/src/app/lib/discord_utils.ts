@@ -1,10 +1,11 @@
 "use server"
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 // Below Code allows for serverside computing of cookie stuff!
 const getCookie = async (name: string) => {
-  return cookies().get(name)?.value ?? '';
+  return await cookies().get(name)?.value ?? '';
 }
 
 // 
@@ -25,6 +26,10 @@ export async function isMember() {
       'X-Member-Check': `true`
     }
   });
+  // Check for redirect status in event of error
+  if(await memberResponse.status == 302) {
+    redirect("/")
+  }
   const responseObj = await memberResponse.json()
   const isMemberOfServer: boolean = responseObj['member'] && responseObj['role'];
   return isMemberOfServer;
@@ -32,6 +37,7 @@ export async function isMember() {
 
 //
 // Verify session cookie is in storage, to skip login page
+// NOTE: THIS MIGHT BE DEPRECATED AFTER MIDDLEWARE UPDATE IN BACKEND USERS
 // - RETURN: Boolean indication login/auth status
 //
 export async function verifyAuth() {
@@ -46,7 +52,7 @@ export async function verifyAuth() {
   const prevAuthResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/checkToken`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    next: { revalidate: 300 },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
@@ -74,5 +80,9 @@ export async function getDiscordUserData() {
       Cookie: `sessionid=${sessionCookie};`
     }
   });
+  // Check for redirect status in event of error
+  if(await userDataResponse.status == 302) {
+    redirect("/")
+  }
   return await userDataResponse.json();
 }
