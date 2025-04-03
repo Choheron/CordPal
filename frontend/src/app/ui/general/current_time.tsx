@@ -58,7 +58,7 @@ export default function CurrentTime(props) {
     )
   }
   return (
-    <div className="flex flex-col w-fit h-fit px-2 py-2 border-neutral-800 bg-zinc-800/30 rounded-xl border font-extralight">
+    <div className="flex flex-col w-fit max-w-full h-fit px-2 py-2 border-neutral-800 bg-zinc-800/30 rounded-xl border font-extralight">
       <p>{((titleOverride) ? titleOverride : "Your Current Time: ")}</p>
       <div className="text-6xl min-w-[400px] px-5">
         <div className="flex w-full py-3">

@@ -58,7 +58,7 @@ export default async function AlbumDisplay(props) {
   }
 
   return (
-    <div className="w-full lg:min-w-[650px] lg:max-w-full mx-auto lg:mx-1 my-auto block overflow-hidden text-ellipsis font-extralight">
+    <div className="w-full lg:min-w-[650px] max-w-full mx-auto lg:mx-1 my-auto block overflow-hidden text-ellipsis font-extralight">
       <div className="w-full my-auto flex flex-row">
         <img 
           src={album_img_src}

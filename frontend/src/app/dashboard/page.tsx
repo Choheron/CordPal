@@ -32,11 +32,11 @@ export default async function Page() {
 
   
   return (
-    <main className="flex flex-col items-center lg:p-24 pt-10 lg:pt-10">
+    <main className="flex flex-col max-w-full items-center lg:p-24 pt-10 lg:pt-10">
       <PageTitle text="Homepage" />
       <div className="flex flex-col w-full lg:justify-center gap-3 lg:w-10/12 lg:flex-row" >
         <AllTimezonesBlock timezoneData={timezoneData} />
-        <div className="flex flex-col h-fit w-full max-w-[800px] px-2 py-2 lg:p-4 items-center border-neutral-800 bg-zinc-800/30 from-inherit rounded-xl border">
+        <div className="flex flex-col h-fit w-full max-w-full sm:max-w-[800px] px-2 py-2 lg:p-4 items-center border-neutral-800 bg-zinc-800/30 from-inherit rounded-xl border">
           <p className="text-2xl pb-2 underline font-extralight">
             Today&apos;s Album of the Day:
           </p>
