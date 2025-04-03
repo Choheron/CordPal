@@ -25,6 +25,7 @@ export default async function Page({
   const nextDay = getNextDay(new Date(Date.parse(date)))
   // Boolean to determine if this date is today
   const isToday = isTodayCheck()
+  
 
   // This may be my ugliest function in this whole thing.... Timezones are really confusing me
   function isTodayCheck() {
