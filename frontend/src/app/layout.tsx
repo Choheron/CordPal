@@ -7,12 +7,13 @@ import Image from "next/image";
 import ClientSnowfall from "./ui/general/holiday/snowfall";
 import { isDecember } from "./lib/utils";
 import Heartbeat from "./ui/heartbeat";
+import Footer from "./ui/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Dis-Cord Site",
-  description: "Discord Bot Compainion Site allowing users to submit albums, track quotes, upload inside joke images, etc.",
+  title: "Cord-Pal",
+  description: "Discord Compainion Site allowing users to submit albums, track quotes, upload inside joke images, etc.",
 };
 
 export default function RootLayout({
@@ -23,7 +24,7 @@ export default function RootLayout({
   // Render App
   return (
     <html lang="en" className='dark'>
-      <body className={`${inter.className} dark`}>
+      <body className={`${inter.className} dark min-h-screen flex flex-col`}>
         {/* Placeholder Component to implement heartbeat */}
         <Heartbeat />
         {/* Only display if it is December (Holiday Display) */}
@@ -61,32 +62,12 @@ export default function RootLayout({
             </>
           ) : (<></>)}
         <Providers>
-          {children}
+        <div className="flex flex-col min-h-screen">
+          <div className="flex-grow">{children}</div>
+          <Footer />
+        </div>
         </Providers>
         {/* Only display if it is December (Holiday Display) */}
-        {(isDecember()) ? 
-          (
-            <div className="flex">
-              <Image
-                src="/images/holiday_decor/string-lights-png-hd-9.png"
-                width={0}
-                height={0}
-                sizes="49vw"
-                alt="Image of some Christmas Lights, Merry Christmas!"
-                className="fixed mt-20 z-0 lg:mt-0 lg:static"
-                style={{ width: '100%', height: 'auto' }}
-              />
-              <Image
-                src="/images/holiday_decor/string-lights-png-hd-9.png"
-                width={0}
-                height={0}
-                sizes="49vw"
-                alt="Image of some Christmas Lights, Merry Christmas!"
-                className="fixed mt-20 z-0 lg:mt-0 lg:static scale-x-[-1]"
-                style={{ width: '100%', height: 'auto' }}
-              />
-            </div>
-          ) : (<></>)}
         {(isDecember()) ? (<ClientSnowfall />) : (<></>)}
       </body>
     </html>

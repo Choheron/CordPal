@@ -32,7 +32,7 @@ export default async function Page() {
 
   
   return (
-    <main className="flex min-h-screen flex-col items-center lg:p-24 pt-10 lg:pt-10">
+    <main className="flex flex-col items-center lg:p-24 pt-10 lg:pt-10">
       <PageTitle text="Homepage" />
       <div className="flex flex-col w-full lg:justify-center gap-3 lg:w-10/12 lg:flex-row" >
         <AllTimezonesBlock timezoneData={timezoneData} />

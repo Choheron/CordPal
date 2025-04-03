@@ -81,6 +81,9 @@ export default function ReviewEmojiMartClientWrapper(props) {
                 key={index}
                 content={
                   <div className="flex flex-col">
+                    <p className="mx-auto text-2xl" >
+                      {emojiGroup['emoji']}
+                    </p>
                     {emojiGroup['objects'].map((obj, index) => {
                       return (
                         <p key={index}>{obj['user_data']['nickname']}</p>

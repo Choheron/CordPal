@@ -95,7 +95,7 @@ export default async function quotes({searchParams}) {
   });
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24 pt-10">
+    <main className="flex flex-col items-center p-24 pt-10">
       <PageTitle text="Quotes" />
       <div className="flex flex-row justify-center w-1/2">
         <QuoteCounts className="w-1/2 mr-5" quotesJson={quotesJson} updateTimestamp={quotesUpdateTimestamp} />

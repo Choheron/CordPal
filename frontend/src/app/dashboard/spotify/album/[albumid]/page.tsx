@@ -87,7 +87,7 @@ export default async function Page({
   }
   
   return (
-    <div className="flex min-h-screen flex-col items-center p-3 pb-36 pt-10">
+    <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text={`${albumData("title")}`} />
       <div className="flex flex-col w-fit justify-center md:w-4/5 gap-2">
         <div className="relative w-fit mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">

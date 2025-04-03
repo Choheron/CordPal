@@ -17,7 +17,7 @@ export default async function music() {
   const allAlbumsList = await getAllAlbums()
 
   return (
-    <div className="flex min-h-screen flex-col items-center p-3 pb-36 pt-10">
+    <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text="Album Of The Day" />
       <Conditional showWhen={!spot_authenticated}>
         <SpotifyLoginBox />

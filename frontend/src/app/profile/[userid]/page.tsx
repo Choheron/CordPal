@@ -23,7 +23,7 @@ export default async function Page({
   const onlineData = await isUserOnline(userData['discord_id'])
 
   return (
-    <main className="flex min-h-screen flex-col items-center lg:p-24 pt-10">
+    <main className="flex flex-col items-center lg:p-24 pt-10">
       <PageTitle text={`${userData['nickname']}'s Profile`} />
       <Button 
         as={Link}

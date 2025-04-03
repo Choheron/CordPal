@@ -54,7 +54,7 @@ export default async function photos({searchParams}) {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center lg:px-24 pt-10">
+    <main className="flex flex-col items-center lg:px-24 pt-10">
       <PageTitle text="Photoshops" />
       <UploadPhotoModal />
       <PhotoFilterBlock 

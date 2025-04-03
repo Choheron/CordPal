@@ -32,7 +32,7 @@ export default function Callback({ searchParams, }: { searchParams: { [key: stri
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col items-center p-24 pt-10">
+    <div className="flex flex-col items-center p-24 pt-10">
       <p>Handling spotify data, please wait...</p>
       <p>Please do not refresh or click off of this page!</p>
       <br />

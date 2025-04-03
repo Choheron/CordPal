@@ -180,7 +180,7 @@ export default async function Page({
 
 
   return (
-    <div className="flex flex-col min-h-screen w-full max-w-full 2xl:w-3/4 mx-auto items-center p-3 pb-36 pt-10 ">
+    <div className="flex flex-col w-full max-w-full 2xl:w-3/4 mx-auto items-center p-3 pb-36 pt-10 ">
       <PageTitle text={`Historical Daily Albums for ${monthName} ${year}`} />
       <div className="flex w-full justify-between">
         <Button 

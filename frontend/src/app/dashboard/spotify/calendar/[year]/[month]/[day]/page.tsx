@@ -45,7 +45,7 @@ export default async function Page({
   }
   
   return (
-    <div className="flex min-h-screen flex-col items-center p-3 pb-36 pt-10">
+    <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text={`Historical Album Of the Day Data - ${date}`} />
       <div className="flex flex-col w-fit justify-center md:w-4/5 gap-2">
         <p className="mx-auto px-2 py-2 text-small italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
