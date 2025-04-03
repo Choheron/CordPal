@@ -105,43 +105,48 @@ export default function AlbumReviewBox(props) {
 
   return (
     <div className="w-full max-w-[1080px] px-2 lg:mx-auto py-2 mt-1 flex flex-col rounded-xl bg-zinc-800/30 border border-neutral-800">
-      <div className="w-full flex flex-col lg:flex-row gap-2 justify-between">
-        <Slider   
-          size="md"
-          radius="lg"
-          step={0.5}
-          marks={getSteps()}
-          color="warning"
-          label="Album Rating"
-          hideValue={true}
-          maxValue={10} 
-          minValue={0} 
-          value={rating}
-          onChange={handleSliderMove}
-          renderThumb={(props) => (
-            <div
-              {...props}
-              className="group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
-            >
-              <Tooltip 
-                className="bg-transparent/80 border-gray-600"
-                content={
-                  <SimilarRatingsBox 
-                    rating={rating} 
-                    albums={albumsByRating[Number.parseFloat(rating).toFixed(1)]}
-                    timestamp={albumsByRating['metadata']['timestamp']} 
-                  />
-                } 
-                showArrow={true} 
-                isOpen={tooltipOpen} 
-                onOpenChange={(open) => setTooltipOpen(open)}
+      <div 
+        className="w-full flex flex-col lg:flex-row gap-2 justify-between"
+        onMouseEnter={() => setTooltipOpen(true)}
+        onMouseLeave={() => setTooltipOpen(false)}
+      >
+        <Tooltip 
+          className="bg-transparent/85 border-gray-600"
+          classNames={{ base: "pointer-events-none" }}
+          offset={-10}
+          content={
+            <SimilarRatingsBox 
+              rating={rating} 
+              albums={albumsByRating[Number.parseFloat(rating).toFixed(1)]}
+              timestamp={albumsByRating['metadata']['timestamp']} 
+            />
+          } 
+          showArrow={true} 
+          isOpen={tooltipOpen}
+        >
+          <Slider   
+            size="md"
+            radius="lg"
+            step={0.5}
+            marks={getSteps()}
+            color="warning"
+            label="Album Rating"
+            hideValue={true}
+            maxValue={10} 
+            minValue={0} 
+            value={rating}
+            onChange={handleSliderMove}
+            renderThumb={(props) => (
+              <div
+                {...props}
+                className="group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
               >
                 <span className="transition-transform bg-yellow-600 shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80" />
-              </Tooltip>
-            </div>
-          )}
-          className="max-w-full px-10 mx-auto" 
-        />
+              </div>
+            )}
+            className="max-w-full px-10 mx-auto" 
+          />
+          </Tooltip>
         {/* <Select 
           label="Favorite Song" 
           className="max-w-full mx-auto my-auto" 

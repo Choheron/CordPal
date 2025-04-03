@@ -32,7 +32,7 @@ export default function SimilarRatingsBox(props) {
               as={Link}
               href={"/dashboard/spotify/album/" + album['spotify_id']}
               radius="full"
-              className={`h-fit w-fit text-white px-0 hover:scale-110`}
+              className={`h-fit w-fit text-white px-0 hover:scale-110 pointer-events-auto`}
               variant="light"
             >
               <Avatar 
