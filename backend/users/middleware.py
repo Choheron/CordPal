@@ -17,7 +17,7 @@ class LastSeenMiddleware:
     # Declare logging
     self.logger = logging.getLogger('django')
     self.heartbeat_endpoint_paths = ["/users/heartbeat", "/users/getAllOnlineData", "/discordapi/checkToken"]
-    self.no_user_validation_paths = ["/metrics", "/discordapi/checkToken", "/discordapi/token"]
+    self.no_user_validation_paths = ["/metrics", "/discordapi/checkToken", "/discordapi/token", "/spotifyapi/setAlbumOfDay"]
     # Determine runtime enviornment
     self.APP_ENV = os.getenv('APP_ENV') or 'DEV'
 
@@ -47,17 +47,8 @@ class LastSeenMiddleware:
         self.logger.debug(f"Setting last_request_timestamp to {str(time)} for user {user.nickname}")
         user.save()
     except Exception as e:
-      # Dont log metrics calls as they cause false errors
-      if((full_path not in self.no_user_validation_paths) and (self.APP_ENV != "DEV") and (not full_path.startswith("/tenor/getGifUrl"))):
-        # Log method call (With username)
-        self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}")
-        # If this is a nonexistent user, return a redirect
-        if(isinstance(e, (User.DoesNotExist, KeyError))):
-          self.logger.warning(f"Expiring session from unknown user and returning 401.")
-          request.session.delete()
-          responseOverride = HttpResponseRedirect("/")
-          responseOverride.set_cookie('sessionid', request.COOKIES.get('sessionid'), max_age=1)
-          return responseOverride
+      # Log method call (With username)
+      self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}")
     
     # Code above this line is executed before the view is called
     # Retrieving the response 

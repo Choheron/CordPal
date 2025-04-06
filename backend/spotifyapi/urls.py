@@ -67,6 +67,7 @@ urlpatterns = [
   path('submitReviewReaction', views_review.submitReviewReaction),
   path('deleteReviewReaction', views_review.deleteReviewReaction),
   path('getReviewByID/<int:id>', views_review.getReviewByID),
+  path('getReviewHistoricalByID/<int:id>', views_review.getReviewHistoricalByID),
   ## ============================================================================================================
   ## Album Of the Day Views
   ## ============================================================================================================

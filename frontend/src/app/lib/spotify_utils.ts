@@ -888,3 +888,24 @@ export async function getReviewByID(review_id) {
   const getReviewJson = await getReviewResponse.json()
   return getReviewJson;
 }
+
+
+//
+// Get a review and its historical edits by its backend PK id
+//
+export async function getReviewHistoricalByID(review_id) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`getReviewHistoricalByID: Sending request to backend '/spotifyapi/getReviewHistoricalByID/${review_id}`)
+  const getReviewHistoricalResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getReviewHistoricalByID/${review_id}`, {
+    method: "GET",
+    credentials: "include",
+    next: { tags: [`review-${review_id}`] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const getReviewHistoricalJson = await getReviewHistoricalResponse.json()
+  return getReviewHistoricalJson;
+}

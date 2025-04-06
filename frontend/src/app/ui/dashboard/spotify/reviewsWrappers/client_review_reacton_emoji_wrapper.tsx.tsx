@@ -8,11 +8,17 @@ import { useEffect, useState } from "react";
 
 // Special wrapper to allow for emoji mart reaction addition and display
 // Merged reaction display and addition to increase speed of display
+// Expected Props:
+//  - reviewId: String - Review ID (PK from backend)
+//  - reactionsList: List(Objects) - List of Objects containing reaction data from backend
+//  - userData: Object - User Data from Backend
+//  - emojiButtonOverride: String - Tailwind override for emoji button
 export default function ReviewEmojiMartClientWrapper(props) {
   const reviewID = props.reviewId
   const [reactionsList, setReactionsList] = useState((props.reactionsList) ? props.reactionsList : [])
   const userData = props.userData
   const userID = userData['guid']
+  const emojiButtonOverride = (props.emojiButtonOverride) ? props.emojiButtonOverride : "absolute -top-2 -right-2"
 
   // Callback to add review to backend
   const handleSelection = async (emojiObj) => {
@@ -66,7 +72,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
   return (
     <>
       {/* Reaction UI */}
-      <div className="absolute -top-2 -right-2">
+      <div className={emojiButtonOverride}>
         <EmojiMartButton 
           selectionCallback={handleSelection}
         />

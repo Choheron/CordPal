@@ -9,7 +9,8 @@ from .models import (
   Review,
   DailyAlbum,
   SpotifyUserData,
-  User
+  User,
+  ReviewHistory
 )
 
 from .utils import (
@@ -511,3 +512,26 @@ def getReviewByID(request: HttpRequest, id: int):
   review = Review.objects.get(pk=id)
   # Return
   return JsonResponse(review.toJSON())
+
+
+###
+# Get a review by its id
+###
+def getReviewHistoricalByID(request: HttpRequest, id: int):
+   # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getReviewByID called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get review by passed in ID
+  review = Review.objects.get(pk=id)
+  # Decalare Out Object
+  out = review.toJSON()
+  # Get all historical edits of review and attach to out object
+  historical = ReviewHistory.objects.filter(review=review).order_by("recorded_at").reverse()
+  out['historical'] = []
+  for rev in historical:
+    out['historical'].append(rev.toJSON())
+  # Return
+  return JsonResponse(out)

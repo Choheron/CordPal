@@ -273,7 +273,6 @@ export default function TipTap(props) {
           content={content}
           onUpdate={({ editor }) => {
             setContent(editor.getHTML())
-            console.log(editor.getHTML())
           }}
           editorProps={{
             attributes: {

@@ -8,7 +8,7 @@ import UserCard from "../../general/userUiItems/user_card";
 import { getTenorGifData } from "@/app/lib/spotify_utils";
 import ClientTimestamp from "../../general/client_timestamp";
 import { Conditional } from "../conditional";
-import { ScrollShadow, Tooltip } from "@heroui/react";
+import { Link, ScrollShadow, Tooltip } from "@heroui/react";
 import ReviewEmojiMartClientWrapper from "./reviewsWrappers/client_review_reacton_emoji_wrapper.tsx";
 import { getUserData } from "@/app/lib/user_utils";
 
@@ -131,11 +131,20 @@ export default async function ReviewAvatarCard(props) {
           <div className="flex justify-between w-full px-2 mt-2 align-middle gap-1">
             Submitted: <ClientTimestamp timestamp={review['review_date']} full={true} />
           </div>
-          <Conditional showWhen={review['last_upated'] != review['review_date']}>
+          <Conditional showWhen={review['last_updated'] != review['review_date']}>
             <div className="flex justify-between w-full px-2 align-middle">
-              Last Updated: <ClientTimestamp timestamp={review['last_upated']} full={true} />
+              Last Updated: <ClientTimestamp timestamp={review['last_updated']} full={true} />
             </div>
           </Conditional>
+          <div className="w-full text-right h-fit pt-2 px-1">
+            <Link
+              href={`/dashboard/spotify/review/${review['id']}`}
+              underline="hover"
+              className="text-xs"
+            >
+              View Full Review
+            </Link>
+          </div>
         </PopoverContent>
       </Popover>
     </div>
