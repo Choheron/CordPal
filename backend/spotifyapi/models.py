@@ -207,10 +207,10 @@ class Review(models.Model):
     def save(self, *args, **kwargs):
       """Save override, will create a history object and user action."""
       from users.models import UserAction
-      # Fetch the original (pre-save) instance from the DB
-      old_review = Review.objects.get(pk=self.pk)
       # Create a history record before updating the review
       if self.pk:  # Only if this is an update, not a new review
+        # Fetch the original (pre-save) instance from the DB
+        old_review = Review.objects.get(pk=self.pk)
         # Create review history object
         history = ReviewHistory.objects.create(
           review=self,

@@ -149,7 +149,7 @@ export default async function Page({
           </div>
           <Conditional showWhen={review_data['historical'].length != 0}>
             <div className="flex w-full gap-1 text-right text-xs italic">
-              <p className="ml-auto">Updated {review_data['historical'].length} times since </p>
+              <p className="ml-auto">Updated {review_data['historical'].length - 1} times since </p>
               <ClientTimestamp timestamp={review_data['last_updated']} full={true} />
             </div>
           </Conditional>
@@ -165,13 +165,14 @@ export default async function Page({
         />
       </div>
 
-      <Conditional showWhen={review_data['historical'].length > 0}>
+      <Conditional showWhen={review_data['historical'].length > 1}>
         {/* Display warning for dates error in review history */}
         <Conditional showWhen={reviewDateObj < new Date("April 6, 2025")} >
           <div className="w-full md:w-3/4 2xl:w-1/2 font-extralight mx-auto px-2 py-2 my-2 text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30 mt-11 -mb-11">
             <p>
               <span className="text-yellow-600"><b>WARNING:</b></span> Review history/edit data recorded before the date of April 6th, 2025 will have inconsistencies and issues due to bugs on the backend.
-              This is a result of the database not properly storing updates when new versions of reviews are created. Most common issues: Score updates not showing, timestamps being wrong, etc.
+              This is a result of the database not properly storing updates when new versions of reviews are created. Most common issues: Score updates not showing, text updates not showing, timestamps 
+              being wrong, etc.
             </p>
           </div>
         </Conditional>
