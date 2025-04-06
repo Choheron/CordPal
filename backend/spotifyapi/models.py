@@ -174,14 +174,16 @@ class Review(models.Model):
       outObj = {}
       outObj['id'] = self.pk
       outObj['user_id'] = self.user.discord_id
+      outObj['user_nickname'] = self.user.nickname
       outObj['album_id'] = self.album.spotify_id
       if(full):
         outObj['album'] = self.album.toJSON()
       outObj['score'] = self.score
       outObj['comment'] = self.review_text
       outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")
-      outObj['last_upated'] = self.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
+      outObj['last_updated'] = self.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
       outObj['first_listen'] = self.first_listen
+      outObj['aotd_date'] = self.aotd_date
       outObj['version'] = self.version
       # Get all reactions, group by reaction, and store a list 
       reactions = self.reactions.all()
@@ -205,17 +207,19 @@ class Review(models.Model):
     def save(self, *args, **kwargs):
       """Save override, will create a history object and user action."""
       from users.models import UserAction
+      # Fetch the original (pre-save) instance from the DB
+      old_review = Review.objects.get(pk=self.pk)
       # Create a history record before updating the review
       if self.pk:  # Only if this is an update, not a new review
         # Create review history object
         history = ReviewHistory.objects.create(
           review=self,
-          score=self.score,
-          review_text=self.review_text,
-          review_date=self.review_date,
-          first_listen=self.first_listen,
-          aotd_date=self.aotd_date,
-          version=self.version
+          score=old_review.score,
+          review_text=old_review.review_text,
+          review_date=old_review.review_date,
+          first_listen=old_review.first_listen,
+          aotd_date=old_review.aotd_date,
+          version=old_review.version
         )
         # Create UserAction for review update
         UserAction.objects.create(
@@ -243,6 +247,23 @@ class ReviewHistory(models.Model):
     version = models.IntegerField(default=1)
 
     recorded_at = models.DateTimeField(auto_now_add=True)  # When the history record was created
+
+    def toJSON(self, full: bool = False):
+      """
+      Return a review history as a JSON. (For HTTP JSON Responses)
+      """
+      outObj = {}
+      outObj['id'] = self.pk
+      outObj['score'] = self.score
+      outObj['comment'] = self.review_text
+      outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")
+      outObj['first_listen'] = self.first_listen
+      outObj['aotd_date'] = self.aotd_date
+      outObj['version'] = self.version
+      outObj['recorded_at'] = self.recorded_at.strftime("%m/%d/%Y, %H:%M:%S")
+      if(full):
+        outObj['review'] = self.review.toJSON()
+      return outObj
 
     def __str__(self):
       return f"History for {self.review} at {self.recorded_at}"
