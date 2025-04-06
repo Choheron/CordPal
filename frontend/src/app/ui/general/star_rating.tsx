@@ -51,7 +51,7 @@ export default function StarRating(props) {
     );
   }
 
-  return <div className="flex justify-center flex-shrink-0 items-center -mt-[6px]">{stars}</div>;
+  return <div className="flex justify-center flex-shrink-0 items-center -mt-1">{stars}</div>;
 
   // MY FIRST ITERATION 
   // const rating = (props.rating) ? Math.min(props.rating, 10) : 0;

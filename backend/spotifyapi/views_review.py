@@ -533,5 +533,9 @@ def getReviewHistoricalByID(request: HttpRequest, id: int):
   out['historical'] = []
   for rev in historical:
     out['historical'].append(rev.toJSON())
+  # Attach current version of review to history
+  tempCurr = review.toJSON()
+  tempCurr['recorded_at'] = tempCurr['last_updated']
+  out['historical'].insert(0, tempCurr)
   # Return
   return JsonResponse(out)
