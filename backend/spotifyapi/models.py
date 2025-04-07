@@ -148,7 +148,7 @@ class DailyAlbum(models.Model):
 # Model for a User's review of an album.
 class Review(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="aotd_reviews")
     score = models.FloatField()  # Score out of 10
     review_text = models.TextField(null=True, blank=True)
     review_date = models.DateTimeField(auto_now_add=True)

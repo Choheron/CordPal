@@ -332,7 +332,7 @@ def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
   # Retrieve user from session cookie
   user = getSpotifyUser(request.session.get('discord_id') if (user_discord_id == None) else user_discord_id)
   # Get all reviews
-  reviewsObj = Review.objects.filter(user=user)
+  reviewsObj = user.aotd_reviews.all()
   # Declare outlist and populate
   out = {}
   out['reviews'] = []

@@ -31,7 +31,7 @@ export default function ReviewCountChartBox(props) {
             alt={`Album Cover for ${album['title']} by ${album['artist']}`}
           />
           <a 
-            href={`/dashboard/spotify/album/${album['spotify_id']}`}
+            href={`/dashboard/spotify/review/${review['id']}`}
             className="absolute flex flex-col h-full w-full justify-center transition opacity-0 group-hover:opacity-100 ease-in-out lg:gap-2 bg-transparent py-0 px-1"
           >
             <p className="text-center text-md line-clamp-2">

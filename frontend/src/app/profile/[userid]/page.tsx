@@ -2,7 +2,7 @@ import { isMember } from "@/app/lib/discord_utils";
 import { getUserData, isUserOnline } from "@/app/lib/user_utils";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import ProfileUserDisplay from "@/app/ui/profile/profile_user_display";
-import UserAlbumFavDisplay from "@/app/ui/profile/user_album_fav_display";
+import UserSpotifyDataDisplay from "@/app/ui/profile/user_spotify_data_display";
 import { Button } from "@heroui/react";
 import { revalidateTag } from "next/cache";
 import Link from "next/link";
@@ -39,7 +39,7 @@ export default async function Page({
           userData={userData}
           onlineData={onlineData}
         />
-        <UserAlbumFavDisplay 
+        <UserSpotifyDataDisplay 
           userId={userid}
           spotifyConnected={userData['spotify_connected']}
         />

@@ -11,7 +11,7 @@ import ReviewCountChartBox from "./review_count_chart_box";
 // EXPECTED PROPS:
 // - userId: String [REQUIRED] - Discord User ID for data fetching from backend
 // - spotifyConnected: Boolean [REQUIRED] - Boolean if a user's spotify is connected, for security of site
-export default async function UserAlbumFavDisplay(props) {
+export default async function UserSpotifyDataDisplay(props) {
   const userId = props.userId
   const spotifyConnected = (props.spotifyConnected) ? props.spotifyConnected : false;
   // Get user fav and least fav album data
