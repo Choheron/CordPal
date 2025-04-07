@@ -33,10 +33,10 @@ export default function ReviewHistoryAccordion(props) {
       var text = data
       switch (op) {
         case DIFF_INSERT:
-          html[x] = '<span class="bg-green-400/30">' + text + '</span>';
+          html[x] = '<span class="bg-green-400/50">' + text + '</span>';
           break;
         case DIFF_DELETE:
-          html[x] = '<span class="bg-red-400/30 line-through">' + text + '</span>';
+          html[x] = '<span class="bg-red-400/50 line-through">' + text + '</span>';
           break;
         case DIFF_EQUAL:
           html[x] = '<span>' + text + '</span>';
@@ -49,7 +49,6 @@ export default function ReviewHistoryAccordion(props) {
 
   const mapReviewHistory = () => {
     return reviewHistoryList.map((hist, index) => {
-      const result = calcAndShowDiffs(index)
       const currScore = hist['score']
       const prevScore = (index != (listLen - 1)) ? reviewHistoryList[index + 1]['score'] : null
 
@@ -107,7 +106,7 @@ export default function ReviewHistoryAccordion(props) {
           {/* Comment Content (Displays changes to comment) */}
           <div 
             className="w-full prose prose-invert prose-sm !max-w-none mb-2 font-normal"
-            dangerouslySetInnerHTML={{__html: result}}
+            dangerouslySetInnerHTML={{__html: calcAndShowDiffs(index)}}
           />
           {/* Submission Timestamp */}
           <div className="text-right text-sm font-extralight text-gray-500">
