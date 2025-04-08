@@ -8,7 +8,7 @@ import {
   ModalFooter,
   useDisclosure
 } from "@heroui/modal";
-import { addToast, Alert, Button, Spinner } from "@heroui/react";
+import { Alert, Button, Spinner } from "@heroui/react";
 import {Input} from "@heroui/react";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
