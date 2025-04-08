@@ -1,4 +1,5 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.contrib.auth import logout as auth_logout
 
 from users.utils import (
   doesUserExist,
@@ -292,4 +293,7 @@ def revokeDiscordToken(request: HttpRequest):
   logger.info("Returning revoked status...")
   out = {}
   out['status'] = True
+  # Log user out
+  auth_logout(request)
+  # Return response
   return JsonResponse(out) 
