@@ -11,6 +11,28 @@ const getCookie = async (name: string) => {
 //
 // Get a count of users in the system
 // - RETURN: Json containing user data from DB
+export async function logout() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const tokenRevokeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/logout`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+  });
+  // Delete Cookie
+  cookies().delete("sessionid");
+  // Log Logout
+  console.log("Logout completed.");
+}
+
+
+//
+// Get a count of users in the system
+// - RETURN: Json containing user data from DB
 export async function getUserCount() {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
@@ -283,4 +305,104 @@ export async function heartbeat(timezoneStr: string = "") {
   const heartbeatStatus = await heartbeatResponse.status;
   const heartbeatMessage = await heartbeatResponse.text();
   return {"status": heartbeatStatus, "body": heartbeatMessage}
+}
+
+
+//
+// Check backend to see if a user field is unique
+//
+export async function isUserFieldUnique(field: string, value: string) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const unqiueResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/isFieldUnique`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    body: JSON.stringify(
+      {
+        "field": field,
+        "value": value,
+      }
+    )
+  });
+  const uniqueStatus = await unqiueResponse.status;
+  const uniqueJSON = await unqiueResponse.json();
+  return {"status": uniqueStatus, "json": uniqueJSON}
+}
+
+
+//
+// Get all possible login methods for user
+//
+export async function getUserLoginMethods(discord_id = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getLoginMethods${(discord_id === "") ? '' : '/' + discord_id}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: ['user-data'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  return (await userDataResponse.json())['methods'];
+}
+
+
+//
+// Get all password requirements 
+//
+export async function getPasswordValidators() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const passvalidatorsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getPasswordValidators`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  return (await passvalidatorsResponse.json())['validators'];
+}
+
+
+//
+// Send request to backend to set user password 
+//
+export async function updateUserPassword(updateBody) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const updateUserPasswordResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/updateUserPassword`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+    body: JSON.stringify(updateBody)
+  });
+  const status = updateUserPasswordResponse.status
+  const data = await updateUserPasswordResponse.json()
+  // Revalidate user data
+  revalidateTag('user-data')
+  // Return
+  return ({"code": status, "data": data})
 }

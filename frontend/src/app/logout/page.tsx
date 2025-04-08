@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation'
+import { logout } from '../lib/user_utils';
 
 export default function Page() {
   const router = useRouter();
@@ -10,15 +11,10 @@ export default function Page() {
   // NOTE: We make use of the call in this page because it needs to run on the client in order to log the user out
   useEffect(() => {
     const doDiscordLogout = async () => {
-      const tokenRevokeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/logout`, {
-        method: "GET",
-        credentials: "include",
-        cache: 'no-cache',
-      });
-      console.log("Logout completed, redirecting...");
-      router.push("/");
+      await logout()
     }
     doDiscordLogout()
+    router.push("/");
   }, []);
 
 
