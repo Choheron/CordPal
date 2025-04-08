@@ -66,10 +66,10 @@ export default async function AlbumDisplay(props) {
           alt={`Album Cover for ${title} by ${artist_name}`}
         />
         <div className="w-full max-w-full flex flex-col lg:gap-2 pl-2 lg:pl-5 pt-1 lg:pt-2 my-auto">
-          <a href={album_url} target="_noreferrer" className="text-xl lg:text-3xl hover:underline">
+          <a href={album_url} target="_noreferrer" className="text-xl lg:text-3xl hover:underline w-fit">
             <b>{title}</b>
           </a>
-          <a href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline italic -mt-1">
+          <a href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline italic -mt-1 w-fit">
             {artist_name}
           </a>
           <Conditional showWhen={release_date != "Unknown"}>
