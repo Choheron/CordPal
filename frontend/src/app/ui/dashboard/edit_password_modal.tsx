@@ -6,7 +6,7 @@ import {
   ModalFooter,
   useDisclosure
 } from "@heroui/modal";
-import { addToast, Alert, Button, Spinner } from "@heroui/react";
+import { addToast, Alert, Badge, Button, Spinner } from "@heroui/react";
 import {Input} from "@heroui/react";
 import React, { useEffect } from "react";
 import { useRouter } from 'next/navigation';
@@ -173,12 +173,21 @@ export default function EditPasswordModal(props) {
 
   return (
     <>
-      <Button 
-        color="primary" 
-        onPress={onOpen}
-      >
-        {(props.update) ? "Change Password" : "Set your Password"}
-      </Button>
+      <Badge
+          color="success" 
+          content=""
+          size="lg"
+          placement="top-left"
+          className="-ml-2 animate-pulse"
+          isInvisible={update}
+        >
+        <Button 
+          color="primary" 
+          onPress={onOpen}
+        >
+          {(props.update) ? "Change Password" : "Set your Password"}
+        </Button>
+      </Badge>
       <Modal 
         size="xl" 
         isOpen={isOpen} 

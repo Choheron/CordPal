@@ -7,7 +7,7 @@ import {
   useDisclosure
 } from "@heroui/modal";
 import {User} from "@heroui/user";
-import { Button } from "@heroui/react";
+import { Badge, Button } from "@heroui/react";
 import {Input} from "@heroui/react";
 import React, { useEffect } from "react";
 import { useRouter } from 'next/navigation';
@@ -163,15 +163,24 @@ export default function SettingsModal(props) {
 
   return (
     <>
-      <Button 
-        className="px-0 text-tiny text-inheret min-w-0 min-h-0 h-fit hover:underline"
+      <Badge 
+        color="primary" 
+        content=""
         size="sm"
-        onPress={onOpen}
-        radius="none"
-        variant="light"
+        placement="top-left"
+        className="-ml-1 animate-pulse"
+        isInvisible={loginMethods.indexOf("Username/Password") != -1}
       >
-        Settings
-      </Button>
+        <Button 
+          className="px-0 text-tiny text-inheret min-w-0 min-h-0 h-fit hover:underline"
+          size="sm"
+          onPress={onOpen}
+          radius="none"
+          variant="light"
+        >
+          Settings
+        </Button>
+      </Badge>
       <Modal size="xl" isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true} onClose={cancelPress}>
         <ModalContent>
           {() => (
