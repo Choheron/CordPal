@@ -10,7 +10,7 @@ import {
 } from "@heroui/modal";
 import { addToast, Alert, Button, Spinner } from "@heroui/react";
 import {Input} from "@heroui/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { Conditional } from "./dashboard/conditional";
 
@@ -28,6 +28,29 @@ export default function LoginModal(props) {
   // Modal Values
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
+
+
+  // Listener for keyboard enter press
+  const handleKeyPress = useCallback((event) => {
+    if (event.key === 'Enter') {
+      if (username !== "" && password !== "" && !loading) {
+        updatePress();
+      }
+    }
+  }, [username, password, loading]);
+
+
+  // UseEffect to add key listener
+  useEffect(() => {
+    // Only add event listener if modal is open
+    if (!isOpen) return;
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [isOpen, handleKeyPress]);
+
 
   function inputsGUI() {
     return (
