@@ -85,7 +85,7 @@ export default async function ReviewAvatarCard(props) {
           </div>
         </PopoverTrigger>
         <PopoverContent
-          className="relative"
+          className="relative w-[338px]"
         >
           <UserCard 
             userDiscordID={review['user_id']} 
@@ -117,6 +117,7 @@ export default async function ReviewAvatarCard(props) {
           <ReviewEmojiMartClientWrapper 
             userData={userData}
             reviewId={review['id']}
+            albumSpotifyID={review['album_id']}
             reactionsList={reactionsList}
           />
           {/* Tenor Disclaimer Display */}

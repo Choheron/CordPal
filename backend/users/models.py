@@ -43,7 +43,23 @@ class User(AbstractUser):
   # Some Backend overhauls
   USERNAME_FIELD = 'nickname' # Set username field to nickname so users can change their email to change their username, email must be unique now
 
-
+  # Overhaul save action to log userdata updates
+  def save(self, *args, **kwargs):
+      """Save override, will create a history object and user action."""
+      from users.models import UserAction
+      if self.pk:  # Only if this is an update, not new
+        # Fetch the original (pre-save) instance from the DB
+        old_user = User.objects.get(pk=self.pk)
+        # Create an update object
+        history = UserAction.objects.create(
+          user = self,
+          action_type="UPDATE",
+          entity_type="USERDATA",
+          entity_id=self.pk,
+          details={"old_user_data": old_user.__dict__, "new_user_data": self.__dict__}
+        )
+      super().save(*args, **kwargs)
+  
   def get_avatar_url(self):
     """Construct the avatar URL from Discord's CDN."""
     if self.discord_avatar:
@@ -105,7 +121,7 @@ class UserAction(models.Model):
 
   user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="actions")
   action_type = models.CharField(max_length=10, choices=ACTION_TYPES)
-  entity_type = models.CharField(max_length=50)  # Examples: "REVIEW", "ALBUM", "PHOTOSHOP", "ALBUM_SELECTION_OUTAGE"
+  entity_type = models.CharField(max_length=50)  # Examples: "REVIEW", "ALBUM", "PHOTOSHOP", "ALBUM_SELECTION_OUTAGE", "USERDATA",
   entity_id = models.IntegerField()
   timestamp = models.DateTimeField(default=timezone.now, blank=True, null=True)
   details = models.JSONField(null=True, blank=True)  # Store extra details (e.g., old vs. new values)

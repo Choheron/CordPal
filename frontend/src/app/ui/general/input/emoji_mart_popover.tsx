@@ -29,6 +29,7 @@ export default function EmojiMartButton(props) {
           className="text-2xl p-1 w-fit h-fit min-w-0 min-h-0 m-1 bg-gray-700 hover:bg-gray-500 overflow-visible"
           onMouseEnter={() => setIsHover(true)}
           onMouseLeave={() => setIsHover(false)}
+          isDisabled={props.isDisabled}
         >
           <div className="relative w-fit h-fit">
             {(isHover || isOpen) ?(<RiUserSmileFill />):(<RiUserSmileLine />) }

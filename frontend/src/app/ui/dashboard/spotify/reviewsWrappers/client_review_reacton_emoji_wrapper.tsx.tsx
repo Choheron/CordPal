@@ -14,17 +14,19 @@ import { useEffect, useState } from "react";
 //  - userData: Object - User Data from Backend
 //  - emojiButtonOverride: String - Tailwind override for emoji button
 export default function ReviewEmojiMartClientWrapper(props) {
+  const albumSpotifyID = props.albumSpotifyID
   const reviewID = props.reviewId
   const [reactionsList, setReactionsList] = useState((props.reactionsList) ? props.reactionsList : [])
   const userData = props.userData
   const userID = userData['guid']
   const emojiButtonOverride = (props.emojiButtonOverride) ? props.emojiButtonOverride : "absolute -top-2 -right-2"
 
-  // Callback to add review to backend
+  // Callback to add reaction to backend
   const handleSelection = async (emojiObj) => {
     const reviewReactionObj = {
       "id": reviewID,
-      "emoji": emojiObj.native
+      "emoji": emojiObj.native,
+      "album_spotify_id": albumSpotifyID 
     }
     const status = await addReviewReaction(reviewReactionObj)
     // If successful, retrieve review data again
@@ -34,11 +36,13 @@ export default function ReviewEmojiMartClientWrapper(props) {
   }
 
   // Handle reaction click for quick add or delete
-  const handleClick = async (emoji, removeReact: boolean) => {
+  const handleClick = async (emojiGroup, removeReact: boolean) => {
     let status = 0
     const reviewReactionObj = {
       "id": reviewID,
-      "emoji": emoji
+      "emoji": emojiGroup['emoji'],
+      "react_id": (removeReact) ? emojiGroup['objects'].find(obj => {return obj["user_id"] == userID})['id'] : "--",
+      "album_spotify_id": albumSpotifyID,
     }
     if(removeReact) {
       status = await deleteReviewReaction(reviewReactionObj)
@@ -75,11 +79,12 @@ export default function ReviewEmojiMartClientWrapper(props) {
       <div className={emojiButtonOverride}>
         <EmojiMartButton 
           selectionCallback={handleSelection}
+          isDisabled={reactionsList.length == 20}
         />
       </div>
       {/* Reaction Emoji Display */}
       <Conditional showWhen={reactionsList.length != 0}>
-        <div className="flex flex-wrap w-full pt-1 gap-1">
+        <div className="flex flex-wrap w-full max-w-full pt-1 gap-1">
           {reactionsList.map((emojiGroup, index) => {
             const didThisReact = isUserInReactList(emojiGroup['objects'])
             return (
@@ -101,7 +106,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
                 <div 
                   key={index}
                   className={`rounded-xl flex gap-1 px-2 py-1 border ${(didThisReact) ? "bg-blue-700/50 border-blue-500" : "bg-slate-700/50 border-slate-500"} hover:cursor-pointer hover:scale-105`}
-                  onClick={() => handleClick(emojiGroup['emoji'], didThisReact)}
+                  onClick={() => handleClick(emojiGroup, didThisReact)}
                 >
                   <p className="text-base">{emojiGroup['emoji']}</p>
                   <p className="text-xs my-auto">{emojiGroup['count']}</p>
@@ -110,6 +115,9 @@ export default function ReviewEmojiMartClientWrapper(props) {
             )
           })}
         </div>
+        <Conditional showWhen={reactionsList.length == 20}>
+          <p className="text-xs text-gray-500 w-full pl-1 pt-1 italic">Max number of distinct reactions reached.</p>
+        </Conditional>
       </Conditional>
     </>
   )

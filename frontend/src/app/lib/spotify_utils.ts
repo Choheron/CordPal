@@ -335,7 +335,7 @@ export async function getReviewsForAlbum(album_spotify_id, date = null) {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['review_submissions'] },
+    next: { tags: ['review_submissions', `album-reviews-${album_spotify_id}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -836,6 +836,7 @@ export async function addReviewReaction(reactObj) {
   // If status was a success, revalidate review tag 
   if(reviewReactStatus == 200) {
     revalidateTag(`review-${reactObj['id']}`)
+    revalidateTag(`album-reviews-${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactStatus;
@@ -863,6 +864,7 @@ export async function deleteReviewReaction(reactObj) {
   // If status was a success, revalidate review tag 
   if(reviewReactDeleteStatus == 200) {
     revalidateTag(`review-${reactObj['id']}`)
+    revalidateTag(`album-reviews-${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactDeleteStatus;

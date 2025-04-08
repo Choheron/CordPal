@@ -67,10 +67,6 @@ class Reaction(models.Model):
     # Call Django's default delete method
     super().delete(*args, **kwargs)
 
-
-  class Meta:
-    unique_together = ('user', 'content_type', 'object_id')  # Ensures one reaction per user per object
-
   
   def __str__(self):
     return f"Comment by {self.user} on {self.content_type} ({self.object_id})"

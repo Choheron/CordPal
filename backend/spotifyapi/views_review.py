@@ -450,13 +450,19 @@ def submitReviewReaction(request: HttpRequest):
     user = getSpotifyUser(request.session.get('discord_id'))
     # Get review from the database
     review = Review.objects.get(pk=reqBody['id'])
-    # Attempt to get reaction if it already exists
+    # Get list of emojis in review reactions
+    reactionEmojis = review.reactions.values_list('emoji', flat=True).distinct()
+    # If the review already has 20 distinct emoji reactions, dont add a new one
+    if((len(reactionEmojis) == 20) and (reqBody['emoji'] not in reactionEmojis)):
+      raise Exception(f"Review {review.pk} has hit max reactions")
+    # Ensure that a user has not already submitted this emoji for this object
     try:
-      reaction: Reaction = review.reactions.get(user = user)
-      reaction.emoji = reqBody['emoji']
-      reaction.save()
-    except:
-      # Create a new review
+      reactCheck = review.reactions.all().filter(user=user).get(emoji=reqBody['emoji'])
+      # Fail if reaction already exists
+      if(reactCheck):
+        raise Exception(f"Reaction with emoji {reqBody['emoji']} by {user.nickname} already exists for review {review.pk}")
+    except Reaction.DoesNotExist as e:
+      # Create a new reaction
       createReaction(review, user, reqBody['emoji'])
     # Return success object 
     return HttpResponse(status=200)
@@ -481,11 +487,13 @@ def deleteReviewReaction(request: HttpRequest):
     reqBody = json.loads(request.body)
     # Retrieve user from session cookie
     user = getSpotifyUser(request.session.get('discord_id'))
+    # Retrieve react PK from request body
+    react_id = reqBody['react_id']
     # Get review from the database
     review = Review.objects.get(pk=reqBody['id'])
     # Attempt to get reaction if it already exists
     try:
-      reaction: Reaction = review.reactions.get(user = user)
+      reaction: Reaction = review.reactions.get(pk=react_id)
       # Delete reaction
       reaction.delete()
     except Reaction.DoesNotExist as e:
