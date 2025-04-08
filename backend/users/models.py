@@ -1,3 +1,5 @@
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.hashers import make_password
 from django.db import models
 from django.utils import timezone
 
@@ -7,7 +9,7 @@ from datetime import (
 )
 
 # Model for Users
-class User(models.Model):
+class User(AbstractUser):
   # Required Fields
   guid = models.BigAutoField(
     "GUID",
@@ -21,7 +23,9 @@ class User(models.Model):
   creation_timestamp = models.DateTimeField(auto_now_add=True)
   # Optional Fields
   email = models.EmailField(max_length=254)
-  nickname = models.CharField(max_length=254)
+  nickname = models.CharField(max_length=254, unique=True)
+  timezone_string = models.CharField(max_length=255, default="America/Chicago") # Last timezone
+  password = models.CharField(max_length=128, null=True, blank=True) # OPTIONAL Password Field (Users [Currently] have the option to create a password after authenticating with discord)
   # Discord Integration Data
   discord_id = models.CharField(max_length=255)
   discord_discriminator = models.CharField(max_length=4, null=True, blank=True)  # 4-digit tag from Discord
@@ -35,8 +39,9 @@ class User(models.Model):
   # Track any and all API calls that come through with this user's session cookie
   last_request_timestamp = models.DateTimeField(null = True)
   last_heartbeat_timestamp = models.DateTimeField(null = True)
-  # Last timezone
-  timezone_string = models.CharField(max_length=255, default="America/Chicago")
+  
+  # Some Backend overhauls
+  USERNAME_FIELD = 'nickname' # Set username field to nickname so users can change their email to change their username, email must be unique now
 
 
   def get_avatar_url(self):
@@ -98,7 +103,7 @@ class UserAction(models.Model):
     ("LOGOUT", "Logout"),
   ]
 
-  user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+  user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="actions")
   action_type = models.CharField(max_length=10, choices=ACTION_TYPES)
   entity_type = models.CharField(max_length=50)  # Examples: "REVIEW", "ALBUM", "PHOTOSHOP", "ALBUM_SELECTION_OUTAGE"
   entity_id = models.IntegerField()

@@ -18,8 +18,8 @@ export default function ReviewHistoryAccordion(props) {
     if(index == (listLen - 1)) {
       return reviewHistoryList[index]['comment']
     }
-    const dmp = new diff_match_patch()
-    const diffs = dmp.diff_main(reviewHistoryList[index + 1]['comment'], reviewHistoryList[index]['comment'])
+    let dmp = new diff_match_patch()
+    let diffs = dmp.diff_main(reviewHistoryList[index + 1]['comment'], reviewHistoryList[index]['comment'])
     dmp.diff_cleanupSemantic(diffs)
 
     const DIFF_DELETE = -1;

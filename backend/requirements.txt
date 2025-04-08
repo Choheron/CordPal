@@ -3,6 +3,7 @@ django-cors-headers
 django-extensions
 django-prometheus
 python-dotenv
+django[argon2]
 requests
 pytz
 # DB Connection Libraries

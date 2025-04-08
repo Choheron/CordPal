@@ -55,6 +55,7 @@ export default function TopBar(props) {
                 userInfo={props.userInfo}
                 avatarURL={props.avatarURL}
                 linkedAccounts={props.linkedAccounts}
+                userLoginMethods={props.userLoginMethods}
               />
             )}
             avatarProps={{

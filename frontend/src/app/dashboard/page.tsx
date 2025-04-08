@@ -56,7 +56,7 @@ export default async function Page() {
         </div>
         <Conditional showWhen={(memberStatus)}>
           <LiveOnlineUsersBox 
-            pollingInterval={10}
+            pollingInterval={15}
             userList={userList}
             onlineData={onlineData}
           />

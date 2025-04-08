@@ -21,4 +21,11 @@ urlpatterns = [
     path('getUsersByTimezone', views.getUsersByTimezone),
     # Heartbeat url to determine online status
     path('heartbeat', views.heartbeat),
+    path('isFieldUnique', views.isFieldUnique),
+    # Below URL has two variations (one for lack of URL Param)
+    path('getLoginMethods/<str:user_discord_id>', views.getLoginMethods),
+    path('getLoginMethods', views.getLoginMethods),
+    path('getPasswordValidators', views.getPasswordValidators),
+    path('updateUserPassword', views.updateUserPassword),
+    path('traditionalLogin', views.traditionalLogin),
 ]

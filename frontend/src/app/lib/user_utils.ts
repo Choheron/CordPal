@@ -65,7 +65,7 @@ export async function getUserList() {
   const userListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserList`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    next: { revalidate: 120 },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
