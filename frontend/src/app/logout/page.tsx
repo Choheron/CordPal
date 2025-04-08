@@ -15,6 +15,7 @@ export default function Page() {
     }
     doDiscordLogout()
     router.push("/");
+    router.refresh();
   }, []);
 
 

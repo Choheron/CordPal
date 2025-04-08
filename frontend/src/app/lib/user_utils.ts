@@ -23,8 +23,9 @@ export async function logout() {
     credentials: "include",
     cache: 'no-cache',
   });
+  const cookieStore = await cookies()
   // Delete Cookie
-  cookies().delete("sessionid");
+  cookieStore.delete("sessionid");
   // Log Logout
   console.log("Logout completed.");
 }

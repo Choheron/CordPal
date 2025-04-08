@@ -22,6 +22,7 @@ export default function LoginModal(props) {
   // States
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [alertColor, setAlertColor] = useState<any>("danger")
   const [errorText, setErrorText] = useState("")
   const [loading, setLoading] = useState(false)
   // Modal Values
@@ -70,14 +71,19 @@ export default function LoginModal(props) {
     const data = await loginResponse.json()
     // If error, display error
     if(status != 200) {
+      setAlertColor("danger")
       setErrorText(data['message'])
       setLoading(false)
     } else if((data['errorType'] != "") && (!data['success'])) {
+      setAlertColor("danger")
       setErrorText(data['message'])
       setLoading(false)
     } else {
+      setAlertColor("success")
+      setErrorText(data['message'])
       // On success, redirect to dashboard
       router.replace("/dashboard")
+      router.refresh()
     }
   }
 
@@ -116,7 +122,7 @@ export default function LoginModal(props) {
               </ModalHeader>
               <ModalBody className="font-extralight">
                 <Conditional showWhen={errorText != ""}>
-                  <Alert color="danger" title={errorText} />
+                  <Alert color={alertColor} title={errorText} />
                 </Conditional>
                 <p>Note: You must login with discord and set up a password before you can use the traditional login method.</p>
                 {inputsGUI()}

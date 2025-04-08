@@ -457,7 +457,7 @@ def traditionalLogin(request: HttpRequest):
     out = {}
     out['success'] = True
     out['errorType'] = ""
-    out["message"] = "Successful Login, Redirect to Dashboard."
+    out["message"] = "Successful Login, Redirecting to Dashboard... Please Wait."
     return JsonResponse(out)
   except Exception:
     logger.error(f"System Error during traditional login! {traceback.format_exc()}")
