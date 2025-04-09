@@ -34,7 +34,7 @@ class LastSeenMiddleware:
       time = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
       # Update only heartbeat timestamp if its a heartbeat call, otherwise update last_request_timestamp
       if(full_path in self.heartbeat_endpoint_paths):
-        if(full_path in "/users/heartbeat"):
+        if(full_path == "/users/heartbeat"):
           # Update timezone if timezone is in request
           user.timezone_string = json.loads(request.body)['heartbeat']['timezone']
           self.logger.debug(f"Setting timezone to {str(user.timezone_string)} for user {user.nickname}")
@@ -47,8 +47,11 @@ class LastSeenMiddleware:
         self.logger.debug(f"Setting last_request_timestamp to {str(time)} for user {user.nickname}")
         user.save()
     except Exception as e:
-      # Log method call (With username)
-      self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}")
+      if(isinstance(e, User.DoesNotExist)):
+        # Log method call (With username)
+        self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}")
+      else:
+        self.logger.error(f"ERROR IN MIDDLEWARE: {e}")
     
     # Code above this line is executed before the view is called
     # Retrieving the response 
