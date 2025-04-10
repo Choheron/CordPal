@@ -26,10 +26,12 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - album_spotify_id: String - (Optional) Album Spotify ID for retrieval of average from database
 //  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
 //  - showAlbumRating: Boolean - (Optional) [DEFAULT TRUE] Show the average user rating for the album
+//  - trackCount: Boolean - (Optional) Number of songs in the album, if provided, will show.
 //  - member_status: Boolean - (Optional) Is the user a member of the desired server?
 export default async function AlbumDisplay(props) {
   // Configuration Props
   const showAlbumRating = (props.showAlbumRating == false) ? props.showAlbumRating : true;
+  const trackCount = (props.trackCount) ? props.trackCount : null;
   // Album props checks
   const title = (props.title) ? props.title : "No Album Title Found";
   const album_url = (props.album_src) ? props.album_src : "https://www.google.com/search?q=sad+face";
@@ -43,13 +45,14 @@ export default async function AlbumDisplay(props) {
   const submission_date: string = (props.submission_date) ? props.submission_date : "Not Provided";
   const release_date: string = (props.release_date) ? props.release_date : "Unknown";
   const release_date_precision: string = (props.release_date_precision) ? props.release_date_precision : "day";
-  // Rating props check
-  const avg_rating = (props.album_spotify_id && showAlbumRating) ? await getAlbumAvgRating(props.album_spotify_id, false): 0.0;
   // Historical props checks
   const historical = (props.historical_date) ? true : false;
-  const historical_date = (props.historical_date) ? props.historical_date : "0000-00-00";
+  const historical_date = (props.historical_date) ? props.historical_date : null;
   // Check that user is authenticated
   const userAuth = (props.member_status) ? props.member_status : true;
+  // Rating props check
+  const avg_rating = (props.album_spotify_id && showAlbumRating) ? await getAlbumAvgRating(props.album_spotify_id, false, historical_date): 0.0;
+  
 
   const dateToCalUrl = (dateStr) => {
     const dateArr = dateStr.split("-")
@@ -62,7 +65,7 @@ export default async function AlbumDisplay(props) {
       <div className="w-full my-auto flex flex-row">
         <img 
           src={album_img_src}
-          className='h-[125px] w-[125px] lg:h-[300px] lg:w-[300px] rounded-2xl mx-auto'
+          className='h-[125px] w-[125px] md:h-[300px] md:w-[300px] rounded-2xl mx-auto'
           alt={`Album Cover for ${title} by ${artist_name}`}
         />
         <div className="w-full max-w-full flex flex-col lg:gap-2 pl-2 lg:pl-5 pt-1 lg:pt-2 my-auto">
@@ -82,6 +85,9 @@ export default async function AlbumDisplay(props) {
                 datePrecision={release_date_precision}
               />
             </div>
+          </Conditional>
+          <Conditional showWhen={trackCount}>
+            <p className="text-sm -my-1">Song Count: {trackCount}</p>
           </Conditional>
           <Conditional showWhen={userAuth && props.submitter}>
             <div className="">
@@ -129,17 +135,6 @@ export default async function AlbumDisplay(props) {
                 />
               </div>
             </div>
-          </Conditional>
-          <Conditional showWhen={historical}>
-            <Button 
-              as={Link}
-              href={"/dashboard/spotify/calendar/" + dateToCalUrl(historical_date)}
-              radius="lg"
-              className={`w-fit hover:underline text-white`}
-              variant="solid"
-            >
-              <b>All Reviews</b>
-            </Button> 
           </Conditional>
         </div>
       </div>

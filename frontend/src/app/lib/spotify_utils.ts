@@ -348,16 +348,18 @@ export async function getReviewsForAlbum(album_spotify_id, date = null) {
 // Get Review by User for specific Album from Backend
 // - RETURN: HttpResponse
 //
-export async function getUserReviewForAlbum(album_spotify_id) {
+export async function getUserReviewForAlbum(album_spotify_id, date = null) {
   // If no album ID provided, return null
   if(album_spotify_id == "") {
     return null
   }
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
+  // Url Tail Definition
+  const urlTail = `/${album_spotify_id}${((date != null) ? `/${date}` : "")}`
   // Get user's review for an album
-  console.log(`getUserReviewForAlbum: Sending request to backend '/spotifyapi/getUserReviewForAlbum/${album_spotify_id}'`)
-  const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getUserReviewForAlbum/${album_spotify_id}`, {
+  console.log(`getUserReviewForAlbum: Sending request to backend '/spotifyapi/getUserReviewForAlbum${urlTail}'`)
+  const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getUserReviewForAlbum${urlTail}`, {
     method: "GET",
     credentials: "include",
     cache: 'no-cache',

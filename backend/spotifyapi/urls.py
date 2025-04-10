@@ -56,6 +56,8 @@ urlpatterns = [
   # Below URL has two variations, one in which a date is provided and one where it isnt
   path('getReviewsForAlbum/<str:album_spotify_id>/<str:date>', views_review.getReviewsForAlbum),
   path('getReviewsForAlbum/<str:album_spotify_id>', views_review.getReviewsForAlbum),
+  # Below URL has two variations, for lack of date provided
+  path('getUserReviewForAlbum/<str:album_spotify_id>/<str:date>', views_review.getUserReviewForAlbum),
   path('getUserReviewForAlbum/<str:album_spotify_id>', views_review.getUserReviewForAlbum),
   path('getAllUserReviewStats', views_review.getAllUserReviewStats),
   path('getUserReviewStats/<str:user_discord_id>', views_review.getUserReviewStats),

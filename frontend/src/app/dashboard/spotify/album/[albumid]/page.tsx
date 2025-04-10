@@ -36,7 +36,7 @@ export default async function Page({
 
   // Box of historical review dates - Generate series of review displays based on dates
   const pastReviewsBox = () => {
-    return aotd_dates.map((date, index) => {
+    return aotd_dates.reverse().map((date, index) => {
       const dateArr = date.split("-")
       return (
           <div 
@@ -90,33 +90,36 @@ export default async function Page({
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text={`${albumData("title")}`} />
       <div className="flex flex-col w-fit justify-center md:w-4/5 gap-2">
-        <div className="relative w-fit mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-          <AlbumDisplay 
-            title={albumData("title")}
-            album_img_src={albumData("album_img_src")}
-            album_src={albumData("album_src")}
-            artist={albumData("artist")}
-            submitter={albumData("submitter")}
-            submitter_comment={albumData("submitter_comment")}
-            submission_date={albumData("submission_date")}
-            release_date={albumData('release_date')}
-            release_date_precision={albumData("release_date_precision")}
-          />
-          <Conditional showWhen={isAdmin || isUploader}>
-            <div className="absolute -top-1 right-1 ">
-              <DeleteModal 
-                confirmCallback={handleDelete}
-                cancelCallback={null}
-                isButtonDisabled={aotd_dates.length > 0}
-                tooltipContent={(aotd_dates.length > 0) ? "Album cannot be deleted, it has been AOtD!" : "Delete Album"}
-                titleText={`Delete "${albumData('title')}"?`}
-                bodyText={`Are you sure you want to delete "${albumData('title')}"? You cannot undo this action.`}
-                redirectText={'/dashboard/spotify'}
-                textboxDescription={"Reason for deletion (Optional)"}
-                textboxPlaceholder="(Optional) Input a reason for deleting the album."
-              />
-            </div>
-          </Conditional>
+        <div className="flex mx-auto">
+          <div className="relative w-fit lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+            <AlbumDisplay 
+              title={albumData("title")}
+              album_img_src={albumData("album_img_src")}
+              album_src={albumData("album_src")}
+              artist={albumData("artist")}
+              submitter={albumData("submitter")}
+              submitter_comment={albumData("submitter_comment")}
+              submission_date={albumData("submission_date")}
+              release_date={albumData('release_date')}
+              release_date_precision={albumData("release_date_precision")}
+              trackCount={JSON.parse(albumData("raw_album_data"))['album']['total_tracks']}
+            />
+            <Conditional showWhen={isAdmin || isUploader}>
+              <div className="absolute -top-1 right-1 ">
+                <DeleteModal 
+                  confirmCallback={handleDelete}
+                  cancelCallback={null}
+                  isButtonDisabled={aotd_dates.length > 0}
+                  tooltipContent={(aotd_dates.length > 0) ? "Album cannot be deleted, it has been AOtD!" : "Delete Album"}
+                  titleText={`Delete "${albumData('title')}"?`}
+                  bodyText={`Are you sure you want to delete "${albumData('title')}"? You cannot undo this action.`}
+                  redirectText={'/dashboard/spotify'}
+                  textboxDescription={"Reason for deletion (Optional)"}
+                  textboxPlaceholder="(Optional) Input a reason for deleting the album."
+                />
+              </div>
+            </Conditional>
+          </div>
         </div>
         <Conditional showWhen={aotd_dates.length > 0}>
           <div className='w-full'>

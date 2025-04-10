@@ -287,7 +287,7 @@ def getAllAlbums(request: HttpRequest):
     # Check if album has been aotd
     try:
       # Get most recent AOtD date
-      albumObj['last_aotd'] = DailyAlbum.objects.filter(album=album).filter(date__lt=timezone.now()).latest('date').date # Return most recent instance of album
+      albumObj['last_aotd'] = DailyAlbum.objects.filter(album=album).filter(date__lte=datetime.datetime.now(tz=pytz.timezone('America/Chicago'))).latest('date').date # Return most recent instance of album
       # Get most recent review rating from AOtD
       albumObj['rating'] = getAlbumRating(album_spotify_id=album.spotify_id, rounded=False, date=albumObj['last_aotd'])
     except:

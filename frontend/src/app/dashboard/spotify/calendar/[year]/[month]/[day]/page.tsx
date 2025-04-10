@@ -107,6 +107,7 @@ export default async function Page({
                 submission_date={albumData("submission_date")}
                 release_date={albumData("release_date")}
                 release_date_precision={albumData("release_date_precision")}
+                historical_date={date}
               />
             </Badge>
             <div className="flex justify-around mt-4">
@@ -125,6 +126,7 @@ export default async function Page({
           <div className="backdrop-blur-2xl px-2 py-2 my-2 mx-auto rounded-2xl bg-zinc-800/30 border border-neutral-800">
             <ReviewDisplay
               album_id={albumData("album_id")}
+              date={date}
             />
           </div>
         </div>

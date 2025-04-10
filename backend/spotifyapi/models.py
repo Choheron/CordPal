@@ -134,7 +134,7 @@ class Album(models.Model):
 
 # Model for an album of the day
 class DailyAlbum(models.Model):
-    album = models.OneToOneField(Album, on_delete=models.CASCADE)
+    album = models.ForeignKey(Album, on_delete=models.PROTECT)
     date = models.DateField(unique=True)
     manual = models.BooleanField(default=False)
 
@@ -161,7 +161,7 @@ class Review(models.Model):
     reactions = GenericRelation(Reaction)
 
     class Meta:
-      unique_together = ('album', 'user')  # Prevent duplicate reviews for the same user and album
+      unique_together = ('album', 'user', 'aotd_date')  # Prevent duplicate reviews for the same user and album
 
 
     def toJSON(self, full: bool = False):

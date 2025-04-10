@@ -44,6 +44,8 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 # Submit a new review of an album by a user.
 ###
 def submitReview(request: HttpRequest):
+  # Todays Date
+  date = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d')
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("submitReview called with a non-POST method, returning 405.")
@@ -58,7 +60,7 @@ def submitReview(request: HttpRequest):
   albumObj = Album.objects.get(spotify_id=reqBody['album_id'])
   # Check if a review already exists for this user
   try:
-    reviewObj = Review.objects.get(album=albumObj, user=userObj)
+    reviewObj = Review.objects.get(album=albumObj, user=userObj, aotd_date=date)
     reviewObj.score = float(reqBody['score'])
     reviewObj.review_text = reqBody['comment']
     reviewObj.first_listen = reqBody['first_listen']
@@ -73,7 +75,7 @@ def submitReview(request: HttpRequest):
       score=float(reqBody['score']),
       review_text=reqBody['comment'],
       first_listen=reqBody['first_listen'],
-      aotd_date=datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d'),
+      aotd_date=date,
       version=2
     )
     # Save new Review data
@@ -95,7 +97,7 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str, date: str = 
     return res
   # If date is not provided grab the most recent date of AOtD
   try:
-    aotd_date = date if (date) else DailyAlbum.objects.filter(album__spotify_id=album_spotify_id).latest('date').date
+    aotd_date = datetime.datetime.strptime(date, "%Y-%m-%d").date() if (date) else DailyAlbum.objects.filter(album__spotify_id=album_spotify_id).latest('date').date
   except:
     out = {}
     out['review_list'] = []
@@ -130,21 +132,29 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str, date: str = 
 ###
 # Get USER Reviews for a specific album.
 ###
-def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str):
+def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str, date: str = None):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getUserReviewForAlbum called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Get Album from the database
+  # If date is not provided grab the most recent date of AOtD
+  try:
+    aotd_date = datetime.datetime.strptime("%Y-%m-%d") if (date) else DailyAlbum.objects.filter(album__spotify_id=album_spotify_id).latest('date').date
+  except:
+    out = {}
+    out['review_list'] = []
+    print(f'Album {album_spotify_id} not found in AOtD List...')
+    return JsonResponse(out)
+  # Get User from the database
   try: 
-    albumObj = Album.objects.get(spotify_id=album_spotify_id)
+    user = getSpotifyUser(request.session.get('discord_id'))
   except ObjectDoesNotExist:
     return JsonResponse({"review": None})
   # Get reivew for album
   try: 
-    review = Review.objects.get(album=albumObj, user=getSpotifyUser(request.session.get('discord_id')))
+    review = user.aotd_reviews.all().get(aotd_date=aotd_date)
   except ObjectDoesNotExist:
     return JsonResponse({"review": None})
   # Declare out object and populate
