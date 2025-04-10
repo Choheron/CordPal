@@ -144,7 +144,7 @@ export default function AlbumReviewBox(props) {
                 <span className="transition-transform bg-yellow-600 shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80" />
               </div>
             )}
-            className="max-w-full px-10 mx-auto" 
+            className="max-w-full px-0 sm:px-10 mx-auto" 
           />
           </Tooltip>
         {/* <Select 

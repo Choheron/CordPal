@@ -251,7 +251,7 @@ export default function TipTap(props) {
     }
 
     return (
-      <div className="absolute -bottom-5 -right-2">
+      <div className="hidden sm:block absolute -bottom-5 -right-2">
         <EmojiMartButton 
           selectionCallback={addEmoji}
         />

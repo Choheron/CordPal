@@ -189,10 +189,10 @@ export default function AddAlbumModal(props) {
   
   return (
     <>
-      <div className="flex flex-col lg:flex-row gap-1 justify-center w-full">
-        <div className="flex">
+      <div className="flex flex-col sm:flex-row gap-0 justify-center w-full">
+        <div className={`flex mx-auto sm:mx-0`}>
           <Button 
-            className="p-2 mt-4 mb-1 rounded-lg text-inheret min-w-0 min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline"
+            className="p-2 mt-2 mb-1 rounded-lg text-inheret min-w-0 min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline"
             size="lg"
             onPress={onOpen}
             radius="none"
@@ -203,8 +203,8 @@ export default function AddAlbumModal(props) {
           </Button>
         </div>
         <Conditional showWhen={!userAllowedToSubmit && userAllowedToSubmitMessage != ""}>
-          <div className="flex gap-1 w-fit mx-2 my-4 backdrop-blur-2xl px-2 py-2 rounded-2xl border border-neutral-800">
-            <p className="text-sm my-auto">
+          <div className="flex gap-1 w-fit mx-auto sm:mx-1 my-auto backdrop-blur-2xl px-2 py-2 rounded-2xl border border-neutral-800">
+            <p className="text-sm my-auto italic text-gray-400">
               You are currently unable to Submit an album. 
             </p>
             <InfoPopover 

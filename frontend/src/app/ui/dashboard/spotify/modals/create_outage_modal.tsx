@@ -147,7 +147,7 @@ export default function CreateOutageModal(props) {
       <div className="flex flex-col lg:flex-row gap-1 justify-center w-full">
         <div className="flex">
           <Button 
-            className="p-2 mt-4 mb-1 rounded-lg text-inheret min-w-0 min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline"
+            className="p-2 mt-4 mb-1 mx-auto rounded-lg text-inheret min-w-0 min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline"
             size="lg"
             onPress={onOpen}
             radius="none"

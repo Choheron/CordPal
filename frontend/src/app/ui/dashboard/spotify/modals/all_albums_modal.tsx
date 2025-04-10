@@ -188,19 +188,19 @@ export default function AllAlbumsModal(props) {
     switch (columnKey) {
       case "title":
         return (
-          <div className="flex gap-2">
+          <div className="w-[400px]">
             <Button 
               as={Link}
               href={"/dashboard/spotify/album/" + album['album_id']}
               radius="lg"
-              className={`w-fit text-left max-w-full h-fit mr-auto hover:underline text-white py-1`}
+              className={`relative w-full max-w-full justify-start h-fit px-0 hover:underline text-white py-1`}
               variant="light"
             >
               <Avatar
                 src={album['album_img_src']}
-                className='my-auto'
+                className='my-auto shrink-0'
               />
-              <p className="text-lg my-auto hover:underline max-w-lg">
+              <p className="w-fit text-lg hover:underline max-w-lg text-ellipsis">
                 {album['title']}
               </p>
             </Button>
@@ -208,9 +208,11 @@ export default function AllAlbumsModal(props) {
         );
       case "artist":
         return (
-          <a href={album['artist']['href']} target="_noreferrer" className="w-fit text-md my-auto hover:underline">
-            {album['artist']['name']}
-          </a>
+          <div className="w-[100px]">
+            <a href={album['artist']['href']} target="_noreferrer" className="w-fit text-md my-auto hover:underline">
+              {album['artist']['name']}
+            </a>
+          </div>
         );
       case "submitter":
         return (
@@ -355,7 +357,7 @@ export default function AllAlbumsModal(props) {
                   >
                     {(item: any) => (
                       <TableRow key={`${item['title']} - ${item['artist']['name']} - ${item['submitter_nickname']}`}>
-                        {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                        {(columnKey) => <TableCell className="w-fit">{renderCell(item, columnKey)}</TableCell>}
                       </TableRow>
                     )}
                   </TableBody>
