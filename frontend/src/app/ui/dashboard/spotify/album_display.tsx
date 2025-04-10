@@ -69,10 +69,9 @@ export default async function AlbumDisplay(props) {
           href={album_page_url}
           className="relative shrink-0 h-[125px] w-[125px] md:h-[300px] md:w-[300px]"
         >
-          <Image 
+          <img 
             src={album_img_src}
-            fill={true}
-            className='rounded-2xl mx-auto'
+            className='rounded-2xl mx-auto object-cover'
             alt={`Album Cover for ${title} by ${artist_name}`}
           />
         </Link>
