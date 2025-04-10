@@ -31,7 +31,7 @@ export default function SimilarRatingsBox(props) {
             <Button 
               as={Link}
               href={"/dashboard/spotify/album/" + album['spotify_id']}
-              radius="full"
+              radius="sm"
               className={`h-fit w-fit text-white px-0 hover:scale-110 pointer-events-auto`}
               variant="light"
             >
@@ -39,6 +39,7 @@ export default function SimilarRatingsBox(props) {
                 src={album['album_img_src']} 
                 name={album['title']}
                 className="w-20 h-20 text-large -mx-1"
+                radius="sm"
               />
             </Button>
           </Tooltip>

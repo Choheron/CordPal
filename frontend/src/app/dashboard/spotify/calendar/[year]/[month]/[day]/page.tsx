@@ -98,6 +98,7 @@ export default async function Page({
             >
               <AlbumDisplay
                 title={albumData("title")}
+                album_id={albumData("album_id")}
                 album_img_src={albumData("album_img_src")}
                 album_src={albumData("album_src")}
                 album_spotify_id={albumData("album_id")}
