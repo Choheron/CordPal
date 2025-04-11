@@ -257,7 +257,7 @@ def generateDayRatingTimeline(aotd_obj: DailyAlbum):
       "review_id": reviewObj.pk
     }
 
-  def createUpdateObj(updateObj: ReviewHistory):
+  def createUpdateObj(updateObj: ReviewHistory, is_first_submission: bool = False):
     """Generate an update object for the timeline"""
     return {
       "timestamp": updateObj.last_updated.astimezone(pytz.UTC).isoformat(),
@@ -265,21 +265,24 @@ def generateDayRatingTimeline(aotd_obj: DailyAlbum):
       "user_id": updateObj.review.user.pk,
       "user_discord_id": updateObj.review.user.discord_id,
       "user_nickname": updateObj.review.user.nickname,
-      "type": "Update",
+      "type": "First Update" if is_first_submission else "Update",
       "score": updateObj.score, # The score given for this object
       "review_id": updateObj.review.pk
     }
   
   def addToUserStack(trackingObj, updateObj: ReviewHistory):
-    '''Add to user stack and return true if this update changes a users score. (Updates that have no previous version also return true as they altered score.s)'''
+    '''
+    Add to user stack and return true if this update changes a users score. (Updates that have no previous version also return true as they altered score.s)
+    Return Data: (Updated Tracking Object, Boolean showing if update was a changing update, Boolean showing if this was the first submission)
+    '''
     tracking: dict = trackingObj
     if updateObj.review.user.nickname in trackingObj.keys():
       status = (tracking[updateObj.review.user.nickname][-1].score != updateObj.score)
       tracking[updateObj.review.user.nickname].append(updateObj)
-      return tracking, status
+      return tracking, status, False
     else:
       tracking[updateObj.review.user.nickname] = [updateObj]
-      return tracking, True
+      return tracking, True, True
 
   # Retrieve Album and date of aotd
   album = aotd_obj.album
@@ -304,20 +307,20 @@ def generateDayRatingTimeline(aotd_obj: DailyAlbum):
       out.append(createReviewObj(curr_review))
       review_p += 1
     elif((curr_review == None) or (curr_update.recorded_at < curr_review.last_updated)):
-      users_obj, status = addToUserStack(users_obj, curr_update)
+      users_obj, status, first_update = addToUserStack(users_obj, curr_update)
       # Only add an update to the list if it changed the score
       if(status): 
-        out.append(createUpdateObj(curr_update))
+        out.append(createUpdateObj(curr_update, first_update))
       update_p += 1
     else: # In the rare event of a simultaneous submission, attach both and increment
       # Add review object
       out.append(createReviewObj(curr_review))
       review_p += 1
       # Add Update object
-      users_obj, status = addToUserStack(users_obj, curr_update)
+      users_obj, status, first_update = addToUserStack(users_obj, curr_update)
       # Only add an update to the list if it changed the score
       if(status): 
-        out.append(createUpdateObj(curr_update))
+        out.append(createUpdateObj(curr_update, first_update))
       update_p += 1
   # Save the object's timeline data
   aotd_obj.rating_timeline={"timeline": out}

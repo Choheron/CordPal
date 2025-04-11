@@ -163,6 +163,13 @@ export async function AOtDScoreTimelineLineChart(props) {
                         <b>Final Review</b>
                       </p>
                     </Conditional>
+                    <Conditional showWhen={entry.type=="First Update"}>
+                    <p
+                        className="text-xs my-auto border border-orange-500 rounded-full px-1 ml-2 bg-orange-500/80 italic text-black font-normal"
+                      >
+                        <b>Inital Review</b>
+                      </p>
+                    </Conditional>
                   </div>
                   <Divider className="mb-2" />
                   <div className="flex flex-row w-full justify-between mb-1">
