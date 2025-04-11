@@ -30,8 +30,7 @@ export async function AOtDScoreTimelineLineChart(props) {
       timeZone: timeZone,
     }).format(new Date(aotdDate))
   );
-  const endOfDay = new Date(new Date(startOfDay).setHours(23, 59, 59, 999));
-
+  const endOfDay = new Date(new Date(startOfDay).setHours(24, 0, 0, 0));
 
   let xScale = scaleTime()
     .domain([startOfDay, endOfDay])
@@ -42,8 +41,7 @@ export async function AOtDScoreTimelineLineChart(props) {
 
   let line = d3_line<(typeof data)[number]>()
     .x((d) => xScale(d.timestamp))
-    .y((d) => yScale(d.value))
-    .curve(curveMonotoneX);
+    .y((d) => yScale(d.value));
 
   let d = line(data);
 
@@ -144,9 +142,9 @@ export async function AOtDScoreTimelineLineChart(props) {
                   style={{
                     left: `${xScale(tick)}%`,
                     top: "100%",
-                    transform: `translateX(${i === 0 ? "0%" : i === data.length - 1 ? "-100%" : "-50%"})`, // The first and last labels should be within the chart area
+                    transform: `translateX(${i === 0 ? "0%" : "-50%"})`,
                   }}
-                  className="text-xs absolute"
+                  className="text-xs absolute text-nowrap"
                 >
                   {tick.toLocaleTimeString("en-US", {
                     timeZone: "America/Chicago",
