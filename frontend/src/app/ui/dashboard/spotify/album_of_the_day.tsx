@@ -80,13 +80,15 @@ export default async function AlbumOfTheDayBox(props) {
               All album artwork, track titles, artist names, and related content are the property of their respective copyright holders.
             </p>
           </div>
-          <AlbumReviewBox 
-            album_id={albumData("album_id")}
-            rating={(albumReview != null) ? albumReview['score'] : null}
-            comment={(albumReview != null) ? albumReview['comment'] : null}
-            first_listen={(albumReview != null) ? albumReview['first_listen']: null}
-            similar_review_data={similarReviewData}
-          />
+          <div className="w-full max-w-full">
+            <AlbumReviewBox 
+              album_id={albumData("album_id")}
+              rating={(albumReview != null) ? albumReview['score'] : null}
+              comment={(albumReview != null) ? albumReview['comment'] : null}
+              first_listen={(albumReview != null) ? albumReview['first_listen']: null}
+              similar_review_data={similarReviewData}
+            />
+          </div>
           <div className="w-full flex">
             <AddAlbumModal />
           </div>

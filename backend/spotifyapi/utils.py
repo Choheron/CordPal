@@ -243,6 +243,31 @@ def checkSelectionFlag(spotify_user: SpotifyUserData):
 # Iterate all reviews and review updates associate with a given AOtD, returning in a format (sorted by timestamp) showing changes to AOTD average rating over the course of the day
 # This data should be updated to be stored in the database, so as to avoid having to recalculate it every time its viewed
 def generateDayRatingTimeline(aotd_obj: DailyAlbum):
+
+  def createReviewObj(reviewObj: Review):
+    """Generate a review object for the timeline"""
+    return {
+      "timestamp": reviewObj.last_updated.astimezone(pytz.UTC).isoformat(),
+      "value": getAlbumPartialReviewScore(review = reviewObj), # The average value of the album by this timestamp
+      "user_id": reviewObj.user.pk,
+      "user_discord_id": reviewObj.user.discord_id,
+      "user_nickname": reviewObj.user.nickname,
+      "type": "Review",
+      "score": reviewObj.score # The score given for this object
+    }
+
+  def createUpdateObj(updateObj: ReviewHistory):
+    """Generate an update object for the timeline"""
+    return {
+      "timestamp": updateObj.last_updated.astimezone(pytz.UTC).isoformat(),
+      "value": getAlbumPartialReviewScore(update = updateObj), # The average value of the album by this timestamp
+      "user_id": updateObj.review.user.pk,
+      "user_discord_id": updateObj.review.user.discord_id,
+      "user_nickname": updateObj.review.user.nickname,
+      "type": "Update",
+      "score": updateObj.score # The score given for this object
+    }
+
   # Retrieve Album and date of aotd
   album = aotd_obj.album
   date = aotd_obj.date
@@ -260,49 +285,17 @@ def generateDayRatingTimeline(aotd_obj: DailyAlbum):
     curr_update = review_updates_list[update_p] if (update_p != len(review_updates_list)) else None
     # Determine the timestamps of each and store the earlier one in the list, then increment
     if((curr_update == None) or (curr_review.last_updated < curr_update.recorded_at)):
-      out.append(
-        {
-          "timestamp": curr_review.last_updated.isoformat(),
-          "value": getAlbumPartialReviewScore(review = curr_review), # The average value of the album by this timestamp
-          "user_id": curr_review.user.pk,
-          "user_discord_id": curr_review.user.discord_id,
-          "user_nickname": curr_review.user.nickname,
-        }
-      )
+      out.append(createReviewObj(curr_review))
       review_p += 1
     elif((curr_review == None) or (curr_update.recorded_at < curr_review.last_updated)):
-      out.append(
-        {
-          "timestamp": curr_update.last_updated.isoformat(),
-          "value": getAlbumPartialReviewScore(update = curr_update), # The average value of the album by this timestamp
-          "user_id": curr_review.user.pk,
-          "user_discord_id": curr_review.user.discord_id,
-          "user_nickname": curr_review.user.nickname,
-        }
-      )
+      out.append(createUpdateObj(curr_update))
       update_p += 1
     else: # In the rare event of a simultaneous submission, attach both and increment
       # Add review object
-      out.append(
-        {
-          "timestamp": curr_review.last_updated.isoformat(),
-          "value": getAlbumPartialReviewScore(review = curr_review), # The average value of the album by this timestamp
-          "user_id": curr_review.user.pk,
-          "user_discord_id": curr_review.user.discord_id,
-          "user_nickname": curr_review.user.nickname,
-        }
-      )
+      out.append(createReviewObj(curr_review))
       review_p += 1
       # Add Update object
-      out.append(
-        {
-          "timestamp": curr_update.last_updated.isoformat(),
-          "value": getAlbumPartialReviewScore(update = curr_update), # The average value of the album by this timestamp
-          "user_id": curr_review.user.pk,
-          "user_discord_id": curr_review.user.discord_id,
-          "user_nickname": curr_review.user.nickname,
-        }
-      )
+      out.append(createUpdateObj(curr_update))
       update_p += 1
   # Save the object's timeline data
   aotd_obj.rating_timeline={"timeline": out}

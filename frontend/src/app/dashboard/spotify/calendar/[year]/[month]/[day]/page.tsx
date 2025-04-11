@@ -1,3 +1,5 @@
+"use server"
+
 import { getAlbumAvgRating, getAlbumOfTheDayData, getDayTimelineData } from "@/app/lib/spotify_utils"
 import { getNextDay, getPrevDay, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
@@ -136,7 +138,7 @@ export default async function Page({
           </div>
         </div>
         <Conditional showWhen={ratingTimeline.length != 0}>
-          <div className="w-full md:w-3/4 mx-auto py-5">
+          <div className="w-full 2xl:w-3/4 mx-auto py-5">
             <div className="pb-5 pt-2 font-extralight text-lg underline">
               <p>Rating Change Timeline:</p>
             </div>

@@ -1,39 +1,41 @@
 "use server"
 
 import { CSSProperties } from "react";
-import { scaleTime, scaleLinear, max, line as d3_line, curveMonotoneX } from "d3";
-import UserAvatar from "@/app/ui/general/userUiItems/user_avatar";
+import { scaleTime, scaleLinear, max, line as d3_line, curveMonotoneX, timeHour } from "d3";
 import { DateTime } from "luxon";
 import { ClientTooltip, TooltipContent, TooltipTrigger } from "../../../../general/charts/rosen_tooltip"; 
+import { Avatar, Divider } from "@heroui/react";
+import { getUserAvatarURL } from "@/app/lib/user_utils";
+import { Conditional } from "../../../conditional";
+import { ratingToTailwindBgColor } from "@/app/lib/utils";
 
 // Expected Props:
 //  - data: List of data formatted for this chart
 //  - aotdDate: String aotd date
 export async function AOtDScoreTimelineLineChart(props) {
-  const timeZone = 'America/Chicago';
-
-  const data: any = props.data.map((item, i) => {
-    const adjustedTime = DateTime.fromISO(item.timestamp).setZone("America/Chicago");
+  const timeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone
+  
+  const data: any = (await Promise.all(props.data.map( async(item) => {
+    const adjustedTime = DateTime.fromISO(item.timestamp).setZone(timeZone);
 
     return {
       timestamp: new Date(adjustedTime.toMillis()),
-      value: item.value,
+      value: item.value.toFixed(2), // The average value of the album by this timestamp
       user_id: item.user_id,
       user_nickname: item.user_nickname,
-      user_discord_id: item.user_discord_id
+      user_discord_id: item.user_discord_id,
+      user_avatar_url: await getUserAvatarURL(item.user_discord_id),
+      type: item.type,
+      score: item.score.toFixed(2) // The score given for this object
     }
-  })
+  }))).sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   const aotdDate = `${props.aotdDate.split("-")[1]}/${props.aotdDate.split("-")[2]}/${props.aotdDate.split("-")[0]}`
-  // Get start and end of day for scaling
-  const startOfDay = new Date(
-    new Intl.DateTimeFormat('en-US', {
-      timeZone: timeZone,
-    }).format(new Date(aotdDate))
-  );
-  const endOfDay = new Date(new Date(startOfDay).setHours(24, 0, 0, 0));
+  // Calculate domain of time
+  const startDomain = new Date(data[0].timestamp).setMinutes(-60, 0, 0);
+  const endDomain = new Date(data[data.length - 1].timestamp).setMinutes(120, 0, 0);
 
   let xScale = scaleTime()
-    .domain([startOfDay, endOfDay])
+    .domain([startDomain, endDomain])
     .range([0, 100]);
   let yScale = scaleLinear()
     .domain([0, 10])
@@ -45,142 +47,175 @@ export async function AOtDScoreTimelineLineChart(props) {
 
   let d = line(data);
 
+  // X Axis labeling logic stuff
+  const hourlyInterval = timeHour.every(1);
+  const ticks = hourlyInterval ? xScale.ticks(hourlyInterval) : [];
+
   if (!d) {
     return null;
   }
 
   return (
-    <div
-      className="relative h-72 w-full"
-      style={
-        {
-          "--marginTop": "0px",
-          "--marginRight": "8px",
-          "--marginBottom": "25px",
-          "--marginLeft": "25px",
-        } as CSSProperties
-      }
-    >
-      {/* Y axis */}
+    <div>
+      <Conditional showWhen={new Date(aotdDate) <= new Date("04/08/2025")}>
+        <div className="w-full text-center font-extralight mx-auto px-2 py-2 my-2 text-small italic border border-neutral-800 rounded-2xl bg-zinc-800/30 -mt-3 mb-5">
+          <p>
+            <span className="text-yellow-600"><b>WARNING:</b></span> Score data for albums on or before January 6th 2025 may have incorrect graphs or data.
+          </p>
+        </div>
+      </Conditional>
       <div
-        className="absolute inset-0
-          h-[calc(100%-var(--marginTop)-var(--marginBottom))]
-          w-[var(--marginLeft)]
-          translate-y-[var(--marginTop)]
-          overflow-visible
-        "
+        className="relative h-72 w-full"
+        style={
+          {
+            "--marginTop": "0px",
+            "--marginRight": "8px",
+            "--marginBottom": "25px",
+            "--marginLeft": "25px",
+          } as CSSProperties
+        }
       >
-        {yScale
-          .ticks(8)
-          .map(yScale.tickFormat(8, "d"))
-          .map((value, i) => (
-            <div
-              key={i}
-              style={{
-                top: `${yScale(+value)}%`,
-                left: "0%",
-              }}
-              className="absolute text-xs tabular-nums -translate-y-1/2 text-gray-500 w-full text-right pr-2"
-            >
-              {value}
-            </div>
-          ))}
-      </div>
-
-      {/* Chart area */}
-      <div
-        className="absolute inset-0
-          h-[calc(100%-var(--marginTop)-var(--marginBottom))]
-          w-[calc(100%-var(--marginLeft)-var(--marginRight))]
-          translate-x-[var(--marginLeft)]
-          translate-y-[var(--marginTop)]
-          overflow-visible
-        "
-      >
-        <svg
-          viewBox="0 0 100 100"
-          className="w-full h-full overflow-visible"
-          preserveAspectRatio="none"
+        {/* Y axis */}
+        <div
+          className="absolute inset-0
+            h-[calc(100%-var(--marginTop)-var(--marginBottom))]
+            w-[var(--marginLeft)]
+            translate-y-[var(--marginTop)]
+            overflow-visible
+          "
         >
-          {/* Grid lines */}
           {yScale
             .ticks(8)
             .map(yScale.tickFormat(8, "d"))
-            .map((active, i) => (
-              <g
-                transform={`translate(0,${yScale(+active)})`}
-                className="text-zinc-300 dark:text-zinc-700"
+            .map((value, i) => (
+              <div
                 key={i}
+                style={{
+                  top: `${yScale(+value)}%`,
+                  left: "0%",
+                }}
+                className="absolute text-xs tabular-nums -translate-y-1/2 text-gray-500 w-full text-right pr-2"
               >
-                <line
-                  x1={0}
-                  x2={100}
-                  stroke="currentColor"
-                  strokeDasharray="6,5"
-                  strokeWidth={0.5}
-                  vectorEffect="non-scaling-stroke"
-                />
-              </g>
+                {value}
+              </div>
             ))}
+        </div>
 
-          {/* Line */}
-          <path
-            d={d}
-            fill="none"
-            className="stroke-gray-400"
-            strokeWidth="2"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-        
-        <div className="translate-y-2">
-          {/* X Axis */}
-          {xScale.ticks(24).map((tick, i) => {
-            return (
-              <div key={i} className="overflow-visible text-zinc-500">
+        {/* Chart area */}
+        <div
+          className="absolute inset-0
+            h-[calc(100%-var(--marginTop)-var(--marginBottom))]
+            w-[calc(100%-var(--marginLeft)-var(--marginRight))]
+            translate-x-[var(--marginLeft)]
+            translate-y-[var(--marginTop)]
+            overflow-visible
+          "
+        >
+          <svg
+            viewBox="0 0 100 100"
+            className="w-full h-full overflow-visible"
+            preserveAspectRatio="none"
+          >
+            {/* Grid lines */}
+            {yScale
+              .ticks(8)
+              .map(yScale.tickFormat(8, "d"))
+              .map((active, i) => (
+                <g
+                  transform={`translate(0,${yScale(+active)})`}
+                  className="text-zinc-300 dark:text-zinc-700"
+                  key={i}
+                >
+                  <line
+                    x1={0}
+                    x2={100}
+                    stroke="currentColor"
+                    strokeDasharray="6,5"
+                    strokeWidth={0.5}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </g>
+              ))}
+
+            {/* Line */}
+            <path
+              d={d}
+              fill="none"
+              className="stroke-gray-400"
+              strokeWidth="2"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+
+          {/* User Icons and Tooltips */}
+          {data.map((entry, index) => (
+            <ClientTooltip key={index}>
+              <TooltipTrigger>
                 <div
                   style={{
-                    left: `${xScale(tick)}%`,
-                    top: "100%",
-                    transform: `translateX(${i === 0 ? "0%" : "-50%"})`,
+                    top: `${yScale(entry.value)}%`,
+                    left: `${xScale(entry.timestamp)}%`,
+                    transform: "translate(-50%, -50%)",
                   }}
-                  className="text-xs absolute text-nowrap"
+                  className="absolute rounded-full overflow-hidden size-6 sm:size-10 cursor-pointer"
                 >
-                  {tick.toLocaleTimeString("en-US", {
-                    timeZone: "America/Chicago",
-                    hour: "numeric",
-                    hour12: true,
-                  })}
+                  <Avatar
+                    src={entry.user_avatar_url}
+                    className="size-6 sm:size-10"
+                  />
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      {/* Labels */}
-      <div
-        className="
-        h-[calc(100%-var(--marginTop)-var(--marginBottom))]
-        w-[calc(100%-var(--marginLeft)-var(--marginRight))]
-        translate-x-[var(--marginLeft)]
-        translate-y-[var(--marginTop)]
-      "
-      >
-        {data.map((entry, i) => (
-          <div
-            key={i}
-            style={{
-              top: `${yScale(entry.value)}%`,
-              left: `${xScale(entry.timestamp)}%`,
-              transform: "translate(-50%, -50%)",
-            }}
-            className="absolute rounded-full overflow-hidden size-10 text-gray-700 pointer-events-none"
-          >
-            <UserAvatar 
-              userDiscordID={entry['user_discord_id']}
-            />
+              </TooltipTrigger>
+              <TooltipContent>
+                <div>
+                  <div className="flex flex-row">
+                    <p className="text-lg">{entry.user_nickname}</p>
+                    <Conditional showWhen={entry.type=="Review"}>
+                      <p
+                        className="text-xs my-auto border border-green-500 rounded-full px-1 ml-2 bg-green-600/80 italic text-black font-normal"
+                      >
+                        Final Review
+                      </p>
+                    </Conditional>
+                  </div>
+                  <Divider className="mb-2" />
+                  <div className="flex flex-row w-full justify-between mb-1">
+                    <p className="my-auto">User Score:</p>
+                    <p className={`ml-2 px-2 py-0 ${ratingToTailwindBgColor(entry.score)} rounded-2xl text-black`}>{entry.score}</p>
+                  </div>
+                  <div className="flex flex-row w-full justify-between">
+                    <p>Album Avg:</p>
+                    <p className={`ml-2 px-2 py-0 ${ratingToTailwindBgColor(entry.value)} rounded-2xl text-black`}>{entry.value}</p>
+                  </div>
+                  <p className="text-sm italic text-gray-500" >{entry.timestamp.toLocaleTimeString("en-us")}</p>
+                </div>
+              </TooltipContent>
+            </ClientTooltip>
+          ))}
+          
+          <div className="translate-y-2">
+            {/* X Axis */}
+            {ticks.map((tick, i) => {
+              return (
+                <div key={i} className="overflow-visible text-zinc-500">
+                  <div
+                    style={{
+                      left: `${xScale(tick)}%`,
+                      top: "100%",
+                      transform: `translateX(-50%)`,
+                    }}
+                    className={`${((i != 0) && (i != ticks.length/2) && (i != ticks.length - 1)) ? "invisible sm:visible" : ""} text-xs absolute text-nowrap`}
+                  >
+                    {tick.toLocaleTimeString("en-US", {
+                      timeZone: "America/Chicago",
+                      hour: "numeric",
+                      hour12: true,
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
