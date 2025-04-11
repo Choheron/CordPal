@@ -130,7 +130,7 @@ const TooltipContent = React.forwardRef<HTMLDivElement, { children: React.ReactN
   if (!context.tooltip || !runningOnClient) {
     return null;
   }
-
+ 
   const isMobile = window.innerWidth < 768;
 
   return createPortal(
