@@ -505,7 +505,7 @@ def deleteReviewReaction(request: HttpRequest):
     try:
       reaction: Reaction = review.reactions.get(pk=react_id)
       # Delete reaction
-      reaction.delete()
+      reaction.delete(deleter=user)
     except Reaction.DoesNotExist as e:
       logger.error(f"Could not delete, no reaction found!")
       raise e
