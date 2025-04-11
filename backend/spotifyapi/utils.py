@@ -253,7 +253,8 @@ def generateDayRatingTimeline(aotd_obj: DailyAlbum):
       "user_discord_id": reviewObj.user.discord_id,
       "user_nickname": reviewObj.user.nickname,
       "type": "Review",
-      "score": reviewObj.score # The score given for this object
+      "score": reviewObj.score, # The score given for this object
+      "review_id": reviewObj.pk
     }
 
   def createUpdateObj(updateObj: ReviewHistory):
@@ -265,7 +266,8 @@ def generateDayRatingTimeline(aotd_obj: DailyAlbum):
       "user_discord_id": updateObj.review.user.discord_id,
       "user_nickname": updateObj.review.user.nickname,
       "type": "Update",
-      "score": updateObj.score # The score given for this object
+      "score": updateObj.score, # The score given for this object
+      "review_id": updateObj.review.pk
     }
 
   # Retrieve Album and date of aotd

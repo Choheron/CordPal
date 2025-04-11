@@ -26,7 +26,8 @@ export async function AOtDScoreTimelineLineChart(props) {
       user_discord_id: item.user_discord_id,
       user_avatar_url: await getUserAvatarURL(item.user_discord_id),
       type: item.type,
-      score: item.score.toFixed(2) // The score given for this object
+      score: item.score.toFixed(2), // The score given for this object
+      review_id: item.review_id
     }
   }))).sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   const aotdDate = `${props.aotdDate.split("-")[1]}/${props.aotdDate.split("-")[2]}/${props.aotdDate.split("-")[0]}`
@@ -159,10 +160,14 @@ export async function AOtDScoreTimelineLineChart(props) {
                   }}
                   className="absolute rounded-full overflow-hidden size-6 sm:size-10 cursor-pointer"
                 >
-                  <Avatar
-                    src={entry.user_avatar_url}
-                    className="size-6 sm:size-10"
-                  />
+                  <a
+                    href={`/dashboard/spotify/review/${entry.review_id}`}
+                  >
+                    <Avatar
+                      src={entry.user_avatar_url}
+                      className="size-6 sm:size-10"
+                    />
+                  </a>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -171,20 +176,20 @@ export async function AOtDScoreTimelineLineChart(props) {
                     <p className="text-lg">{entry.user_nickname}</p>
                     <Conditional showWhen={entry.type=="Review"}>
                       <p
-                        className="text-xs my-auto border border-green-500 rounded-full px-1 ml-2 bg-green-600/80 italic text-black font-normal"
+                        className="text-xs my-auto border border-green-500 rounded-full px-1 ml-2 bg-green-500/80 italic text-black font-normal"
                       >
-                        Final Review
+                        <b>Final Review</b>
                       </p>
                     </Conditional>
                   </div>
                   <Divider className="mb-2" />
                   <div className="flex flex-row w-full justify-between mb-1">
                     <p className="my-auto">User Score:</p>
-                    <p className={`ml-2 px-2 py-0 ${ratingToTailwindBgColor(entry.score)} rounded-2xl text-black`}>{entry.score}</p>
+                    <p className={`ml-2 px-2 py-0 ${ratingToTailwindBgColor(entry.score)} rounded-2xl text-black`}><b>{entry.score}</b></p>
                   </div>
                   <div className="flex flex-row w-full justify-between">
                     <p>Album Avg:</p>
-                    <p className={`ml-2 px-2 py-0 ${ratingToTailwindBgColor(entry.value)} rounded-2xl text-black`}>{entry.value}</p>
+                    <p className={`ml-2 px-2 py-0 ${ratingToTailwindBgColor(entry.value)} rounded-2xl text-black`}><b>{entry.value}</b></p>
                   </div>
                   <p className="text-sm italic text-gray-500" >{entry.timestamp.toLocaleTimeString("en-us")}</p>
                 </div>
@@ -217,6 +222,7 @@ export async function AOtDScoreTimelineLineChart(props) {
           </div>
         </div>
       </div>
+      <p className="text-sm text-gray-500 ml-2 italic">Times are shown in {timeZone}</p>
     </div>
   );
 }
