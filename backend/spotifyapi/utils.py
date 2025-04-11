@@ -281,7 +281,6 @@ def generateDayRatingTimeline(aotd_obj: DailyAlbum):
       tracking[updateObj.review.user.nickname] = [updateObj]
       return tracking, True
 
-
   # Retrieve Album and date of aotd
   album = aotd_obj.album
   date = aotd_obj.date
