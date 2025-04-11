@@ -3,8 +3,7 @@
 import { CSSProperties } from "react";
 import { scaleTime, scaleLinear, max, line as d3_line, curveMonotoneX, timeHour } from "d3";
 import { DateTime } from "luxon";
-import { ClientTooltip, TooltipContent, TooltipTrigger } from "../../../../general/charts/rosen_tooltip"; 
-import { Avatar, Divider } from "@heroui/react";
+import { Avatar, Divider, Tooltip } from "@heroui/react";
 import { getUserAvatarURL } from "@/app/lib/user_utils";
 import { Conditional } from "../../../conditional";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
@@ -150,27 +149,9 @@ export async function AOtDScoreTimelineLineChart(props) {
 
           {/* User Icons and Tooltips */}
           {data.map((entry, index) => (
-            <ClientTooltip key={index}>
-              <TooltipTrigger>
-                <div
-                  style={{
-                    top: `${yScale(entry.value)}%`,
-                    left: `${xScale(entry.timestamp)}%`,
-                    transform: "translate(-50%, -50%)",
-                  }}
-                  className="absolute rounded-full overflow-hidden size-6 sm:size-10 cursor-pointer"
-                >
-                  <a
-                    href={`/dashboard/spotify/review/${entry.review_id}`}
-                  >
-                    <Avatar
-                      src={entry.user_avatar_url}
-                      className="size-6 sm:size-10"
-                    />
-                  </a>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
+            <Tooltip 
+              showArrow={true}
+              content={
                 <div>
                   <div className="flex flex-row">
                     <p className="text-lg">{entry.user_nickname}</p>
@@ -193,8 +174,26 @@ export async function AOtDScoreTimelineLineChart(props) {
                   </div>
                   <p className="text-sm italic text-gray-500" >{entry.timestamp.toLocaleTimeString("en-us")}</p>
                 </div>
-              </TooltipContent>
-            </ClientTooltip>
+              }
+            >
+              <div
+                style={{
+                  top: `${yScale(entry.value)}%`,
+                  left: `${xScale(entry.timestamp)}%`,
+                  transform: "translate(-50%, -50%)",
+                }}
+                className="absolute rounded-full overflow-hidden size-6 sm:size-10 cursor-pointer"
+              >
+                <a
+                  href={`/dashboard/spotify/review/${entry.review_id}`}
+                >
+                  <Avatar
+                    src={entry.user_avatar_url}
+                    className="size-6 sm:size-10"
+                  />
+                </a>
+              </div>
+            </Tooltip>
           ))}
           
           <div className="translate-y-2">
