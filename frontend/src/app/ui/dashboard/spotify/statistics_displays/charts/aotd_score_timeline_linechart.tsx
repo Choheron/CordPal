@@ -151,6 +151,7 @@ export async function AOtDScoreTimelineLineChart(props) {
           {data.map((entry, index) => (
             <Tooltip 
               showArrow={true}
+              key={index}
               content={
                 <div>
                   <div className="flex flex-row">
@@ -222,6 +223,7 @@ export async function AOtDScoreTimelineLineChart(props) {
         </div>
       </div>
       <p className="text-sm text-gray-500 ml-2 italic">Times are shown in {timeZone}</p>
+      <p className="text-sm text-gray-500 ml-2 italic">Review updates that did not alter score are not shown in the chart.</p>
     </div>
   );
 }
