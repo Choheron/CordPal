@@ -42,7 +42,7 @@ export default function TopBar(props) {
           {/* User Settings Modal and Profile Display */}
           <User
             as="button"
-            className="fixed lg:static top-2.5 left-0 z-10 w-auto ml-5 pt-5 px-2 lg:pt-0 lg:mr-10"
+            className="fixed lg:static top-2.5 left-0 z-10 w-auto ml-5 pt-5 px-2 lg:pt-0 lg:mr-10 lg:-ml-[100%]"
             name={props.userInfo['nickname']}
             avatarProps={{
               isBordered: true,
