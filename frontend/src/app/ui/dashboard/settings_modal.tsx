@@ -16,6 +16,7 @@ import { isUserFieldUnique, updateUserData } from "@/app/lib/user_utils";
 import ClientTimestamp from "../general/client_timestamp";
 import { boolToString } from "@/app/lib/utils";
 import EditPasswordModal from "./edit_password_modal";
+import { Conditional } from "./conditional";
 
 
 // Expected props:
@@ -23,6 +24,8 @@ import EditPasswordModal from "./edit_password_modal";
 //  - avatarURL: String URL of Discord User's Avatar
 //  - linkedAccounts: List containing connected account data 
 //  - userLoginMethods: List - List of Strings corresponding to login methods
+//  - isOpenOverride: Boolean - Override button and determine open state by passed in value
+//  - setIsOpenOverride: function - Override the open function. REQUIRED IF isOpenOverride is provided
 export default function SettingsModal(props) {
   // Static values
   const userInfo = props.userInfo // UserInfo Object Keys: {guid, username, last_updated_timestamp, creation_timestamp, email, nickname, discord_id, discord_discriminator, discord_is_verified, discord_avatar, spotify_connected, is_active, is_staff, avatar_url}
@@ -149,11 +152,17 @@ export default function SettingsModal(props) {
       // Reload page
       router.refresh()
     }
+    if(props.isOpenOverride != null) {
+      props.setIsOpenOverride(false)
+    }
     onClose()
   }
 
   // Reset values on cancel button press
   const cancelPress = () => {
+    if(props.isOpenOverride != null) {
+      props.setIsOpenOverride(false)
+    }
     setEmailValue(props.userInfo['email'])
     setNicknameValue(props.userInfo['nickname'])
     onClose()
@@ -163,25 +172,34 @@ export default function SettingsModal(props) {
 
   return (
     <>
-      <Badge 
-        color="primary" 
-        content=""
-        size="sm"
-        placement="top-left"
-        className="-ml-1 animate-pulse"
-        isInvisible={loginMethods.indexOf("Username/Password") != -1}
-      >
-        <Button 
-          className="px-0 text-tiny text-inheret min-w-0 min-h-0 h-fit hover:underline"
+      <Conditional showWhen={props.isOpenOverride == null}>
+        <Badge 
+          color="primary" 
+          content=""
           size="sm"
-          onPress={onOpen}
-          radius="none"
-          variant="light"
+          placement="top-left"
+          className="-ml-1 animate-pulse"
+          isInvisible={loginMethods.indexOf("Username/Password") != -1}
         >
-          Settings
-        </Button>
-      </Badge>
-      <Modal size="xl" isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true} onClose={cancelPress}>
+          <Button 
+            className="px-0 text-tiny text-inheret min-w-0 min-h-0 h-fit hover:underline"
+            size="sm"
+            onPress={onOpen}
+            radius="none"
+            variant="light"
+          >
+            Settings
+          </Button>
+        </Badge>
+      </Conditional>
+      <Modal 
+        size="xl" 
+        isOpen={(props.isOpenOverride != null) ? props.isOpenOverride : isOpen} 
+        onOpenChange={onOpenChange} 
+        isDismissable={false} 
+        isKeyboardDismissDisabled={true} 
+        onClose={cancelPress}
+      >
         <ModalContent>
           {() => (
             <>
