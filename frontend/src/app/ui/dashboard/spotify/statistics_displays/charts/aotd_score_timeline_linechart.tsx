@@ -141,6 +141,7 @@ export async function AOtDScoreTimelineLineChart(props) {
             <path
               d={d}
               fill="none"
+              // className="bg-linear-to-r from-cyan-500 to-blue-500"
               className="stroke-gray-400"
               strokeWidth="2"
               vectorEffect="non-scaling-stroke"

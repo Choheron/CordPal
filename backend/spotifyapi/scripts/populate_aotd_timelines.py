@@ -17,7 +17,7 @@ def run():
   index = 0
   for aotd in aotd_list:
     try:
-      print(f"Attempting to populate timeline for AOTD {aotd.pk}: {aotd.album.title} ({index}/{len(aotd_list)})")
+      print(f"Attempting to populate timeline for AOTD {aotd.pk}: {aotd.album.title} ({index+1}/{len(aotd_list)})")
       generateDayRatingTimeline(aotd)
     except Exception as e:
       failed_update.append({"aotd": aotd.pk, "error": e})
