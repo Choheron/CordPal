@@ -5,7 +5,7 @@ import { Button, Divider } from "@heroui/react";
 import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
 import ReviewDisplay from "./review_display";
-import { getAlbumOfTheDayData, getChanceOfAotdSelect, getReviewsForAlbum, getSimilarReviewsForRatings, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
+import { getAlbumOfTheDayData, getChanceOfAotdSelect, getDayTimelineData, getReviewsForAlbum, getSimilarReviewsForRatings, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
 import AddAlbumModal from "./modals/add_album_modal";
 
 import Link from "next/link";
@@ -39,7 +39,7 @@ export default async function AlbumOfTheDayBox(props) {
   }
 
   return (
-    <div className="w-full lg:max-w-[1080px] flex flex-col lg:flex-row lg:gap-2">
+    <div className="w-fit lg:max-w-[1080px] flex flex-col lg:flex-row lg:gap-2">
       <div className="backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
         <div className="w-full flex flex-col">
           <div className="flex w-full justify-between px-2 mt-1 mb-1">
@@ -92,7 +92,7 @@ export default async function AlbumOfTheDayBox(props) {
           </div>
         </div>
       </div>
-      <div className="static w-full lg:w-fit backdrop-blur-2xl px-2 py-2 mt-0 mb-2 lg:my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+      <div className="static w-full lg:w-fit backdrop-blur-2xl px-2 py-2 mt-0 lg:my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
         <ReviewDisplay 
           review_list={reviewList}
         />

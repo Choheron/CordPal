@@ -344,6 +344,33 @@ export async function getReviewsForAlbum(album_spotify_id, date = null) {
   return reviewListRes['review_list'];
 }
 
+
+//
+// Get Reviews from Backend
+// - RETURN: JSON Object of List of reviews
+//
+export async function getDayTimelineData(date: string = "") {
+  // If no album ID provided, return empty list
+  if(date == "") {
+    return []
+  }
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Get all user reviews for an album
+  console.log(`getDayTimelineData: Sending request to backend '/spotifyapi/getDayTimelineData/${date}'`)
+  const dayTimelineResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getDayTimelineData/${date}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const reviewListRes = await dayTimelineResponse.json()
+  return reviewListRes['timeline'];
+}
+
+
 //
 // Get Review by User for specific Album from Backend
 // - RETURN: HttpResponse

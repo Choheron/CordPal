@@ -12,6 +12,9 @@ import json
 
 logger = logging.getLogger(__name__)
 
+def generateTimelineDict():
+  return { "timeline": [] }
+
 # Model for spotify data that corresponds to a user
 class SpotifyUserData(models.Model):
   # Foriegn key of a user object, primary key, required
@@ -137,6 +140,7 @@ class DailyAlbum(models.Model):
     album = models.ForeignKey(Album, on_delete=models.PROTECT)
     date = models.DateField(unique=True)
     manual = models.BooleanField(default=False)
+    rating_timeline = models.JSONField(default=generateTimelineDict, null=True)
 
     def dateToCalString(self):
       return self.date.strftime('%Y-%m-%d')
@@ -217,6 +221,7 @@ class Review(models.Model):
           score=old_review.score,
           review_text=old_review.review_text,
           review_date=old_review.review_date,
+          last_updated=old_review.last_updated,
           first_listen=old_review.first_listen,
           aotd_date=old_review.aotd_date,
           version=old_review.version
@@ -242,6 +247,7 @@ class ReviewHistory(models.Model):
     review_text = models.TextField(null=True, blank=True)
     review_date = models.DateTimeField()  # Original date of the review
     first_listen = models.BooleanField(default=None, null=True) # Is this review a result of a first listen?
+    last_updated = models.DateTimeField(default=None, null=True) # When was this verion of the review (the one being overwritten) recorded 
     aotd_date = models.DateField(null=False) # Attach each review to the aotd date in which it was provided
     # Add review versioning for display
     version = models.IntegerField(default=1)
@@ -257,6 +263,7 @@ class ReviewHistory(models.Model):
       outObj['score'] = self.score
       outObj['comment'] = self.review_text
       outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")
+      outObj['last_updated'] = self.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
       outObj['first_listen'] = self.first_listen
       outObj['aotd_date'] = self.aotd_date
       outObj['version'] = self.version

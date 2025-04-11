@@ -6,7 +6,8 @@ from django.core import management
 from .utils import (
   checkSelectionFlag,
   getSpotifyUser,
-  getAlbumRating
+  getAlbumRating,
+  generateDayRatingTimeline
 )
 from .models import (
   Album,
@@ -22,6 +23,7 @@ import os
 import datetime
 import pytz
 import random
+import traceback
 
 # Declare logging
 logger = logging.getLogger('django')
@@ -127,6 +129,13 @@ def setAlbumOfDay(request: HttpRequest):
   )
   # Save object
   albumOfTheDayObj.save()
+  # Attempt to get previous AOtD Object
+  yesterday = day - datetime.timedelta(days=1)
+  try:
+    yesterday_aotd = DailyAlbum.objects.get(date=yesterday)
+    generateDayRatingTimeline(yesterday_aotd)
+  except:
+    logger.error(f"ERROR IN GENERATING TIMELINE DATA FOR DATE: {yesterday.strftime('%Y-%m-%d')} TRACEBACK: {traceback.print_exc()}")
   # Print success
   logger.info(f'Successfully selected album of the day: \"{albumOfTheDayObj}\" submitted by: \"{albumOfTheDay.submitted_by.nickname}\"')
   return HttpResponse(f'Successfully selected album of the day: \"{albumOfTheDayObj}\" submitted by: \"{albumOfTheDay.submitted_by.nickname}\"')
@@ -328,3 +337,23 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
   # Return out object with timestamp
   out['timestamp'] = timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
   return JsonResponse(out)
+
+
+###
+# Get timeline data for a single aotd instance. If the data is not yet generated, return empty list in json
+# aotd_date expected in %Y-%m-%d format.
+###
+def getDayTimelineData(request: HttpRequest, aotd_date: str):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getDayTimelineData called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get aotd object
+  try:
+    aotd_obj = DailyAlbum.objects.get(date=datetime.datetime.strptime(aotd_date, "%Y-%m-%d"))
+  except:
+    return JsonResponse({"timeline": []})
+  # Return object data
+  return JsonResponse(aotd_obj.rating_timeline)

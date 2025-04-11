@@ -88,6 +88,8 @@ urlpatterns = [
   path('getChanceOfAotdSelect', views_aotd.getChanceOfAotdSelect),
   # Get all AOtD Instances for a month
   path('getAOtDByMonth/<str:year>/<str:month>', views_aotd.getAOtDByMonth),
+  # Get AOtD Rating Timeline
+  path('getDayTimelineData/<str:aotd_date>', views_aotd.getDayTimelineData),
   ## ============================================================================================================
   ## User Selection Outage Views
   ## ============================================================================================================

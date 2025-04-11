@@ -9,6 +9,7 @@ import datetime
 import pytz
 import json
 import os
+import traceback
 
 class LastSeenMiddleware:
 
@@ -51,7 +52,10 @@ class LastSeenMiddleware:
         # Log method call (With username)
         self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}")
       else:
-        self.logger.error(f"ERROR IN MIDDLEWARE: {e}")
+        if(full_path == "/metrics"):
+          self.logger.info(f"Reporting metrics to prometheus")
+        else:
+          self.logger.error(f"ERROR IN MIDDLEWARE: PATH: {full_path} TRACEBACK: {traceback.print_exc()}")
     
     # Code above this line is executed before the view is called
     # Retrieving the response 

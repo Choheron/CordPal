@@ -17,7 +17,8 @@ from .models import (
   Album,
   Review,
   DailyAlbum,
-  UserAlbumOutage
+  UserAlbumOutage,
+  ReviewHistory
 )
 
 from users.utils import (
@@ -237,3 +238,107 @@ def checkSelectionFlag(spotify_user: SpotifyUserData):
     spotify_user.selection_blocked_flag = blocked
     logger.info(f"Changing `selection_blocked_flag` to {blocked} for {spotify_user.user.nickname}...")
     spotify_user.save()
+
+
+# Iterate all reviews and review updates associate with a given AOtD, returning in a format (sorted by timestamp) showing changes to AOTD average rating over the course of the day
+# This data should be updated to be stored in the database, so as to avoid having to recalculate it every time its viewed
+def generateDayRatingTimeline(aotd_obj: DailyAlbum):
+  # Retrieve Album and date of aotd
+  album = aotd_obj.album
+  date = aotd_obj.date
+  # Get all album reviews
+  aotd_reviews_list = list(Review.objects.filter(album=album, aotd_date=date).order_by('last_updated'))
+  # Get all album review updates
+  review_updates_list = list(ReviewHistory.objects.filter(review__in=aotd_reviews_list, aotd_date=date).order_by('recorded_at'))
+  # Declare output object, which is a list of values in timestamp order
+  out = []
+  # Implement a two pointer loop to ensure all of the data is captured from both querysets
+  review_p = 0
+  update_p = 0
+  while((review_p != len(aotd_reviews_list)) or (update_p != len(review_updates_list))):
+    curr_review = aotd_reviews_list[review_p] if (review_p != len(aotd_reviews_list)) else None
+    curr_update = review_updates_list[update_p] if (update_p != len(review_updates_list)) else None
+    # Determine the timestamps of each and store the earlier one in the list, then increment
+    if((curr_update == None) or (curr_review.last_updated < curr_update.recorded_at)):
+      out.append(
+        {
+          "timestamp": curr_review.last_updated.isoformat(),
+          "value": getAlbumPartialReviewScore(review = curr_review), # The average value of the album by this timestamp
+          "user_id": curr_review.user.pk,
+          "user_discord_id": curr_review.user.discord_id,
+          "user_nickname": curr_review.user.nickname,
+        }
+      )
+      review_p += 1
+    elif((curr_review == None) or (curr_update.recorded_at < curr_review.last_updated)):
+      out.append(
+        {
+          "timestamp": curr_update.last_updated.isoformat(),
+          "value": getAlbumPartialReviewScore(update = curr_update), # The average value of the album by this timestamp
+          "user_id": curr_review.user.pk,
+          "user_discord_id": curr_review.user.discord_id,
+          "user_nickname": curr_review.user.nickname,
+        }
+      )
+      update_p += 1
+    else: # In the rare event of a simultaneous submission, attach both and increment
+      # Add review object
+      out.append(
+        {
+          "timestamp": curr_review.last_updated.isoformat(),
+          "value": getAlbumPartialReviewScore(review = curr_review), # The average value of the album by this timestamp
+          "user_id": curr_review.user.pk,
+          "user_discord_id": curr_review.user.discord_id,
+          "user_nickname": curr_review.user.nickname,
+        }
+      )
+      review_p += 1
+      # Add Update object
+      out.append(
+        {
+          "timestamp": curr_update.last_updated.isoformat(),
+          "value": getAlbumPartialReviewScore(update = curr_update), # The average value of the album by this timestamp
+          "user_id": curr_review.user.pk,
+          "user_discord_id": curr_review.user.discord_id,
+          "user_nickname": curr_review.user.nickname,
+        }
+      )
+      update_p += 1
+  # Save the object's timeline data
+  aotd_obj.rating_timeline={"timeline": out}
+  aotd_obj.save()
+
+
+# Get the average review score of an album up to a timestamp on any given day
+# Allows retrieval of a score partially thru the day (for timeline purposes)
+def getAlbumPartialReviewScore(album: Album = None, timestamp: datetime.datetime = None, review: Review = None, update: ReviewHistory = None):
+  if(review):
+    timestamp = review.last_updated
+    album = review.album
+    aotd_date = review.aotd_date
+  elif(update):
+    timestamp = update.last_updated
+    album = update.review.album
+    aotd_date = update.aotd_date
+  else:
+    timestamp = timestamp
+    album = album
+    aotd_date = DailyAlbum.objects.get(album=album, date=timestamp.date())
+  # After establishing timestamp values, get all reviews that apply to this album
+  reviews = Review.objects.filter(album=album, aotd_date=aotd_date).filter(review_date__lte=timestamp)
+  # Iterate reviews and get the most recent applicable score, add it to the sum, increment count, and move on.
+  count = 0.0
+  sum = 0.0
+  for review in reviews:
+    if(review.last_updated == review.review_date):
+      sum != review.score
+    elif(review.last_updated > timestamp):
+      # Get most recent applicable update
+      update = review.history.all().filter(last_updated__lte=timestamp).order_by('-last_updated').first()
+      sum += update.score
+    else: # By reaching this point, a review must have had updates but the final review is still below the timestamp
+      sum += review.score
+    count += 1
+  # Calculate average
+  average = (sum/count)
+  return average

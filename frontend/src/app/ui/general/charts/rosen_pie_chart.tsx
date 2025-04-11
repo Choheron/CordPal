@@ -1,6 +1,6 @@
 import React from "react";
 import { pie, arc, PieArcDatum } from "d3";
-import { ClientTooltip, TooltipContent, TooltipTrigger } from "./rosen_tooltip"; // Or wherever you pasted Tooltip.tsx
+import { ClientTooltip, TooltipContent, TooltipTrigger } from "./rosen_tooltip"; 
 import UserAvatar from "../userUiItems/user_avatar";
 import UserCard from "../userUiItems/user_card";
 
@@ -10,45 +10,6 @@ type DataItem = {
   value: number;
   percent: string;
 };
-
-// const data: DataItem[] = [
-//   {
-//     name: "Apple",
-//     value: 731,
-//     logo: "https://etoro-cdn.etorostatic.com/market-avatars/1001/1001_494D5A_F7F7F7.svg",
-//     color: "text-pink-400",
-//   },
-//   {
-//     name: "Mercedes",
-//     value: 631,
-//     logo: "https://etoro-cdn.etorostatic.com/market-avatars/1206/1206_2F3350_F7F7F7.svg",
-//     color: "text-purple-400",
-//   },
-//   {
-//     name: "Palantir",
-//     value: 331,
-//     logo: "https://etoro-cdn.etorostatic.com/market-avatars/7991/7991_2C2C2C_F7F7F7.svg",
-//     color: "text-indigo-400",
-//   },
-//   {
-//     name: "Google",
-//     value: 232,
-//     logo: "https://etoro-cdn.etorostatic.com/market-avatars/1002/1002_3183FF_F7F7F7.svg",
-//     color: "text-sky-400",
-//   },
-//   {
-//     name: "Tesla",
-//     value: 101,
-//     logo: "https://etoro-cdn.etorostatic.com/market-avatars/1007/1007_F7F7F7_2C2C2C.svg",
-//     color: "text-lime-400",
-//   },
-//   {
-//     name: "Meta",
-//     value: 42,
-//     logo: "https://etoro-cdn.etorostatic.com/market-avatars/1008/1008_F7F7F7_2C2C2C.svg",
-//     color: "text-amber-400",
-//   },
-// ];
 
 export function RosenPieChart(props) {
   // Random Colors

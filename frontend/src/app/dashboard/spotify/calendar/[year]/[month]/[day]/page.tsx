@@ -1,8 +1,10 @@
-import { getAlbumAvgRating, getAlbumOfTheDayData } from "@/app/lib/spotify_utils"
+import { getAlbumAvgRating, getAlbumOfTheDayData, getDayTimelineData } from "@/app/lib/spotify_utils"
 import { getNextDay, getPrevDay, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
+import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/spotify/album_display"
 import ReviewDisplay from "@/app/ui/dashboard/spotify/review_display"
+import { AOtDScoreTimelineLineChart } from "@/app/ui/dashboard/spotify/statistics_displays/charts/aotd_score_timeline_linechart"
 import { Badge, Button } from "@heroui/react"
 import Link from "next/link"
 import { RiArrowLeftCircleFill, RiArrowLeftCircleLine, RiArrowRightCircleLine, RiCalendar2Fill } from "react-icons/ri"
@@ -19,6 +21,8 @@ export default async function Page({
   // Decalre date string
   const date = `${year}-${month}-${day}`
   const albumOfTheDayObj = await getAlbumOfTheDayData(date)
+  // Get timeline of rating for the day
+  const ratingTimeline = await getDayTimelineData(date)
   // Get previous day's date
   const prevDay = getPrevDay(new Date(Date.parse(date)))
   // Get next day's date (null if next day is in the future)
@@ -131,6 +135,17 @@ export default async function Page({
             />
           </div>
         </div>
+        <Conditional showWhen={ratingTimeline.length != 0}>
+          <div className="w-full md:w-3/4 mx-auto py-5">
+            <div className="pb-5 pt-2 font-extralight text-lg underline">
+              <p>Rating Change Timeline:</p>
+            </div>
+            <AOtDScoreTimelineLineChart
+              data={ratingTimeline}
+              aotdDate={date}
+            />
+          </div>
+        </Conditional>
         <Button 
           as={Link}
           href={"/dashboard/spotify"}
