@@ -18,7 +18,10 @@ export default async function ReviewDisplay(props) {
         <p>{reviews.length}/{userCount}</p>
       </div>
       {reviews.length === 0 ? (
-          <p>No User Reviews Yet</p>
+          <div className="w-full text-center">
+            <p className="mx-auto font-extralight pt-10">No Reviews... Yet...</p>
+            <p className="mx-auto font-extralight text-sm pt-10">Be the change you with to see, Submit your review now!</p>
+          </div>
         ) : (
           reviews.sort((a, b) => a['score'] < b['score'] ? 1 : -1).map((review, index) => (
             <div className="mx-auto" key={index}>
