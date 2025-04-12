@@ -1,5 +1,6 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.forms.models import model_to_dict
+from django.db.models import Count, Q
 from django.utils import timezone
 from django.core import management
 
@@ -201,8 +202,22 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  # Get current date
+  day = datetime.date.today()
+  tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+  # Get Date a year ago to filter by
+  one_year_ago = day - datetime.timedelta(days=365)
+  # Get user list
+  user_list = SpotifyUserData.objects.all().annotate(
+    total_submissions=Count('user__album', distinct=True),
+    recent_picks=Count(
+      'user__album__dailyalbum',
+      filter=Q(user__album__dailyalbum__date__gte=one_year_ago),
+      distinct=True
+    )
+  )
   # Iterate all users and update the selection blocked flag
-  for user in SpotifyUserData.objects.all():
+  for user in user_list:
     checkSelectionFlag(user)
   # Get user (use request cookie if user is not passed in)
   user = (getSpotifyUser(request.session.get('discord_id')) if (user_discord_id=="") else (getSpotifyUser(user_discord_id)))
@@ -210,9 +225,6 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
   # Check if user's selections are currently blocked, return 0% chance
   if(SpotifyUserData.objects.get(user=user).selection_blocked_flag):
     return JsonResponse({'percentage': 0.00, 'block_type': "INACTIVITY", 'reason': "Inactivity, user has not reviewed in over three days."})
-  # Get current date
-  day = datetime.date.today()
-  tomorrow = datetime.date.today() + datetime.timedelta(days=1)
   # Check if user is currently under an outage
   try:
     outage = UserAlbumOutage.objects.filter(user=user).get(start_date__lte=tomorrow, end_date__gte=tomorrow)
@@ -230,17 +242,14 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
     return JsonResponse(outageOut)
   except UserAlbumOutage.DoesNotExist as e:
     logger.info(f"User {user.nickname} is not currently under an outage. {e}")
-  # Get Date a year ago to filter by
-  one_year_ago = day - datetime.timedelta(days=365)
   # Get counts needed to determine percentage
   user_submissions_count = Album.objects.filter(submitted_by=user).count()
   user_eligible_count = user_submissions_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=user).count())
   total_eligible_count = 0
-  for spot_user in SpotifyUserData.objects.all():
+  for spot_user in user_list:
     if((spot_user.selection_blocked_flag) or ((len(UserAlbumOutage.objects.filter(user=spot_user.user).filter(start_date__lte=tomorrow, end_date__gte=tomorrow)) > 0))):
       continue
-    temp_submission_count = Album.objects.filter(submitted_by=spot_user.user).count()
-    temp_eligible_count = temp_submission_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=spot_user.user).count())
+    temp_eligible_count = spot_user.total_submissions - spot_user.recent_picks
     total_eligible_count += temp_eligible_count
   # Do math for percentage
   try:
