@@ -353,7 +353,7 @@ def getAlbumPartialReviewScore(album: Album = None, timestamp: datetime.datetime
   sum = 0.0
   for review in reviews:
     if(review.last_updated == review.review_date):
-      sum != review.score
+      sum += review.score
     elif(review.last_updated > timestamp):
       # Get most recent applicable update
       update = review.history.all().filter(last_updated__lte=timestamp).order_by('-last_updated').first()
