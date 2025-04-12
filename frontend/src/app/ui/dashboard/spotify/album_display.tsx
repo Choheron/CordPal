@@ -6,7 +6,7 @@ import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
 import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
 import Image from "next/image";
-import { Badge, Button } from "@heroui/react";
+import { Badge, Button, Tooltip } from "@heroui/react";
 import Link from 'next/link'
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";
@@ -100,25 +100,28 @@ export default async function AlbumDisplay(props) {
             <div className="">
               <p>Submitter: </p>
               <div className="ml-2 -mb-1">
-                <Popover placement="left" showArrow={true} className="w-fit">
-                  <Badge 
-                    content=" " 
-                    size="sm" 
-                    placement="top-left"
-                    isInvisible={submitter_comment == "No Comment Provided"}
-                    shape="circle"
-                    className="bg-blue-300 -ml-2"
-                  >
-                    <PopoverTrigger>
+                <Badge 
+                  content=" " 
+                  size="sm" 
+                  placement="top-left"
+                  isInvisible={submitter_comment == "No Comment Provided"}
+                  shape="circle"
+                  className="bg-blue-300 -ml-2"
+                >
+                    <Tooltip 
+                      content={<p>{submitter_comment}</p>}
+                      showArrow
+                      isDisabled={submitter_comment == "No Comment Provided"}
+                    >
                       <div>
-                        <UserCard userDiscordID={submitter} fallbackName={"User Not Found"}/>
+                        <UserCard 
+                          userDiscordID={submitter} 
+                          fallbackName={"User Not Found"}
+                          isProfileLink
+                        />
                       </div>
-                    </PopoverTrigger>
-                  </Badge>
-                  <PopoverContent>
-                    <p>{submitter_comment}</p>
-                  </PopoverContent>
-                </Popover>
+                    </Tooltip>
+                </Badge>
               </div>
             </div>
             <div className="flex text-sm -mt-2">
