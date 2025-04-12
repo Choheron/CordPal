@@ -174,14 +174,13 @@ def getAlbumRating(album_spotify_id, rounded=True, date: str = None):
   aotd = DailyAlbum.objects.get(date=aotd_date)
   # If there is already a value in the databse for this date (not an 11) then return that, else calculate rating 
   if(aotd.rating != 11):
-    return aotd.rating
+    return (round(aotd.rating) if rounded else aotd.rating)
   # Retrieve album from database
   albumObj = aotd.album
   # Get average review score of album
   reviewList = Review.objects.filter(album=albumObj).filter(aotd_date=aotd_date)
   # Return None if the album has not been reviewed
   if(len(reviewList) == 0):
-    logger.info(f"No reviews found for {albumObj.title} on Date: {aotd_date}")
     return None
   review_sum = 0.0
   for review in reviewList:
