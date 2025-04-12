@@ -65,7 +65,10 @@ export default async function UserCard(props) {
           showFallback: true,
           name: userData['nickname'],
           src: userAvatarURL,
-
+          className: "flex-shrink-0"
+        }}
+        classNames={{
+          name: "line-clamp-1"
         }}
       />
     </Badge>

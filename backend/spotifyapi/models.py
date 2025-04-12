@@ -141,6 +141,7 @@ class DailyAlbum(models.Model):
     date = models.DateField(unique=True)
     manual = models.BooleanField(default=False)
     rating_timeline = models.JSONField(default=generateTimelineDict, null=True)
+    rating = models.FloatField(default=11.0, null=True) # Score for this day, will only be populated after the day is over (11 means it was not populated yet, Null means no reviews were made)
 
     def dateToCalString(self):
       return self.date.strftime('%Y-%m-%d')

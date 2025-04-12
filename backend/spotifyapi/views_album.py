@@ -412,11 +412,14 @@ def getLowestHighestAlbumStats(request: HttpRequest):
   # Iterate through and retreive data
   for dailyAlbum in all_albums:
     album_rating = getAlbumRating(dailyAlbum.album.spotify_id, rounded=False, date=dailyAlbum.date)
+    # If album rating is none, skip
+    if(album_rating == None):
+      continue
     # Check to see if album meets review requirements (must have 4 or more reviews) [ONLY MAKE THIS CHECK IF IN PROD]
     if((os.getenv("APP_ENV") == "PROD") and (Review.objects.filter(album=dailyAlbum.album).count() < 4)):
       continue
     # Check for lowest album
-    if(lowest_album == None or (album_rating != None and album_rating < lowest_album_rating)):
+    if((lowest_album == None) or ((album_rating != None) and (album_rating < lowest_album_rating))):
       lowest_album = dailyAlbum.album
       lowest_album_rating = album_rating
       lowest_album_date = dailyAlbum.date

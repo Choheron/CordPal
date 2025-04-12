@@ -130,11 +130,12 @@ def setAlbumOfDay(request: HttpRequest):
   )
   # Save object
   albumOfTheDayObj.save()
-  # Attempt to get previous AOtD Object
   yesterday = day - datetime.timedelta(days=1)
   try:
+    # Attempt to get previous AOtD Object and generate a timeline, as well as store final rating for that album in the AOtD object
     yesterday_aotd = DailyAlbum.objects.get(date=yesterday)
     generateDayRatingTimeline(yesterday_aotd)
+    yesterday_aotd.rating = getAlbumRating(yesterday_aotd.album.spotify_id, False, yesterday.strftime("%Y-%m-%d"))
   except:
     logger.error(f"ERROR IN GENERATING TIMELINE DATA FOR DATE: {yesterday.strftime('%Y-%m-%d')} TRACEBACK: {traceback.print_exc()}")
   # Print success
@@ -216,9 +217,26 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
       distinct=True
     )
   )
+  # Get a map of all outages
+  user_outage_map = set(
+    UserAlbumOutage.objects
+      .filter(start_date__lte=tomorrow, end_date__gte=tomorrow)
+      .values_list('user_id', flat=True)
+  )
   # Iterate all users and update the selection blocked flag
   for user in user_list:
     checkSelectionFlag(user)
+  # Get a list of users who are eligible for selection
+  eligible_users = SpotifyUserData.objects.filter(
+    selection_blocked_flag=False
+  ).exclude(user_id__in=user_outage_map).select_related('user').annotate(
+    total_submissions=Count('user__album', distinct=True),
+    recent_picks=Count(
+      'user__album__dailyalbum',
+      filter=Q(user__album__dailyalbum__date__gte=one_year_ago),
+      distinct=True
+    )
+  )
   # Get user (use request cookie if user is not passed in)
   user = (getSpotifyUser(request.session.get('discord_id')) if (user_discord_id=="") else (getSpotifyUser(user_discord_id)))
   logger.info(f"Checking chance of AOTD selection for user: {user.nickname}")
@@ -245,12 +263,9 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
   # Get counts needed to determine percentage
   user_submissions_count = Album.objects.filter(submitted_by=user).count()
   user_eligible_count = user_submissions_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=user).count())
-  total_eligible_count = 0
-  for spot_user in user_list:
-    if((spot_user.selection_blocked_flag) or ((len(UserAlbumOutage.objects.filter(user=spot_user.user).filter(start_date__lte=tomorrow, end_date__gte=tomorrow)) > 0))):
-      continue
-    temp_eligible_count = spot_user.total_submissions - spot_user.recent_picks
-    total_eligible_count += temp_eligible_count
+  total_eligible_count = sum(
+    user.total_submissions - user.recent_picks for user in eligible_users
+  )
   # Do math for percentage
   try:
     chance = round((float(user_eligible_count)/float(total_eligible_count)) * 100.00, 2)

@@ -167,11 +167,16 @@ def isUserSpotifyConnected(request: HttpRequest):
  
 
 # Get album's average rating (by spotifyid passed in [NOT ALBUM OBJECT])
-def getAlbumRating(album_spotify_id, rounded=True, date: str=None):
+def getAlbumRating(album_spotify_id, rounded=True, date: str = None):
   # Get most recent aotd date if date is not provided
   aotd_date = date if (date) else DailyAlbum.objects.filter(album__spotify_id=album_spotify_id).latest('date').date
+  # Attempt to get aotd from database
+  aotd = DailyAlbum.objects.get(date=aotd_date)
+  # If there is already a value in the databse for this date (not an 11) then return that, else calculate rating 
+  if(aotd.rating != 11):
+    return aotd.rating
   # Retrieve album from database
-  albumObj = Album.objects.get(spotify_id=album_spotify_id)
+  albumObj = aotd.album
   # Get average review score of album
   reviewList = Review.objects.filter(album=albumObj).filter(aotd_date=aotd_date)
   # Return None if the album has not been reviewed

@@ -42,6 +42,7 @@ export default async function RecentSubmissions(props) {
                         name: submission['title'],
                         src: submission['album_img_src'],
                         size: "lg",
+                        radius: "md"
                       }}
                     />
                   </div>

@@ -37,7 +37,7 @@ export default async function MusicStatsBox(props) {
                     <p>{(user['block_type'] == "OUTAGE") ? `This outage lasts until: ${user['outage_end']}` : ``}</p>
                   </div>
                 }
-                className="max-w-[300px]"
+                className="max-w-[300px] mb-5"
               >
                 <div className="flex">
                   {(user['selection_blocked']) ? ((user['block_type'] == "OUTAGE") ? (<p>✖️</p>) : (<p>&#9940;</p>)) : (<p>&#9989;</p>)}
