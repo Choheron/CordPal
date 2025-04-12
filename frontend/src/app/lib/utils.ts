@@ -88,6 +88,35 @@ export function ratingToTailwindBgColor(rating: number) {
     return "bg-[#ff0000]"
 }
 
+// Convert a rating to a string representing tailwind color
+export function ratingToTailwindTextColor(rating: number) {
+  // Normalize rating
+  rating = Math.max(0.0, rating);
+  rating = Math.min(10.00, rating);
+  if(rating >= 9.99)
+    return "text-[#55ff00]"
+  if(rating >= 9.0)
+    return "text-[#83ee00]"
+  if(rating >= 8.0)
+    return "text-[#a4db00]"
+  if(rating >= 7.0)
+    return "text-[#bac800]"
+  if(rating >= 6.0)
+    return "text-[#cdb400]"
+  if(rating >= 5.0)
+    return "text-[#dc9e00]"
+  if(rating >= 4.0)
+    return "text-[#ea8600]"
+  if(rating >= 3.0)
+    return "text-[#f66900]"
+  if(rating >= 2.0)
+    return "text-[#fc4700]"
+  if(rating >= 1.0)
+    return "text-[#de1111]"
+  if(rating >= 0.0)
+    return "text-[#ff0000]"
+}
+
 // Return true if it is currently in December
 export const isDecember = () => {
   // Get Current Date

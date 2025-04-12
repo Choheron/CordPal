@@ -6,16 +6,23 @@ import { DateTime } from "luxon";
 import { Avatar, Divider, Tooltip } from "@heroui/react";
 import { getUserAvatarURL } from "@/app/lib/user_utils";
 import { Conditional } from "../../../conditional";
-import { ratingToTailwindBgColor } from "@/app/lib/utils";
+import { ratingToTailwindBgColor, ratingToTailwindTextColor } from "@/app/lib/utils";
 
 // Expected Props:
 //  - data: List of data formatted for this chart
 //  - aotdDate: String aotd date
 export async function AOtDScoreTimelineLineChart(props) {
   const timeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone
-  
+  // Get data and format through a fast map
+  let ratingRange={lowest: 10, highest: 0}
   const data: any = (await Promise.all(props.data.map( async(item) => {
     const adjustedTime = DateTime.fromISO(item.timestamp).setZone(timeZone);
+    if(item.value.toFixed(2) < ratingRange.lowest) {
+      ratingRange.lowest = item.value.toFixed(2)
+    }
+    if(item.value.toFixed(2) > ratingRange.highest) {
+      ratingRange.highest = item.value.toFixed(2)
+    }
 
     return {
       timestamp: new Date(adjustedTime.toMillis()),
@@ -29,6 +36,7 @@ export async function AOtDScoreTimelineLineChart(props) {
       review_id: item.review_id
     }
   }))).sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
   const aotdDate = `${props.aotdDate.split("-")[1]}/${props.aotdDate.split("-")[2]}/${props.aotdDate.split("-")[0]}`
   // Calculate domain of time
   const startDomain = new Date(data[0].timestamp).setMinutes(-60, 0, 0);
@@ -141,11 +149,16 @@ export async function AOtDScoreTimelineLineChart(props) {
             <path
               d={d}
               fill="none"
-              // className="bg-linear-to-r from-cyan-500 to-blue-500"
-              className="stroke-gray-400"
+              stroke="url(#lineFull-gradient)"
               strokeWidth="2"
               vectorEffect="non-scaling-stroke"
             />
+            <defs>
+              <linearGradient id="lineFull-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="currentColor" className={`${ratingToTailwindTextColor(ratingRange.highest)}`} />
+                <stop offset="100%" stopColor="currentColor" className={`${ratingToTailwindTextColor(ratingRange.lowest)}`} />
+              </linearGradient>
+            </defs>
           </svg>
 
           {/* User Icons and Tooltips */}
