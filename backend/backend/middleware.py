@@ -29,6 +29,9 @@ class metadataMiddleware:
       data = json.loads(response.content)
       data['meta'] = { 'timestamp': timezone.now().strftime("%d/%m/%Y, %H:%M:%S") }
       response.content = json.dumps(data)
-
+    # Attach a header to show that this was not a cache hit
+    response['X-Generated-At'] = timezone.now().strftime("%d/%m/%Y, %H:%M:%S") + " " + timezone.get_current_timezone_name()
+    response["Access-Control-Expose-Headers"] = "X-Generated-At"
+    
     # Returning the response
     return response

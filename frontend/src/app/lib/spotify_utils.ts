@@ -242,6 +242,7 @@ export async function deleteAlbumFromBackend(album_spotify_id, reason = null) {
   const status = deleteAlbumResponse.status
   // Revalidate requests to ensure no data is lost
   revalidateTag('album_submissions')
+  revalidateTag(`album_${album_spotify_id}`)
   return status
 }
 
@@ -272,17 +273,7 @@ export async function getAlbumOfTheDayData(date: string = '') {
     console.log("Error when retrieving album of the day!")
     return {"error_message": "No album found", "album_id": null}
   }
-  // Get album Data
-  console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbum/${albumOfDayInfo['album_id']}'`)
-  const albumDayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbum/${albumOfDayInfo['album_id']}`, {
-    method: "GET",
-    credentials: "include",
-    cache: 'force-cache',
-    headers: {
-      Cookie: `sessionid=${sessionCookie};`
-    },
-  });
-  const albumData = await albumDayResponse.json()
+  const albumData = await albumOfDayInfo['album_data']
   // Add Date for album of day
   albumData['AOD_date'] = albumOfDayInfo['date']
   return albumData;
@@ -389,7 +380,8 @@ export async function getUserReviewForAlbum(album_spotify_id, date = null) {
   const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getUserReviewForAlbum${urlTail}`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'force-cache',
+    next: { tags: [`album_review_${album_spotify_id}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -419,12 +411,15 @@ export async function submitReviewToBackend(reviewObject) {
   });
   // Revalidate review related calls
   revalidateTag('review_submissions')
+  revalidateTag(`review_submissions_${reviewObject['userId']}`)
+  revalidateTag(`album_review_${reviewObject['album_id']}`)
   // Revalidate AOTD calls for calendar views
   const now = new Date()
   revalidateTag(`calendar-${now.getFullYear()}-${padNumber(now.getMonth() + 1)}`)
   // Return callback code
   return submitReviewResponse.status
 }
+
 
 //
 // Get Last X Album Submissions
@@ -509,7 +504,7 @@ export async function getAllAlbums() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['review_submissions', 'album_submissions'] },
+    next: { tags: ['album_submissions', 'ATOD'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -526,15 +521,16 @@ export async function getAlbum(album_spotify_id: string) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Validate that user has connected spotify
-  console.log(`getAlbum: Sending request to backend '/spotifyapi/getAlbum/${album_spotify_id}'`)
   const allAlbumsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbum/${album_spotify_id}`, {
     method: "GET",
     credentials: "include",
-    next: { revalidate: 300 },
+    cache: 'force-cache',
+    next: { tags: [`album_${album_spotify_id}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
   });
+  console.log(`getAlbum: Attempted request to backend '/spotifyapi/getAlbum/${album_spotify_id}' -> Data Generated: ${allAlbumsResponse.headers.get('X-Generated-At')}`)
   const allAlbumsJson = await allAlbumsResponse.json()
   return allAlbumsJson;
 }
@@ -598,7 +594,7 @@ export async function getUserReviewStats(userId: string = "") {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['review_submissions'] },
+    next: { tags: [`review_submissions_${userId}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -623,7 +619,7 @@ export async function getAllUserReviews(userId: string = "") {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['review_submissions'] },
+    next: { tags: [`review_submissions_${userId}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },

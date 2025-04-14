@@ -26,6 +26,7 @@ import datetime
 import pytz
 import random
 import traceback
+import json
 
 # Declare logging
 logger = logging.getLogger('django')
@@ -42,6 +43,7 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 # Get All Reviews for a specific album. Returns a spotify album id and date
 ###
 def getAlbumOfDay(request: HttpRequest, date: str = ""):
+  from .views_album import getAlbum
   # Fill date if it isnt provided
   if(date == ""):
     date = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d')
@@ -67,6 +69,7 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
   out['raw_response'] = model_to_dict(dailyAlbumObj)
   out['album_id'] = dailyAlbumObj.album.spotify_id
   out['album_name'] = dailyAlbumObj.album.title
+  out['album_data'] = json.loads(getAlbum(request, dailyAlbumObj.album.spotify_id).content)
   out['date'] = date
   logger.info(f"Returning Album of Day Object for Date {date}: {out}...")
   return JsonResponse(out)
@@ -137,6 +140,7 @@ def setAlbumOfDay(request: HttpRequest):
     yesterday_aotd = DailyAlbum.objects.get(date=yesterday)
     generateDayRatingTimeline(yesterday_aotd)
     yesterday_aotd.rating = getAlbumRating(yesterday_aotd.album.spotify_id, False, yesterday.strftime("%Y-%m-%d"))
+    yesterday_aotd.save()
   except:
     logger.error(f"ERROR IN GENERATING TIMELINE DATA FOR DATE: {yesterday.strftime('%Y-%m-%d')} TRACEBACK: {traceback.print_exc()}")
   # Print success

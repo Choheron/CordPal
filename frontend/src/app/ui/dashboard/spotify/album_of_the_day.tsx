@@ -10,12 +10,15 @@ import AddAlbumModal from "./modals/add_album_modal";
 
 import Link from "next/link";
 import { RiCalendar2Fill} from "react-icons/ri";
+import { getUserData } from "@/app/lib/user_utils";
 
 // GUI Display for the Album of the Day
 export default async function AlbumOfTheDayBox(props) {
   let albumOfTheDayObj = await getAlbumOfTheDayData()
   const albumReview = await getUserReviewForAlbum(albumData("album_id"))
   const similarReviewData = await getSimilarReviewsForRatings()
+  // Get user Data
+  const user_data = await getUserData()
   // Retrieve review data on this level instead of at reviewbox level
   let reviewList = await getReviewsForAlbum(albumData("album_id"));
 
@@ -83,6 +86,7 @@ export default async function AlbumOfTheDayBox(props) {
           <div className="w-full max-w-full">
             <AlbumReviewBox 
               album_id={albumData("album_id")}
+              user_data={user_data}
               rating={(albumReview != null) ? albumReview['score'] : null}
               comment={(albumReview != null) ? albumReview['comment'] : null}
               first_listen={(albumReview != null) ? albumReview['first_listen']: null}

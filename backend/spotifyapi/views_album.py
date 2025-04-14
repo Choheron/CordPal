@@ -14,9 +14,7 @@ from .models import (
   Review,
   DailyAlbum
 )
-from .views_aotd import (
-  getChanceOfAotdSelect
-)
+
 
 import logging
 from dotenv import load_dotenv
@@ -352,6 +350,8 @@ def getLastXAlbums(request: HttpRequest, count: int):
 # Get Album Stats (submission numbers)
 ###
 def getAlbumsStats(request: HttpRequest):
+  # Avoid circular import
+  from .views_aotd import getChanceOfAotdSelect
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAlbumsStats called with a non-GET method, returning 405.")
@@ -377,10 +377,10 @@ def getAlbumsStats(request: HttpRequest):
     userData['selection_chance'] = chance_view_response['percentage']
     userData['block_type'] = chance_view_response['block_type']
     userData['reason'] = chance_view_response['reason']
-    userData['admin_outage'] = chance_view_response['admin_outage'] if (userData['block_type'] == "OUTAGE") else None
+    userData['admin_outage'] = chance_view_response['outage']['admin_outage'] if (userData['block_type'] == "OUTAGE") else None
     if(userData['block_type'] == "OUTAGE"):
-      userData['outage_start'] = chance_view_response['outage_start']
-      userData['outage_end'] = chance_view_response['outage_end']
+      userData['outage_start'] = chance_view_response['outage']['outage_start']
+      userData['outage_end'] = chance_view_response['outage']['outage_end']
     # Append to List
     userStatsList.append(userData)
   # Add list to out

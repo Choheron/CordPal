@@ -21,6 +21,7 @@ import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 //  - comment: String - (optional) User's comment if they left a previous review
 //  - first_listen: Boolean - (optional) Status of first listen if they left a previous review 
 //  - similar_review_data: Object - Object containing albums organized based on rating (key is rating)
+//  - user_data: Object - Data about the user
 export default function AlbumReviewBox(props) {
   // Activate Router
   const router = useRouter();
@@ -38,6 +39,8 @@ export default function AlbumReviewBox(props) {
   const songList = (props.song_data) ? props.song_data : [{name: "None Provided"}]
   // Album Scoring Prop Validation
   const [albumsByRating, setAlbumsByRating] = useState((props.similar_review_data != null) ? props.similar_review_data : {})
+  // User Data retrieval
+  const userData = props.user_data
 
   const getSteps = () => {
     let steps: any = []
@@ -89,6 +92,7 @@ export default function AlbumReviewBox(props) {
     out['score'] = rating
     out['comment'] = comment 
     out['first_listen'] = isFirstListen
+    out['userId'] = userData['discord_id']
 
     await submitReviewToBackend(out)
     // Turn off review ready checkmark

@@ -36,8 +36,8 @@ export default function Footer(props) {
             <Image 
               src="/images/branding/Spotify_Full_Logo_RGB_Green.png" 
               alt="Spotify Logo" 
-              height="20px"
-              width="auto"
+              height="auto"
+              width="75px"
               className="text-center"
             />
           </a>
