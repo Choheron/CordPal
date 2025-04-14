@@ -78,6 +78,8 @@ urlpatterns = [
   path('getAlbumOfDay', views_aotd.getAlbumOfDay),
   # Command to be called by cronjob to set the album of the day
   path('setAlbumOfDay', views_aotd.setAlbumOfDay),
+  # Command to be called by cronjob to calculate selection chances on a cadence
+  path('calculateAOTDChances', views_aotd.calculateAOTDChances),
   # ADMIN Command to be called by admin for special occasion album of the days
   path('setAlbumOfDayADMIN/<str:date>/<str:album_spotify_id>', views_aotd.setAlbumOfDayADMIN),
   # Return dates in which the passed in album was aotd

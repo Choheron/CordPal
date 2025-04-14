@@ -15,7 +15,8 @@ from .models import (
   DailyAlbum,
   SpotifyUserData,
   Review,
-  UserAlbumOutage
+  UserAlbumOutage,
+  UserChanceCache
 )
 
 import logging
@@ -194,12 +195,12 @@ def getAotdDates(request: HttpRequest, album_spotify_id: str):
 
 
 ###
-# Return the percentage chance that a user's album will be picked (given current conditions)
+# Calculate all user's percentage of being picked given current conditions (will run on a cron)
 ###
-def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
-  # Make sure request is a get request
-  if(request.method != "GET"):
-    logger.warning("getChanceOfAotdSelect called with a non-GET method, returning 405.")
+def calculateAOTDChances(request: HttpRequest):
+  # Make sure request is a post request
+  if(request.method != "POST"):
+    logger.warning("calculateAOTDChances called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -226,8 +227,10 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
   # Iterate all users and update the selection blocked flag
   for user in user_list:
     checkSelectionFlag(user)
+  # Get a list of all spotify users
+  spotify_users = SpotifyUserData.objects.all()
   # Get a list of users who are eligible for selection
-  eligible_users = SpotifyUserData.objects.filter(
+  eligible_users = spotify_users.filter(
     selection_blocked_flag=False
   ).exclude(user_id__in=user_outage_map).select_related('user').annotate(
     total_submissions=Count('user__album', distinct=True),
@@ -237,42 +240,75 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
       distinct=True
     )
   )
-  # Get user (use request cookie if user is not passed in)
-  user = (getSpotifyUser(request.session.get('discord_id')) if (user_discord_id=="") else (getSpotifyUser(user_discord_id)))
-  logger.info(f"Checking chance of AOTD selection for user: {user.nickname}")
-  # Check if user's selections are currently blocked, return 0% chance
-  if(SpotifyUserData.objects.get(user=user).selection_blocked_flag):
-    return JsonResponse({'percentage': 0.00, 'block_type': "INACTIVITY", 'reason': "Inactivity, user has not reviewed in over three days."})
-  # Check if user is currently under an outage
-  try:
-    outage = UserAlbumOutage.objects.filter(user=user).get(start_date__lte=tomorrow, end_date__gte=tomorrow)
-    logger.info(f"User {user.nickname} is currently under an outage, lasts until {outage.end_date.strftime('%Y-%m-%d')}!")
-    # Create outage return json
-    outageOut = {}
-    outageOut["target_user"] = outage.user.discord_id
-    outageOut["percentage"] = 0.00
-    outageOut["block_type"] = "OUTAGE"
-    outageOut["reason"] = f"{outage.reason}"
-    outageOut["admin_outage"] = f"{outage.admin_enacted}"
-    outageOut["outage_start"] = outage.start_date.strftime('%Y-%m-%d')
-    outageOut["outage_end"] = outage.end_date.strftime('%Y-%m-%d')
-    # Return outage object
-    return JsonResponse(outageOut)
-  except UserAlbumOutage.DoesNotExist as e:
-    logger.info(f"User {user.nickname} is not currently under an outage. {e}")
-  # Get counts needed to determine percentage
-  user_submissions_count = Album.objects.filter(submitted_by=user).count()
-  user_eligible_count = user_submissions_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=user).count())
-  total_eligible_count = sum(
-    user.total_submissions - user.recent_picks for user in eligible_users
-  )
-  # Do math for percentage
-  try:
-    chance = round((float(user_eligible_count)/float(total_eligible_count)) * 100.00, 2)
-  except:
-    chance = round(0, 2)
-  # Return data 
-  return JsonResponse({'percentage': chance, 'block_type': None, 'reason': None})
+  # Iterate all spotify users and calculate aotd chances
+  for spotUser in spotify_users:
+    logger.info(f"Calculating chance percentage for user {spotUser.user.nickname}")
+    # Retrieve user from spotifydata
+    user = spotUser.user
+    # Get the user's chance object
+    userChanceObj: UserChanceCache = UserChanceCache.objects.update_or_create(
+      spotify_user=spotUser,
+      defaults={
+        'chance_percentage': 0.00,
+        'block_type': None,
+        'outage': None,
+        'reason': None,
+      }
+    )[0]
+    # Check if user's selections are currently blocked, return 0% chance
+    if(spotUser.selection_blocked_flag):
+      userChanceObj.chance_percentage = 0.00
+      userChanceObj.block_type = "INACTIVITY"
+      userChanceObj.reason = "Inactivity, user has not reviewed in over three days."
+    # Check if user is currently under an outage
+    elif(user.discord_id in user_outage_map):
+      outage = UserAlbumOutage.objects.filter(user=user).get(start_date__lte=tomorrow, end_date__gte=tomorrow)
+      logger.info(f"User {user.nickname} is currently under an outage, lasts until {outage.end_date.strftime('%Y-%m-%d')}!")
+      # Create outage return json
+      userChanceObj.chance_percentage = 0.00
+      userChanceObj.block_type = "OUTAGE"
+      userChanceObj.outage = outage
+      userChanceObj.reason = f"{outage.reason}"
+      # Continue onto next user
+      continue
+    else:
+      # Get counts needed to determine percentage
+      user_submissions_count = Album.objects.filter(submitted_by=user).count()
+      user_eligible_count = user_submissions_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=user).count())
+      total_eligible_count = sum(
+        user.total_submissions - user.recent_picks for user in eligible_users
+      )
+      # Do math for percentage
+      try:
+        chance = round((float(user_eligible_count)/float(total_eligible_count)) * 100.00, 2)
+      except:
+        chance = round(0, 2)
+      # Update with correct data
+      userChanceObj.chance_percentage = chance
+      userChanceObj.block_type = None
+      userChanceObj.reason = None
+    # Save user chance object
+    userChanceObj.save()
+  # Return a 200 for successful calculation
+  return HttpResponse(status=200)
+
+
+###
+# Return the percentage chance that a user's album will be picked (taken from DB)
+###
+def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getChanceOfAotdSelect called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get current chance object from cache
+  spotUser: SpotifyUserData = (getSpotifyUser(user_discord_id) if (user_discord_id != "") else getSpotifyUser(request.session.get("discord_id"))).spotify_data
+  # Get user percentage
+  out: UserChanceCache = spotUser.aotd_chance
+  # Return object
+  return JsonResponse(out.toJSON())
 
 
 ###

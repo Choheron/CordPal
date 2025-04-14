@@ -36,7 +36,7 @@ export default async function Page({
   const reviewDateFormatted = `${reviewDateSplit[2]}/${padNumber(reviewDateSplit[0])}/${padNumber(reviewDateSplit[1])}`
   const isReviewToday = (timezoneDate == reviewDateFormatted)
   // Determine if today is the current review date
-  const returnUrl = (isReviewToday) ? `/dashboard/spotify` : `/dashboard/spotify/calendar/${reviewDateObj.getFullYear()}/${padNumber(reviewDateObj.getMonth() + 1)}/${padNumber(reviewDateObj.getDay() - 1)}`
+  const returnUrl = (isReviewToday) ? `/dashboard/spotify` : `/dashboard/spotify/calendar/${reviewDateObj.getFullYear()}/${padNumber(reviewDateObj.getMonth() + 1)}/${padNumber(reviewDateObj.getDate())}`
 
   // Parse review text to display embeds 
   // Regex for youtube video embedding

@@ -9,4 +9,5 @@ urlpatterns = [
   path('userData', views.getDiscordUserData),
   path('checkToken', views.checkIfPrevAuth),
   path('logout', views.revokeDiscordToken),
+  path('getEmojiList', views.getEmojiList),
 ]

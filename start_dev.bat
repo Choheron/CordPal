@@ -15,7 +15,7 @@ REM Third tab: Frontend development server
 wt -w 0 nt -d E:\Repos\discord-website\frontend --title "Frontend Dev" powershell -noexit -command npm run dev
 
 REM Fourth tab: Backend development server
-wt -w 0 nt -d E:\Repos\discord-website\backend --title "Backend Dev" powershell -noexit -command "./venv/Scripts/activate;python manage.py runserver"
+wt -w 0 nt -d E:\Repos\discord-website\backend --title "Backend Dev" powershell -noexit -command "./venv/Scripts/activate; python manage.py runserver"
 
 ECHO All tabs opened successfully.
 

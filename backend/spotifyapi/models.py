@@ -22,6 +22,7 @@ class SpotifyUserData(models.Model):
     User,
     on_delete=models.CASCADE,
     primary_key=True,
+    related_name="spotify_data"
   )
   # Spotify Data
   country = models.CharField(max_length=2)
@@ -89,7 +90,6 @@ class Album(models.Model):
     else:
       return "Not Available"
     
-  
   def toJSON(self):
     """Return an Album as a JSON. (For HTTP JSON Responses)"""
     out = {}
@@ -130,7 +130,6 @@ class Album(models.Model):
     # Call Django's default delete method
     super().delete(*args, **kwargs)
 
-
   def __str__(self):
     return f"{self.title} by {self.artist}"
 
@@ -167,7 +166,6 @@ class Review(models.Model):
 
     class Meta:
       unique_together = ('album', 'user', 'aotd_date')  # Prevent duplicate reviews for the same user and album
-
 
     def toJSON(self, full: bool = False):
       """
@@ -207,7 +205,6 @@ class Review(models.Model):
       # Convert to list and attach to out obj
       outObj['reactions'] = list(rObj.values())
       return outObj
-
 
     def save(self, *args, **kwargs):
       """Save override, will create a history object and user action."""
@@ -338,3 +335,35 @@ class UserAlbumOutage(models.Model):
     )
     # Call Django's default delete method
     super().delete(*args, **kwargs)
+
+
+# Storage for User chance object, representing the chance that a user will be selected for the next AOtD 
+class UserChanceCache(models.Model):
+  spotify_user = models.OneToOneField(
+    SpotifyUserData, 
+    on_delete=models.CASCADE,
+    related_name="aotd_chance"
+  )
+  chance_percentage = models.FloatField() # Percentage that user will be selected.
+  block_type = models.CharField(max_length=50, null=True) # Should be either "OUTAGE", "INACTIVITY", or None
+  outage = models.OneToOneField(UserAlbumOutage, null=True, on_delete=models.CASCADE) # If user is under an outage, link to that outage.
+  reason = models.TextField(null=True) # Reason for the percentage, should be empty if user is not blocked in any way (This will carry the outage reason as well if user is under outage)
+  last_updated = models.DateTimeField(auto_now=True)
+
+  def toJSON(self):
+    """Convert cache object to a dict for HTTP transfer"""
+    out = {}
+    out['spotify_user_id'] = self.spotify_user.pk
+    out['user_id'] = self.spotify_user.user.guid
+    out['user_nickname'] = self.spotify_user.user.nickname
+    out['percentage'] = self.chance_percentage
+    out['block_type'] = self.block_type
+    out['reason'] = self.reason
+    out['last_updated'] = self.last_updated.strftime('%m/%d/%Y, %H:%M:%S')
+    if(self.outage != None):
+      out['outage'] = {}
+      out['outage']["target_user"] = self.outage.user.discord_id
+      out['outage']["admin_outage"] = f"{self.outage.admin_enacted}"
+      out['outage']["outage_start"] = self.outage.start_date.strftime('%Y-%m-%d')
+      out['outage']["outage_end"] = self.outage.end_date.strftime('%Y-%m-%d')
+    return out

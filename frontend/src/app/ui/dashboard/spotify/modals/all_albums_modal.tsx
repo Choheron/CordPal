@@ -199,6 +199,7 @@ export default function AllAlbumsModal(props) {
               <Avatar
                 src={album['album_img_src']}
                 className='my-auto shrink-0'
+                radius="sm"
               />
               <p className="w-fit text-lg hover:underline max-w-lg text-ellipsis">
                 {album['title']}

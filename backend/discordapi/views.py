@@ -297,3 +297,17 @@ def revokeDiscordToken(request: HttpRequest):
   auth_logout(request)
   # Return response
   return JsonResponse(out) 
+
+
+###
+# Get a list of emojis from the server
+# NOTE: This should be done by the bot, it would seem
+###
+def getEmojiList(request: HttpRequest):
+  headers = {
+    "Authorization": f"Bot {os.getenv('DISCORD_BOT_TOKEN')}"
+  }
+  # Send Request to API
+  discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/guilds/{os.getenv('CORD_SERVER_ID')}/emojis", headers=headers)
+  discordResObj: dict = discordRes.json()
+  print(discordResObj)
