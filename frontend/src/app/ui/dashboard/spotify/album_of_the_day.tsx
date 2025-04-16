@@ -14,11 +14,12 @@ import { getUserData } from "@/app/lib/user_utils";
 
 // GUI Display for the Album of the Day
 export default async function AlbumOfTheDayBox(props) {
-  let albumOfTheDayObj = await getAlbumOfTheDayData()
-  const albumReview = await getUserReviewForAlbum(albumData("album_id"))
-  const similarReviewData = await getSimilarReviewsForRatings()
   // Get user Data
   const user_data = await getUserData()
+  // Get album data
+  let albumOfTheDayObj = await getAlbumOfTheDayData()
+  const albumReview = await getUserReviewForAlbum(albumData("album_id"))
+  const similarReviewData = await getSimilarReviewsForRatings(user_data['discord_id'])
   // Retrieve review data on this level instead of at reviewbox level
   let reviewList = await getReviewsForAlbum(albumData("album_id"));
 

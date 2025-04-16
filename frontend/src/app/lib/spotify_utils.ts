@@ -326,7 +326,7 @@ export async function getReviewsForAlbum(album_spotify_id, date = null) {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: [`album_reviews_${album_spotify_id}`] },
+    next: { tags: [`album_review_${album_spotify_id}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -482,7 +482,7 @@ export async function getLowestHighestAlbumStats() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['review_submissions'] },
+    next: { tags: ['AOTD'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -661,7 +661,7 @@ export async function getTenorGifData(tenor_url: string = "", tenor_gif_id: stri
 //
 // Get user's similarly rated albums for the review slider tooltip
 //
-export async function getSimilarReviewsForRatings() {
+export async function getSimilarReviewsForRatings(user_discord_id: string) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Validate that user has connected spotify
@@ -670,7 +670,7 @@ export async function getSimilarReviewsForRatings() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['review_submissions'] },
+    next: { tags: [`review_submissions_${user_discord_id}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -861,7 +861,7 @@ export async function addReviewReaction(reactObj) {
   // If status was a success, revalidate review tag 
   if(reviewReactStatus == 200) {
     revalidateTag(`review_${reactObj['id']}`)
-    revalidateTag(`album_reviews_${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
+    revalidateTag(`album_review_${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactStatus;
@@ -889,7 +889,7 @@ export async function deleteReviewReaction(reactObj) {
   // If status was a success, revalidate review tag 
   if(reviewReactDeleteStatus == 200) {
     revalidateTag(`review_${reactObj['id']}`)
-    revalidateTag(`album_reviews_${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
+    revalidateTag(`album_review_${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactDeleteStatus;
