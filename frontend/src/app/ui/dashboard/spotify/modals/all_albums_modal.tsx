@@ -31,7 +31,7 @@ import UserDropdown from "@/app/ui/general/userUiItems/user_dropdown";
 export default function AllAlbumsModal(props) {
   const [updateTimestamp, setUpdateTimestamp] = React.useState<any>("")
   const [albumListOriginal, setAlbumListOriginal] = React.useState([])
-  const [albumList, setAlbumList] = React.useState((props.albumList) ? props.albumList : [])
+  const [albumList, setAlbumList] = React.useState((props.albumList) ? props.albumList : null)
   // Album List Loading vars
   const [listLoading, setListLoading] = React.useState((props.albumList) ? false : true )
   // Sorting variables
@@ -135,24 +135,26 @@ export default function AllAlbumsModal(props) {
     }
   };
 
-  // UseEffect to pull Album Data
+  // UseEffect to pull Album Data on first mount (offloaded to client to make the page load faster)
   React.useEffect(() => {
-    if(!props.albumList) {
+    console.log("Is open? " + isOpen)
+    if(albumList == null && isOpen) {
       const ingestData = async () => {
+        setListLoading(true)
         let albumData = await getAllAlbums()
         setAlbumList(albumData['albums_list'].sort((a,b) => {return b['rating'] - a['rating']}))
         setAlbumListOriginal(albumData['albums_list'])
         setUpdateTimestamp(albumData['timestamp'])
+        setListLoading(false)
       }
       ingestData()
-      setListLoading(false)
     }
-  }, [])
+  }, [isOpen])
 
-  // UseEffect for when list changes
+  // UseEffect to pull Album Data on first mount (offloaded to client to make the page load faster)
   React.useEffect(() => {
-    setListLoading(false)
-  }, [albumList])
+    console.log(listLoading)
+  }, [listLoading])
 
   // UseEffect for when filters change
   React.useEffect(() => {
@@ -268,9 +270,11 @@ export default function AllAlbumsModal(props) {
   // Reset values on cancel button press
   const hardRefresh = () => {
     const ingestNewData = async () => {
+      setAlbumList([])
       let albumData = await getAllAlbumsNoCache()
       setAlbumList(albumData['albums_list'])
       setUpdateTimestamp(albumData['timestamp'])
+      setListLoading(false)
     }
     setListLoading(true)
     ingestNewData()
@@ -354,7 +358,14 @@ export default function AllAlbumsModal(props) {
                   </TableHeader>
                   <TableBody 
                     items={albumList}
-                    emptyContent={"No rows to display."}
+                    emptyContent={(listLoading) ? 
+                      <div>
+                        <Spinner />
+                        <p>Loading...</p>
+                      </div>
+                      : 
+                      <p>No Data Available...</p> 
+                    }
                   >
                     {(item: any) => (
                       <TableRow key={`${item['title']} - ${item['artist']['name']} - ${item['submitter_nickname']}`}>
@@ -367,7 +378,7 @@ export default function AllAlbumsModal(props) {
               <ModalFooter>
                 <div className="flex w-full justify-between">
                   <p className="my-auto">
-                    Data Last Updated: {convertToLocalTZString(updateTimestamp, true)}
+                    Data Last Updated: {(listLoading) ? " Loading..." : convertToLocalTZString(updateTimestamp, true)}
                   </p>
                   <div className="flex">
                     <Button color="primary" variant="solid" className="mr-2 mt-auto" isDisabled={listLoading} onPress={hardRefresh}>

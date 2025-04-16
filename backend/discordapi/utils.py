@@ -70,26 +70,30 @@ def isDiscordTokenExpired(request: HttpRequest):
   return False
 
 
-def refreshDiscordToken(request: HttpRequest):
+def refreshDiscordToken(request: HttpRequest, discord_user_id: str = ""):
   logger.info("Refreshing Discord Token...")
+  userDiscordId = discord_user_id if (discord_user_id != "") else request.session.get("discord_id")
   # Get token data
-  tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get("discord_id"))
+  tokenData = DiscordTokens.objects.get(user__discord_id = userDiscordId)
   # Retrieve session data
   refreshToken = tokenData.refresh_token
   # Prep request data and headers to discord api
   reqHeaders = { 'Content-Type': 'application/x-www-form-urlencoded' }
   reqData = {
      'grant_type': 'refresh_token',
-     'refresh_token': refreshToken
+     'refresh_token': refreshToken,
+     'client_id': os.getenv('DISCORD_CLIENT_ID'),
+     'client_secret': os.getenv('DISCORD_CLIENT_SECRET')
    }
   # Make request to discord api
   discordRes = requests.post(f"{os.getenv('DISCORD_API_ENDPOINT')}/oauth2/token", headers=reqHeaders, data=reqData, auth=(os.getenv('DISCORD_CLIENT_ID'), os.getenv('DISCORD_CLIENT_SECRET')))
   if(discordRes.status_code != 200):
-    logger.error("Error in request:\n" + discordRes.reason)
-    logger.info("More Info: \n" + json.dumps(discordRes.json()))
+    logger.error("Error in request: " + discordRes.reason)
+    logger.info("More Info: " + json.dumps(discordRes.json()))
     discordRes.raise_for_status()
   # Convert response to Json
   discordResJSON = discordRes.json()
+  discordResJSON['id'] = userDiscordId
   # Store discord data in database
   storeDiscordTokenInDatabase(request, discordResJSON)
   # After updating session, check if user's profile picture needs to be updated

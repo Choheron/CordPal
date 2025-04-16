@@ -14,7 +14,7 @@ export default async function music() {
   const spot_authenticated = await isSpotifyLinked();
   const recentSubmissionsResponse = await getLastXSubmissions(10);
   // Fetch all albums on the serverside to reduce loading time of modal
-  const allAlbumsList = await getAllAlbums()
+  // const allAlbumsList = await getAllAlbums()
 
   return (
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
@@ -36,9 +36,7 @@ export default async function music() {
         <MusicStatsBox />
       </Conditional>
       <Conditional showWhen={spot_authenticated}>
-        <AllTopSongsBox 
-          albumList={allAlbumsList}
-        />
+        <AllTopSongsBox />
       </Conditional>
     </div>
   );

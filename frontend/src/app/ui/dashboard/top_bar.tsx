@@ -55,7 +55,7 @@ export default function TopBar(props) {
           variant="flat"
         >
           <DropdownItem 
-            key="settings"
+            key="profile"
             href={`/profile/${props.userInfo['discord_id']}`}
           >
             My Profile

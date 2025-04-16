@@ -57,7 +57,7 @@ export async function verifyAuth() {
       Cookie: `sessionid=${sessionCookie};`
     }
   });
-  const isAuthorized: boolean = (await prevAuthResponse.json())['valid'];
+  const isAuthorized: boolean = (await prevAuthResponse.json());
   return isAuthorized;
 }
 

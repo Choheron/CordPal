@@ -22,6 +22,7 @@ from datetime import timedelta
 from dotenv import load_dotenv
 import os
 import json
+import traceback
 
 # Declare logging
 logger = logging.getLogger('django')
@@ -159,12 +160,15 @@ def validateServerMember(request: HttpRequest):
     out['role'] = False
     return JsonResponse(out)
   # Ensure user is logged in
-  if(isDiscordTokenExpired(request)):
-    try:
+  try:
+    if(isDiscordTokenExpired(request)):
       refreshDiscordToken(request)
-    except Exception as e:
-      logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}")
-      return HttpResponse("/", status=302)
+  except Exception as e:
+    logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}")
+    # Clear session cookie on fail
+    response = HttpResponse("/", status=302)
+    response.delete_cookie("session_id")
+    return response
   # Check if member status already exists in session store
   if(("server_member" in request.session) and (datetime.strptime(request.session.get("server_member_expiry"), cookie_time_fmt) < datetime.now())):
     status = request.session.get("server_member")
@@ -220,12 +224,13 @@ def checkIfPrevAuth(request: HttpRequest):
     res.status_code = 405
     return res
   # Check if session is still valid
-  validSession = (request.session.get_expiry_age() != 0)
+  validSession = (request.session.get('discord_id') != None) and (DiscordTokens.objects.get(user__discord_id = request.session.get('discord_id')).access_token != None)
   logger.info(f"Valid Session After Expiry Check: {validSession}")
   # If session is invalid, return false
   if(not validSession):
     out = {}
     out['valid'] = validSession
+    out['reason'] = "DIS"
     return JsonResponse(out)
   # Check if user sessionid token is valid
   logger.info("Ensuring sessionid is valid...")
@@ -249,13 +254,18 @@ def checkIfPrevAuth(request: HttpRequest):
 ###
 # Revoke discord token and clear session data for user
 ###
-def revokeDiscordToken(request: HttpRequest):
+def logout(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("revokeDiscordToken called with a non-GET method, returning 405.")
+    logger.warning("logout called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  # Check if id exists in session
+  discord_id = request.session.get('discord_id')
+  if(discord_id == None):
+    logger.error(f"LOGOUT CALLED WITH NO DISCORD ID! RETURNING 500...")
+    return HttpResponse(status=500)
   # Ensure user is logged in
   if(isDiscordTokenExpired(request)):
     try:
@@ -264,7 +274,7 @@ def revokeDiscordToken(request: HttpRequest):
       logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}")
       return HttpResponse("/", status=302)
   # Get token data from session
-  tokenData = DiscordTokens.objects.get(user = request.session.get('discord_id'))
+  tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get('discord_id'))
   # Prep request data and headers to discord api
   reqHeaders = { 
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -295,8 +305,10 @@ def revokeDiscordToken(request: HttpRequest):
   out['status'] = True
   # Log user out
   auth_logout(request)
-  # Return response
-  return JsonResponse(out) 
+  # Generate Response
+  response = JsonResponse(out) 
+  response.delete_cookie("session_id")
+  return response
 
 
 ###

@@ -18,6 +18,7 @@ import { Conditional } from "./dashboard/conditional";
 // Expected props:
 //  - userInfo: JSON Containing user information
 //  - update: Boolean for if this user is updating an existing password or not
+//  - isDisabled: Boolean - Is the button to open the modal to be disabled
 export default function LoginModal(props) {
   // States
   const [username, setUsername] = useState("")
@@ -126,12 +127,13 @@ export default function LoginModal(props) {
         radius="lg"
         className={`w-full hover:underline bg-black`}
         variant="solid"
+        isDisabled={props.isDisabled}
       >
         User/Pass
       </Button>
       <Modal 
         size="xl" 
-        isOpen={isOpen} 
+        isOpen={(props.isDisabled) ? !props.isDisabled : isOpen} 
         onOpenChange={onOpenChange} 
         isDismissable={false} 
         isKeyboardDismissDisabled={false} 

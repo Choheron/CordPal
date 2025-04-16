@@ -71,7 +71,7 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
   out['album_name'] = dailyAlbumObj.album.title
   out['album_data'] = json.loads(getAlbum(request, dailyAlbumObj.album.spotify_id).content)
   out['date'] = date
-  logger.info(f"Returning Album of Day Object for Date {date}: {out}...")
+  logger.info(f"Returning Album of Day Object for Date {date}...")
   return JsonResponse(out)
 
 

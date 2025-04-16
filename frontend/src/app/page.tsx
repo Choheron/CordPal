@@ -4,13 +4,19 @@ import "@/app/globals.css";
 import { verifyAuth } from "./lib/discord_utils";
 import { redirect } from "next/navigation";
 import AboutBlock from "./ui/about/about_block";
-import { Button, Link } from "@heroui/react";
+import { Alert, Button, Link } from "@heroui/react";
 import LoginModal from "./ui/login_modal";
+import { Conditional } from "./ui/dashboard/conditional";
 
-export default async function Home() {
+export default async function Home({ searchParams }) {
+  // Check if the redirect param exists
+  const redirectReason = searchParams.redirect
   // If user already has a session code/is already logged in, then redirect them to the dashboard page
-  if(await verifyAuth()) {
+  if((await verifyAuth())['valid']) {
     redirect('/dashboard');
+  }
+  if(redirectReason) {
+    
   }
 
   return (
@@ -34,7 +40,9 @@ export default async function Home() {
                   className="p-2"
                 />
               </Button>
-              <LoginModal />
+              <LoginModal 
+                isDisabled={(redirectReason == "DIS") ? true : false}
+              />
             </div>
           </div>
         </div>
@@ -50,6 +58,15 @@ export default async function Home() {
           {/* </a> */}
         </div>
       </div>
+      <Conditional showWhen={(redirectReason == "DIS")}>
+        <Alert 
+          title={`Login Failed! See Details`}
+          description={`Your discord token is expired, please authenticate with discord once again to be able to do traditional authentication once more.`}
+          color="danger"
+          variant="bordered"
+          className="my-2"
+        />
+      </Conditional>
       <AboutBlock loggedIn={false} />
     </main>
   );

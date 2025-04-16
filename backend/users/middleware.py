@@ -18,7 +18,7 @@ class LastSeenMiddleware:
     # Declare logging
     self.logger = logging.getLogger('django')
     self.heartbeat_endpoint_paths = ["/users/heartbeat", "/users/getAllOnlineData", "/discordapi/checkToken"]
-    self.no_user_validation_paths = ["/metrics", "/discordapi/checkToken", "/discordapi/token", "/spotifyapi/setAlbumOfDay"]
+    self.no_user_validation_paths = ["/metrics", "/discordapi/checkToken", "/discordapi/token", "/spotifyapi/setAlbumOfDay", "/users/traditionalLogin"]
     # Determine runtime enviornment
     self.APP_ENV = os.getenv('APP_ENV') or 'DEV'
 
@@ -28,7 +28,7 @@ class LastSeenMiddleware:
     # Get session data from request
     try:
       # Get user object 
-      user = User.objects.all().get(discord_id=request.session['discord_id'])
+      user = User.objects.get(discord_id=request.session['discord_id'])
       # Log method call (With username)
       self.logger.info(f"Incoming Request from user \"{user.nickname}\": {full_path}")
       # Get current timestamp
@@ -54,8 +54,10 @@ class LastSeenMiddleware:
       else:
         if(full_path == "/metrics"):
           self.logger.info(f"Reporting metrics to prometheus")
+        elif(full_path in self.no_user_validation_paths):
+          self.logger.info(f"Incoming request to path {full_path} without a discord_id in request... Possibly a cron?")
         else:
-          self.logger.error(f"ERROR IN MIDDLEWARE: PATH: {full_path} TRACEBACK: {traceback.print_exc()}")
+          self.logger.error(f"ERROR IN USER MIDDLEWARE: PATH: {full_path} TRACEBACK: {traceback.print_exc()}")
     
     # Code above this line is executed before the view is called
     # Retrieving the response 

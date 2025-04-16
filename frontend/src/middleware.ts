@@ -14,11 +14,12 @@ export async function middleware(request: NextRequest) {
   console.log("MIDDLEWARE: Running for Path: " + request.nextUrl.pathname)
   // Check if user is authorized, if not, redirect to login
   try {
-    if(!(await verifyAuth())) {
-      return NextResponse.redirect(new URL('/', request.url));
+    const authorized = await verifyAuth()
+    if(!(authorized['valid'])) {
+      return NextResponse.redirect(new URL(`/?redirect=${authorized['reason']}`, request.url));
     }
   } catch {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL(`/`, request.url));
   }
   // If this is a heartbeat call, skip it
   if((request.headers.get("X-Heartbeat")) || (request.headers.get("X-Member-Check"))) {

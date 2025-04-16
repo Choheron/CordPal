@@ -56,7 +56,7 @@ export function convertToLocalTZString(date: Date, full: boolean = false) {
   let hours = (adjustedDate.getHours() > 12)? adjustedDate.getHours() - 12 : adjustedDate.getHours();
   //if 00 then it is 12 am
   hours = (hours == 0)? 12 : hours;
-  return `${splitString[0]} ${splitString[1]} ${splitString[2]}` + ((full) ? ` ${hours}:${adjustedDate.getMinutes()}:${adjustedDate.getSeconds()} ${suffix}` : "")
+  return `${splitString[0]} ${splitString[1]} ${splitString[2]}` + ((full) ? ` ${hours}:${padNumber(adjustedDate.getMinutes())}:${padNumber(adjustedDate.getSeconds())} ${suffix}` : "")
 }
 
 // Convert a rating to a string representing tailwind color

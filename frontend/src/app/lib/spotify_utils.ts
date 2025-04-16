@@ -283,22 +283,22 @@ export async function getAlbumOfTheDayData(date: string = '') {
 // Get album rating
 // - RETURN: object containing album of the day data
 //
-export async function getAlbumAvgRating(spotify_album_id, rounded = true, date = null) {
+export async function getAlbumAvgRating(album_spotify_id, rounded = true, date = null) {
   // If spotify id is null, return 0
-  if(spotify_album_id == null) {
+  if(album_spotify_id == null) {
     return 0.0
   }
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Tail to string for variants in API calls
-  const urlTail = ((rounded) ? "" : "/false") + ((date != null) ? `/${date}` : "")
+  const urlTail = ((rounded) ? "/" : "/false") + ((date != null) ? `/${date}` : "")
   // Validate that user has connected spotify
-  console.log(`getAlbumOfTheDayData: Sending request to backend '/spotifyapi/getAlbumAvgRating/${spotify_album_id}${urlTail}'`)
-  const avgRatingResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumAvgRating/${spotify_album_id}${urlTail}`, {
+  console.log(`getAlbumAvgRating: Sending request to backend '/spotifyapi/getAlbumAvgRating/${album_spotify_id}${urlTail}'`)
+  const avgRatingResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumAvgRating/${album_spotify_id}${urlTail}`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['review_submissions'] },
+    next: { tags: [`album_review_${album_spotify_id}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -326,7 +326,7 @@ export async function getReviewsForAlbum(album_spotify_id, date = null) {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['review_submissions', `album-reviews-${album_spotify_id}`] },
+    next: { tags: [`album_reviews_${album_spotify_id}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -860,8 +860,8 @@ export async function addReviewReaction(reactObj) {
   const reviewReactStatus = reviewReactResponse.status
   // If status was a success, revalidate review tag 
   if(reviewReactStatus == 200) {
-    revalidateTag(`review-${reactObj['id']}`)
-    revalidateTag(`album-reviews-${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
+    revalidateTag(`review_${reactObj['id']}`)
+    revalidateTag(`album_reviews_${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactStatus;
@@ -888,8 +888,8 @@ export async function deleteReviewReaction(reactObj) {
   const reviewReactDeleteStatus = reviewReactDeleteResponse.status
   // If status was a success, revalidate review tag 
   if(reviewReactDeleteStatus == 200) {
-    revalidateTag(`review-${reactObj['id']}`)
-    revalidateTag(`album-reviews-${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
+    revalidateTag(`review_${reactObj['id']}`)
+    revalidateTag(`album_reviews_${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactDeleteStatus;
@@ -907,7 +907,7 @@ export async function getReviewByID(review_id) {
   const getReviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getReviewByID/${review_id}`, {
     method: "GET",
     credentials: "include",
-    next: { tags: [`review-${review_id}`] },
+    next: { tags: [`review_${review_id}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -928,7 +928,7 @@ export async function getReviewHistoricalByID(review_id) {
   const getReviewHistoricalResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getReviewHistoricalByID/${review_id}`, {
     method: "GET",
     credentials: "include",
-    next: { tags: [`review-${review_id}`] },
+    next: { tags: [`review_${review_id}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
