@@ -9,6 +9,7 @@ import RecentSubmissions from "@/app/ui/dashboard/spotify/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/spotify/statistics_displays/music_stats_box";
 import AllAlbumsModal from "@/app/ui/dashboard/spotify/modals/all_albums_modal";
 import AllTopSongsBox from "@/app/ui/dashboard/spotify/all_top_songs_box";
+import { Alert } from "@heroui/react";
 
 export default async function music() {
   const spot_authenticated = await isSpotifyLinked();
@@ -19,6 +20,26 @@ export default async function music() {
   return (
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text="Album Of The Day" />
+      <Alert
+        title={`Spotify is currently experiencing outages`}
+        description={
+          <div>
+            <p>As soon as Spotify is back up, the site will automatically be able to retrieve your data, there will be NO ADDITIONAL OUTAGE.</p>
+            <div className="flex flex-col ml-3">
+              <a href="https://x.com/SpotifyStatus" className="text-blue-400 hover:underline">Spotify Status Twitter</a>
+              <a 
+                href="https://community.spotify.com/t5/Ongoing-Issues/Downtime-April-16th-App-and-website-not-loading/idi-p/6922020" 
+                className="text-blue-400 hover:underline"              
+              >
+                Spotify Page for Current Outage
+              </a>
+            </div>
+          </div>
+        }
+        color="danger"
+        variant="faded"
+        className="w-full md:w-3/4 my-2"
+      />
       <Conditional showWhen={!spot_authenticated}>
         <SpotifyLoginBox />
       </Conditional>
