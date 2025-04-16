@@ -40,6 +40,7 @@ export default async function ReviewStatsUserCard(props) {
         <div>
           <UserCard
             userDiscordID={reviewData['discord_id']}
+            avatarClassNameOverride="size-[40px]"
             customDescription={
               <p>Click for review stats</p>
             }
@@ -49,6 +50,7 @@ export default async function ReviewStatsUserCard(props) {
       <PopoverContent>
         <UserCard 
           userDiscordID={props.userDiscordID}
+          avatarClassNameOverride="size-[40px]"
           customDescription={
             <p>Review Statistics</p>
           }

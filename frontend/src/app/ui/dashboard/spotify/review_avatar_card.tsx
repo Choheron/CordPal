@@ -81,6 +81,7 @@ export default async function ReviewAvatarCard(props) {
                   textSize="text-xl xl:text-2xl"
                 />
               }
+              avatarClassNameOverride="size-[40px]"
             />
           </div>
         </PopoverTrigger>

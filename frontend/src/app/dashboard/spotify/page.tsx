@@ -20,31 +20,25 @@ export default async function music() {
   return (
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text="Album Of The Day" />
-      <Alert
+      {/* <Alert
         title={`Spotify is currently experiencing outages`}
         description={
           <div>
             <p>As soon as Spotify is back up, the site will automatically be able to retrieve your data, there will be NO ADDITIONAL OUTAGE.</p>
             <div className="flex flex-col ml-3">
               <a href="https://x.com/SpotifyStatus" className="text-blue-400 hover:underline">Spotify Status Twitter</a>
-              <a 
-                href="https://community.spotify.com/t5/Ongoing-Issues/Downtime-April-16th-App-and-website-not-loading/idi-p/6922020" 
-                className="text-blue-400 hover:underline"              
-              >
-                Spotify Page for Current Outage
-              </a>
             </div>
           </div>
         }
         color="danger"
         variant="faded"
-        className="w-full md:w-3/4 my-2"
-      />
+        className="w-full md:w-fit my-2"
+      /> */}
       <Conditional showWhen={!spot_authenticated}>
         <SpotifyLoginBox />
       </Conditional>
       <Conditional showWhen={spot_authenticated}>
-        <div className="flex flex-col w-fit justify-center xl:flex-row md:w-4/5 gap-2">
+        <div className="flex flex-col w-full lg:w-[650px] justify-center xl:flex-row md:w-4/5 gap-2">
           <AlbumOfTheDayBox title={"Album Of The Day"} />
           <div className="w-full max-w-full lg:max-w-[350px] flex flex-col">
             <RecentSubmissions 

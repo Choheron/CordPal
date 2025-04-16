@@ -15,10 +15,12 @@ import { onlineStatusToTailwindBgColor } from "@/app/lib/utils";
 // - isProfileLink: Boolean (Optional) [DEFAULT FALSE] - Should the usercard be treated as a link to the user's profile
 // - onlineStatusDesc: Boolean (Optional) [DEFAULT FALSE] - Should the description be a check for a users online status? Will appear before custom desc
 // - onlineBadge: Boolean (Optional) [DEFAULT FALSE] - Show a dot in the top left signifying if the user is online or not
+// - avatarClassNameOverride: String (Optional) - Override the avatar classname
 export default async function UserCard(props) {
   let customDesc = (props.customDescription) ? props.customDescription : null;
   const profileLink = (props.isProfileLink) ? props.isProfileLink : false;
   const showOnlineDot = (props.onlineBadge) ? props.onlineBadge : false;
+  const avatarClassName = (props.avatarClassNameOverride) ? props.avatarClassNameOverride : "flex-shrink-0 size-[20px] md:size-[40px]";
 
   try {
     var userData = await getUserData(props.userDiscordID)
@@ -65,10 +67,10 @@ export default async function UserCard(props) {
           showFallback: true,
           name: userData['nickname'],
           src: userAvatarURL,
-          className: "flex-shrink-0"
+          className: avatarClassName
         }}
         classNames={{
-          name: "line-clamp-1"
+          name: "line-clamp-1 text-xs sm:text-sm"
         }}
       />
     </Badge>

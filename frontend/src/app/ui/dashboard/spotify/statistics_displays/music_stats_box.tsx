@@ -9,6 +9,7 @@ import { dateToString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import ReviewStatsUserCard from "./review_stats_user_card";
 import MinimalAlbumDisplay from "../minimal_album_display";
 import CreateOutageModal from "../modals/create_outage_modal";
+import AlbumDisplay from "../album_display";
 
 // GUI Display for an Album
 // Expected Props:
@@ -26,6 +27,7 @@ export default async function MusicStatsBox(props) {
         <td className="line-clamp-1 mx-2">
           <UserCard
             userDiscordID={user['discord_id']}
+            avatarClassNameOverride="size-[40px]"
             customDescription={(
               <Tooltip 
                 content={
@@ -82,7 +84,7 @@ export default async function MusicStatsBox(props) {
   return (
     <div className="w-fill min-w-[340px] mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row gap-10 backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
       {/* Album Submission Stats */}
-      <div className='min-w-[320px] w-[320px] mx-auto flex flex-col'>
+      <div className='min-w-[300px] w-[300px] mx-auto flex flex-col'>
         <p className="mx-auto text-xl underline mb-1">
           Album Submission Stats: 
         </p>
@@ -117,78 +119,56 @@ export default async function MusicStatsBox(props) {
         </div>
       </div>
       {/* Lowest and Highest Album Stats */}
-      <div className="w-300 flex flex-col">
+      <div className="w-fit flex flex-col">
         {/* Album Highest Stats */}
-        <div className='w-fit mx-auto flex flex-col'>
+        <div className='w-full lg:w-[650px] mx-auto flex flex-col'>
           <p className="mx-auto text-xl underline mb-2">
             Highest Album: {dateToString(albumLowHighStatsJson['highest_album']['date'])}
           </p>
           <div className="mx-auto">
-            <Badge 
-              content={(await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2)} 
-              size="lg" 
-              placement="top-left" 
-              shape="rectangle"
-              showOutline={false}
-              variant="shadow"
-              className={`-mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['highest_album']["spotify_id"], false)).toFixed(2))} text-lg lg:text-xl text-black`}
-            >
-              <MinimalAlbumDisplay
-                title={albumLowHighStatsJson['highest_album']["title"]}
-                album_spotify_id={albumLowHighStatsJson['highest_album']["spotify_id"]}
-                album_img_src={albumLowHighStatsJson['highest_album']["album_img_src"]}
-                album_src={albumLowHighStatsJson['highest_album']["spotify_url"]}
-                artist={{"name": albumLowHighStatsJson['highest_album']["artist"], "href": albumLowHighStatsJson['highest_album']["artist_url"]}}
-                submitter={albumLowHighStatsJson['highest_album']["submitter_id"]}
-                submitter_comment={albumLowHighStatsJson['highest_album']["submitter_comment"]}
-                submission_date={albumLowHighStatsJson['highest_album']["submission_date"]}
-                historical_date={albumLowHighStatsJson['highest_album']['date']}
-                sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
-                showAlbumRating={2}
-                starTextOverride="text-3xl"
-              />
-            </Badge>
+            <AlbumDisplay
+              title={albumLowHighStatsJson['highest_album']["title"]}
+              album_spotify_id={albumLowHighStatsJson['highest_album']["spotify_id"]}
+              album_img_src={albumLowHighStatsJson['highest_album']["album_img_src"]}
+              album_src={albumLowHighStatsJson['highest_album']["spotify_url"]}
+              artist={{"name": albumLowHighStatsJson['highest_album']["artist"], "href": albumLowHighStatsJson['highest_album']["artist_url"]}}
+              submitter={albumLowHighStatsJson['highest_album']["submitter_id"]}
+              submitter_comment={albumLowHighStatsJson['highest_album']["submitter_comment"]}
+              submission_date={albumLowHighStatsJson['highest_album']["submission_date"]}
+              historical_date={albumLowHighStatsJson['highest_album']['date']}
+              sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
+              showAlbumRating={2}
+              starTextOverride="text-3xl"
+            />
           </div>
           <Divider className="my-1" />
-        </div>
-        {/* Album Lowest Stats */}
-        <div className='w-fit mx-auto flex flex-col'>
+          {/* Album Lowest Stats */}
           <p className="mx-auto text-xl underline mb-2">
             Lowest Album: {dateToString(albumLowHighStatsJson['lowest_album']['date'])}
           </p>
           <div className="mx-auto">
-            <Badge 
-              content={(await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2)} 
-              size="lg" 
-              placement="top-left" 
-              shape="rectangle"
-              showOutline={false}
-              variant="shadow"
-              className={`-mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumLowHighStatsJson['lowest_album']["spotify_id"], false)).toFixed(2))} text-lg lg:text-xl text-black`}
-            >
-              <MinimalAlbumDisplay
-                title={albumLowHighStatsJson['lowest_album']["title"]}
-                album_spotify_id={albumLowHighStatsJson['lowest_album']["spotify_id"]}
-                album_img_src={albumLowHighStatsJson['lowest_album']["album_img_src"]}
-                album_src={albumLowHighStatsJson['lowest_album']["spotify_url"]}
-                artist={{"name": albumLowHighStatsJson['lowest_album']["artist"], "href": albumLowHighStatsJson['lowest_album']["artist_url"]}}
-                submitter={albumLowHighStatsJson['lowest_album']["submitter_id"]}
-                submitter_comment={albumLowHighStatsJson['lowest_album']["submitter_comment"]}
-                submission_date={albumLowHighStatsJson['lowest_album']["submission_date"]}
-                historical_date={albumLowHighStatsJson['lowest_album']['date']}
-                sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
-                showAlbumRating={2}
-                starTextOverride="text-3xl"
-              />
-            </Badge>
+            <AlbumDisplay
+              title={albumLowHighStatsJson['lowest_album']["title"]}
+              album_spotify_id={albumLowHighStatsJson['lowest_album']["spotify_id"]}
+              album_img_src={albumLowHighStatsJson['lowest_album']["album_img_src"]}
+              album_src={albumLowHighStatsJson['lowest_album']["spotify_url"]}
+              artist={{"name": albumLowHighStatsJson['lowest_album']["artist"], "href": albumLowHighStatsJson['lowest_album']["artist_url"]}}
+              submitter={albumLowHighStatsJson['lowest_album']["submitter_id"]}
+              submitter_comment={albumLowHighStatsJson['lowest_album']["submitter_comment"]}
+              submission_date={albumLowHighStatsJson['lowest_album']["submission_date"]}
+              historical_date={albumLowHighStatsJson['lowest_album']['date']}
+              sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
+              showAlbumRating={2}
+              starTextOverride="text-3xl"
+            />
           </div>
         </div>
-        <div className="max-w-[300px] mx-auto px-2 py-2 mt-2 text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
+        <div className="lg:w-[650px] mx-auto px-2 py-2 mt-2 text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
           <p>In order to be considered for highest or lowest album, an album must have 4 or more reviews. Any album with 3 or less reviews will not be counted.</p>
         </div>
       </div>
       {/* Review Stats */}
-      <div className='min-w-[320px] w-fit mx-auto flex flex-col'>
+      <div className='min-w-[300px] w-[300px] mx-auto flex flex-col'>
         <p className="mx-auto text-xl underline mb-1">
           Review Stats: 
         </p>

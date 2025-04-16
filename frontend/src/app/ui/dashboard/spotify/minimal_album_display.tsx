@@ -44,7 +44,7 @@ export default async function MinimalAlbumDisplay(props) {
   const submitter_comment = (props.submitter_comment) ? props.submitter_comment : "No Comment Provided";
   const submission_date: string = (props.submission_date) ? props.submission_date : "Not Provided";
   // Rating props check
-  const avg_rating = (props.album_spotify_id && showAlbumRating) ? await getAlbumAvgRating(props.album_spotify_id, false): 0.0;
+  const avg_rating = (props.album_spotify_id && (showAlbumRating != 0)) ? (await getAlbumAvgRating(props.album_spotify_id, false)) : 0.0;
   const rating_override = (props.ratingOverride) ? props.ratingOverride : false;
   // Historical props checks
   const historical = (props.historical_date) ? true : false;
@@ -55,15 +55,91 @@ export default async function MinimalAlbumDisplay(props) {
   const titleTextOverride = (props.titleTextOverride) ? props.titleTextOverride : 'text-center text-xl lg:text-3xl text-wrap'
   const artistTextOverride = (props.artistTextOverride) ? props.artistTextOverride : 'text-center text-sm lg:text-xl italic text-wrap'
   const starTextOverride = (props.starTextOverride) ? props.starTextOverride : 'text-xl 3xl:text-3xl'
+  // Tooltip disabled overhaul
+  const tooltipDisabled = (props.tooltipDisabled) ? props.tooltipDisabled : false;
+
+  const tooltipContent = () => {
+    return (
+      <div className="max-w-full">
+        <p className={titleTextOverride}>
+          {title}
+        </p>
+        <p className={artistTextOverride}>
+          {artist_name}
+        </p>
+        <Conditional showWhen={(submitter && showSubmitInfo)}>
+          <Tooltip 
+            content={submitter_comment} 
+            className={`w-fit`}
+            isDisabled={submitter_comment == "No Comment Provided"}
+          >
+            <div className="-mb-4 w-fit mx-auto">
+              <Badge 
+                content=" " 
+                size="sm" 
+                placement="top-left"
+                isInvisible={submitter_comment == "No Comment Provided"}
+                shape="circle"
+                className="bg-blue-300 -ml-2"
+              >
+                <UserCard 
+                  userDiscordID={submitter} 
+                  fallbackName={"User Not Found"}
+                  customDescription={(
+                    <p>
+                      Submitter
+                    </p>
+                  )}
+                />
+              </Badge>
+            </div>
+          </Tooltip>
+        </Conditional>
+        <Conditional showWhen={((avg_rating != null) && showAlbumRating != 0)}>
+          <div className="w-full">
+            <Conditional showWhen={showAlbumRating == 2} >
+                <p className={`w-fit mx-auto px-2 rounded-xl text-black ${ratingToTailwindBgColor((rating_override) ? rating_override : avg_rating)}`}>
+                  <b>{avg_rating.toFixed(2)}</b>
+                </p>
+            </Conditional>
+            <div className="w-fit mx-auto mt-2">
+              <StarRating 
+                className="text-yellow-400"
+                rating={(rating_override) ? rating_override : avg_rating} 
+                textSize={starTextOverride}
+              />
+            </div>
+          </div>
+        </Conditional>
+      </div>
+    )
+  }
+
 
   return (
     <div className={`relative group ${sizingOverride} sm:mx-2 lg:mx-1 my-auto flex flex-row`}>
-      <img 
-        src={album_img_src}
-        className={`${sizingOverride} rounded-2xl mx-auto group-hover:blur-sm duration-700 ease-in-out group-hover:brightness-[.25]`}
-        alt={`Album Cover for ${title} by ${artist_name}`}
-      />
-      <Button 
+      <Tooltip 
+        content={tooltipContent()}
+        showArrow
+        className={`${sizingOverride} !max-h-fit`}
+        isDisabled={tooltipDisabled}
+      >
+        <Button
+          as={Link}
+          href={(historical) ? `/dashboard/spotify/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
+          radius="lg"
+          className={`${sizingOverride} px-0`}
+          isDisabled={!props.album_spotify_id}
+        >
+          <img 
+            src={album_img_src}
+            className={`${sizingOverride} w-full`}
+            alt={`Album Cover for ${title} by ${artist_name}`}
+          />
+        </Button>
+      </Tooltip>
+      {/* Below was the old implementation, however this fails to conform to the spotify developer rules. */}
+      {/* <Button
         as={Link}
         href={(historical) ? `/dashboard/spotify/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
         radius="lg"
@@ -122,7 +198,7 @@ export default async function MinimalAlbumDisplay(props) {
             </div>
           </div>
         </Conditional>
-      </Button>
+      </Button> */}
     </div>
   )
 }

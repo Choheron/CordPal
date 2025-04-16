@@ -29,6 +29,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - showAlbumRating: Boolean - (Optional) [DEFAULT TRUE] Show the average user rating for the album
 //  - trackCount: Boolean - (Optional) Number of songs in the album, if provided, will show.
 //  - member_status: Boolean - (Optional) Is the user a member of the desired server?
+//  - vertical: Boolean - (Optional) Is this to be a vertical display instead of side by side?
 export default async function AlbumDisplay(props) {
   // Configuration Props
   const showAlbumRating = (props.showAlbumRating == false) ? props.showAlbumRating : true;
@@ -54,6 +55,8 @@ export default async function AlbumDisplay(props) {
   const userAuth = (props.member_status) ? props.member_status : true;
   // Rating props check
   const avg_rating = (props.album_spotify_id && showAlbumRating) ? await getAlbumAvgRating(props.album_spotify_id, false, historical_date): 0.0;
+  // Vertical Override
+  const vertical = (props.vertical) ? props.vertical : false;
   
 
   const dateToCalUrl = (dateStr) => {
@@ -64,7 +67,7 @@ export default async function AlbumDisplay(props) {
 
   return (
     <div className="w-full lg:min-w-[650px] max-w-full mx-auto lg:mx-1 my-auto block overflow-hidden text-ellipsis font-extralight">
-      <div className="w-full my-auto flex flex-row">
+      <div className={`w-full my-auto flex ${(vertical) ? "flex-col" : "flex-row" } `}>
         <Link 
           href={album_page_url}
           className="relative shrink-0 h-[125px] w-[125px] md:h-[300px] md:w-[300px]"
@@ -98,7 +101,7 @@ export default async function AlbumDisplay(props) {
           </Conditional>
           <Conditional showWhen={userAuth && props.submitter}>
             <div className="">
-              <p>Submitter: </p>
+              <p className="text-xs sm:text-base">Submitter: </p>
               <div className="ml-2 -mb-1">
                 <Badge 
                   content=" " 
@@ -124,13 +127,13 @@ export default async function AlbumDisplay(props) {
                 </Badge>
               </div>
             </div>
-            <div className="flex text-sm -mt-2">
+            <div className="flex text-xs lg:text-sm sm:-mt-2">
               <p>Submitted:</p>
               <ClientTimestamp className="italic pl-1" timestamp={submission_date} full={false}/>
             </div>
           </Conditional>
           <Conditional showWhen={(avg_rating != 0) && ((avg_rating != null) && showAlbumRating)}>
-            <div className="">
+            <div className="text-xs lg:text-base">
               <div className="flex mb-1">
                 <p>Average {(userAuth) ? "User":"Member"} Rating: </p>
                 <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(avg_rating)}`}>

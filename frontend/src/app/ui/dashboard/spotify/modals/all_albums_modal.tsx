@@ -137,8 +137,7 @@ export default function AllAlbumsModal(props) {
 
   // UseEffect to pull Album Data on first mount (offloaded to client to make the page load faster)
   React.useEffect(() => {
-    console.log("Is open? " + isOpen)
-    if(albumList == null && isOpen) {
+    if(isOpen) {
       const ingestData = async () => {
         setListLoading(true)
         let albumData = await getAllAlbums()
@@ -150,11 +149,6 @@ export default function AllAlbumsModal(props) {
       ingestData()
     }
   }, [isOpen])
-
-  // UseEffect to pull Album Data on first mount (offloaded to client to make the page load faster)
-  React.useEffect(() => {
-    console.log(listLoading)
-  }, [listLoading])
 
   // UseEffect for when filters change
   React.useEffect(() => {
@@ -302,7 +296,7 @@ export default function AllAlbumsModal(props) {
         size="5xl" 
         scrollBehavior={"inside"}
         isOpen={isOpen} 
-        onOpenChange={onOpenChange} 
+        onOpenChange={onOpen} 
         backdrop="blur"
         onClose={cancelPress}
         classNames={{

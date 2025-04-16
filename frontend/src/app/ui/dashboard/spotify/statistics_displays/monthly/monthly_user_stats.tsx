@@ -60,21 +60,15 @@ export default function MonthlyUserStats(props) {
                   className="group relative flex h-[40%] md:h-[30%] w-[40%] md:w-[30%] m-1"
                   key={index}
                 >
-                  <img 
-                    src={(album['cover_url']) ? album['cover_url'] : album['album_img_src']}
-                    className='h-full w-full rounded-2xl mx-auto group-hover:blur-sm duration-700 ease-in-out group-hover:brightness-50'
-                    alt={`Album Cover for ${album['title']} by ${getArtist(album)}`}
-                  />
                   <a 
                     href={`/dashboard/spotify/album/${album['spotify_id']}`}
-                    className="absolute flex flex-col h-full w-full justify-center transition opacity-0 group-hover:opacity-100 ease-in-out lg:gap-2 bg-transparent py-0 px-1"
+                    className="flex flex-col h-full w-full justify-center py-0 px-1"
                   >
-                    <p className="text-center text-md line-clamp-2">
-                      <b>{album['title']}</b>
-                    </p>
-                    <p className="text-center text-sm italic text-wrap">
-                      {getArtist(album)}
-                    </p>
+                    <img 
+                      src={(album['cover_url']) ? album['cover_url'] : album['album_img_src']}
+                      className='h-full w-full rounded-2xl mx-auto'
+                      alt={`Album Cover for ${album['title']} by ${getArtist(album)}`}
+                    />
                   </a>
                 </div>
               )
