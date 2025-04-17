@@ -27,7 +27,7 @@ export default async function MusicStatsBox(props) {
         <td className="line-clamp-1 mx-2">
           <UserCard
             userDiscordID={user['discord_id']}
-            avatarClassNameOverride="size-[40px]"
+            avatarClassNameOverride="size-[40px] flex-shrink-0"
             customDescription={(
               <Tooltip 
                 content={
