@@ -139,6 +139,7 @@ export default async function MusicStatsBox(props) {
               sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
               showAlbumRating={2}
               starTextOverride="text-3xl"
+              showCalLink={true}
             />
           </div>
           <Divider className="my-1" />
@@ -160,6 +161,7 @@ export default async function MusicStatsBox(props) {
               sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
               showAlbumRating={2}
               starTextOverride="text-3xl"
+              showCalLink={true}
             />
           </div>
         </div>

@@ -27,6 +27,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - album_spotify_id: String - (Optional) Album Spotify ID for retrieval of average from database
 //  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
 //  - showAlbumRating: Boolean - (Optional) [DEFAULT TRUE] Show the average user rating for the album
+//  - showCalLink: Boolean - (Optional) [DEFAULT FALSE] Show a button for the user to go to the calendar date displayed
 //  - trackCount: Boolean - (Optional) Number of songs in the album, if provided, will show.
 //  - member_status: Boolean - (Optional) Is the user a member of the desired server?
 //  - vertical: Boolean - (Optional) Is this to be a vertical display instead of side by side?
@@ -37,7 +38,7 @@ export default async function AlbumDisplay(props) {
   // Album props checks
   const title = (props.title) ? props.title : "No Album Title Found";
   const album_url = (props.album_src) ? props.album_src : "https://www.google.com/search?q=sad+face";
-  const album_page_url = (props.album_id) ? `/dashboard/spotify/album/${props.album_id}` : album_url;
+  const album_page_url = (props.album_spotify_id) ? `/dashboard/spotify/album/${props.album_spotify_id}` : album_url;
   const album_img_src = (props.album_img_src) ? props.album_img_src : "/images/DALL-E_Album_Not_Found.webp";
   // Artist props checks
   const artist_name = (props.artist && props.artist['name']) ? props.artist['name'] : "Artist Name not Found";
@@ -51,6 +52,7 @@ export default async function AlbumDisplay(props) {
   // Historical props checks
   const historical = (props.historical_date) ? true : false;
   const historical_date = (props.historical_date) ? props.historical_date : null;
+  const showCalLink = (props.showCalLink) ? props.showCalLink : false;
   // Check that user is authenticated
   const userAuth = (props.member_status) ? props.member_status : true;
   // Rating props check
@@ -60,6 +62,9 @@ export default async function AlbumDisplay(props) {
   
 
   const dateToCalUrl = (dateStr) => {
+    if(dateStr == null) {
+      return ""
+    }
     const dateArr = dateStr.split("-")
 
     return `${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`
@@ -79,7 +84,7 @@ export default async function AlbumDisplay(props) {
           />
         </Link>
         <div className="w-full max-w-full flex flex-col lg:gap-2 pl-2 lg:pl-4 pt-1 lg:pt-2 my-auto">
-          <a href={album_url} target="_noreferrer" className="text-xl lg:text-3xl hover:underline w-fit">
+          <a href={album_url} target="_noreferrer" className="text-xl lg:text-3xl hover:underline w-fit line-clamp-1">
             <b>{title}</b>
           </a>
           <a href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline -mt-2 w-fit">
@@ -149,6 +154,16 @@ export default async function AlbumDisplay(props) {
                 />
               </div>
             </div>
+          </Conditional>
+          <Conditional showWhen={historical && showCalLink}>
+            <Button 
+              as={Link}
+              className="bg-gradient-to-br from-green-700/80 to-green-800/80"
+              href={`/dashboard/spotify/calendar/${dateToCalUrl(historical_date)}`}
+              variant="solid"
+            >
+              Go to {dateToCalUrl(historical_date)}
+            </Button>
           </Conditional>
         </div>
       </div>
