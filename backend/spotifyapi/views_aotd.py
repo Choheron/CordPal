@@ -361,7 +361,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
       temp = {}
       temp['raw_data'] = model_to_dict(albumObj)
       temp['title'] = albumObj.title
-      temp['album_id'] = albumObj.spotify_id
+      temp['spotify_id'] = albumObj.spotify_id
       temp['album_img_src'] = albumObj.cover_url
       temp['album_src'] = albumObj.spotify_url
       temp['artist'] = {}

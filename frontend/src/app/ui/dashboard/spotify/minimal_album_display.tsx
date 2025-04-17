@@ -28,6 +28,7 @@ import { ratingToTailwindBgColor } from "@/app/lib/utils";
 //  - titleTextOverride: String - (Optional) Override the tailwind css for the title text
 //  - artistTextOverride: String - (Optional) Override the tailwind css for the artist text
 //  - starTextOverride: String - (Optional) Override the tailwind css for the star rating text
+//  - albumCoverOverride: String (Optional) Override for album display
 export default async function MinimalAlbumDisplay(props) {
   // Configuration Props
   const showAlbumRating = (props.showAlbumRating) ? props.showAlbumRating : 0;
@@ -55,6 +56,7 @@ export default async function MinimalAlbumDisplay(props) {
   const titleTextOverride = (props.titleTextOverride) ? props.titleTextOverride : 'text-center text-xl lg:text-3xl text-wrap'
   const artistTextOverride = (props.artistTextOverride) ? props.artistTextOverride : 'text-center text-sm lg:text-xl italic text-wrap'
   const starTextOverride = (props.starTextOverride) ? props.starTextOverride : 'text-xl 3xl:text-3xl'
+  const albumCoverOverride = (props.albumCoverOverride) ? `${sizingOverride} ${props.albumCoverOverride}` : `${sizingOverride} sm:mx-2 lg:mx-1 my-auto rounded-2xl`
   // Tooltip disabled overhaul
   const tooltipDisabled = (props.tooltipDisabled) ? props.tooltipDisabled : false;
 
@@ -117,7 +119,7 @@ export default async function MinimalAlbumDisplay(props) {
 
 
   return (
-    <div className={`relative group ${sizingOverride} sm:mx-2 lg:mx-1 my-auto flex flex-row`}>
+    <div className={`relative group ${albumCoverOverride}`}>
       <Tooltip 
         content={tooltipContent()}
         showArrow
@@ -127,8 +129,8 @@ export default async function MinimalAlbumDisplay(props) {
         <Button
           as={Link}
           href={(historical) ? `/dashboard/spotify/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
-          radius="lg"
-          className={`${sizingOverride} px-0`}
+          radius="none"
+          className={`${albumCoverOverride} px-0 py-0`}
           isDisabled={!props.album_spotify_id}
         >
           <img 

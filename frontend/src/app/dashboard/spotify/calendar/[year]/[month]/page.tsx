@@ -1,7 +1,7 @@
 "use server"
 
 import { getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/app/lib/spotify_utils"
-import { daysInMonth, monthToName, padNumber } from "@/app/lib/utils"
+import { daysInMonth, monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import MinimalAlbumDisplay from "@/app/ui/dashboard/spotify/minimal_album_display"
@@ -96,7 +96,7 @@ export default async function Page({
   const genDay = (dateStr) => {
     const albumObj = aotdData[dateStr]
     const dateArr = dateStr.split("-")
-    const sizingTailwind = "relative w-full h-full sm:p-1"
+    const sizingTailwind = "relative w-full max-w-full h-full"
 
     // Return a field value from the album object or null
     function albumGet(field) {
@@ -109,71 +109,85 @@ export default async function Page({
     // If the album date is from last month, return a text block
     if(dateStr.split("-")[1] != (firstDay.getMonth() + 1)) {
       return (
-        <div className={sizingTailwind}>
-          <div className="w-full h-full content-center bg-gray-800/30 rounded-2xl border border-neutral-800">
-            <p className="invisible sm:visible w-fit m-auto">Previous Month</p>
-          </div>
-          <div className="absolute bg-zinc-800/90 border border-neutral-800 top-0 p-[2px] sm:p-2 rounded-tl-2xl rounded-br-2xl text-xs sm:text-base">
-            <p>{dateArr[2]}</p>
-          </div>
-        </div>
+        <></>
       )
     }
-    // If the album date is greater than today, return a special object for future albums
-    if(new Date(Number(dateArr[0]), Number(dateArr[1]) - 1, Number(dateArr[2])) > today) {
+
+    const getDayHtml = () => {
+      // If the album date is greater than today, return a special object for future albums
+      if(new Date(Number(dateArr[0]), Number(dateArr[1]) - 1, Number(dateArr[2])) > today) {
+        return (
+          <div className={sizingTailwind}>
+            <MinimalAlbumDisplay
+              showAlbumRating={true}
+              title={"Future Album"}
+              album_img_src={"https://www.placemonkeys.com/500?greyscale&random"}
+              artist={{'name': "Monke"}}
+              sizingOverride="w-full h-full"
+              albumCoverOverride="rounded-b-2xl"
+            />
+          </div>
+        )
+      }
       return (
         <div className={sizingTailwind}>
+          {/* Album Body */}
           <MinimalAlbumDisplay
+            showSubmitInfo={albumGet("submitter") != null}
             showAlbumRating={true}
-            title={"Future Album"}
-            album_img_src={"https://www.placemonkeys.com/500?greyscale&random"}
-            artist={{'name': "Monke"}}
+            ratingOverride={albumGet("rating")}
+            title={albumGet("title")}
+            album_spotify_id={albumGet("spotify_id")}
+            album_img_src={albumGet("album_img_src")}
+            album_src={albumGet("spotify_url")}
+            artist={albumGet("artist")}
+            submitter={albumGet("submitter")}
+            submitter_comment={albumGet("submitter_comment")}
+            submission_date={albumGet("submission_date")}
+            historical_date={albumGet('date')}
             sizingOverride="w-full h-full"
+            albumCoverOverride="rounded-b-2xl"
+            buttonUrlOverride={`/dashboard/spotify/calendar/${year}/${month}/${padNumber(dateArr[2])}`}
+            titleTextOverride="text-center text-xl 2xl:text-2xl text-wrap line-clamp-2"
+            artistTextOverride="text-center text-sm 2xl:text-xl italic text-wrap"
+            starTextOverride="text-base 2xl:text-2xl"
           />
-          <div className="absolute sm:left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-[2px] sm:p-2 rounded-tl-2xl rounded-br-2xl text-xs sm:text-base">
-            <p>{dateArr[2]}</p>
-          </div>
         </div>
       )
     }
+
+    
     return (
-      <div className={sizingTailwind}>
-        <MinimalAlbumDisplay
-          showSubmitInfo={albumGet("submitter") != null}
-          showAlbumRating={true}
-          ratingOverride={albumGet("rating")}
-          title={albumGet("title")}
-          album_spotify_id={albumGet("album_id")}
-          album_img_src={albumGet("album_img_src")}
-          album_src={albumGet("spotify_url")}
-          artist={albumGet("artist")}
-          submitter={albumGet("submitter")}
-          submitter_comment={albumGet("submitter_comment")}
-          submission_date={albumGet("submission_date")}
-          historical_date={albumGet('date')}
-          sizingOverride="w-full h-full"
-          buttonUrlOverride={`/dashboard/spotify/calendar/${year}/${month}/${padNumber(dateArr[2])}`}
-          titleTextOverride="text-center text-xl 2xl:text-2xl text-wrap line-clamp-2"
-          artistTextOverride="text-center text-sm 2xl:text-xl italic text-wrap"
-          starTextOverride="text-base 2xl:text-2xl"
-        />
-        <div className="absolute sm:left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-[2px] sm:p-2 rounded-tl-2xl rounded-br-2xl text-xs sm:text-base">
-          <p>{dateArr[2]}</p>
+      <div className="rounded-2xl sm:px-[2px] md:px-1 max-w-full max-h-full">
+        {/* Day Header */}
+        <div className="relative bg-neutral-800 rounded-tl-2xl rounded-tr-2xl h-fit">
+          <div className="p-[2px] sm:p-2 w-fit sm:min-w-10 text-center bg-zinc-900/90 border border-zinc-900 rounded-t-2xl rounded-br-2xl text-xs sm:text-base">
+            <p>{dateArr[2]}</p>
+          </div>
+          <Conditional showWhen={albumGet("rating") != null}>
+            <div className={`absolute p-[2px] sm:p-2 w-fit sm:min-w-10 mx-auto left-0 right-0 text-center ${ratingToTailwindBgColor(albumGet("rating"))} bg-opacity-40 top-0 rounded-2xl text-xs md:text-base`}>
+              <p>{albumGet("rating")?.toFixed(2)}</p>
+            </div>
+          </Conditional>
+          <Conditional showWhen={dateStr == aotdData['stats']['highest_aotd_date']}>
+            <Tooltip content={`Highest Rated Album for ${monthToName(month)} ${year}`}>
+              <div className="absolute right-0 bg-green-600/90 border border-green-800 top-0 p-[2px] sm:p-2 rounded-t-2xl rounded-bl-2xl text-xs sm:text-2xl">
+                <RiThumbUpFill />
+              </div>
+            </Tooltip>
+          </Conditional>
+          <Conditional showWhen={dateStr == aotdData['stats']['lowest_aotd_date']}>
+            <Tooltip content={`Lowest Rated Album for ${monthToName(month)} ${year}`}>
+              <div className="absolute right-0 bg-red-600/90 border border-red-800 top-0 p-[2px] sm:p-2 rounded-t-2xl rounded-bl-2xl text-xs sm:text-2xl">
+                <RiThumbDownFill />
+              </div>
+            </Tooltip>
+          </Conditional>
         </div>
-        <Conditional showWhen={dateStr == aotdData['stats']['highest_aotd_date']}>
-          <Tooltip content={`Highest Rated Album for ${monthToName(month)} ${year}`}>
-            <div className="absolute right-0 sm:-right-1 bg-green-600/90 border border-green-800 top-0 p-[2px] sm:p-2 rounded-tr-2xl rounded-bl-2xl text-xs sm:text-2xl">
-              <RiThumbUpFill />
-            </div>
-          </Tooltip>
-        </Conditional>
-        <Conditional showWhen={dateStr == aotdData['stats']['lowest_aotd_date']}>
-          <Tooltip content={`Lowest Rated Album for ${monthToName(month)} ${year}`}>
-            <div className="absolute right-0 sm:-right-1 bg-red-600/90 border border-red-800 top-0 p-[2px] sm:p-2 rounded-tr-2xl rounded-bl-2xl text-xs sm:text-2xl">
-              <RiThumbDownFill />
-            </div>
-          </Tooltip>
-        </Conditional>
+        {/* Day Body */}
+        <div className={sizingTailwind}>
+          {getDayHtml()}
+        </div>
       </div>
     )
   }

@@ -119,6 +119,7 @@ export default async function AlbumDisplay(props) {
                       <div>
                         <UserCard 
                           userDiscordID={submitter} 
+                          avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[40px]"}
                           fallbackName={"User Not Found"}
                           isProfileLink
                         />

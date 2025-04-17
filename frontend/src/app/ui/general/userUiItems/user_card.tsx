@@ -20,7 +20,7 @@ export default async function UserCard(props) {
   let customDesc = (props.customDescription) ? props.customDescription : null;
   const profileLink = (props.isProfileLink) ? props.isProfileLink : false;
   const showOnlineDot = (props.onlineBadge) ? props.onlineBadge : false;
-  const avatarClassName = (props.avatarClassNameOverride) ? props.avatarClassNameOverride : "flex-shrink-0 size-[20px] md:size-[40px]";
+  const avatarClassName = (props.avatarClassNameOverride) ? props.avatarClassNameOverride : "flex-shrink-0 size-[40px]";
 
   try {
     var userData = await getUserData(props.userDiscordID)

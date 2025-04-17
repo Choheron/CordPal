@@ -65,7 +65,7 @@ export default async function MonthlyLowestHighestAlbum(props) {
             showAlbumRating={true}
             ratingOverride={highestAlbumObj["rating"]}
             title={highestAlbumObj["title"]}
-            album_spotify_id={highestAlbumObj["album_id"]}
+            album_spotify_id={highestAlbumObj["spotify_id"]}
             album_img_src={highestAlbumObj["album_img_src"]}
             album_src={highestAlbumObj["spotify_url"]}
             artist={highestAlbumObj["artist"]}
@@ -105,7 +105,7 @@ export default async function MonthlyLowestHighestAlbum(props) {
             showAlbumRating={true}
             ratingOverride={lowestAlbumObj["rating"]}
             title={lowestAlbumObj["title"]}
-            album_spotify_id={lowestAlbumObj["album_id"]}
+            album_spotify_id={lowestAlbumObj["spotify_id"]}
             album_img_src={lowestAlbumObj["album_img_src"]}
             album_src={lowestAlbumObj["spotify_url"]}
             artist={lowestAlbumObj["artist"]}

@@ -475,7 +475,7 @@ def getSubmissionsByMonth(request: HttpRequest, year: str, month: str):
     user_stats["percent"] = ((submissions_temp.count()/float(len(submissions))) * 100) if (len(submissions_temp) != 0) else 0
     user_stats["submissions"] = []
     for album in submissions_temp:
-      user_stats["submissions"].append(model_to_dict(album))
+      user_stats["submissions"].append(album.toJSON())
     # Attach stats object to user_stats dict
     out['user_stats'][user_id] = user_stats
   # Mark single value of all submissions
