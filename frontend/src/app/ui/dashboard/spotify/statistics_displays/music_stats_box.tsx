@@ -27,7 +27,7 @@ export default async function MusicStatsBox(props) {
         <td className="line-clamp-1 mx-2">
           <UserCard
             userDiscordID={user['discord_id']}
-            avatarClassNameOverride="size-[40px] flex-shrink-0"
+            avatarClassNameOverride="size-[35px] flex-shrink-0"
             customDescription={(
               <Tooltip 
                 content={
@@ -37,6 +37,7 @@ export default async function MusicStatsBox(props) {
                     {(user['selection_blocked']) ? (<p><b>Reason:</b> <i>{user['reason']}</i></p>) : <></>}
                     <p>{`${(user['block_type'] == "OUTAGE") ? (user['admin_outage'] == "true") ? `Outage placed by admins.` : `Outage placed by ${user['nickname']}.` : ""}`}</p>
                     <p>{(user['block_type'] == "OUTAGE") ? `This outage lasts until: ${user['outage_end']}` : ``}</p>
+                    <p>{`User has submitted ${user['submission_count']} album(s).`}</p>
                   </div>
                 }
                 className="max-w-[300px] mb-5"
@@ -52,12 +53,12 @@ export default async function MusicStatsBox(props) {
         </td>
         <td>
           <p className="mx-auto px-2 py-1 bg-gray-800 rounded-full w-fit">
-            {user['submission_count']}
+            {user['aotd_count']}
           </p>
         </td>
         <td>
           <p className="mx-auto px-2 py-1 bg-gray-800 rounded-full w-fit">
-            {user['aotd_count']}
+            {user['unpicked_count']}
           </p>
         </td>
       </tr>
@@ -103,12 +104,12 @@ export default async function MusicStatsBox(props) {
         </div>
         <Divider className="my-1" />
         <div className="flex flex-col justify-between h-full">
-          <table className="table-fixed w-fit">
+          <table className="table-fixed w-full">
             <thead>
               <tr>
                 <th className="w-1/2">User</th>
-                <th className="w-1/4 px-1">Submitted</th>
                 <th className="w-1/4 pl-1">AOtD</th>
+                <th className="w-1/4 px-1">Unpicked</th>
               </tr>
             </thead>
             <tbody>

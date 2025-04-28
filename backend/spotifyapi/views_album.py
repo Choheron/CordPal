@@ -378,6 +378,7 @@ def getAlbumsStats(request: HttpRequest):
     userData = {}
     userData['submission_count'] = Album.objects.filter(submitted_by=user.user).count()
     userData['aotd_count'] = DailyAlbum.objects.filter(album__submitted_by=user.user).count()
+    userData['unpicked_count'] = f"{(Album.objects.filter(submitted_by=user.user).count() - DailyAlbum.objects.filter(album__submitted_by=user.user).count())}/100"
     userData['discord_id'] = user.user.discord_id
     userData['nickname'] = user.user.nickname
     chance_view_response = json.loads(getChanceOfAotdSelect(request, user.user.discord_id).content)
