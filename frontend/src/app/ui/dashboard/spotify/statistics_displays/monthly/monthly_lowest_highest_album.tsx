@@ -49,17 +49,14 @@ export default async function MonthlyLowestHighestAlbum(props) {
         {monthName} {year}&lsquo;s Highest:
       </p>
       <Divider className="mb-1" />
-      <Badge
-        isInvisible={highestAlbumObj['rating'] == null}
-        content={highestAlbumRating} 
-        size="lg" 
-        placement="top-right" 
-        shape="rectangle"
-        showOutline={false}
-        variant="shadow"
-        className={`-mt-1  ${ratingToTailwindBgColor(highestAlbumRating)} lg:text-xl text-black`}
-      >
-        <div className="relative w-full h-full p-1">
+      <div className="relative w-full h-full p-1">
+        <div className="h-fit lg:text-xl flex mx-auto w-full justify-between px-0 sm:px-2 mb-1">
+          <p>{monthName} {highestAlbumDateArr[2]}</p>
+          <p className={`${ratingToTailwindBgColor(highestAlbumRating)} text-black w-fit px-1 rounded-2xl`}>
+            {highestAlbumRating}
+          </p>
+        </div>
+        <div>
           <MinimalAlbumDisplay
             showSubmitInfo
             showAlbumRating={true}
@@ -79,27 +76,21 @@ export default async function MonthlyLowestHighestAlbum(props) {
             artistTextOverride="text-center text-sm 2xl:text-xl italic text-wrap"
             starTextOverride="text-base 2xl:text-3xl"
           />
-          <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
-            <p>{highestAlbumDateArr[2]}</p>
-          </div>
         </div>
-      </Badge>
+      </div>
       {/* Lowest Album */}
       <p className="font-extralight w-full text-center text-xl">
         {monthName} {year}&lsquo;s Lowest:
       </p>
       <Divider className="mb-1" />
-      <Badge
-        isInvisible={lowestAlbumObj['rating'] == null}
-        content={lowestAlbumRating} 
-        size="lg" 
-        placement="top-right" 
-        shape="rectangle"
-        showOutline={false}
-        variant="shadow"
-        className={`-mt-1 ${ratingToTailwindBgColor(lowestAlbumRating)} lg:text-xl text-black`}
-      >
-        <div className="relative w-full h-full p-1">
+      <div className="relative w-full h-full p-1">
+        <div className="h-fit lg:text-xl flex mx-auto w-full justify-between px-0 sm:px-2 mb-1">
+          <p>{monthName} {lowestAlbumDateArr[2]}</p>
+          <p className={`${ratingToTailwindBgColor(lowestAlbumRating)} text-black w-fit px-1 rounded-2xl`}>
+            {highestAlbumRating}
+          </p>
+        </div>
+        <div>
           <MinimalAlbumDisplay
             showSubmitInfo
             showAlbumRating={true}
@@ -119,11 +110,8 @@ export default async function MonthlyLowestHighestAlbum(props) {
             artistTextOverride="text-center text-sm 2xl:text-xl italic text-wrap"
             starTextOverride="text-base 2xl:text-3xl"
           />
-          <div className="absolute left-1 bg-zinc-800/90 border border-neutral-800 top-0 p-2 rounded-tl-2xl rounded-br-2xl">
-            <p>{lowestAlbumDateArr[2]}</p>
-          </div>
         </div>
-      </Badge>
+      </div>
     </div>
   )
 }

@@ -56,7 +56,7 @@ export default async function MinimalAlbumDisplay(props) {
   const titleTextOverride = (props.titleTextOverride) ? props.titleTextOverride : 'text-center text-xl lg:text-3xl text-wrap'
   const artistTextOverride = (props.artistTextOverride) ? props.artistTextOverride : 'text-center text-sm lg:text-xl italic text-wrap'
   const starTextOverride = (props.starTextOverride) ? props.starTextOverride : 'text-xl 3xl:text-3xl'
-  const albumCoverOverride = (props.albumCoverOverride) ? `${sizingOverride} ${props.albumCoverOverride}` : `${sizingOverride} sm:mx-2 lg:mx-1 my-auto rounded-2xl`
+  const albumCoverOverride = (props.albumCoverOverride) ? `${sizingOverride} ${props.albumCoverOverride}` : `${sizingOverride} my-auto rounded-2xl`
   // Tooltip disabled overhaul
   const tooltipDisabled = (props.tooltipDisabled) ? props.tooltipDisabled : false;
 
