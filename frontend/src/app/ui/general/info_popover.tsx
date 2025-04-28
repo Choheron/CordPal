@@ -18,7 +18,7 @@ export default function InfoPopover(props) {
         <p className={`${props.triggerClassName} text-xs underline text-${props.triggerTextColor}`}>{props.triggerText}</p>
       </PopoverTrigger>
       <PopoverContent>
-        <div className="px-1 py-2">
+        <div className="px-1 py-2 max-w-[350px]">
           <div className="text-small font-bold">{props.popoverTitle}</div>
           <div className="text-tiny">{props.popoverText}</div>
         </div>

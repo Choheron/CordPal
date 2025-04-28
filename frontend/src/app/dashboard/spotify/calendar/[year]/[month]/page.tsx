@@ -156,7 +156,7 @@ export default async function Page({
       )
     }
 
-    
+    const is_highest_or_lowest = ((dateStr == aotdData['stats']['highest_aotd_date']) || (dateStr == aotdData['stats']['lowest_aotd_date']))
     return (
       <div className="rounded-2xl sm:px-[2px] md:px-1 max-w-full max-h-full">
         {/* Day Header */}
@@ -165,7 +165,7 @@ export default async function Page({
             <p>{dateArr[2]}</p>
           </div>
           <Conditional showWhen={albumGet("rating") != null}>
-            <div className={`absolute p-[2px] sm:p-2 w-fit sm:min-w-10 mx-auto left-0 right-0 text-center ${ratingToTailwindBgColor(albumGet("rating"))} bg-opacity-40 top-0 rounded-2xl text-xs md:text-base`}>
+            <div className={`absolute p-[2px] sm:p-2 w-fit sm:min-w-10 mx-auto ${(is_highest_or_lowest) ? "left-0 rounded-2xl" : "rounded-t-2xl rounded-bl-2xl"} right-0 text-center ${ratingToTailwindBgColor(albumGet("rating"))} bg-opacity-65 top-0 text-xs md:text-base`}>
               <p>{albumGet("rating")?.toFixed(2)}</p>
             </div>
           </Conditional>

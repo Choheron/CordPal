@@ -70,32 +70,17 @@ export default async function MinimalAlbumDisplay(props) {
           {artist_name}
         </p>
         <Conditional showWhen={(submitter && showSubmitInfo)}>
-          <Tooltip 
-            content={submitter_comment} 
-            className={`w-fit`}
-            isDisabled={submitter_comment == "No Comment Provided"}
-          >
-            <div className="-mb-4 w-fit mx-auto">
-              <Badge 
-                content=" " 
-                size="sm" 
-                placement="top-left"
-                isInvisible={submitter_comment == "No Comment Provided"}
-                shape="circle"
-                className="bg-blue-300 -ml-2"
-              >
-                <UserCard 
-                  userDiscordID={submitter} 
-                  fallbackName={"User Not Found"}
-                  customDescription={(
-                    <p>
-                      Submitter
-                    </p>
-                  )}
-                />
-              </Badge>
-            </div>
-          </Tooltip>
+          <div className="-mb-4 w-fit mx-auto">
+            <UserCard 
+              userDiscordID={submitter} 
+              fallbackName={"User Not Found"}
+              customDescription={(
+                <p>
+                  Submitter
+                </p>
+              )}
+            />
+          </div>
         </Conditional>
         <Conditional showWhen={((avg_rating != null) && showAlbumRating != 0)}>
           <div className="w-full">

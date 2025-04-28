@@ -117,9 +117,16 @@ export default async function AlbumDisplay(props) {
                   className="bg-blue-300 -ml-2"
                 >
                     <Tooltip 
-                      content={<p>{submitter_comment}</p>}
+                      content={
+                        <p className="w-[300px]">
+                          {submitter_comment}
+                        </p>
+                      }
                       showArrow
                       isDisabled={submitter_comment == "No Comment Provided"}
+                      classNames={{
+                        content: ["w-fit"],
+                      }}
                     >
                       <div>
                         <UserCard 
