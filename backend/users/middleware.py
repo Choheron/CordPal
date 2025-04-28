@@ -38,7 +38,7 @@ class LastSeenMiddleware:
         if(full_path == "/users/heartbeat"):
           # Update timezone if timezone is in request
           user.timezone_string = json.loads(request.body)['heartbeat']['timezone']
-          self.logger.debug(f"Setting timezone to {str(user.timezone_string)} for user {user.nickname}")
+          self.logger.info(f"Setting timezone to {str(user.timezone_string)} for user {user.nickname}")
         user.last_heartbeat_timestamp = time
         self.logger.debug(f"Setting last_heartbeat_timestamp to {str(time)} for user {user.nickname}")
         user.save()

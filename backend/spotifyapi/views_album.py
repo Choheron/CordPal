@@ -97,6 +97,12 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
   except ObjectDoesNotExist as e:
     validityStatus['canSubmit'] = False
     validityStatus['reason'] = f"You have not submitted a review for the current album!"
+  ## Check if 1000 albums have been submitted, this will lock down submissions past that point to better control users submissions
+  # Get count of all albums
+  albumCount = Album.objects.all().count()
+  if(albumCount >= 1000):
+    validityStatus['canSubmit'] = False
+    validityStatus['reason'] = f"Album submission has been locked at 1000 albums, if youd like to submit one, maybe delete one you arent as fond of! (This is a temporary measure as developers consider better control methods)"
   # Return Statuses
   return JsonResponse(validityStatus)
 
