@@ -87,7 +87,7 @@ export default async function MonthlyLowestHighestAlbum(props) {
         <div className="h-fit lg:text-xl flex mx-auto w-full justify-between px-0 sm:px-2 mb-1">
           <p>{monthName} {lowestAlbumDateArr[2]}</p>
           <p className={`${ratingToTailwindBgColor(lowestAlbumRating)} text-black w-fit px-1 rounded-2xl`}>
-            {highestAlbumRating}
+            {lowestAlbumRating}
           </p>
         </div>
         <div>

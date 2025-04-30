@@ -8,10 +8,10 @@ import { redirect } from "next/navigation";
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   // Is user correctly authed
-  const memberStatus = (await isMember());
-  if(memberStatus == false) {
-    redirect('/dashboard')
-  }
+  // const memberStatus = (await isMember());
+  // if(memberStatus == false) {
+  //   redirect('/dashboard')
+  // }
 
   return (
     <div>
