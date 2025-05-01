@@ -162,6 +162,7 @@ def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str, date: str
   # Return user review
   return JsonResponse({"review": outObj})
 
+
 ###
 # Get Review stats for all users.
 # TODO: Track streaks of reviews to see which user has been maintaining the streak
