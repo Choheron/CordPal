@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
 from django.utils import timezone
+import numpy
 
 from .utils import (
   getAlbumRating,
@@ -325,6 +326,28 @@ def getAlbumAvgRating(request: HttpRequest, album_spotify_id: str, rounded: str 
     return res
   rating = getAlbumRating(album_spotify_id, rounded=rounded, date=aotd_date)
   return JsonResponse({"rating": rating})
+
+
+###
+# Get the standard deviation for the ratings for an album.
+# If a date is not provided in the url bar, will return the most recent aotd standard deviation for that album
+###
+def getAlbumSTD(request: HttpRequest, album_spotify_id: str, date: str = None):
+  # If date is not provided grab the most recent date of AOtD
+  aotd_date = date if (date) else DailyAlbum.objects.filter(album__spotify_id=album_spotify_id).latest('date').date
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getAlbumSTD called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get all ratings for an album
+  reviewList = Review.objects.filter(album__spotify_id=album_spotify_id).filter(aotd_date=aotd_date)
+  # Iterate review list and get scores
+  reviewScores = [rev.score for rev in reviewList]
+  # Get standard deviation
+  standardDev = numpy.std(reviewScores)
+  return JsonResponse({"standard_deviation": standardDev})
 
 
 ###

@@ -1,13 +1,13 @@
 "use server"
 
-import { getAlbumAvgRating, getAlbumOfTheDayData, getDayTimelineData } from "@/app/lib/spotify_utils"
+import { getAlbumAvgRating, getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData } from "@/app/lib/spotify_utils"
 import { getNextDay, getPrevDay, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/spotify/album_display"
 import ReviewDisplay from "@/app/ui/dashboard/spotify/review_display"
 import { AOtDScoreTimelineLineChart } from "@/app/ui/dashboard/spotify/statistics_displays/charts/aotd_score_timeline_linechart"
-import { Badge, Button } from "@heroui/react"
+import { Badge, Button, Divider } from "@heroui/react"
 import Link from "next/link"
 import { RiArrowLeftCircleFill, RiArrowLeftCircleLine, RiArrowRightCircleLine, RiCalendar2Fill } from "react-icons/ri"
 
@@ -31,6 +31,8 @@ export default async function Page({
   const nextDay = getNextDay(new Date(Date.parse(date)))
   // Boolean to determine if this date is today
   const isToday = isTodayCheck()
+  // Fetch standard deviation for this date
+  const standard_deviation = await getAlbumSTD(albumData("album_id"), date)
   
 
   // This may be my ugliest function in this whole thing.... Timezones are really confusing me
@@ -92,31 +94,28 @@ export default async function Page({
                 <RiArrowRightCircleLine className="text-2xl" />
               </Button> 
             </div>
-            <Badge
-              content={(await getAlbumAvgRating(albumData('album_id'), false)).toFixed(2)} 
-              size="lg" 
-              placement="top-left" 
-              shape="rectangle"
-              showOutline={false}
-              variant="shadow"
-              className={`lg:-ml-4 -mt-1 ${ratingToTailwindBgColor((await getAlbumAvgRating(albumData('album_id'), false)).toFixed(2))} lg:text-xl text-black`}
-              isInvisible={albumData("title") == ""}
-            >
-              <AlbumDisplay
-                title={albumData("title")}
-                album_id={albumData("album_id")}
-                album_img_src={albumData("album_img_src")}
-                album_src={albumData("album_src")}
-                album_spotify_id={albumData("album_id")}
-                artist={albumData("artist")}
-                submitter={albumData("submitter")}
-                submitter_comment={albumData("submitter_comment")}
-                submission_date={albumData("submission_date")}
-                release_date={albumData("release_date")}
-                release_date_precision={albumData("release_date_precision")}
-                historical_date={date}
-              />
-            </Badge>
+            <AlbumDisplay
+              title={albumData("title")}
+              album_id={albumData("album_id")}
+              album_img_src={albumData("album_img_src")}
+              album_src={albumData("album_src")}
+              album_spotify_id={albumData("album_id")}
+              artist={albumData("artist")}
+              submitter={albumData("submitter")}
+              submitter_comment={albumData("submitter_comment")}
+              submission_date={albumData("submission_date")}
+              release_date={albumData("release_date")}
+              release_date_precision={albumData("release_date_precision")}
+              historical_date={date}
+            />
+            <div className="mt-2 w-full md:w-4/5 mx-auto">
+              <p className="text-xl lg:text-3xl">Day Stats:</p>
+              <Divider />
+              <div className="flex w-fit gap-2">
+                <p>Standard Deviation: </p>
+                <p>{standard_deviation}</p>
+              </div>
+            </div>
             <div className="flex justify-around mt-4">
               <Button 
                 as={Link}

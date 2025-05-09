@@ -936,3 +936,26 @@ export async function getReviewHistoricalByID(review_id) {
   const getReviewHistoricalJson = await getReviewHistoricalResponse.json()
   return getReviewHistoricalJson;
 }
+
+
+//
+// Get the standard deviation for the reviews for an album on a given date
+//
+export async function getAlbumSTD(album_spotify_id, date = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Determine URL tail
+  const urlTail = `/${album_spotify_id}${((date != null) ? `/${date}` : "")}`
+  // Make backend request
+  console.log(`getAlbumSTD: Sending request to backend '/spotifyapi/getAlbumSTD${urlTail}`)
+  const getAlbumSTDResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getAlbumSTD${urlTail}`, {
+    method: "GET",
+    credentials: "include",
+    next: { tags: [`album_review_${album_spotify_id}`] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const getAlbumSTDResponseJson = await getAlbumSTDResponse.json()
+  return getAlbumSTDResponseJson['standard_deviation'];
+}

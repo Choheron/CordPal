@@ -11,3 +11,5 @@ psycopg
 psycopg2-binary
 # Prometheus
 prometheus_client
+# Math Libaries 
+numpy

@@ -40,6 +40,9 @@ urlpatterns = [
   path('getAlbumAvgRating/<str:album_spotify_id>/<str:rounded>', views_album.getAlbumAvgRating),
   path('getAlbumAvgRating/<str:album_spotify_id>', views_album.getAlbumAvgRating),
   # Below URL has two variations (one for lack of URL Param)
+  path('getAlbumSTD/<str:album_spotify_id>/<str:date>', views_album.getAlbumSTD),
+  path('getAlbumSTD/<str:album_spotify_id>', views_album.getAlbumSTD),
+  # Below URL has two variations (one for lack of URL Param)
   path('checkIfUserCanSubmit/<str:date>', views_album.checkIfUserCanSubmit),
   path('checkIfUserCanSubmit', views_album.checkIfUserCanSubmit),
   # Statistics Endpoints
