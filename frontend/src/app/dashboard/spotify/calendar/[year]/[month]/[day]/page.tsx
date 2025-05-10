@@ -32,7 +32,7 @@ export default async function Page({
   // Boolean to determine if this date is today
   const isToday = isTodayCheck()
   // Fetch standard deviation for this date
-  const standard_deviation = await getAlbumSTD(albumData("album_id"), date)
+  const standard_deviation = (albumData("album_id")) ? await getAlbumSTD(albumData("album_id"), date) : "N/A"
   
 
   // This may be my ugliest function in this whole thing.... Timezones are really confusing me

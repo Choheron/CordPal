@@ -231,9 +231,9 @@ def checkSelectionFlag(spotify_user: SpotifyUserData):
   except UserAlbumOutage.DoesNotExist as e:
     logger.debug(f"User {user.nickname} is not under an outage")
   # Get the next midnight, then subtract 3 days to determine validity of user
-  three_days_ago = (datetime.date.today() + timedelta(days=1)) - timedelta(days=3)
+  selection_timeout = (datetime.date.today() + timedelta(days=1)) - timedelta(days=3)
   # Get list of reviews from the past 3 days
-  recent_review_users = list(Review.objects.filter(review_date__gte=three_days_ago).values_list('user__discord_id', flat=True).distinct())
+  recent_review_users = list(Review.objects.filter(review_date__gte=selection_timeout).values_list('user__discord_id', flat=True).distinct())
   logger.debug(f"Checking selection blocked flag for user: {spotify_user.user.nickname} [Flag is currently: {spotify_user.selection_blocked_flag}]...")
   # Check if user is in the list of recent reviewers
   blocked = spotify_user.user.discord_id not in recent_review_users
