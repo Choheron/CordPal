@@ -6,6 +6,12 @@ from .utils import (
   isUserSpotifyConnected,
 )
 
+from .models import (
+  SpotifyUserData,
+)
+from users.models import (
+  User
+)
 
 import logging
 import requests
@@ -99,3 +105,22 @@ def doSpotifyTokenSwap(request: HttpRequest):
   # Return Code
   logger.info("Returning HTTP 200 Response...")
   return HttpResponse(content=messageOut, content_type='text/json', status=200)
+
+
+###
+# Get bearer token for user. Used for grooveselect beta, will not be used for real MVP of grooveselect
+###
+def getBearerToken(request: HttpRequest):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getBearerToken called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get user, check if token is expired, refresh if so, and return token data
+  site_user = User.objects.get(discord_id = request.session.get("discord_id"))
+  messageOut = {"bearer_token": None}
+  if(isUserSpotifyConnected(request)):
+    spot_user = SpotifyUserData.objects.get(user=site_user)
+    messageOut['bearer_token'] = spot_user.access_token
+  return JsonResponse(messageOut, status=200)

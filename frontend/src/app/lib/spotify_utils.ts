@@ -959,3 +959,23 @@ export async function getAlbumSTD(album_spotify_id, date = "") {
   const getAlbumSTDResponseJson = await getAlbumSTDResponse.json()
   return getAlbumSTDResponseJson['standard_deviation'];
 }
+
+//
+// Get the current user's spotify bearer token from the backend
+//
+export async function getSpotifyBearerToken() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`getSpotifyBearerToken: Sending request to backend '/spotifyapi/getBearerToken`)
+  const spotBearerResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/getBearerToken`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const spotBearerJSON = await spotBearerResponse.json()
+  return spotBearerJSON['bearer_token'];
+}
