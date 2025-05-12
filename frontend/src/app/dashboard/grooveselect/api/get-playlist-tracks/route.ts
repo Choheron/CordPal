@@ -4,8 +4,8 @@ import { type NextRequest } from 'next/server'
 export async function GET(request: NextRequest) {
   // Parse data 
   const requestHeaders = new Headers(request.headers)
-  const queryUrl = await requestHeaders.get('queryurl')
-  const auth = await requestHeaders.get('Authorization')
+  const queryUrl: any = await requestHeaders.get('queryurl')
+  const auth: any = await requestHeaders.get('Authorization')
   // Query
   const playlistResJSON = await (await fetch(queryUrl, {
     method: "GET",
