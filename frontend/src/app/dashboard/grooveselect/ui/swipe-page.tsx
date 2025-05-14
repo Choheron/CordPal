@@ -2,6 +2,7 @@
 
 import { Button, Card, CardBody, CardHeader, Progress, Skeleton } from "@heroui/react"
 import { useEffect, useState } from "react"
+import { Conditional } from "@/app/ui/dashboard/conditional"
 
 // Swipe interaction page for a single playlist, will be the bulk of the program
 // Expected Props:
@@ -20,6 +21,7 @@ export default function SwipePage(props) {
   // Current song index
   const [currSongIndex, setCurrSongIndex] = useState(0)
   const [currTrack, setCurrTrack] = useState(trackList[0])
+  const [finished, setFinished] = useState(false)
 
 
   // UseEffect on current song index
@@ -39,8 +41,6 @@ export default function SwipePage(props) {
       setTrackList(trackList.concat(playlistResJSON['items']))
       setNextTrackPageUrl(playlistResJSON['next'])
       setPollingBackend(false)
-      console.log(trackList)
-      console.log(currSongIndex)
     }
     // If user is within 10 songs of the current length of tracks, and there are more tracks to be queried, extend the tracklist
     if(currSongIndex >= (trackList.length - 10) && nextTrackPageUrl && !pollingBackend) {
@@ -48,7 +48,11 @@ export default function SwipePage(props) {
       queryNextTracks()
     }
     // Set Current Track
-    setCurrTrack(trackList[currSongIndex])
+    if(currSongIndex != trackList.length) {
+      setCurrTrack(trackList[currSongIndex])
+    } else {
+      setFinished(true)
+    }
     
   }, [currSongIndex])
 
@@ -62,17 +66,40 @@ export default function SwipePage(props) {
   }
 
   // Handle Selection Button
-  const handleButton = (action: string) => {
+  const handleActionButton = (action: string) => {
     trackList[currSongIndex]['USER_CHOICE'] = action
     setTrackList(trackList)
     setCurrSongIndex(currSongIndex + 1)
   }
 
-  console.log(currTrack)
-  return (
-    <div>
-      {/* Top Display of current song and progress */}
+  // Handle user wanting to initiate playback of the current track on their spotify
+  const handlePlayButton = () => {
+    const requestTrackPlayback = async () => {
+      const playbackRes = await fetch('/dashboard/grooveselect/api/start-playback', {
+        method: "PUT",
+        credentials: "include",
+        cache: 'no-cache',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${bearer_token}`,
+        },
+        body: JSON.stringify({
+          'playlistURI': playlistData['uri'],
+          'offset': currSongIndex
+        })
+      });
+      console.log(playbackRes)
+    }
+    // Log response
+    requestTrackPlayback()
+  }
+
+
+  // Return UI for the Topbar of the Application
+  const topBar = () => {
+    return (
       <div className="w-full lg:w-3/4 mx-auto px-5 md:px-0 mt-2">
+        {/* Top Display of current song and progress */}
         <Progress 
           aria-label="Progress through playlist..."
           className="w-full pb-3"
@@ -124,19 +151,30 @@ export default function SwipePage(props) {
           <p>{`Tracks Remaining: ${(trackData['total']) - (currSongIndex+1)}`}</p>
         </div>
       </div>
+    )
+  }
+
+
+  // ==============================================
+  // FINAL RETURN STATEMENT
+  // ==============================================
+  return (
+    <div>
+      {topBar()}
       <div className="flex justify-center">
         {/* Remove Button */}
         <Button 
-          onPress={() => handleButton("REMOVE")}
+          onPress={() => handleActionButton("REMOVE")}
           isDisabled={currTrack == null}
-          className="text-black mr-2 my-auto"
+          className="text-black mr-2 my-auto mx-auto size-[300px]"
           color="danger"
+          radius="lg"
         >
           <b>Remove</b>
         </Button>
         {/* Song Card */}
         <Card
-          className="w-2/5 md:w-[600px]"
+          className="w-2/5 md:w-[600px] shrink-0"
         >
           <CardHeader className="w-full max-h-full p-0">
             <img 
@@ -146,9 +184,24 @@ export default function SwipePage(props) {
             />
           </CardHeader>
           <CardBody>
-            <a href={currTrack['track']['external_urls']['spotify']} className="text-sm sm:text-3xl line-clamp-1 hover:underline">{currTrack['track']['name']}</a>
-            <a href={currTrack['track']['artists'][0]['external_urls']['spotify']} className="text-xs sm:text-xl italic hover:underline">{currTrack['track']['artists'][0]['name']}</a>
-            <a href={currTrack['track']['album']['external_urls']['spotify']} className="text-xs sm:text-lg hover:underline">{currTrack['track']['album']['name']}</a>
+            <div className="flex">
+              <div className="w-full">
+                <a href={currTrack['track']['external_urls']['spotify']} className="text-sm sm:text-3xl line-clamp-1 hover:underline">{currTrack['track']['name']}</a>
+                <a href={currTrack['track']['artists'][0]['external_urls']['spotify']} className="text-xs sm:text-xl italic hover:underline">{currTrack['track']['artists'][0]['name']}</a><br/>
+                <a href={currTrack['track']['album']['external_urls']['spotify']} className="text-xs sm:text-lg hover:underline">{currTrack['track']['album']['name']}</a>
+              </div>
+              <Conditional showWhen={userData['product'] == "premium"}>
+                <div className="w-fit">
+                  <Button
+                    radius="full"
+                    color="success"
+                    onPress={handlePlayButton}
+                  >
+                    Play
+                  </Button>
+                </div>
+              </Conditional>
+            </div>
             <p className="text-xs sm:text-base">Length: {(currTrack['track']['duration_ms']/1000/60).toFixed(0)}:{(currTrack['track']['duration_ms']/1000%60).toFixed(0).padStart(2, "0")}</p>
             <p className="text-xs sm:text-base">Released: {currTrack['track']['album']['release_date']}</p>
             <p className="text-xs sm:text-base">Added: {currTrack['added_at'].substring(0, 10)}</p>
@@ -156,10 +209,11 @@ export default function SwipePage(props) {
         </Card>
         {/* Keep Button */}
         <Button 
-          onPress={() => handleButton("KEEP")}
+          onPress={() => handleActionButton("KEEP")}
           isDisabled={currTrack == null}
-          className="ml-2 my-auto"
+          className="ml-2 my-auto mx-auto size-[300px]"
           color="success"
+          radius="lg"
         >
           <b>Keep</b>
         </Button>

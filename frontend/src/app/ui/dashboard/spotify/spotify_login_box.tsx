@@ -5,7 +5,7 @@ import {Divider} from "@heroui/divider";
 
 export default async function SpotifyLoginBox(props) {
 
-  const spot_scope = 'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-follow-read user-follow-modify user-read-playback-position user-top-read user-read-recently-played user-library-modify user-library-read user-read-email user-read-private'
+  const spot_scope = 'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-follow-read user-follow-modify user-read-playback-position user-top-read user-read-recently-played user-library-modify user-library-read user-read-email user-read-private user-modify-playback-state'
   const params = new URLSearchParams({
     response_type: 'code',
     client_id: String(process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID),

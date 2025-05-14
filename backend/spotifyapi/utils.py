@@ -56,6 +56,9 @@ def updateSpotifyAuthData(spotUserDataObj: SpotifyUserData, spotifyResJSON: json
   if('refresh_token' in spotifyResJSON):
     spotUserDataObj.refresh_token = spotifyResJSON['refresh_token']
   spotUserDataObj.save()
+  # Make sure user is flagged as connected 
+  spotUserDataObj.user.spotify_connected = True
+  spotUserDataObj.user.save()
   # Return True
   return True
 
