@@ -1,14 +1,15 @@
 'use server'
 
-import { deleteAlbumFromBackend, getAlbum, getAlbumAvgRating, getAlbumOfTheDayData, getAotdDates } from "@/app/lib/spotify_utils"
+import { deleteAlbumFromBackend, getAlbum, getAlbumAvgRating, getAlbumOfTheDayData, getAotdDates, getSpotifyData } from "@/app/lib/spotify_utils"
 import { isUserAdmin, isUserAlbumUploader } from "@/app/lib/user_utils"
 import { monthToName, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/spotify/album_display"
+import AlbumPlayButton from "@/app/ui/dashboard/spotify/album_play_button"
 import ReviewDisplay from "@/app/ui/dashboard/spotify/review_display"
 import DeleteModal from "@/app/ui/general/modals/delete_modal"
-import { Badge, Button, Divider, Tooltip } from "@heroui/react"
+import { Button, Divider } from "@heroui/react"
 import Link from "next/link"
 
 // Page to display data for a specific album
@@ -19,6 +20,8 @@ export default async function Page({
 }) {
   // Retrieive prop of albumid from url
   const albumid = (await params).albumid
+  // Retrieve current user's data
+  const spot_user_data = await getSpotifyData()
   // Retrieve data about album from backend
   const albumObj = await getAlbum(albumid)
   // Retrieve aotd_dates list from backend
@@ -104,6 +107,12 @@ export default async function Page({
               release_date_precision={albumData("release_date_precision")}
               trackCount={JSON.parse(albumData("raw_album_data"))['album']['total_tracks']}
             />
+            <div className="absolute bottom-1 right-1">
+              <AlbumPlayButton 
+                spotUserData={spot_user_data}
+                albumOfTheDayObj={albumObj}
+              />
+            </div>
             <Conditional showWhen={isAdmin || isUploader}>
               <div className="absolute -top-1 right-1 ">
                 <DeleteModal 
