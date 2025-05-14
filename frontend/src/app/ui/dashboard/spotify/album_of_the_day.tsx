@@ -1,34 +1,38 @@
 "use server"
 
-import { Button, Divider } from "@heroui/react";
+import { Button } from "@heroui/react";
 
 import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
 import ReviewDisplay from "./review_display";
-import { getAlbumOfTheDayData, getChanceOfAotdSelect, getDayTimelineData, getReviewsForAlbum, getSimilarReviewsForRatings, getUserReviewForAlbum } from "@/app/lib/spotify_utils";
+import { 
+  getAlbumOfTheDayData, 
+  getReviewsForAlbum, 
+  getSimilarReviewsForRatings, 
+  getSpotifyData, 
+  getUserReviewForAlbum, 
+} from "@/app/lib/spotify_utils";
 import AddAlbumModal from "./modals/add_album_modal";
 
 import Link from "next/link";
 import { RiCalendar2Fill} from "react-icons/ri";
 import { getUserData } from "@/app/lib/user_utils";
+import AlbumPlayButton from "./album_play_button";
 
 // GUI Display for the Album of the Day
 export default async function AlbumOfTheDayBox(props) {
   // Get user Data
   const user_data = await getUserData()
+  const spot_user_data = await getSpotifyData()
   // Get album data
-  let albumOfTheDayObj = await getAlbumOfTheDayData()
+  const albumOfTheDayObj = await getAlbumOfTheDayData()
   const albumReview = await getUserReviewForAlbum(albumData("album_id"))
   const similarReviewData = await getSimilarReviewsForRatings(user_data['discord_id'])
   // Retrieve review data on this level instead of at reviewbox level
   let reviewList = await getReviewsForAlbum(albumData("album_id"));
 
-  // Check if album of the day is outdated
+  // Get Todays Date
   let todayDate = new Date()
-  if(todayDate.toISOString().split('T')[0] != albumOfTheDayObj['AOD_date']) {
-    albumOfTheDayObj = await getAlbumOfTheDayData()
-  }
-
   // Get yesterday's date
   const yesterdayString = new Date(new Date().setDate(new Date().getDate()-1)).toISOString().split('T')[0];
   const yesterdayStringArr = yesterdayString.split("-")
@@ -56,6 +60,10 @@ export default async function AlbumOfTheDayBox(props) {
             >
               <b>View Yesterday&apos;s Album</b>
             </Button> 
+            <AlbumPlayButton 
+              spotUserData={spot_user_data}
+              albumOfTheDayObj={albumOfTheDayObj}
+            />
             <Button 
               as={Link}
               href={`/dashboard/spotify/calendar/${todayDate.toISOString().split('T')[0].split("-")[0]}/${todayDate.toISOString().split('T')[0].split("-")[1]}`}

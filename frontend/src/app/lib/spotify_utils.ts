@@ -979,3 +979,34 @@ export async function getSpotifyBearerToken() {
   const spotBearerJSON = await spotBearerResponse.json()
   return spotBearerJSON['bearer_token'];
 }
+
+
+//
+// Init playback call for Spotify
+//
+export async function initPlayerPlayback(albumUri) {
+  // Get bearer token from backend
+  const bearer_token = await getSpotifyBearerToken()
+  // Build Req Body
+  const reqBody = {
+    "context_uri": albumUri,
+    "offset": {
+      "position": 0
+    },
+    "position_ms": 0
+  }
+  
+  // Get album of the day
+  console.log(`initPlayerPlayback: Sending request to Spotify 'https://api.spotify.com/v1/me/player/play'`)
+  const playbackStartRes = await (await fetch("https://api.spotify.com/v1/me/player/play", {
+    method: "PUT",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${bearer_token}`,
+    },
+    body: JSON.stringify(reqBody)
+  }))
+  return await playbackStartRes.status;
+}

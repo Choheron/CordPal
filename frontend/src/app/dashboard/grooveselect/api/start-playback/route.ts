@@ -25,8 +25,9 @@ export async function PUT(request: NextRequest) {
     },
     body: JSON.stringify(reqBody)
   }))
+  console.log(playbackStartRes)
   // Return success code
   return new Response(`Playing track from playlist URI: ${bodyJSON['playlistURI']} with offset ${bodyJSON['offset']}`, {
-    status: 200,
+    status: await playbackStartRes.status,
   })
 }

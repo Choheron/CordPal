@@ -1,8 +1,9 @@
 "use client"
 
-import { Button, Card, CardBody, CardHeader, Progress, Skeleton } from "@heroui/react"
+import { Button, Card, CardBody, CardHeader, Progress, Skeleton, Tooltip } from "@heroui/react"
 import { useEffect, useState } from "react"
 import { Conditional } from "@/app/ui/dashboard/conditional"
+import { RiPlayLargeFill } from "react-icons/ri"
 
 // Swipe interaction page for a single playlist, will be the bulk of the program
 // Expected Props:
@@ -192,13 +193,19 @@ export default function SwipePage(props) {
               </div>
               <Conditional showWhen={userData['product'] == "premium"}>
                 <div className="w-fit">
-                  <Button
-                    radius="full"
-                    color="success"
-                    onPress={handlePlayButton}
+                  <Tooltip 
+                    content={"You must have an active Spotify session to play music."}
+                    className="max-w-40"
                   >
-                    Play
-                  </Button>
+                    <Button
+                      radius="full"
+                      color="success"
+                      className="block w-fit min-w-fit h-fit p-2"
+                      onPress={handlePlayButton}
+                    >
+                      <RiPlayLargeFill className="sm:text-2xl" />
+                    </Button>
+                  </Tooltip>
                 </div>
               </Conditional>
             </div>
