@@ -4,6 +4,7 @@ import { Button, Card, CardBody, CardHeader, Progress, Skeleton, Tooltip } from 
 import { useEffect, useState } from "react"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import { RiPlayLargeFill } from "react-icons/ri"
+import ConfirmationModal from "./confirmation_modal"
 
 // Swipe interaction page for a single playlist, will be the bulk of the program
 // Expected Props:
@@ -54,7 +55,6 @@ export default function SwipePage(props) {
     } else {
       setFinished(true)
     }
-    
   }, [currSongIndex])
 
   // Get skeletons for current index
@@ -70,7 +70,11 @@ export default function SwipePage(props) {
   const handleActionButton = (action: string) => {
     trackList[currSongIndex]['USER_CHOICE'] = action
     setTrackList(trackList)
-    setCurrSongIndex(currSongIndex + 1)
+    if((currSongIndex + 1) == trackList.length) {
+      setFinished(true)
+    } else {
+      setCurrSongIndex(currSongIndex + 1)
+    }
   }
 
   // Handle user wanting to initiate playback of the current track on their spotify
@@ -89,7 +93,6 @@ export default function SwipePage(props) {
           'offset': currSongIndex
         })
       });
-      console.log(playbackRes)
     }
     // Log response
     requestTrackPlayback()
@@ -156,12 +159,9 @@ export default function SwipePage(props) {
   }
 
 
-  // ==============================================
-  // FINAL RETURN STATEMENT
-  // ==============================================
-  return (
-    <div>
-      {topBar()}
+  // Render the Swiping page (main interaction) of the application
+  const swipeScreen = () => {
+    return (
       <div className="flex justify-center">
         {/* Remove Button */}
         <Button 
@@ -173,47 +173,60 @@ export default function SwipePage(props) {
         >
           <b>Remove</b>
         </Button>
-        {/* Song Card */}
-        <Card
-          className="w-2/5 md:w-[600px] shrink-0"
-        >
-          <CardHeader className="w-full max-h-full p-0">
-            <img 
-              src={currTrack['track']['album']['images'][0]['url']}
-              className='rounded-lg w-full h-full'
-              alt={`test`}
-            />
-          </CardHeader>
-          <CardBody>
-            <div className="flex">
-              <div className="w-full">
-                <a href={currTrack['track']['external_urls']['spotify']} className="text-sm sm:text-3xl line-clamp-1 hover:underline">{currTrack['track']['name']}</a>
-                <a href={currTrack['track']['artists'][0]['external_urls']['spotify']} className="text-xs sm:text-xl italic hover:underline">{currTrack['track']['artists'][0]['name']}</a><br/>
-                <a href={currTrack['track']['album']['external_urls']['spotify']} className="text-xs sm:text-lg hover:underline">{currTrack['track']['album']['name']}</a>
-              </div>
-              <Conditional showWhen={userData['product'] == "premium"}>
-                <div className="w-fit">
-                  <Tooltip 
-                    content={"You must have an active Spotify session to play music."}
-                    className="max-w-40"
-                  >
-                    <Button
-                      radius="full"
-                      color="success"
-                      className="block w-fit min-w-fit h-fit p-2"
-                      onPress={handlePlayButton}
-                    >
-                      <RiPlayLargeFill className="sm:text-2xl" />
-                    </Button>
-                  </Tooltip>
+          <div>
+          {/* Song Card */}
+          <Card
+            className="w-2/5 md:w-[600px] shrink-0"
+          >
+            <CardHeader className="w-full max-h-full p-0">
+              <img 
+                src={currTrack['track']['album']['images'][0]['url']}
+                className='rounded-lg w-full h-full'
+                alt={`test`}
+              />
+            </CardHeader>
+            <CardBody>
+              <div className="flex">
+                <div className="w-full">
+                  <a href={currTrack['track']['external_urls']['spotify']} className="text-sm sm:text-3xl line-clamp-1 hover:underline">{currTrack['track']['name']}</a>
+                  <a href={currTrack['track']['artists'][0]['external_urls']['spotify']} className="text-xs sm:text-xl line-clamp-1 italic hover:underline">{currTrack['track']['artists'][0]['name']}</a>
+                  <a href={currTrack['track']['album']['external_urls']['spotify']} className="text-xs sm:text-lg line-clamp-1 hover:underline">{currTrack['track']['album']['name']}</a>
                 </div>
-              </Conditional>
-            </div>
-            <p className="text-xs sm:text-base">Length: {(currTrack['track']['duration_ms']/1000/60).toFixed(0)}:{(currTrack['track']['duration_ms']/1000%60).toFixed(0).padStart(2, "0")}</p>
-            <p className="text-xs sm:text-base">Released: {currTrack['track']['album']['release_date']}</p>
-            <p className="text-xs sm:text-base">Added: {currTrack['added_at'].substring(0, 10)}</p>
-          </CardBody>
-        </Card>
+                <Conditional showWhen={userData['product'] == "premium"}>
+                  <div className="w-fit">
+                    <Tooltip 
+                      content={"You must have an active Spotify session to play music."}
+                      className="max-w-40"
+                    >
+                      <Button
+                        radius="full"
+                        color="success"
+                        className="block w-fit min-w-fit h-fit p-2"
+                        onPress={handlePlayButton}
+                      >
+                        <RiPlayLargeFill className="sm:text-2xl" />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                </Conditional>
+              </div>
+              <p className="text-xs sm:text-base">Length: {Math.floor(currTrack['track']['duration_ms']/1000/60).toFixed(0)}:{Math.floor(currTrack['track']['duration_ms']/1000%60).toFixed(0).padStart(2, "0")}</p>
+              <p className="text-xs sm:text-base">Released: {currTrack['track']['album']['release_date']}</p>
+              <p className="text-xs sm:text-base">Added: {currTrack['added_at'].substring(0, 10)}</p>
+            </CardBody>
+          </Card>
+          <div>
+            <Button 
+              onPress={() => setCurrSongIndex(currSongIndex-1)}
+              isDisabled={currTrack == null || currSongIndex == 0}
+              className="mt-1"
+              color="default"
+              radius="lg"
+            >
+              <b>Previous Song</b>
+            </Button>
+          </div>
+        </div>
         {/* Keep Button */}
         <Button 
           onPress={() => handleActionButton("KEEP")}
@@ -225,6 +238,27 @@ export default function SwipePage(props) {
           <b>Keep</b>
         </Button>
       </div>
+    )
+  }
+
+
+  // ==============================================
+  // FINAL RETURN STATEMENT
+  // ==============================================
+  return (
+    <div>
+      {topBar()}
+      {(finished) ? (
+        <ConfirmationModal 
+          trackList={trackList}
+          setTrackListCallback={setTrackList}
+          isOpen={finished}
+          playlistData={playlistData}
+          bearerToken={bearer_token}
+        />
+      ) : (
+        swipeScreen()
+      )}
     </div>
   )
 }

@@ -19,7 +19,7 @@ export default async function PlaylistDisplay(props) {
 
   return (
     <a 
-      className="relative group flex w-full text-left max-w-[600px] rounded-2xl p-2 bg-gradient-to-r from-green-600/30 to-green-500/30 hover:to-green-600 transition-all duration-150 ease-in-out"
+      className="relative group flex w-full text-left max-w-[600px] rounded-2xl p-2 bg-gradient-to-r from-gray-600/30 to-gray-500/30 hover:to-gray-600 transition-all duration-150 ease-in-out"
       href={`/dashboard/grooveselect/${playlistID}`}
     >
       <div className="size-[150px] mr-3 flex-shrink-0">

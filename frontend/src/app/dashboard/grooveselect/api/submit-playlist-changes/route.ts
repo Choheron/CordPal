@@ -1,22 +1,20 @@
 import { type NextRequest } from 'next/server'
 
-// Query spotify for next playlist tracks
-export async function PUT(request: NextRequest) {
+// Start process of deletion of songs from a playlist
+export async function POST(request: NextRequest) {
   // Parse header data 
   const requestHeaders = new Headers(request.headers)
   const auth: any = await requestHeaders.get('Authorization')
   // Parse Body Data
   const bodyJSON = await request.json()
+  const playlistId = bodyJSON['playlist_id']
   const reqBody = {
-    "context_uri": bodyJSON['playlistURI'],
-    "offset": {
-      "position": bodyJSON['offset']
-    },
-    "position_ms": 0
+    "tracks": bodyJSON['trackURIs'],
+    "snapshot_id": bodyJSON['snapshot_id']
   }
   // Query
-  const playbackStartRes = await (await fetch("https://api.spotify.com/v1/me/player/play", {
-    method: "PUT",
+  const deleteRes = await (await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+    method: "DELETE",
     credentials: "include",
     cache: 'no-cache',
     headers: {
@@ -27,6 +25,6 @@ export async function PUT(request: NextRequest) {
   }))
   // Return success code
   return new Response(`Playing track from playlist URI: ${bodyJSON['playlistURI']} with offset ${bodyJSON['offset']}`, {
-    status: await playbackStartRes.status,
+    status: await deleteRes.status,
   })
 }
