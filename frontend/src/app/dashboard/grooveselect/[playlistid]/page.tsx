@@ -37,7 +37,7 @@ export default async function Page({
 
   return (
     <div className="pt-10">
-      <PageTitle text={`[WIP] Editing "${playlistResJSON['name']}" [WIP]`} />
+      <PageTitle text={`Editing "${playlistResJSON['name']}"`} />
       <SwipePage
         userData={userDataJSON}
         playlistObj={playlistResJSON}

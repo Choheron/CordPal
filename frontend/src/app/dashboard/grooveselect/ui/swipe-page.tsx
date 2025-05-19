@@ -1,10 +1,11 @@
 "use client"
 
 import { Button, Card, CardBody, CardHeader, Progress, Skeleton, Tooltip } from "@heroui/react"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import { RiPlayLargeFill } from "react-icons/ri"
 import ConfirmationModal from "./confirmation_modal"
+import { useRouter } from 'next/navigation'
 
 // Swipe interaction page for a single playlist, will be the bulk of the program
 // Expected Props:
@@ -24,6 +25,8 @@ export default function SwipePage(props) {
   const [currSongIndex, setCurrSongIndex] = useState(0)
   const [currTrack, setCurrTrack] = useState(trackList[0])
   const [finished, setFinished] = useState(false)
+  // Redirection
+  const { push } = useRouter();
 
 
   // UseEffect on current song index
@@ -66,6 +69,7 @@ export default function SwipePage(props) {
     return skeletons
   }
 
+
   // Handle Selection Button
   const handleActionButton = (action: string) => {
     trackList[currSongIndex]['USER_CHOICE'] = action
@@ -76,6 +80,34 @@ export default function SwipePage(props) {
       setCurrSongIndex(currSongIndex + 1)
     }
   }
+
+  // Handle user input
+  const handleKeyPress = useCallback((event) => {
+    switch(event.key) {
+      // Left is REMOVE
+      case "ArrowLeft":
+        handleActionButton("REMOVE")
+        break;
+      // Right is KEEP
+      case "ArrowRight":
+        handleActionButton("KEEP")
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+  }, [handleActionButton]);
+  
+  // UseEffect for handling keyboard input mapping for swiping
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [handleKeyPress]);
+
+  
+
 
   // Handle user wanting to initiate playback of the current track on their spotify
   const handlePlayButton = () => {
@@ -114,7 +146,7 @@ export default function SwipePage(props) {
           size="md"
           value={currSongIndex + 1}
         />
-        <div className={`border rounded-2xl flex w-full ${(currSongIndex < 2) ? "justify-end" : ""}`}>
+        <div className={`border rounded-2xl flex w-full overflow-hidden ${(currSongIndex < 2) ? "justify-end" : ""}`}>
           {
             (currSongIndex - 2 < 0) ? (
               getSkeletons()
@@ -171,7 +203,10 @@ export default function SwipePage(props) {
           color="danger"
           radius="lg"
         >
-          <b>Remove</b>
+          <div className="text-center">
+            <b>Remove</b>
+            <p>&#40;Left Arrow&#41;</p>
+          </div>
         </Button>
           <div>
           {/* Song Card */}
@@ -215,7 +250,7 @@ export default function SwipePage(props) {
               <p className="text-xs sm:text-base">Added: {currTrack['added_at'].substring(0, 10)}</p>
             </CardBody>
           </Card>
-          <div>
+          <div className="flex gap-2">
             <Button 
               onPress={() => setCurrSongIndex(currSongIndex-1)}
               isDisabled={currTrack == null || currSongIndex == 0}
@@ -224,6 +259,15 @@ export default function SwipePage(props) {
               radius="lg"
             >
               <b>Previous Song</b>
+            </Button>
+            <Button 
+              onPress={() => (push('/dashboard/grooveselect'))}
+              isDisabled={finished}
+              className="mt-1"
+              color="danger"
+              radius="lg"
+            >
+              <b>Cancel</b>
             </Button>
           </div>
         </div>
@@ -235,7 +279,10 @@ export default function SwipePage(props) {
           color="success"
           radius="lg"
         >
-          <b>Keep</b>
+          <div className="text-center">
+            <b>Keep</b>
+            <p>&#40;Right Arrow&#41;</p>
+          </div>
         </Button>
       </div>
     )

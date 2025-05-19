@@ -31,7 +31,7 @@ export default async function GrooveSelect(props) {
 
   return (
     <main className="flex flex-col items-center lg:px-24 pt-10">
-      <PageTitle text="[WIP] GrooveSelect [WIP]" />
+      <PageTitle text="GrooveSelect Beta (0.1.0)" />
       <div className="flex">
         {/* Playlist Display and Selection */}
         <div>
