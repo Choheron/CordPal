@@ -400,7 +400,7 @@ export async function getUserReviewForAlbum(album_spotify_id, date = null) {
         return backendDate
       }
     }
-    return {...cookieReview, "cookie": true}
+    return {...cookieReview, "cookie": true, "backendExist": (backendReview != null)}
   }
   return backendReview;
 }

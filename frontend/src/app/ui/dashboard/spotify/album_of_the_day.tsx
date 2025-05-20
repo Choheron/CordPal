@@ -100,6 +100,7 @@ export default async function AlbumOfTheDayBox(props) {
               comment={(albumReview != null) ? albumReview['comment'] : null}
               first_listen={(albumReview != null) ? albumReview['first_listen']: null}
               similar_review_data={similarReviewData}
+              hasUserSubmitted={(albumReview != null) ? albumReview['backendExist']: null}
             />
           </div>
           <div className="w-full flex">

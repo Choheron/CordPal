@@ -22,6 +22,7 @@ import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 //  - first_listen: Boolean - (optional) Status of first listen if they left a previous review 
 //  - similar_review_data: Object - Object containing albums organized based on rating (key is rating)
 //  - user_data: Object - Data about the user
+//  - hasUserSubmitted: Boolean - Boolean to determine if a review for this album by this user on this date exists in the backend
 export default function AlbumReviewBox(props) {
   // Activate Router
   const router = useRouter();
@@ -196,13 +197,13 @@ export default function AlbumReviewBox(props) {
             onValueChange={setIsReady}
             isDisabled={!isReviewUpdated}
           >
-            Ready to {(props.rating != null)? "Update" : "Submit"}?
+            Ready to {(props.hasUserSubmitted)? "Update" : "Submit"}?
           </Checkbox>
           <Button
             isDisabled={!isReady}
             onPress={submitReview}
           >
-            {(props.rating != null)? "Update" : "Submit"} Review
+            {(props.hasUserSubmitted)? "Update" : "Submit"} Review
           </Button>
         </div>
       </div>
