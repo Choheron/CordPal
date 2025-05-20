@@ -387,7 +387,48 @@ export async function getUserReviewForAlbum(album_spotify_id, date = null) {
     },
   });
   const reviewRes = await reviewResponse.json()
-  return reviewRes['review'];
+  const backendReview = reviewRes['review']
+  // Check if a user cookie exists for aotd_review that is the same as the passed in id
+  const hasCookieReview = (await cookies()).has(`aotd_review_${album_spotify_id}`)
+  if(hasCookieReview) {
+    const cookieReview = JSON.parse(await getCookie(`aotd_review_${album_spotify_id}`));
+    // Parse date from backend review, see if timestamp is newer on cookie
+    if(backendReview != null) {
+      const backendDate = Date.parse(backendReview['last_updated'])
+      const cookieDate = Date.parse(cookieReview['last_updated'])
+      if(backendDate < cookieDate) {
+        return backendDate
+      }
+    }
+    return {...cookieReview, "cookie": true}
+  }
+  return backendReview;
+}
+
+
+//
+// Set Review cookie, so as to be able to save reviews in progress
+// - RETURN: HttpResponse
+//
+export async function setReviewCookie(reviewText, reviewScore, album_spotify_id, first_listen) {
+  // If no album ID provided, return null
+  if(album_spotify_id == "") {
+    return null
+  }
+  // Get cookies
+  const cookieStore = await cookies()
+  // Create review object
+  const reviewCookieObj = {
+    album_id: album_spotify_id,
+    score: reviewScore,
+    comment: reviewText,
+    first_listen: first_listen,
+    last_updated: new Date().toISOString()
+  }
+  // Overwrite or set the review in the cookie
+  console.log(`setReviewCookie: Setting user review cookie!`)
+  cookieStore.set(`aotd_review_${album_spotify_id}`, JSON.stringify(reviewCookieObj), { secure: true, maxAge: 86400 })
+  return true;
 }
 
 

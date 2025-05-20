@@ -7,7 +7,7 @@ import Router from "next/router"
 import { Button, Tooltip } from "@heroui/react";
 import ReviewTipTap from "../../general/input/Tiptap";
 import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@heroui/react";
-import { submitReviewToBackend } from "@/app/lib/spotify_utils";
+import { setReviewCookie, submitReviewToBackend } from "@/app/lib/spotify_utils";
 import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 
 
@@ -53,10 +53,12 @@ export default function AlbumReviewBox(props) {
     return steps
   }
 
-  // UseEffect to ensure review cannot be updated unless something changes
+  // UseEffect to ensure review cannot be updated unless something changes and update cookie
   useEffect(() => {
     if((rating != props.rating) || (comment != props.comment) || (isFirstListen != props.first_listen)) {
       setIsReviewUpdated(true)
+      // Update reivew cookie if a change has been made
+      setReviewCookie(comment, rating, props.album_id, isFirstListen)
     } else {
       setIsReviewUpdated(false)
     }

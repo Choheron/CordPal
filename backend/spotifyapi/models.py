@@ -172,7 +172,6 @@ class Review(models.Model):
       Return a review as a JSON. (For HTTP JSON Responses)
       Parameters:
       - full: Boolean - Include all data from album and any other related objects
-      
       """
       outObj = {}
       outObj['id'] = self.pk
