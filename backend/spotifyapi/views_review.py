@@ -272,10 +272,16 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
   # Attach score counts to user object
   out['score_counts'] = tempList
   # Calculate average review score
-  out['average_review_score'] = out['review_score_sum']/out['total_reviews']
+  out['average_review_score'] = out['review_score_sum']/(out['total_reviews'] if (out['total_reviews'] != 0) else 1)
   # Get final data on lowest and highest albums
-  out['highest_album'] = Album.objects.get(spotify_id=out['highest_score_album']).toJSON()
-  out['lowest_album'] = Album.objects.get(spotify_id=out['lowest_score_album']).toJSON()
+  try:
+    out['highest_album'] = Album.objects.get(spotify_id=out['highest_score_album']).toJSON()
+  except:
+    out['highest_album'] = None
+  try:
+    out['lowest_album'] = Album.objects.get(spotify_id=out['lowest_score_album']).toJSON()
+  except:
+    out['lowest_album'] = None
   # Return out object
   return JsonResponse(out)
 

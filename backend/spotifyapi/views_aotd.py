@@ -263,7 +263,7 @@ def calculateAOTDChances(request: HttpRequest):
     if(spotUser.selection_blocked_flag):
       # Get user's last review
       lastReview = Review.objects.filter(user=spotUser.user).order_by('-aotd_date').first()
-      days_since = day - lastReview.aotd_date
+      days_since = day - (lastReview.aotd_date if (lastReview != None) else day)
       # Store data
       userChanceObj.chance_percentage = 0.00
       userChanceObj.block_type = "INACTIVITY"
