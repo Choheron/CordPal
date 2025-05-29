@@ -26,6 +26,7 @@ urlpatterns = [
     path("users/", include('users.urls')),
     path("photos/", include('photos.urls')),
     path("spotifyapi/", include('spotifyapi.urls')),
+    path("aotd/", include('aotd.urls')),
     path("tenor/", include('tenor.urls')),
     path('admin/', admin.site.urls),
 ]
