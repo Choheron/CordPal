@@ -5,8 +5,8 @@ import { getUserData } from "@/app/lib/user_utils"
 import { convertToLocalTZString, generateDateFromUTCString, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
-import ReviewHistoryAccordion from "@/app/ui/dashboard/spotify/review_history_accordion"
-import ReviewEmojiMartClientWrapper from "@/app/ui/dashboard/spotify/reviewsWrappers/client_review_reacton_emoji_wrapper.tsx"
+import ReviewHistoryAccordion from "@/app/ui/dashboard/aotd/review_history_accordion"
+import ReviewEmojiMartClientWrapper from "@/app/ui/dashboard/aotd/reviewsWrappers/client_review_reacton_emoji_wrapper.tsx"
 import ClientTimestamp from "@/app/ui/general/client_timestamp"
 import StarRating from "@/app/ui/general/star_rating"
 import UserCard from "@/app/ui/general/userUiItems/user_card"
@@ -36,7 +36,7 @@ export default async function Page({
   const reviewDateFormatted = `${reviewDateSplit[2]}/${padNumber(reviewDateSplit[0])}/${padNumber(reviewDateSplit[1])}`
   const isReviewToday = (timezoneDate == reviewDateFormatted)
   // Determine if today is the current review date
-  const returnUrl = (isReviewToday) ? `/dashboard/spotify` : `/dashboard/spotify/calendar/${reviewDateObj.getFullYear()}/${padNumber(reviewDateObj.getMonth() + 1)}/${padNumber(reviewDateObj.getDate())}`
+  const returnUrl = (isReviewToday) ? `/dashboard/aotd` : `/dashboard/aotd/calendar/${reviewDateObj.getFullYear()}/${padNumber(reviewDateObj.getMonth() + 1)}/${padNumber(reviewDateObj.getDate())}`
 
   // Parse review text to display embeds 
   // Regex for youtube video embedding

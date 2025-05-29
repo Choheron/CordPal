@@ -53,7 +53,7 @@ export default async function AlbumOfTheDayBox(props) {
           <div className="flex w-full justify-between px-2 mt-1 mb-1">
             <Button 
               as={Link}
-              href={`/dashboard/spotify/calendar/${yesterdayStringArr[0]}/${yesterdayStringArr[1]}/${yesterdayStringArr[2]}`}
+              href={`/dashboard/aotd/calendar/${yesterdayStringArr[0]}/${yesterdayStringArr[1]}/${yesterdayStringArr[2]}`}
               radius="lg"
               className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
               variant="solid"
@@ -66,7 +66,7 @@ export default async function AlbumOfTheDayBox(props) {
             />
             <Button 
               as={Link}
-              href={`/dashboard/spotify/calendar/${todayDate.toISOString().split('T')[0].split("-")[0]}/${todayDate.toISOString().split('T')[0].split("-")[1]}`}
+              href={`/dashboard/aotd/calendar/${todayDate.toISOString().split('T')[0].split("-")[0]}/${todayDate.toISOString().split('T')[0].split("-")[1]}`}
               radius="lg"
               className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
               variant="solid"

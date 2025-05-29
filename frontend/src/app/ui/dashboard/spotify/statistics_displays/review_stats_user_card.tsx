@@ -81,7 +81,7 @@ export default async function ReviewStatsUserCard(props) {
           <p className="my-auto mx-auto">Highest Rated Album:</p>
           <Button 
             as={Link}
-            href={"/dashboard/spotify/calendar/" + convertToHistoricalDateUrl(reviewData['highest_score_date'])}
+            href={"/dashboard/aotd/calendar/" + convertToHistoricalDateUrl(reviewData['highest_score_date'])}
             radius="lg"
             className={`w-fit hover:underline text-white h-fit py-2 mx-auto ${ratingToTailwindBgColor(reviewData['highest_score_given'])} bg-opacity-50 shadow-lg`}
             variant="bordered"
@@ -104,7 +104,7 @@ export default async function ReviewStatsUserCard(props) {
           <p className="my-auto mx-auto">Lowest Rated Album:</p>
           <Button 
             as={Link}
-            href={"/dashboard/spotify/calendar/" + convertToHistoricalDateUrl(reviewData['lowest_score_date'])}
+            href={"/dashboard/aotd/calendar/" + convertToHistoricalDateUrl(reviewData['lowest_score_date'])}
             radius="lg"
             className={`w-fit hover:underline text-white h-fit py-2 mx-auto ${ratingToTailwindBgColor(reviewData['lowest_score_given'])} bg-opacity-50 shadow-lg`}
             variant="bordered"

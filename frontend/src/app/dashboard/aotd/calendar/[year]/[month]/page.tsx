@@ -4,8 +4,8 @@ import { getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/
 import { daysInMonth, monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
-import MinimalAlbumDisplay from "@/app/ui/dashboard/spotify/minimal_album_display"
-import MonthlyStatsBox from "@/app/ui/dashboard/spotify/statistics_displays/monthly_stats_box"
+import MinimalAlbumDisplay from "@/app/ui/dashboard/aotd/minimal_album_display"
+import MonthlyStatsBox from "@/app/ui/dashboard/aotd/statistics_displays/monthly_stats_box"
 import { Button, Tooltip } from "@heroui/react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
@@ -44,7 +44,7 @@ export default async function Page({
 
   // If the user isnt supposed to be here, redirect them to the current month's page
   if((firstDay > today) || ((Object.keys(aotdData).length == 1))) {
-    redirect(`/dashboard/spotify/calendar/${today.getFullYear()}/${today.getMonth() + 1}`)
+    redirect(`/dashboard/aotd/calendar/${today.getFullYear()}/${today.getMonth() + 1}`)
   }
 
   // Populate an array containing strings of dates (YYYY-MM-DD) that corresponds to where to place the days in the UI
@@ -147,7 +147,7 @@ export default async function Page({
             historical_date={albumGet('date')}
             sizingOverride="w-full h-full"
             albumCoverOverride="rounded-b-2xl"
-            buttonUrlOverride={`/dashboard/spotify/calendar/${year}/${month}/${padNumber(dateArr[2])}`}
+            buttonUrlOverride={`/dashboard/aotd/calendar/${year}/${month}/${padNumber(dateArr[2])}`}
             titleTextOverride="text-center text-xl 2xl:text-2xl text-wrap line-clamp-2"
             artistTextOverride="text-center text-sm 2xl:text-xl italic text-wrap"
             starTextOverride="text-base 2xl:text-2xl"
@@ -199,7 +199,7 @@ export default async function Page({
       <div className="flex w-full justify-between">
         <Button 
           as={Link}
-          href={`/dashboard/spotify/calendar/${lastMonth.getFullYear()}/${padNumber(Number(lastMonth.getMonth()) + 1)}`}
+          href={`/dashboard/aotd/calendar/${lastMonth.getFullYear()}/${padNumber(Number(lastMonth.getMonth()) + 1)}`}
           radius="lg"
           className={`${(Object.keys(lastMonthAotdData).length == 1) ? "invisible" : ""} w-fit hover:underline text-white`}
           variant="solid"
@@ -208,7 +208,7 @@ export default async function Page({
         </Button>
         <Button 
           as={Link}
-          href={`/dashboard/spotify`}
+          href={`/dashboard/aotd`}
           radius="lg"
           className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
           variant="solid"
@@ -217,7 +217,7 @@ export default async function Page({
         </Button>
         <Button 
           as={Link}
-          href={`/dashboard/spotify/calendar/${nextMonth.getFullYear()}/${padNumber(nextMonth.getMonth() + 1)}`}
+          href={`/dashboard/aotd/calendar/${nextMonth.getFullYear()}/${padNumber(nextMonth.getMonth() + 1)}`}
           radius="lg"
           className={`${(currMonth) ? "invisible" : ""} w-fit hover:underline text-white `}
           variant="solid"

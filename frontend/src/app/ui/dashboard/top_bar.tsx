@@ -29,7 +29,7 @@ export default function TopBar(props) {
     // { name: 'Clips', href: '/dashboard/clips', conditional: props['isMember'], disabled: false },
     { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'], disabled: false },
     { name: 'Quotes', href: '/dashboard/quotes', conditional: props['isMember'], disabled: false },
-    { name: 'Album Of the Day (Spotify)', href: '/dashboard/spotify', conditional: props['isMember'], disabled: false },
+    { name: 'Album Of the Day (Spotify)', href: '/dashboard/aotd', conditional: props['isMember'], disabled: false },
     { name: 'GrooveSelect Beta', href: '/dashboard/grooveselect', conditional: props['isMember'], disabled: false },
     { name: 'Functionality Requests', href: '/dashboard/fr', conditional: props['isMember'], disabled: true },
     { name: 'About', href: '/dashboard/about', conditional: true, disabled: false },

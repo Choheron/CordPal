@@ -140,7 +140,7 @@ export default async function ReviewAvatarCard(props) {
           </Conditional>
           <div className="w-full text-right h-fit pt-2 px-1">
             <Link
-              href={`/dashboard/spotify/review/${review['id']}`}
+              href={`/dashboard/aotd/review/${review['id']}`}
               underline="hover"
               className="text-xs"
             >

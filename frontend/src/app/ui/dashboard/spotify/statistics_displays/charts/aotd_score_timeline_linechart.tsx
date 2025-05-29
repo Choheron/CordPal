@@ -207,7 +207,7 @@ export async function AOtDScoreTimelineLineChart(props) {
                 className="absolute rounded-full overflow-hidden size-6 sm:size-10 cursor-pointer"
               >
                 <a
-                  href={`/dashboard/spotify/review/${entry.review_id}`}
+                  href={`/dashboard/aotd/review/${entry.review_id}`}
                 >
                   <Avatar
                     src={entry.user_avatar_url}

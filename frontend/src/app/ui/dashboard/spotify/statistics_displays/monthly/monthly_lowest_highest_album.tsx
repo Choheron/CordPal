@@ -71,7 +71,7 @@ export default async function MonthlyLowestHighestAlbum(props) {
             submission_date={highestAlbumObj["submission_date"]}
             historical_date={highestAlbumObj['date']}
             sizingOverride="w-full h-full"
-            buttonUrlOverride={`/dashboard/spotify/calendar/${year}/${month}/${highestAlbumDateArr[2]}`}
+            buttonUrlOverride={`/dashboard/aotd/calendar/${year}/${month}/${highestAlbumDateArr[2]}`}
             titleTextOverride="text-center text-xl 2xl:text-2xl text-wrap line-clamp-2"
             artistTextOverride="text-center text-sm 2xl:text-xl italic text-wrap"
             starTextOverride="text-base 2xl:text-3xl"
@@ -105,7 +105,7 @@ export default async function MonthlyLowestHighestAlbum(props) {
             submission_date={lowestAlbumObj["submission_date"]}
             historical_date={lowestAlbumObj['date']}
             sizingOverride="w-full h-full"
-            buttonUrlOverride={`/dashboard/spotify/calendar/${year}/${month}/${lowestAlbumDateArr[2]}`}
+            buttonUrlOverride={`/dashboard/aotd/calendar/${year}/${month}/${lowestAlbumDateArr[2]}`}
             titleTextOverride="text-center text-xl 2xl:text-2xl text-wrap line-clamp-2"
             artistTextOverride="text-center text-sm 2xl:text-xl italic text-wrap"
             starTextOverride="text-base 2xl:text-3xl"

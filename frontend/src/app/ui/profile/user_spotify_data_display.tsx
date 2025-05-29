@@ -1,7 +1,7 @@
 'use server'
 
 import { getAllUserReviews, getUserReviewStats } from "@/app/lib/spotify_utils";
-import MinimalAlbumDisplay from "../dashboard/spotify/minimal_album_display";
+import MinimalAlbumDisplay from "../dashboard/aotd/minimal_album_display";
 import StarRating from "../general/star_rating";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import ReviewScoreCountBarChart from "../general/charts/review_score_bar_chart";

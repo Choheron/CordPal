@@ -187,7 +187,7 @@ export default function AllAlbumsModal(props) {
           <div className="w-[400px]">
             <Button 
               as={Link}
-              href={"/dashboard/spotify/album/" + album['album_id']}
+              href={"/dashboard/aotd/album/" + album['album_id']}
               radius="lg"
               className={`relative w-full max-w-full justify-start h-fit px-0 hover:underline text-white py-1`}
               variant="light"
@@ -247,7 +247,7 @@ export default function AllAlbumsModal(props) {
           (album['last_aotd'] != null) ? (
             <Button 
               as={Link}
-              href={`/dashboard/spotify/calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`}
+              href={`/dashboard/aotd/calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`}
               radius="lg"
               className={`w-full mx-auto hover:underline text-white`}
               variant="solid"

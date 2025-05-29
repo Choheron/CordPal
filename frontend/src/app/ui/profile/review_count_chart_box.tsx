@@ -42,7 +42,7 @@ export default function ReviewCountChartBox(props) {
             }
           >
           <a 
-            href={`/dashboard/spotify/review/${review['id']}`}
+            href={`/dashboard/aotd/review/${review['id']}`}
             className="flex flex-col h-full w-full justify-center py-0 mx-1"
           >
             <img 

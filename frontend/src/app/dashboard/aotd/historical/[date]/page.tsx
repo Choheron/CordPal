@@ -20,7 +20,7 @@ export default async function Page({
           className="text-blue-600 hover:underline"
           href={`../calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`}
         >
-          dashboard/spotify/calendar/{dateArr[0]}/{dateArr[1]}/{dateArr[2]}
+          dashboard/aotd/calendar/{dateArr[0]}/{dateArr[1]}/{dateArr[2]}
         </a>
       </div>
     </div>    

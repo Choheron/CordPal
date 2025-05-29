@@ -38,7 +38,7 @@ export default async function AlbumDisplay(props) {
   // Album props checks
   const title = (props.title) ? props.title : "No Album Title Found";
   const album_url = (props.album_src) ? props.album_src : "https://www.google.com/search?q=sad+face";
-  const album_page_url = (props.album_spotify_id) ? `/dashboard/spotify/album/${props.album_spotify_id}` : album_url;
+  const album_page_url = (props.album_spotify_id) ? `/dashboard/aotd/album/${props.album_spotify_id}` : album_url;
   const album_img_src = (props.album_img_src) ? props.album_img_src : "/images/DALL-E_Album_Not_Found.webp";
   // Artist props checks
   const artist_name = (props.artist && props.artist['name']) ? props.artist['name'] : "Artist Name not Found";
@@ -167,7 +167,7 @@ export default async function AlbumDisplay(props) {
             <Button 
               as={Link}
               className="bg-gradient-to-br from-green-700/80 to-green-800/80"
-              href={`/dashboard/spotify/calendar/${dateToCalUrl(historical_date)}`}
+              href={`/dashboard/aotd/calendar/${dateToCalUrl(historical_date)}`}
               variant="solid"
             >
               Go to {dateToCalUrl(historical_date)}

@@ -26,7 +26,7 @@ export default function Callback({ searchParams, }: { searchParams: { [key: stri
         cache: 'no-store',
       });
       console.log("Spotify Handshake completed, redirecting...");
-      router.push("/dashboard/spotify");
+      router.push("/dashboard/aotd");
     }
     doSpotifyHandshake()
   }, []);

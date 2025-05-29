@@ -5,9 +5,9 @@ import { isUserAdmin, isUserAlbumUploader } from "@/app/lib/user_utils"
 import { monthToName, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
-import AlbumDisplay from "@/app/ui/dashboard/spotify/album_display"
-import AlbumPlayButton from "@/app/ui/dashboard/spotify/album_play_button"
-import ReviewDisplay from "@/app/ui/dashboard/spotify/review_display"
+import AlbumDisplay from "@/app/ui/dashboard/aotd/album_display"
+import AlbumPlayButton from "@/app/ui/dashboard/aotd/album_play_button"
+import ReviewDisplay from "@/app/ui/dashboard/aotd/review_display"
 import DeleteModal from "@/app/ui/general/modals/delete_modal"
 import { Button, Divider } from "@heroui/react"
 import Link from "next/link"
@@ -61,7 +61,7 @@ export default async function Page({
             <Divider className="mb-2" />
             <Button
               as={Link}
-              href={`/dashboard/spotify/calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`}
+              href={`/dashboard/aotd/calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`}
               className={`bg-gradient-to-br from-green-700/80 to-green-800/80 text-black w-1/2 mx-auto`}
               variant="solid"
             >
@@ -122,7 +122,7 @@ export default async function Page({
                   tooltipContent={(aotd_dates.length > 0) ? "Album cannot be deleted, it has been AOtD!" : "Delete Album"}
                   titleText={`Delete "${albumData('title')}"?`}
                   bodyText={`Are you sure you want to delete "${albumData('title')}"? You cannot undo this action.`}
-                  redirectText={'/dashboard/spotify'}
+                  redirectText={'/dashboard/aotd'}
                   textboxDescription={"Reason for deletion (Optional)"}
                   textboxPlaceholder="(Optional) Input a reason for deleting the album."
                 />
@@ -142,7 +142,7 @@ export default async function Page({
         </Conditional>
         <Button 
           as={Link}
-          href={"/dashboard/spotify"}
+          href={"/dashboard/aotd"}
           radius="lg"
           className="w-fit mx-auto hover:underline" 
           variant="bordered"

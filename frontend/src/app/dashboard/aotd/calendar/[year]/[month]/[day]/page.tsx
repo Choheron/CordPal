@@ -4,9 +4,9 @@ import { getAlbumAvgRating, getAlbumOfTheDayData, getAlbumSTD, getDayTimelineDat
 import { getNextDay, getPrevDay, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
-import AlbumDisplay from "@/app/ui/dashboard/spotify/album_display"
-import ReviewDisplay from "@/app/ui/dashboard/spotify/review_display"
-import { AOtDScoreTimelineLineChart } from "@/app/ui/dashboard/spotify/statistics_displays/charts/aotd_score_timeline_linechart"
+import AlbumDisplay from "@/app/ui/dashboard/aotd/album_display"
+import ReviewDisplay from "@/app/ui/dashboard/aotd/review_display"
+import { AOtDScoreTimelineLineChart } from "@/app/ui/dashboard/aotd/statistics_displays/charts/aotd_score_timeline_linechart"
 import { Badge, Button, Divider } from "@heroui/react"
 import Link from "next/link"
 import { RiArrowLeftCircleFill, RiArrowLeftCircleLine, RiArrowRightCircleLine, RiCalendar2Fill } from "react-icons/ri"
@@ -66,7 +66,7 @@ export default async function Page({
               {/* Previous Day Button */}
               <Button 
                 as={Link}
-                href={`/dashboard/spotify/calendar/${prevDay.getFullYear()}/${padNumber(prevDay.getMonth() + 1)}/${padNumber(prevDay.getDate())}`}
+                href={`/dashboard/aotd/calendar/${prevDay.getFullYear()}/${padNumber(prevDay.getMonth() + 1)}/${padNumber(prevDay.getDate())}`}
                 radius="full"
                 className={`w-fit hover:underline text-white`}
                 variant="solid"
@@ -76,7 +76,7 @@ export default async function Page({
               {/* Month View Button */}
               <Button 
                 as={Link}
-                href={`/dashboard/spotify/calendar/${year}/${month}`}
+                href={`/dashboard/aotd/calendar/${year}/${month}`}
                 radius="full"
                 className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
                 variant="solid"
@@ -86,7 +86,7 @@ export default async function Page({
               {/* Next Day Button */}
               <Button
                 as={Link}
-                href={`/dashboard/spotify/calendar/${nextDay.getFullYear()}/${padNumber(nextDay.getMonth() + 1)}/${padNumber(nextDay.getDate())}`}
+                href={`/dashboard/aotd/calendar/${nextDay.getFullYear()}/${padNumber(nextDay.getMonth() + 1)}/${padNumber(nextDay.getDate())}`}
                 radius="full"
                 className={`${(isToday) ? 'invisible' : ''} w-fit hover:underline text-white`}
                 variant="solid"
@@ -119,7 +119,7 @@ export default async function Page({
             <div className="flex justify-around mt-4">
               <Button 
                 as={Link}
-                href={"/dashboard/spotify/album/" + albumData("album_id")}
+                href={"/dashboard/aotd/album/" + albumData("album_id")}
                 radius="lg"
                 className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
                 variant="solid"
@@ -149,7 +149,7 @@ export default async function Page({
         </Conditional>
         <Button 
           as={Link}
-          href={"/dashboard/spotify"}
+          href={"/dashboard/aotd"}
           radius="lg"
           className="w-fit mx-auto hover:underline" 
           variant="bordered"

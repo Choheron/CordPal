@@ -52,7 +52,7 @@ export default async function MinimalAlbumDisplay(props) {
   const historical_date: string = (props.historical_date) ? props.historical_date : "0000-00-00";
   // Sizing overrides 
   const sizingOverride = (props.sizingOverride) ? props.sizingOverride : "h-[125px] w-[125px] lg:h-[300px] lg:w-[300px]"
-  const buttonUrlOverride = (props.buttonUrlOverride) ? props.buttonUrlOverride : `/dashboard/spotify/album/${props.album_spotify_id}`
+  const buttonUrlOverride = (props.buttonUrlOverride) ? props.buttonUrlOverride : `/dashboard/aotd/album/${props.album_spotify_id}`
   const titleTextOverride = (props.titleTextOverride) ? props.titleTextOverride : 'text-center text-xl lg:text-3xl text-wrap'
   const artistTextOverride = (props.artistTextOverride) ? props.artistTextOverride : 'text-center text-sm lg:text-xl italic text-wrap'
   const starTextOverride = (props.starTextOverride) ? props.starTextOverride : 'text-xl 3xl:text-3xl'
@@ -113,7 +113,7 @@ export default async function MinimalAlbumDisplay(props) {
       >
         <Button
           as={Link}
-          href={(historical) ? `/dashboard/spotify/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
+          href={(historical) ? `/dashboard/aotd/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
           radius="none"
           className={`${albumCoverOverride} px-0 py-0`}
           isDisabled={!props.album_spotify_id}
@@ -128,7 +128,7 @@ export default async function MinimalAlbumDisplay(props) {
       {/* Below was the old implementation, however this fails to conform to the spotify developer rules. */}
       {/* <Button
         as={Link}
-        href={(historical) ? `/dashboard/spotify/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
+        href={(historical) ? `/dashboard/aotd/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
         radius="lg"
         className={`absolute flex flex-col transition opacity-0 group-hover:opacity-100 ease-in-out ${sizingOverride} lg:gap-2 bg-transparent p-0`}
         isDisabled={!props.album_spotify_id}

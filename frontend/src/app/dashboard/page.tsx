@@ -5,7 +5,7 @@ import { isMember, getDiscordUserData } from "../lib/discord_utils";
 import { getAllOnlineData, getUserData, getUserList, getUsersByTimezone } from "../lib/user_utils";
 import PageTitle from "../ui/dashboard/page_title";
 import LiveOnlineUsersBox from "../ui/dashboard/live_online_users_box";
-import AlbumDisplay from "../ui/dashboard/spotify/album_display";
+import AlbumDisplay from "../ui/dashboard/aotd/album_display";
 import { getAlbumOfTheDayData } from "../lib/spotify_utils";
 import AllTimezonesBlock from "../ui/dashboard/allTimezonesBlock";
 

@@ -2,13 +2,13 @@
 
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { Conditional } from "@/app/ui/dashboard/conditional";
-import SpotifyLoginBox from "@/app/ui/dashboard/spotify/spotify_login_box";
+import SpotifyLoginBox from "@/app/ui/dashboard/aotd/spotify_login_box";
 import { getAllAlbums, getLastXSubmissions, getSpotifyData, isSpotifyLinked } from "@/app/lib/spotify_utils";
-import AlbumOfTheDayBox from "@/app/ui/dashboard/spotify/album_of_the_day";
-import RecentSubmissions from "@/app/ui/dashboard/spotify/recent_submissions";
-import MusicStatsBox from "@/app/ui/dashboard/spotify/statistics_displays/music_stats_box";
-import AllAlbumsModal from "@/app/ui/dashboard/spotify/modals/all_albums_modal";
-import AllTopSongsBox from "@/app/ui/dashboard/spotify/all_top_songs_box";
+import AlbumOfTheDayBox from "@/app/ui/dashboard/aotd/album_of_the_day";
+import RecentSubmissions from "@/app/ui/dashboard/aotd/recent_submissions";
+import MusicStatsBox from "@/app/ui/dashboard/aotd/statistics_displays/music_stats_box";
+import AllAlbumsModal from "@/app/ui/dashboard/aotd/modals/all_albums_modal";
+import AllTopSongsBox from "@/app/ui/dashboard/aotd/all_top_songs_box";
 import { Alert } from "@heroui/react";
 
 export default async function music() {
