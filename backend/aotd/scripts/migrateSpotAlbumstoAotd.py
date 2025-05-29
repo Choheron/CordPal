@@ -26,6 +26,8 @@ def run():
   # Iterate album objects and create a new Album Object in AOTD (sleep for 1 second after to avoid rate limiting)
   index = 1
   for spot_album in spot_album_objects:
+    # Sleep for 1 second no matter what, to avoid rate limiting (this is wasting time but I want to play it safe)
+    time.sleep(1)
     try:
       # Build search URL
       url = f"https://musicbrainz.org/ws/2/release"
@@ -105,8 +107,6 @@ def run():
       failed_update.append((spot_album, e))
     # Increment Index
     index += 1
-    # Sleep for 1 second
-    time.sleep(1)
 
   # Exit if successful
   if(len(failed_update) == 0):
