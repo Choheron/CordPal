@@ -39,13 +39,20 @@ def testAlbumData(request: HttpRequest, album_spotify_id: str):
     return res
   # Convert response to Json
   logger.info(f"Attempting to migrate album with ID {album_spotify_id}...")
+  spotAlbumObject = SpotAlbum.objects.get(spotify_id = album_spotify_id)
+  if(spotAlbumObject):
+    logger.info(f"Album found in Spotify Database, name: {spotAlbumObject.title}!")
+  try:
+    newAlbum = Album.objects.get(legacy_album=spotAlbumObject)
+    spotAlbumObject.mbid = newAlbum.mbid
+    spotAlbumObject.save()
+    print(f"Migrated album for {spotAlbumObject.title} already found, skipping...")
+  except Exception as e:
+    print(f"Migrated album for {spotAlbumObject.title} not found...")
   # Declare out dict
   out = {}
   # Get album from database
   try:
-    spotAlbumObject = SpotAlbum.objects.get(spotify_id = album_spotify_id)
-    if(spotAlbumObject):
-      logger.info(f"Album found in Spotify Database, name: {spotAlbumObject.title}!")
     # Build search URL
     url = f"https://musicbrainz.org/ws/2/release"
     params = {
@@ -58,7 +65,13 @@ def testAlbumData(request: HttpRequest, album_spotify_id: str):
     logger.info(f"Making request to musicbrainz search url...")
     response = requests.get(url, params=params, headers=headers)
     data = response.json()
-    album_data: dict = data['releases'][0]
+    album_data = None
+    for result in data['releases']:
+      if(result['release-group']['primary-type'] == 'Album'):
+        album_data = result
+        break
+    if(album_data == None):
+      raise Exception("Album not found in inital search...")
     logger.info(f"Retrieved data with first result MBID of {album_data['id']}... Searching Tracks...")
     # Build Tracks Url
     url = f"https://musicbrainz.org/ws/2/release/{album_data['id']}"

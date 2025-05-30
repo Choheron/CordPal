@@ -22,15 +22,19 @@ def parseReleaseDate(date_str):
 def run():
   failed_update = []
   # Retreive all Spotify Album objects
-  spot_album_objects = SpotAlbum.objects.all()
+  spot_album_objects = SpotAlbum.objects.all().order_by('pk')
   # Iterate album objects and create a new Album Object in AOTD (sleep for 1 second after to avoid rate limiting)
   index = 1
+  headers = {
+    'User-Agent': 'CordPal/0.0.1 ( www.cordpal.app )'
+  }
   for spot_album in spot_album_objects:
     try:
       newAlbum = Album.objects.get(legacy_album=spot_album)
       spot_album.mbid = newAlbum.mbid
       spot_album.save()
       print(f"Migrated album for {spot_album.title} already found, skipping...")
+      index += 1
       continue
     except Exception as e:
       print(f"Migrated album for {spot_album.title} not found...")
@@ -38,48 +42,54 @@ def run():
     # Sleep for 1 second no matter what, to avoid rate limiting (this is wasting time but I want to play it safe)
     time.sleep(1)
     try:
-      # Build search URL
-      url = f"https://musicbrainz.org/ws/2/release"
-      params = {
-        'query': f"release:\"{spot_album.title}\" AND artist:\"{spot_album.artist}\"",
-        'fmt': 'json'
-      }
-      headers = {
-        'User-Agent': 'CordPal/0.0.1 ( www.cordpal.app )'
-      }
-      print(f"Making request to musicbrainz search url for album {spot_album.title} by {spot_album.artist} ({index}/{len(spot_album_objects)})...")
-      response = requests.get(url, params=params, headers=headers)
-      data = response.json()
-      try:
-        album_data = data['releases'][0]
-      except:
-        print(f"Did not locate album based on artist and album title search, using just album title and only accepting various artists as artist...")
+      if(spot_album.mbid):
+        print(f"Unmigrated album mbid provided, searching using mbid...")
+        # MBID provided but no matching album found post-migration, this lets us pull remasters and manually located mbids
+        url = f"https://musicbrainz.org/ws/2/release/{spot_album.mbid}"
+        params = {
+          'inc': "artists+release-groups+recordings",
+          'fmt': 'json'
+        }
+        response = requests.get(url, params=params, headers=headers)
+        album_data = response.json()
+        album_data['track_data'] = { 'tracks': album_data['media'][0]['tracks'] }
+      else:
+        # Build search URL
         url = f"https://musicbrainz.org/ws/2/release"
         params = {
-          'query': f"release:\"{spot_album.title}\" AND artist:\"Various Artists\"",
+          'query': f"release:\"{spot_album.title}\" AND artist:\"{spot_album.artist}\"",
+          'fmt': 'json'
+        }
+        print(f"Making request to musicbrainz search url for album {spot_album.title} by {spot_album.artist} ({index}/{len(spot_album_objects)})...")
+        response = requests.get(url, params=params, headers=headers)
+        data = response.json()
+        try:
+          album_data = None
+          for result in data['releases']:
+            if(result['release-group']['primary-type'] == 'Album'):
+              album_data = result
+              break
+          if(album_data == None):
+            raise Exception("Album not found in inital search...")
+        except:
+          print(f"Did not locate album based on artist and album title search, using just album title and only accepting various artists as artist...")
+          url = f"https://musicbrainz.org/ws/2/release"
+          params = {
+            'query': f"release:\"{spot_album.title}\" AND artist:\"Various Artists\"",
+            'fmt': 'json'
+          }
+          response = requests.get(url, params=params, headers=headers)
+          data = response.json()
+          album_data = data['releases'][0]
+        # Build Tracks Url
+        url = f"https://musicbrainz.org/ws/2/release/{album_data['id']}"
+        params = {
+          'inc': 'recordings',
           'fmt': 'json'
         }
         response = requests.get(url, params=params, headers=headers)
         data = response.json()
-        album_data = data['releases'][0]
-      # Check if an album with the same mbid already exists, if so, continue
-      try:
-        existingAlbum = Album.objects.get(mbid=album_data['id'])
-        spot_album.mbid = album_data['id']
-        spot_album.save()
-        index += 1
-        continue
-      except:
-        pass
-      # Build Tracks Url
-      url = f"https://musicbrainz.org/ws/2/release/{album_data['id']}"
-      params = {
-        'inc': 'recordings',
-        'fmt': 'json'
-      }
-      response = requests.get(url, params=params, headers=headers)
-      data = response.json()
-      album_data['track_data'] = { 'tracks': data['media'][0]['tracks'], 'track_count': album_data['track-count'] }
+        album_data['track_data'] = { 'tracks': data['media'][0]['tracks'], 'track_count': album_data['track-count'] }
       # Attempt to pull release date from tracks if not present in original data
       if('date' not in album_data.keys()):
         counts = {}
@@ -103,7 +113,7 @@ def run():
         album_url=f"https://musicbrainz.org/release/{album_data['id']}",
         submitted_by=spot_album.submitted_by,
         user_comment=spot_album.user_comment,
-        disambiguation=album_data['disambiguation'],
+        disambiguation=album_data['disambiguation'] if ('disambiguation' in album_data.keys()) else "",
         submission_date=spot_album.submission_date,
         release_date=parseReleaseDate(album_data['date']),
         release_date_str=album_data['date'],
@@ -128,6 +138,7 @@ def run():
     exit(0)
   
   # Print out failed albums from update
+  print(f"{len(failed_update)} Failed Migration")
   print("| Failed Album | Spotify Album Django PK | ERROR |")
   print("| -------------------- | ------------------ | -------------------- |")
   entry: SpotAlbum
