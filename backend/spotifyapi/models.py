@@ -76,6 +76,7 @@ class Album(models.Model):
   release_date = models.DateField(default=None, null=True) # Track release date of album
   release_date_precision = models.CharField(max_length=10, default="unknown") # Should be one of the following values: "year", "month", "day", "unknown"
   raw_data = models.JSONField(null=True) # JSON field to store all data returned from the frontend
+  mbid = models.CharField(max_length=256, unique=True, null=True) # For migration off of spotifyAPI and onto MusicBrainz, this will assist in migration data retreival
 
   def subDateToCalString(self):
     return self.submission_date.strftime('%Y-%m-%d')

@@ -26,6 +26,15 @@ def run():
   # Iterate album objects and create a new Album Object in AOTD (sleep for 1 second after to avoid rate limiting)
   index = 1
   for spot_album in spot_album_objects:
+    try:
+      newAlbum = Album.objects.get(legacy_album=spot_album)
+      spot_album.mbid = newAlbum.mbid
+      spot_album.save()
+      print(f"Migrated album for {spot_album.title} already found, skipping...")
+      continue
+    except Exception as e:
+      print(f"Migrated album for {spot_album.title} not found...")
+      pass
     # Sleep for 1 second no matter what, to avoid rate limiting (this is wasting time but I want to play it safe)
     time.sleep(1)
     try:
@@ -56,6 +65,8 @@ def run():
       # Check if an album with the same mbid already exists, if so, continue
       try:
         existingAlbum = Album.objects.get(mbid=album_data['id'])
+        spot_album.mbid = album_data['id']
+        spot_album.save()
         index += 1
         continue
       except:
@@ -92,6 +103,7 @@ def run():
         album_url=f"https://musicbrainz.org/release/{album_data['id']}",
         submitted_by=spot_album.submitted_by,
         user_comment=spot_album.user_comment,
+        disambiguation=album_data['disambiguation'],
         submission_date=spot_album.submission_date,
         release_date=parseReleaseDate(album_data['date']),
         release_date_str=album_data['date'],
@@ -101,6 +113,9 @@ def run():
       )
       # Save new album data
       newAotdAlbum.save()
+      # Update reference on spot album
+      spot_album.mbid = newAotdAlbum.mbid
+      spot_album.save()
     except Exception as e:
       print(f"FAILED TO MIGRATE FOR: {spot_album.title}")
       print(f"ERROR: {e}")
