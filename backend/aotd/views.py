@@ -85,7 +85,7 @@ def testAlbumData(request: HttpRequest, album_spotify_id: str):
         # Track highest value
         if(currDate == "" or counts[track['recording']['first-release-date']] < counts[currDate]):
           currDate = track['recording']['first-release-date']
-    album_data['date'] = currDate
+      album_data['date'] = currDate
     # Convert album data into what it would look like for a model object 
     out = {}
     out['mbid'] = album_data['id']

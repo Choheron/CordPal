@@ -49,7 +49,7 @@ class Album(models.Model):
   submission_date = models.DateTimeField(auto_now_add=True) 
   release_date = models.DateField(max_length=50, null=True) # Date Object Release Date (Optional if a release date can be parsed)
   release_date_str = models.CharField(max_length=50, null=True) # Raw Release date, if found or provided
-  disambiguation = models.CharField(max_length=50, null=False) # If its a remaster or not
+  disambiguation = models.CharField(max_length=50, null=False, default="") # If its a remaster or not, defauly to ""
   raw_data = models.JSONField(null=True) # JSON field to store all data returned from the frontend
   track_list = models.JSONField(null=True) # JSON field to contain a list of tracks from the musicbrainz api, will be fetched after selection.
 
