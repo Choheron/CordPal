@@ -1,4 +1,4 @@
-import { getReviewsForAlbum, getSpotifyUserCount } from "@/app/lib/aotd_utils";
+import { getReviewsForAlbum, getAotdUserCount } from "@/app/lib/aotd_utils";
 import ReviewAvatarCard from "./review_avatar_card";
 
 // GUI Display for reviews of an album
@@ -9,7 +9,7 @@ export default async function ReviewDisplay(props) {
   // Setup Props (Query backend if no reviewlist is passed in)
   const reviews = (props.review_list != null) ? props.review_list : await getReviewsForAlbum(props.album_id, props.date);
   // Get count of users in website
-  const userCount = await getSpotifyUserCount();
+  const userCount = await getAotdUserCount();
 
   return (
     <div className="w-full min-w-[250px] max-w-full my-2 flex flex-col flex-shrink-0 gap-2">

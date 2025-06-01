@@ -267,7 +267,7 @@ def getAllAlbums(request: HttpRequest):
     albumObj['submitter_comment'] = album.user_comment
     albumObj['submission_date'] = album.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
     albumObj['release_date_str'] = album.release_date_str
-    albumObj['release_date'] = album.release_date.strftime("%m/%d/%Y, %H:%M:%S")
+    albumObj['release_date'] = album.release_date.strftime("%m/%d/%Y, %H:%M:%S") if album.release_date else None
     # Check if album has been aotd
     try:
       # Get most recent AOtD date
@@ -438,12 +438,12 @@ def getLowestHighestAlbumStats(request: HttpRequest):
       highest_album_rating = album_rating
       highest_album_date = dailyAlbum.date
   # Populate out objects
-  out['lowest_album'] = lowest_album.toJSON()
-  out['lowest_album']['rating'] = getAlbumRating(lowest_album.mbid, rounded=False)
-  out['lowest_album']['date'] = lowest_album_date
-  out['highest_album'] = highest_album.toJSON()
-  out['highest_album']['rating'] = getAlbumRating(highest_album.mbid, rounded=False)
-  out['highest_album']['date'] = highest_album_date
+  out['lowest_album'] = lowest_album.toJSON() if lowest_album else {}
+  out['lowest_album']['rating'] = getAlbumRating(lowest_album.mbid, rounded=False) if lowest_album else 0.0
+  out['lowest_album']['date'] = lowest_album_date if lowest_album_date else datetime.datetime.now().strftime("%Y-%m-%d")
+  out['highest_album'] = highest_album.toJSON() if highest_album else {}
+  out['highest_album']['rating'] = getAlbumRating(highest_album.mbid, rounded=False) if highest_album else 0.0
+  out['highest_album']['date'] = highest_album_date if highest_album_date else datetime.datetime.now().strftime("%Y-%m-%d")
   # Return Object
   return JsonResponse(out)
 
