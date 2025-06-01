@@ -32,10 +32,10 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 ## =========================================================================================================================================================================================
 
 ###
-# Check if a user has connected spotify to their account
+# Check if a user has connected aotd to their account
 ###
 def isAotdParticipant(request: HttpRequest):
-  '''Check if a user has connected spotify to their account'''
+  '''Check if a user has connected aotd to their account'''
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("isAotdParticipant called with a non-GET method, returning 405.")
@@ -50,9 +50,9 @@ def isAotdParticipant(request: HttpRequest):
 
 def enrollUser(request: HttpRequest):
   '''Enroll a user as an AOtD participant'''
-  # Make sure request is a get request
+  # Make sure request is a POST request
   if(request.method != "POST"):
-    logger.warning("enrollUser called with a non-GET method, returning 405.")
+    logger.warning("enrollUser called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -64,4 +64,4 @@ def enrollUser(request: HttpRequest):
   )
   newUser.save()
   # Return jsonResponse containing status
-  return HttpResponse()
+  return JsonResponse({ "enrolled": True})

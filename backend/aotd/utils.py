@@ -42,22 +42,22 @@ def getAotdUserObj(discord_id):
     return None
 
 
-# Return status of user's spotify connection (true if user has enrolled in aotd)
+# Return status of user's aotd connection (true if user has enrolled in aotd)
 def isUserAotdParticipant(request: HttpRequest):
-  '''Return status of user's spotify connection (true if user has enrolled in aotd)'''
+  '''Return status of user's aotd connection (true if user has enrolled in aotd)'''
   try:
     # Retrieve users discord_id from session
     discord_id = request.session.get("discord_id")
     # Get user object from DB
-    site_user = User.objects.get(discord_id = discord_id)
-    # Return boolean of spotify connection status
-    return site_user.spotify_connected # TODO: needs to become a link to its AOTD data
+    site_user = User.objects.get(discord_id=discord_id)
+    # Return boolean of aotd connection status
+    return site_user.aotd_enrolled
   except Exception as e:
-    logger.error(f"USER COOKIE OR SPOTIFY DATA REFRESH ERROR!!! ERROR: {e}")
+    logger.error(f"USER COOKIE OR AOTD DATA REFRESH ERROR!!! ERROR: {e}")
     return False
  
 
-# Get album's average rating (by spotifyid passed in [NOT ALBUM OBJECT])
+# Get album's average rating (by mbid passed in [NOT ALBUM OBJECT])
 def getAlbumRating(mbid, rounded=True, date: str = None):
   # Get most recent aotd date if date is not provided
   aotd_date = date if (date) else DailyAlbum.objects.filter(mbid=mbid).latest('date').date

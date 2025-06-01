@@ -40,7 +40,7 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 ## =========================================================================================================================================================================================
 
 ###
-# Get All Reviews for a specific album. Returns a spotify album id and date
+# Get All Reviews for a specific album. Returns a aotd album id and date
 ###
 def getAlbumOfDay(request: HttpRequest, date: str = ""):
   from .views_album import getAlbum
@@ -67,9 +67,9 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
   # Return album of passed in day
   out = {} 
   out['raw_response'] = model_to_dict(dailyAlbumObj)
-  out['album_id'] = dailyAlbumObj.album.spotify_id
+  out['album_id'] = dailyAlbumObj.album.mbid
   out['album_name'] = dailyAlbumObj.album.title
-  out['album_data'] = json.loads(getAlbum(request, dailyAlbumObj.album.spotify_id).content)
+  out['album_data'] = json.loads(getAlbum(request, dailyAlbumObj.album.mbid).content)
   out['date'] = date
   logger.info(f"Returning Album of Day Object for Date {date}...")
   return JsonResponse(out)
@@ -123,7 +123,7 @@ def setAlbumOfDay(request: HttpRequest):
     logger.info(f"Temp album selected: {tempAlbum.title}")
     try:
       albumCheck = DailyAlbum.objects.filter(date__gte=one_year_ago).get(album=tempAlbum)
-      albumPool = albumPool.exclude(spotify_id=tempAlbum.spotify_id)
+      albumPool = albumPool.exclude(mbid=tempAlbum.mbid)
     except DailyAlbum.DoesNotExist:
       albumOfTheDay = tempAlbum
       selected = True
@@ -139,7 +139,7 @@ def setAlbumOfDay(request: HttpRequest):
     # Attempt to get previous AOtD Object and generate a timeline, as well as store final rating for that album in the AOtD object
     yesterday_aotd = DailyAlbum.objects.get(date=yesterday)
     generateDayRatingTimeline(yesterday_aotd)
-    yesterday_aotd.rating = getAlbumRating(yesterday_aotd.album.spotify_id, False, yesterday.strftime("%Y-%m-%d"))
+    yesterday_aotd.rating = getAlbumRating(yesterday_aotd.album.mbid, False, yesterday.strftime("%Y-%m-%d"))
     yesterday_aotd.save()
   except:
     logger.error(f"ERROR IN GENERATING TIMELINE DATA FOR DATE: {yesterday.strftime('%Y-%m-%d')} TRACEBACK: {traceback.print_exc()}")
@@ -151,7 +151,7 @@ def setAlbumOfDay(request: HttpRequest):
 ###
 # Set a new album of the day.  NOTE: This WILL OVERRIDE any already set album for any date! Returns an HTTPResponse
 ###
-def setAlbumOfDayADMIN(request: HttpRequest, date: str, album_spotify_id: str):
+def setAlbumOfDayADMIN(request: HttpRequest, date: str, mbid: str):
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("setAlbumOfDayADMIN called with a non-POST method, returning 405.")
@@ -161,7 +161,7 @@ def setAlbumOfDayADMIN(request: HttpRequest, date: str, album_spotify_id: str):
   # Get current date
   day = datetime.datetime.strptime(date, "%Y-%m-%d")
   # Define Album Object
-  albumOfTheDay = Album.objects.get(spotify_id=album_spotify_id)
+  albumOfTheDay = Album.objects.get(mbid=mbid)
   # Create an album of the day object
   albumOfTheDayObj = DailyAlbum(
     album=albumOfTheDay,
@@ -178,15 +178,15 @@ def setAlbumOfDayADMIN(request: HttpRequest, date: str, album_spotify_id: str):
 ###
 # When passed in an album, return a list of the dates in which it was AOtD
 ###
-def getAotdDates(request: HttpRequest, album_spotify_id: str):
+def getAotdDates(request: HttpRequest, mbid: str):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getAotdDates called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Retrieve album object using spotify_id
-  album = Album.objects.get(spotify_id=album_spotify_id)
+  # Retrieve album object using mbid
+  album = Album.objects.get(mbid=mbid)
   # Get list of dates
   aotd_dates = list(DailyAlbum.objects.filter(album=album).filter(date__lte=datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date()).values_list('date', flat=True))
   # Create return object and return it
@@ -231,10 +231,10 @@ def calculateAOTDChances(request: HttpRequest):
   # Iterate all users and update the selection blocked flag
   for user in user_list:
     checkSelectionFlag(user)
-  # Get a list of all spotify users
-  spotify_users = AotdUserData.objects.all()
+  # Get a list of all aotd users
+  aotd_users = AotdUserData.objects.all()
   # Get a list of users who are eligible for selection
-  eligible_users = spotify_users.filter(
+  eligible_users = aotd_users.filter(
     selection_blocked_flag=False
   ).exclude(user_id__in=user_outage_map).select_related('user').annotate(
     total_submissions=Count('user__album', distinct=True),
@@ -244,14 +244,14 @@ def calculateAOTDChances(request: HttpRequest):
       distinct=True
     )
   )
-  # Iterate all spotify users and calculate aotd chances
-  for spotUser in spotify_users:
-    logger.info(f"Calculating chance percentage for user {spotUser.user.nickname}")
-    # Retrieve user from spotifydata
-    user = spotUser.user
+  # Iterate all aotd users and calculate aotd chances
+  for aotdUser in aotd_users:
+    logger.info(f"Calculating chance percentage for user {aotdUser.user.nickname}")
+    # Retrieve user from aotd data
+    user = aotdUser.user
     # Get the user's chance object
     userChanceObj: UserChanceCache = UserChanceCache.objects.update_or_create(
-      spotify_user=spotUser,
+      aotd_user=aotdUser,
       defaults={
         'chance_percentage': 0.00,
         'block_type': None,
@@ -260,9 +260,9 @@ def calculateAOTDChances(request: HttpRequest):
       }
     )[0]
     # Check if user's selections are currently blocked, return 0% chance
-    if(spotUser.selection_blocked_flag):
+    if(aotdUser.selection_blocked_flag):
       # Get user's last review
-      lastReview = Review.objects.filter(user=spotUser.user).order_by('-aotd_date').first()
+      lastReview = Review.objects.filter(user=aotdUser.user).order_by('-aotd_date').first()
       days_since = day - (lastReview.aotd_date if (lastReview != None) else day)
       # Store data
       userChanceObj.chance_percentage = 0.00
@@ -338,15 +338,15 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
   if(len(month_AOtD) != 0):
     # Track highest and lowest album scores of the month
     highest_aotd: DailyAlbum = month_AOtD.first()
-    highest_aotd_rating = getAlbumRating(highest_aotd.album.spotify_id, rounded=False, date=highest_aotd.date)
+    highest_aotd_rating = getAlbumRating(highest_aotd.album.mbid, rounded=False, date=highest_aotd.date)
     lowest_aotd: DailyAlbum = month_AOtD.first()
-    lowest_aotd_rating = getAlbumRating(lowest_aotd.album.spotify_id, rounded=False, date=lowest_aotd.date)
+    lowest_aotd_rating = getAlbumRating(lowest_aotd.album.mbid, rounded=False, date=lowest_aotd.date)
     # Track counts of submitters selected
     selection_counts = {}
     for aotd in month_AOtD:
       albumObj = aotd.album
       # Get album Rating
-      rating = getAlbumRating(aotd.album.spotify_id, rounded=False, date=aotd.date)
+      rating = getAlbumRating(aotd.album.mbid, rounded=False, date=aotd.date)
       # Check highest and lowest ratings if rating is not null
       if(rating):
         if((highest_aotd_rating == None) or (rating > highest_aotd_rating)):
@@ -365,12 +365,12 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
       temp = {}
       temp['raw_data'] = model_to_dict(albumObj)
       temp['title'] = albumObj.title
-      temp['spotify_id'] = albumObj.spotify_id
+      temp['album_id'] = albumObj.mbid
       temp['album_img_src'] = albumObj.cover_url
-      temp['album_src'] = albumObj.spotify_url
+      temp['album_src'] = albumObj.album_url
       temp['artist'] = {}
       temp['artist']['name'] = albumObj.artist
-      temp['artist']['href'] = (albumObj.artist_url if albumObj.artist_url != "" else albumObj.raw_data['album']['artists'][0]['external_urls']['spotify'])
+      temp['artist']['href'] = (albumObj.artist_url)
       temp['submitter'] = albumObj.submitted_by.discord_id
       temp['submitter_comment'] = albumObj.user_comment
       temp['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")

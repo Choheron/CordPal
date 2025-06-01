@@ -1,7 +1,7 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.forms.models import model_to_dict
 
-from users.utils import getSpotifyUser
+from users.utils import getUserObj
 
 from .models import (
   AotdUserData,
@@ -27,12 +27,12 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 
 
 ###
-# Get a list of users who have connected spotify
+# Get a list of users who have connected Aotd
 ###
-def getSpotifyUsersObj(request: HttpRequest):
+def getAotdUsersObj(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getSpotifyUsersList called with a non-GET method, returning 405.")
+    logger.warning("getAotdUsersObj called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -48,12 +48,12 @@ def getSpotifyUsersObj(request: HttpRequest):
   return JsonResponse(out)
 
 ###
-# Get a list of users who have connected spotify as a raw list
+# Get a list of users who have connected Aotd as a raw list
 ###
-def getSpotifyUsersList(request: HttpRequest):
+def getAotdUsersList(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getSpotifyUsersList called with a non-GET method, returning 405.")
+    logger.warning("getAotdUsersList called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -72,12 +72,12 @@ def getSpotifyUsersList(request: HttpRequest):
 
 
 ###
-# Get a count of all users in the Spotify DB
+# Get a count of all users in the Aotd DB
 ###
-def getSpotifyUserCount(request: HttpRequest):
+def getAotdUserCount(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getSpotifyUserCount called with a non-GET method, returning 405.")
+    logger.warning("getAotdUserCount called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -90,19 +90,19 @@ def getSpotifyUserCount(request: HttpRequest):
 
 
 ###
-# Retrieve spotify Data from databse for current user
+# Retrieve Aotd Data from databse for current user
 ###
-def getSpotifyData(request: HttpRequest):
+def getAotdData(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getSpotifyData called with a non-GET method, returning 405.")
+    logger.warning("getAotdData called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
   # Retrieve user object
-  userObj = getSpotifyUser(request.session.get('discord_id'))
-  # Ensure user has authenticated with spotify before
-  if(userObj.spotify_connected):
+  userObj = getUserObj(request.session.get('discord_id'))
+  # Ensure user has authenticated with Aotd before
+  if(userObj.aotd_enrolled):
     userSpotObj = AotdUserData.objects.filter(user = userObj).first()
     dir_response = model_to_dict(userSpotObj)
     dir_response['user'] = userSpotObj.user.nickname
@@ -123,7 +123,7 @@ def getSelectionBlockedFlag(request: HttpRequest):
     res.status_code = 405
     return res
   # Get user data from session
-  user = getSpotifyUser(request.session.get('discord_id'))
+  user = getUserObj(request.session.get('discord_id'))
   # Retrieve and return that user's flag status
   flag_status = (AotdUserData.objects.get(user=user)).selection_blocked_flag
   logger.info(f"Returning selection blocked flag status of {flag_status} for user {user.discord_id}...")

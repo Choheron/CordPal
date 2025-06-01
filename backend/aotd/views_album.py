@@ -7,7 +7,7 @@ import numpy
 from .utils import (
   getAlbumRating,
 )
-from users.utils import getSpotifyUser
+from users.utils import getUserObj
 from .models import (
   AotdUserData,
   Album,
@@ -56,7 +56,7 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, mbid: str):
     out['exists'] = True
   except ObjectDoesNotExist as e:
     out['exists'] = False
-  # Return Spotify Response
+  # Return aotd Response
   return JsonResponse(out)
 
 
@@ -75,7 +75,7 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
   validityStatus['canSubmit'] = True
   validityStatus['reason'] = "User is able to submit albums."
   # Get user from database
-  userObj = getSpotifyUser(request.session.get('discord_id'))
+  userObj = getUserObj(request.session.get('discord_id'))
   # Fill date if it isnt provided (Defauly to current time)
   if(date == ""):
     date = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d')
@@ -133,7 +133,7 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, mbid: str):
     out['submitter_nickname'] = albumObject.submitted_by.nickname
   except ObjectDoesNotExist as e:
     out['exists'] = False
-  # Return Spotify Response
+  # Return aotd Response
   return JsonResponse(out)
 
 
@@ -157,7 +157,7 @@ def submitAlbum(request: HttpRequest):
     return HttpResponse(status=400)
   except ObjectDoesNotExist as e:
     # Get user from database
-    user = getSpotifyUser(request.session.get('discord_id'))
+    user = getUserObj(request.session.get('discord_id'))
     
     # Declare new album object
     newAlbum = Album(
@@ -184,7 +184,7 @@ def deleteAlbum(request: HttpRequest):
   try:
     albumObject = Album.objects.get(mbid = reqBody['album_id'])
     # Get user object from request
-    user = getSpotifyUser(request.session['discord_id'])
+    user = getUserObj(request.session['discord_id'])
     # If user has not submitted the attempted delete, throw an error (Does not apply to admins)
     if((albumObject.submitted_by != user) and (not user.is_staff)):
       logger.warning(f"deleteAlbum: User {user.discord_id}/{user.nickname} attempted to delete Album: {reqBody['album_id']}, however did not submit said Album!")
@@ -225,7 +225,7 @@ def getAlbum(request: HttpRequest, mbid: str):
   out['album_src'] = albumObj.album_url
   out['artist'] = {}
   out['artist']['name'] = albumObj.artist
-  out['artist']['href'] = (albumObj.artist_url if albumObj.artist_url != "" else albumObj.raw_data['album']['artists'][0]['external_urls']['spotify'])
+  out['artist']['href'] = (albumObj.artist_url if albumObj.artist_url != "" else albumObj.raw_data['album']['artists'][0]['external_urls']['aotd'])
   out['submitter'] = albumObj.submitted_by.discord_id
   out['submitter_nickname'] = albumObj.submitted_by.nickname
   out['submitter_comment'] = albumObj.user_comment
@@ -260,7 +260,7 @@ def getAllAlbums(request: HttpRequest):
     albumObj['album_src'] = album.album_url
     albumObj['artist'] = {}
     albumObj['artist']['name'] = album.artist
-    albumObj['artist']['href'] = (album.artist_url if album.artist_url != "" else album.raw_data['album']['artists'][0]['external_urls']['spotify'])
+    albumObj['artist']['href'] = (album.artist_url if album.artist_url != "" else album.raw_data['album']['artists'][0]['external_urls']['aotd'])
     albumObj['submitter'] = album.submitted_by.discord_id
     albumObj['submitter_avatar_url'] = album.submitted_by.get_avatar_url()
     albumObj['submitter_nickname'] = album.submitted_by.nickname
@@ -328,7 +328,7 @@ def getAlbumSTD(request: HttpRequest, mbid: str, date: str = None):
 
 
 ###
-# Get All Reviews for a specific album. Returns a spotify album id and date
+# Get All Reviews for a specific album. Returns a aotd album id and date
 ###
 def getLastXAlbums(request: HttpRequest, count: int):
   # Make sure request is a get request
@@ -370,7 +370,7 @@ def getAlbumsStats(request: HttpRequest):
   out = {}
   # Get total album count
   out['total_albums'] = Album.objects.all().count()
-  # Get all spotify users
+  # Get all aotd users
   spotUsers = AotdUserData.objects.all()
   # Iterate through and build user json
   userStatsList = []
@@ -507,8 +507,8 @@ def isUserAlbumUploader(request: HttpRequest, mbid: str, user_discord_id: str = 
     res.status_code = 405
     return res
   # If a user id is not provided, retrieve from request
-  user = getSpotifyUser(user_discord_id if user_discord_id else request.session['discord_id'])
-  # Get album using spotify ID
+  user = getUserObj(user_discord_id if user_discord_id else request.session['discord_id'])
+  # Get album using aotd ID
   album = Album.objects.get(mbid=mbid)
   # Get submitter status
   out = (user == album.submitted_by)

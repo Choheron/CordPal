@@ -326,7 +326,7 @@ class UserAlbumOutage(models.Model):
 
 # Storage for User chance object, representing the chance that a user will be selected for the next AOtD 
 class UserChanceCache(models.Model):
-  spotify_user = models.OneToOneField(
+  aotd_user = models.OneToOneField(
     AotdUserData, 
     on_delete=models.CASCADE,
     related_name="aotd_chance"
@@ -340,9 +340,9 @@ class UserChanceCache(models.Model):
   def toJSON(self):
     """Convert cache object to a dict for HTTP transfer"""
     out = {}
-    out['spotify_user_id'] = self.spotify_user.pk
-    out['user_id'] = self.spotify_user.user.guid
-    out['user_nickname'] = self.spotify_user.user.nickname
+    out['aotd_user_id'] = self.aotd_user.pk
+    out['user_id'] = self.aotd_user.user.guid
+    out['user_nickname'] = self.aotd_user.user.nickname
     out['percentage'] = self.chance_percentage
     out['block_type'] = self.block_type
     out['reason'] = self.reason

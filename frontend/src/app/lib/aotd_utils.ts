@@ -30,6 +30,29 @@ export async function isAotdParticipant() {
   return isAotdConnected;
 }
 
+
+// 
+// Enroll a user in the AOtD
+// - RETURN: Boolen representing successful
+//
+export async function enrollAotdUser() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Validate that user has opted into Aotd participation
+  console.log("isAotdParticipant: Sending request to backend '/aotd/enrollUser'")
+  const aotdResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/enrollUser`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const success: boolean = (await aotdResponse.json())['enrolled'];
+  return success;
+}
+
+
 //
 // Determine if a user is allowed to submit an album based off of criteria on the backend
 // - RETURN: Object containing submission validity information

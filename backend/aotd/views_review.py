@@ -2,7 +2,7 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
 
-from users.utils import getSpotifyUser
+from users.utils import getUserObj
 
 from .models import (
   Album,
@@ -54,9 +54,9 @@ def submitReview(request: HttpRequest):
   # Get data from request
   reqBody = json.loads(request.body)
   # Get user from database
-  userObj = getSpotifyUser(request.session.get('discord_id'))
+  userObj = getUserObj(request.session.get('discord_id'))
   # Get Album from the database
-  albumObj = Album.objects.get(spotify_id=reqBody['album_id'])
+  albumObj = Album.objects.get(mbid=reqBody['album_id'])
   # Check if a review already exists for this user
   try:
     reviewObj = Review.objects.get(album=albumObj, user=userObj, aotd_date=date)
@@ -87,7 +87,7 @@ def submitReview(request: HttpRequest):
 ###
 # Get All Reviews for a specific album.
 ###
-def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str, date: str = None):
+def getReviewsForAlbum(request: HttpRequest, mbid: str, date: str = None):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getReviewsForAlbum called with a non-GET method, returning 405.")
@@ -96,19 +96,19 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str, date: str = 
     return res
   # If date is not provided grab the most recent date of AOtD
   try:
-    aotd_date = datetime.datetime.strptime(date, "%Y-%m-%d").date() if (date) else DailyAlbum.objects.filter(album__spotify_id=album_spotify_id).latest('date').date
+    aotd_date = datetime.datetime.strptime(date, "%Y-%m-%d").date() if (date) else DailyAlbum.objects.filter(album__mbid=mbid).latest('date').date
   except:
     out = {}
     out['review_list'] = []
-    print(f'Album {album_spotify_id} not found in AOtD List...')
+    print(f'Album {mbid} not found in AOtD List...')
     return JsonResponse(out)
   # Get Album from the database
   try:
-    albumObj = Album.objects.get(spotify_id=album_spotify_id)
+    albumObj = Album.objects.get(mbid=mbid)
   except Album.DoesNotExist:
     out = {}
     out['review_list'] = []
-    print(f'Album {album_spotify_id} not found...')
+    print(f'Album {mbid} not found...')
     return JsonResponse(out)
   # Get all reivews for album
   try:
@@ -116,7 +116,7 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str, date: str = 
   except Review.DoesNotExist:
     out = {}
     out['review_list'] = []
-    print(f'No reviews found for album {album_spotify_id}...')
+    print(f'No reviews found for album {mbid}...')
     return JsonResponse(out)
   # Declare outlist and populate
   outList = []
@@ -131,7 +131,7 @@ def getReviewsForAlbum(request: HttpRequest, album_spotify_id: str, date: str = 
 ###
 # Get USER Reviews for a specific album.
 ###
-def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str, date: str = None):
+def getUserReviewForAlbum(request: HttpRequest, mbid: str, date: str = None):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getUserReviewForAlbum called with a non-GET method, returning 405.")
@@ -140,15 +140,15 @@ def getUserReviewForAlbum(request: HttpRequest, album_spotify_id: str, date: str
     return res
   # If date is not provided grab the most recent date of AOtD
   try:
-    aotd_date = datetime.datetime.strptime("%Y-%m-%d") if (date) else DailyAlbum.objects.filter(album__spotify_id=album_spotify_id).latest('date').date
+    aotd_date = datetime.datetime.strptime("%Y-%m-%d") if (date) else DailyAlbum.objects.filter(album__mbid=mbid).latest('date').date
   except:
     out = {}
     out['review_list'] = []
-    print(f'Album {album_spotify_id} not found in AOtD List...')
+    print(f'Album {mbid} not found in AOtD List...')
     return JsonResponse(out)
   # Get User from the database
   try: 
-    user = getSpotifyUser(request.session.get('discord_id'))
+    user = getUserObj(request.session.get('discord_id'))
   except ObjectDoesNotExist:
     return JsonResponse({"review": None})
   # Get reivew for album
@@ -200,11 +200,11 @@ def getAllUserReviewStats(request: HttpRequest):
     reviewData[review.user.discord_id]['review_score_sum'] += review.score
     if((reviewData[review.user.discord_id]['lowest_score_given'] == -1) or (reviewData[review.user.discord_id]['lowest_score_given'] > review.score)):
       reviewData[review.user.discord_id]['lowest_score_given'] = review.score
-      reviewData[review.user.discord_id]['lowest_score_album'] = review.album.spotify_id
+      reviewData[review.user.discord_id]['lowest_score_album'] = review.album.mbid
       reviewData[review.user.discord_id]['lowest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
     if((reviewData[review.user.discord_id]['highest_score_given'] == -1) or (reviewData[review.user.discord_id]['highest_score_given'] <= review.score)):
       reviewData[review.user.discord_id]['highest_score_given'] = review.score
-      reviewData[review.user.discord_id]['highest_score_album'] = review.album.spotify_id
+      reviewData[review.user.discord_id]['highest_score_album'] = review.album.mbid
       reviewData[review.user.discord_id]['highest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
   # Calcualte averages 
   for userReviewData in reviewData.keys():
@@ -255,11 +255,11 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
     out['review_score_sum'] += review.score
     if((out['lowest_score_given'] == -1) or (out['lowest_score_given'] > review.score)):
       out['lowest_score_given'] = review.score
-      out['lowest_score_album'] = review.album.spotify_id
+      out['lowest_score_album'] = review.album.mbid
       out['lowest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
     if((out['highest_score_given'] == -1) or (out['highest_score_given'] <= review.score)):
       out['highest_score_given'] = review.score
-      out['highest_score_album'] = review.album.spotify_id
+      out['highest_score_album'] = review.album.mbid
       out['highest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
   # Convert get list of objects per score
   index = 0.0
@@ -274,11 +274,11 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
   out['average_review_score'] = out['review_score_sum']/(out['total_reviews'] if (out['total_reviews'] != 0) else 1)
   # Get final data on lowest and highest albums
   try:
-    out['highest_album'] = Album.objects.get(spotify_id=out['highest_score_album']).toJSON()
+    out['highest_album'] = Album.objects.get(mbid=out['highest_score_album']).toJSON()
   except:
     out['highest_album'] = None
   try:
-    out['lowest_album'] = Album.objects.get(spotify_id=out['lowest_score_album']).toJSON()
+    out['lowest_album'] = Album.objects.get(mbid=out['lowest_score_album']).toJSON()
   except:
     out['lowest_album'] = None
   # Return out object
@@ -314,7 +314,7 @@ def getSimilarReviewsForRatings(request: HttpRequest):
     res.status_code = 405
     return res
   # Retrieve user from session cookie
-  user = getSpotifyUser(request.session.get('discord_id'))
+  user = getUserObj(request.session.get('discord_id'))
   # Iterate through possible ratings and build return object
   out = {}
   score = 0
@@ -346,7 +346,7 @@ def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
     res.status_code = 405
     return res
   # Retrieve user from session cookie
-  user = getSpotifyUser(request.session.get('discord_id') if (user_discord_id == None) else user_discord_id)
+  user = getUserObj(request.session.get('discord_id') if (user_discord_id == None) else user_discord_id)
   # Get all reviews
   reviewsObj = user.aotd_reviews.all()
   # Declare outlist and populate
@@ -463,7 +463,7 @@ def submitReviewReaction(request: HttpRequest):
     # Get data from request
     reqBody = json.loads(request.body)
     # Retrieve user from session cookie
-    user = getSpotifyUser(request.session.get('discord_id'))
+    user = getUserObj(request.session.get('discord_id'))
     # Get review from the database
     review = Review.objects.get(pk=reqBody['id'])
     # Get list of emojis in review reactions
@@ -502,7 +502,7 @@ def deleteReviewReaction(request: HttpRequest):
     # Get data from request
     reqBody = json.loads(request.body)
     # Retrieve user from session cookie
-    user = getSpotifyUser(request.session.get('discord_id'))
+    user = getUserObj(request.session.get('discord_id'))
     # Retrieve react PK from request body
     react_id = reqBody['react_id']
     # Get review from the database

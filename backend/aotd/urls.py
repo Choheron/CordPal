@@ -19,10 +19,10 @@ urlpatterns = [
   ## ============================================================================================================
   ## User Views
   ## ============================================================================================================
-  path('getAotdData', views_user.getSpotifyData),
-  path('getAotdUsersObj', views_user.getSpotifyUsersObj),
-  path('getAotdUsersList', views_user.getSpotifyUsersList),
-  path('getAotdUserCount', views_user.getSpotifyUserCount),
+  path('getAotdData', views_user.getAotdData),
+  path('getAotdUsersObj', views_user.getAotdUsersObj),
+  path('getAotdUsersList', views_user.getAotdUsersList),
+  path('getAotdUserCount', views_user.getAotdUserCount),
   path('getSelectionBlockedFlag', views_user.getSelectionBlockedFlag),
   ## ============================================================================================================
   ## Album Views
