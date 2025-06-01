@@ -1,4 +1,4 @@
-import { getReviewsForAlbum, getSpotifyUserCount } from "@/app/lib/spotify_utils";
+import { getReviewsForAlbum, getSpotifyUserCount } from "@/app/lib/aotd_utils";
 import ReviewAvatarCard from "./review_avatar_card";
 
 // GUI Display for reviews of an album

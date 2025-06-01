@@ -7,7 +7,7 @@ import Router from "next/router"
 import { Button, Tooltip } from "@heroui/react";
 import ReviewTipTap from "../../general/input/Tiptap";
 import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@heroui/react";
-import { setReviewCookie, submitReviewToBackend } from "@/app/lib/spotify_utils";
+import { setReviewCookie, submitReviewToBackend } from "@/app/lib/aotd_utils";
 import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 
 

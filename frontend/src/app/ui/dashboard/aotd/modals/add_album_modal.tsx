@@ -15,9 +15,11 @@ import React from "react";
 import { useRouter } from 'next/navigation';
 import { Listbox,  ListboxItem} from "@heroui/listbox";
 
-import { checkIfAlbumAlreadyExists, checkIfUserCanSubmit, spotifySearch, submitAlbumToBackend } from "@/app/lib/spotify_utils";
+import { checkIfAlbumAlreadyExists, checkIfUserCanSubmit, submitAlbumToBackend } from "@/app/lib/aotd_utils";
 import { Conditional } from "../../conditional";
 import InfoPopover from "@/app/ui/general/info_popover";
+import { musicBrainzAlbumSearch } from "@/app/lib/aotd_utils";
+import {Image} from "@heroui/image";
 
 // Modal to allow a user to submit an album for the album of the day pool
 export default function AddAlbumModal(props) {
@@ -33,8 +35,8 @@ export default function AddAlbumModal(props) {
   const [albumErrorData, setAlbumErrorData] = React.useState({})
   // Search Dynamic Values
   const [searchTitle, setSearchTitle] = React.useState("");
-  const [searchArtist, setSearchArtist] = React.useState("");
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const [searchArtist, setSearchArtist] = React.useState<any>("");
+  const [searchObj, setSearchObj] = React.useState({ album: "", artist: null});
   const [isSearchLoading, setIsSearchLoading] = React.useState(false);
   const [searchAlbumsResponse, setSearchAlbumsResponse] = React.useState({});
   // Mapped data to album cards
@@ -69,36 +71,34 @@ export default function AddAlbumModal(props) {
     // Clear existing album list elements
     setAlbumList([])
     // Create payload to send data to backend
-    let albumSearchData = {}
-    albumSearchData['title'] = searchTitle
-    albumSearchData['artist'] = searchArtist
-    // Send search request to backend
-    let searchString = ""
+    let albumSearchData = { album: "", artist: null}
     if(searchTitle != "") {
-      searchString += searchTitle
+      albumSearchData.album = searchTitle
     }
-    if(searchArtist != "") {
-      searchString += (" artist:" + searchArtist)
+    if((searchArtist != "") && (searchArtist != null)) {
+      albumSearchData.artist = searchArtist
+    } else {
+      setSearchArtist(null)
     }
-    setSearchQuery(searchString)
+    setSearchObj(albumSearchData)
   }
 
   // UseEffect to search for an album once query data is updated
   React.useEffect(() => {
     const getSearchResults = async () => {
-      if(searchQuery == "") {
+      if(searchObj.album == "") {
         return;
       }
-      setSearchAlbumsResponse((await spotifySearch("album", searchQuery, 6, 0))['albums'])
+      setSearchAlbumsResponse((await musicBrainzAlbumSearch(searchObj.album, searchObj.artist)))
     }
     getSearchResults()
-  }, [searchQuery])
+  }, [searchObj])
 
   // UseEffect to map album data from spotify to a selectable listItem
   React.useEffect(() => {
-    if(searchAlbumsResponse['items']) {
+    if(searchAlbumsResponse['releases']) {
       setAlbumList(
-        searchAlbumsResponse['items'].map((album_obj, index) => {
+        searchAlbumsResponse['releases'].map((album_obj, index) => {
           return album_obj
         })
       )
@@ -106,16 +106,16 @@ export default function AddAlbumModal(props) {
     setIsSearchLoading(false)
   }, [searchAlbumsResponse])
 
-  // UseEffect to get selected album data
-  React.useEffect(() => {
-    const getSearchResults = async () => {
-      if(searchQuery == "") {
-        return;
-      }
-      setSearchAlbumsResponse((await spotifySearch("album", searchQuery, 5, 0))['albums'])
-    }
-    getSearchResults()
-  }, [searchQuery])
+  // // UseEffect to get selected album data
+  // React.useEffect(() => {
+  //   const getSearchResults = async () => {
+  //     if(searchQuery == "") {
+  //       return;
+  //     }
+  //     setSearchAlbumsResponse((await spotifySearch("album", searchQuery, 5, 0))['albums'])
+  //   }
+  //   getSearchResults()
+  // }, [searchQuery])
 
 
   // UseEffect to map album data from spotify to a selectable listItem
@@ -129,15 +129,15 @@ export default function AddAlbumModal(props) {
       setAlbumError(albumErrData['exists'])
     }
     checkIfAlbumAlreadySubmitted()
-    if(searchAlbumsResponse['items']) {
+    if(searchAlbumsResponse['releases']) {
       setSelectedAlbum(null)
       setAlbumError(false)
-      for(let i = 0; i < searchAlbumsResponse['items'].length; i++) {
-        if(!(searchAlbumsResponse['items'][i])) {
+      for(let i = 0; i < searchAlbumsResponse['releases'].length; i++) {
+        if(!(searchAlbumsResponse['releases'][i])) {
           break;
         }
-        if(searchAlbumsResponse['items'][i]['id'] == selectedValue) {
-          setSelectedAlbum(searchAlbumsResponse['items'][i])
+        if(searchAlbumsResponse['releases'][i]['id'] == selectedValue) {
+          setSelectedAlbum(searchAlbumsResponse['releases'][i])
         }
       }
     }
@@ -155,8 +155,8 @@ export default function AddAlbumModal(props) {
     // Alert user of action status
     if((status == 200) && (selectedAlbum != null)) {
       addToast({
-        title: `Successfully submitted "${selectedAlbum['name']}"!`,
-        description: `${selectedAlbum['name']} has been added to the Album of the Day Selecton Pool!`,
+        title: `Successfully submitted "${selectedAlbum['title']}"!`,
+        description: `${selectedAlbum['title']} has been added to the Album of the Day Selecton Pool!`,
         color: "success",
       })
     } else {
@@ -197,7 +197,7 @@ export default function AddAlbumModal(props) {
             onPress={onOpen}
             radius="none"
             variant="solid"
-            isDisabled={!userAllowedToSubmit}
+            // isDisabled={!userAllowedToSubmit}
           >
             <b>Submit An Album</b>
           </Button>
@@ -219,7 +219,14 @@ export default function AddAlbumModal(props) {
           </div>
         </Conditional>
       </div>
-      <Modal size="xl" isOpen={isOpen} isDismissable={false} onOpenChange={onOpenChange} onClose={cancelPress}>
+      <Modal 
+        size="xl" 
+        isOpen={isOpen} 
+        isDismissable={false} 
+        onOpenChange={onOpenChange} 
+        onClose={cancelPress}
+        scrollBehavior="inside"
+      >
         <ModalContent>
           {() => (
             <>
@@ -282,10 +289,27 @@ export default function AddAlbumModal(props) {
                         className="my-1 rounded-xl bg-zinc-800/30 border border-neutral-800"
                       >
                         <div className="flex">
-                          <img src={album['images'][2]['url']} width={64} height={64}  className="rounded-xl" />
+                          <div className="shrink-0">
+                            <Image
+                              src={`https://coverartarchive.org/release/${album['id']}/front`}
+                              fallbackSrc="https://placehold.co/100x100?text=Cover+Not+Found"
+                              alt={`Album Art for ${album['title']}`}
+                              width={100}
+                              height={100}
+                              className="rounded-xl"
+                            />
+                          </div>
                           <div className="flex flex-col ml-2">
-                            <p className="text-xl line-clamp-1">{album['name']}</p>
-                            <p className="text-md italic">{album['artists'][0]['name']}</p>
+                            <div className="flex">
+                              <p className="text-2xl line-clamp-1">{album['title']}</p>
+                              <Conditional showWhen={album['disambiguation']}>
+                                <p className="text-sm my-auto ml-1 italic">&#40;{album['disambiguation']}&#41;</p>
+                              </Conditional>
+                            </div>
+                            <p className="text-base italic">{album['artist-credit'][0]['name']}</p>
+                            <p className="text-base italic">{album['date']}</p>
+                            <p className="text-sm">Type: {album['release-group']['primary-type']}</p>
+                            <p className="text-sm">{album['track-count']} Tracks</p>
                           </div>
                         </div>
                       </ListboxItem>
@@ -297,12 +321,26 @@ export default function AddAlbumModal(props) {
                     <Divider />
                     <p>Selected Album:</p>
                     <div className="flex">
-                      <img src={selectedAlbum['images'][0]['url']} width={150} height={150}  className="rounded-xl" />
+                      <Image
+                        src={`https://coverartarchive.org/release/${selectedAlbum['id']}/front`}
+                        fallbackSrc="https://placehold.co/150x150?text=Cover+Not+Found"
+                        alt={`Album Art for ${selectedAlbum['title']}`}
+                        width={150}
+                        height={150}
+                        className="rounded-xl"
+                      />
                       <div className="flex flex-col ml-2">
-                        <p className="text-xl">{selectedAlbum['name']}</p>
-                        <p className="text-md italic">{selectedAlbum['artists'][0]['name']}</p>
-                        <a href={selectedAlbum['external_urls']['spotify']} target="_noreferrer" className="text-lg hover:underline">
-                          Spotify Link for Verification
+                        <div className="flex">
+                          <p className="text-2xl">{selectedAlbum['title']}</p>
+                          <Conditional showWhen={selectedAlbum['disambiguation']}>
+                            <p className="text-sm my-auto ml-1 italic">&#40;{selectedAlbum['disambiguation']}&#41;</p>
+                          </Conditional>
+                        </div>
+                        <p className="text-base italic">{selectedAlbum['artist-credit'][0]['name']}</p>
+                        <p className="text-base italic">{selectedAlbum['date']}</p>
+                        <p className="text-sm">{selectedAlbum['track-count']} Tracks</p>
+                        <a href={`https://musicbrainz.org/release/${selectedAlbum['id']}`} target="_noreferrer" className="text-lg text-blue-600 hover:underline">
+                          MusicBranz Link for Verification
                         </a>
                       </div>
                     </div>

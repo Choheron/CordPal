@@ -1,6 +1,6 @@
 "use server"
 
-import { getAlbumAvgRating, getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData } from "@/app/lib/spotify_utils"
+import { getAlbumAvgRating, getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData } from "@/app/lib/aotd_utils"
 import { getNextDay, getPrevDay, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
@@ -99,7 +99,7 @@ export default async function Page({
               album_id={albumData("album_id")}
               album_img_src={albumData("album_img_src")}
               album_src={albumData("album_src")}
-              album_spotify_id={albumData("album_id")}
+              album_mbid={albumData("album_id")}
               artist={albumData("artist")}
               submitter={albumData("submitter")}
               submitter_comment={albumData("submitter_comment")}

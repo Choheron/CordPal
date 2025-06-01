@@ -2,7 +2,7 @@ import { Conditional } from "../conditional"
 import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
-import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
+import { getAlbumAvgRating } from '@/app/lib/aotd_utils';
 import { Badge, Button, Tooltip } from "@heroui/react";
 import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
@@ -18,7 +18,7 @@ import { ratingToTailwindBgColor } from "@/app/lib/utils";
 //  - submitter: String - (Optional) The discord id of the user that submitted this album, not applicable in all use cases
 //  - submitter_comment: String - (Optional) An optional comment that the album submitter may have left with this album
 //  - submission_date: String - (Optional) A String representation of the submission date of the Album
-//  - album_spotify_id: String - (Optional) Album Spotify ID for retrieval of average from database
+//  - album_mbid: String - (Optional) Album Spotify ID for retrieval of average from database
 //  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
 //  - showAlbumRating: Boolean - (Optional) [DEFAULT 0] 0: Show no ratings, 1: Show stars, 2: Show stars and number
 //  - showSubmitInfo: Boolean - (Optional) [DEFAULT FALSE] Show the submission info for the album
@@ -45,14 +45,14 @@ export default async function MinimalAlbumDisplay(props) {
   const submitter_comment = (props.submitter_comment) ? props.submitter_comment : "No Comment Provided";
   const submission_date: string = (props.submission_date) ? props.submission_date : "Not Provided";
   // Rating props check
-  const avg_rating = (props.album_spotify_id && (showAlbumRating != 0)) ? (await getAlbumAvgRating(props.album_spotify_id, false)) : 0.0;
+  const avg_rating = (props.album_mbid && (showAlbumRating != 0)) ? (await getAlbumAvgRating(props.album_mbid, false)) : 0.0;
   const rating_override = (props.ratingOverride) ? props.ratingOverride : false;
   // Historical props checks
   const historical = (props.historical_date) ? true : false;
   const historical_date: string = (props.historical_date) ? props.historical_date : "0000-00-00";
   // Sizing overrides 
   const sizingOverride = (props.sizingOverride) ? props.sizingOverride : "h-[125px] w-[125px] lg:h-[300px] lg:w-[300px]"
-  const buttonUrlOverride = (props.buttonUrlOverride) ? props.buttonUrlOverride : `/dashboard/aotd/album/${props.album_spotify_id}`
+  const buttonUrlOverride = (props.buttonUrlOverride) ? props.buttonUrlOverride : `/dashboard/aotd/album/${props.album_mbid}`
   const titleTextOverride = (props.titleTextOverride) ? props.titleTextOverride : 'text-center text-xl lg:text-3xl text-wrap'
   const artistTextOverride = (props.artistTextOverride) ? props.artistTextOverride : 'text-center text-sm lg:text-xl italic text-wrap'
   const starTextOverride = (props.starTextOverride) ? props.starTextOverride : 'text-xl 3xl:text-3xl'
@@ -116,7 +116,7 @@ export default async function MinimalAlbumDisplay(props) {
           href={(historical) ? `/dashboard/aotd/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
           radius="none"
           className={`${albumCoverOverride} px-0 py-0`}
-          isDisabled={!props.album_spotify_id}
+          isDisabled={!props.album_mbid}
         >
           <img 
             src={album_img_src}
@@ -131,7 +131,7 @@ export default async function MinimalAlbumDisplay(props) {
         href={(historical) ? `/dashboard/aotd/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
         radius="lg"
         className={`absolute flex flex-col transition opacity-0 group-hover:opacity-100 ease-in-out ${sizingOverride} lg:gap-2 bg-transparent p-0`}
-        isDisabled={!props.album_spotify_id}
+        isDisabled={!props.album_mbid}
       >
         <p className={titleTextOverride}>
           {title}

@@ -9,21 +9,19 @@ import {
   getAlbumOfTheDayData, 
   getReviewsForAlbum, 
   getSimilarReviewsForRatings, 
-  getSpotifyData, 
+  getAotdData, 
   getUserReviewForAlbum, 
-} from "@/app/lib/spotify_utils";
+} from "@/app/lib/aotd_utils";
 import AddAlbumModal from "./modals/add_album_modal";
 
 import Link from "next/link";
 import { RiCalendar2Fill} from "react-icons/ri";
 import { getUserData } from "@/app/lib/user_utils";
-import AlbumPlayButton from "./album_play_button";
 
 // GUI Display for the Album of the Day
 export default async function AlbumOfTheDayBox(props) {
   // Get user Data
   const user_data = await getUserData()
-  const spot_user_data = await getSpotifyData()
   // Get album data
   const albumOfTheDayObj = await getAlbumOfTheDayData()
   const albumReview = await getUserReviewForAlbum(albumData("album_id"))
@@ -59,11 +57,7 @@ export default async function AlbumOfTheDayBox(props) {
               variant="solid"
             >
               <b>View Yesterday&apos;s Album</b>
-            </Button> 
-            <AlbumPlayButton 
-              spotUserData={spot_user_data}
-              albumOfTheDayObj={albumOfTheDayObj}
-            />
+            </Button>
             <Button 
               as={Link}
               href={`/dashboard/aotd/calendar/${todayDate.toISOString().split('T')[0].split("-")[0]}/${todayDate.toISOString().split('T')[0].split("-")[1]}`}
@@ -79,7 +73,7 @@ export default async function AlbumOfTheDayBox(props) {
             album_img_src={albumData("album_img_src")}
             album_id={albumData("album_id")}
             album_src={albumData("album_src")}
-            album_spotify_id={albumData("album_id")}
+            album_mbid={albumData("album_id")}
             artist={albumData("artist")}
             submitter={albumData("submitter")}
             submitter_comment={albumData("submitter_comment")}

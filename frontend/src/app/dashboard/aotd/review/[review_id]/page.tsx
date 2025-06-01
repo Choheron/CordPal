@@ -1,6 +1,6 @@
 "use server"
 
-import { getAlbum, getReviewHistoricalByID, getTenorGifData } from "@/app/lib/spotify_utils"
+import { getAlbum, getReviewHistoricalByID, getTenorGifData } from "@/app/lib/aotd_utils"
 import { getUserData } from "@/app/lib/user_utils"
 import { convertToLocalTZString, generateDateFromUTCString, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"

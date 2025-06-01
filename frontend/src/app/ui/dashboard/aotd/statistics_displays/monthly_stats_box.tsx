@@ -7,7 +7,7 @@ import MonthlySelectionCountsPie from "./monthly/monthly_selection_counts_pie";
 import MonthlySubmissionCountsPie from "./monthly/monthly_submission_counts_pie";
 import MonthlyUserStats from "./monthly/monthly_user_stats";
 import UserCard from "@/app/ui/general/userUiItems/user_card";
-import { getAllSpotifyUsersList, getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/app/lib/spotify_utils";
+import { getAllSpotifyUsersList, getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/app/lib/aotd_utils";
 
 // Display monthy statistics for the AOtD
 // Expected Props:

@@ -1,6 +1,6 @@
 'use server'
 
-import { getAllUserReviews, getUserReviewStats } from "@/app/lib/spotify_utils";
+import { getAllUserReviews, getUserReviewStats } from "@/app/lib/aotd_utils";
 import MinimalAlbumDisplay from "../dashboard/aotd/minimal_album_display";
 import StarRating from "../general/star_rating";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
@@ -50,7 +50,7 @@ export default async function UserSpotifyDataDisplay(props) {
                 showAlbumRating={true}
                 ratingOverride={reviewStats['highest_score_given']}
                 title={reviewStats['highest_album']["title"]}
-                album_spotify_id={reviewStats['highest_album']["spotify_id"]}
+                album_mbid={reviewStats['highest_album']["mbid"]}
                 album_img_src={reviewStats['highest_album']["album_img_src"]}
                 album_src={reviewStats['highest_album']["spotify_url"]}
                 artist={{"name": reviewStats['highest_album']["artist"], "href": reviewStats['highest_album']["artist_url"]}}
@@ -69,7 +69,7 @@ export default async function UserSpotifyDataDisplay(props) {
                 showAlbumRating={true}
                 ratingOverride={reviewStats['lowest_score_given']}
                 title={reviewStats['lowest_album']["title"]}
-                album_spotify_id={reviewStats['lowest_album']["spotify_id"]}
+                album_mbid={reviewStats['lowest_album']["mbid"]}
                 album_img_src={reviewStats['lowest_album']["album_img_src"]}
                 album_src={reviewStats['lowest_album']["spotify_url"]}
                 artist={{"name": reviewStats['lowest_album']["artist"], "href": reviewStats['lowest_album']["artist_url"]}}

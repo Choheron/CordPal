@@ -25,7 +25,7 @@ export default async function RecentSubmissions(props) {
               <div className="ml-1" key={index}>
                 <Button 
                   as={Link}
-                  href={"/dashboard/aotd/album/" + submission['spotify_id']}
+                  href={"/dashboard/aotd/album/" + submission['mbid']}
                   radius="lg"
                   className={`h-fit w-full hover:underline text-white pt-1`}
                   variant="light"

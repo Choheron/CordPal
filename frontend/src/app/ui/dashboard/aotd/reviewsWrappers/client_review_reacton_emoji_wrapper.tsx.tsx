@@ -1,6 +1,6 @@
 "use client"
 
-import { addReviewReaction, deleteReviewReaction, getReviewByID } from "@/app/lib/spotify_utils"
+import { addReviewReaction, deleteReviewReaction, getReviewByID } from "@/app/lib/aotd_utils"
 import EmojiMartButton from "@/app/ui/general/input/emoji_mart_popover"
 import { Conditional } from "../../conditional";
 import { Tooltip } from "@heroui/react";
@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 //  - userData: Object - User Data from Backend
 //  - emojiButtonOverride: String - Tailwind override for emoji button
 export default function ReviewEmojiMartClientWrapper(props) {
-  const albumSpotifyID = props.albumSpotifyID
+  const albumMbid = props.albumMbid
   const reviewID = props.reviewId
   const [reactionsList, setReactionsList] = useState((props.reactionsList) ? props.reactionsList : [])
   const userData = props.userData
@@ -26,7 +26,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
     const reviewReactionObj = {
       "id": reviewID,
       "emoji": emojiObj.native,
-      "album_spotify_id": albumSpotifyID 
+      "album_mbid": albumMbid 
     }
     const status = await addReviewReaction(reviewReactionObj)
     // If successful, retrieve review data again
@@ -42,7 +42,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
       "id": reviewID,
       "emoji": emojiGroup['emoji'],
       "react_id": (removeReact) ? emojiGroup['objects'].find(obj => {return obj["user_id"] == userID})['id'] : "--",
-      "album_spotify_id": albumSpotifyID,
+      "album_mbid": albumMbid,
     }
     if(removeReact) {
       status = await deleteReviewReaction(reviewReactionObj)

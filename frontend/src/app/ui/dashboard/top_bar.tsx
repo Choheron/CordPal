@@ -2,15 +2,12 @@
 
 import { Conditional } from "./conditional";
 import { usePathname } from 'next/navigation';
-import {Divider} from "@heroui/divider";
 import {User} from "@heroui/user";
 
 import clsx from 'clsx';
 
 import SettingsModal from "./settings_modal";
-import Image from "next/image";
-import { isDecember } from "@/app/lib/utils";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Link } from "@heroui/react";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Link } from "@heroui/react";
 import { useState } from "react";
 
 // Expected props:

@@ -5,7 +5,7 @@ import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
 import StarRating from "../../general/star_rating";
 import UserCard from "../../general/userUiItems/user_card";
 
-import { getTenorGifData } from "@/app/lib/spotify_utils";
+import { getTenorGifData } from "@/app/lib/aotd_utils";
 import ClientTimestamp from "../../general/client_timestamp";
 import { Conditional } from "../conditional";
 import { Link, ScrollShadow, Tooltip } from "@heroui/react";
@@ -118,7 +118,7 @@ export default async function ReviewAvatarCard(props) {
           <ReviewEmojiMartClientWrapper 
             userData={userData}
             reviewId={review['id']}
-            albumSpotifyID={review['album_id']}
+            albumMbid={review['album_id']}
             reactionsList={reactionsList}
           />
           {/* Tenor Disclaimer Display */}

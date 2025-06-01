@@ -1,6 +1,6 @@
 "use server"
 
-import { getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/app/lib/spotify_utils"
+import { getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/app/lib/aotd_utils"
 import { daysInMonth, monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
@@ -137,7 +137,7 @@ export default async function Page({
             showAlbumRating={true}
             ratingOverride={albumGet("rating")}
             title={albumGet("title")}
-            album_spotify_id={albumGet("spotify_id")}
+            album_mbid={albumGet("mbid")}
             album_img_src={albumGet("album_img_src")}
             album_src={albumGet("spotify_url")}
             artist={albumGet("artist")}

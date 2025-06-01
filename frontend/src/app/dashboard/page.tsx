@@ -6,7 +6,7 @@ import { getAllOnlineData, getUserData, getUserList, getUsersByTimezone } from "
 import PageTitle from "../ui/dashboard/page_title";
 import LiveOnlineUsersBox from "../ui/dashboard/live_online_users_box";
 import AlbumDisplay from "../ui/dashboard/aotd/album_display";
-import { getAlbumOfTheDayData } from "../lib/spotify_utils";
+import { getAlbumOfTheDayData } from "../lib/aotd_utils";
 import AllTimezonesBlock from "../ui/dashboard/allTimezonesBlock";
 
 export default async function Page() {
@@ -44,7 +44,7 @@ export default async function Page() {
             title={albumData("title")}
             album_img_src={albumData("album_img_src")}
             album_src={albumData("album_src")}
-            album_spotify_id={albumData("album_id")}
+            album_mbid={albumData("album_id")}
             artist={albumData("artist")}
             submitter={albumData("submitter")}
             submitter_comment={albumData("submitter_comment")}

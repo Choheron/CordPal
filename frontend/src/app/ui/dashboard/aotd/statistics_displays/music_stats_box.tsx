@@ -1,7 +1,7 @@
 'use server'
 
 import UserCard from "@/app/ui/general/userUiItems/user_card";
-import { getAlbumAvgRating, getAlbumsStats, getAllUserReviewStats, getChanceOfAotdSelect, getLowestHighestAlbumStats } from "@/app/lib/spotify_utils";
+import { getAlbumAvgRating, getAlbumsStats, getAllUserReviewStats, getChanceOfAotdSelect, getLowestHighestAlbumStats } from "@/app/lib/aotd_utils";
 
 import {Badge} from "@heroui/badge";
 import { Divider, Tooltip } from "@heroui/react";
@@ -129,7 +129,7 @@ export default async function MusicStatsBox(props) {
           <div className="mx-auto">
             <AlbumDisplay
               title={albumLowHighStatsJson['highest_album']["title"]}
-              album_spotify_id={albumLowHighStatsJson['highest_album']["spotify_id"]}
+              album_mbid={albumLowHighStatsJson['highest_album']["mbid"]}
               album_img_src={albumLowHighStatsJson['highest_album']["album_img_src"]}
               album_src={albumLowHighStatsJson['highest_album']["spotify_url"]}
               artist={{"name": albumLowHighStatsJson['highest_album']["artist"], "href": albumLowHighStatsJson['highest_album']["artist_url"]}}
@@ -151,7 +151,7 @@ export default async function MusicStatsBox(props) {
           <div className="mx-auto">
             <AlbumDisplay
               title={albumLowHighStatsJson['lowest_album']["title"]}
-              album_spotify_id={albumLowHighStatsJson['lowest_album']["spotify_id"]}
+              album_mbid={albumLowHighStatsJson['lowest_album']["mbid"]}
               album_img_src={albumLowHighStatsJson['lowest_album']["album_img_src"]}
               album_src={albumLowHighStatsJson['lowest_album']["spotify_url"]}
               artist={{"name": albumLowHighStatsJson['lowest_album']["artist"], "href": albumLowHighStatsJson['lowest_album']["artist_url"]}}

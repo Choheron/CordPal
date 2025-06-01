@@ -4,7 +4,7 @@ import { Conditional } from "../conditional"
 import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
-import { getAlbumAvgRating } from '@/app/lib/spotify_utils';
+import { getAlbumAvgRating } from '@/app/lib/aotd_utils';
 import Image from "next/image";
 import { Badge, Button, Tooltip } from "@heroui/react";
 import Link from 'next/link'
@@ -24,7 +24,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - submission_date: String - (Optional) A String representation of the submission date of the Album
 //  - release_date: String - (Optional) A String representation of the release date of the Album
 //  - release_date_precision: String - (Optional) Preciseness of release date string. Must be "year", "month" or "day". Defaults to "day"
-//  - album_spotify_id: String - (Optional) Album Spotify ID for retrieval of average from database
+//  - album_mbid: String - (Optional) Album Spotify ID for retrieval of average from database
 //  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
 //  - showAlbumRating: Boolean - (Optional) [DEFAULT TRUE] Show the average user rating for the album
 //  - showCalLink: Boolean - (Optional) [DEFAULT FALSE] Show a button for the user to go to the calendar date displayed
@@ -38,7 +38,7 @@ export default async function AlbumDisplay(props) {
   // Album props checks
   const title = (props.title) ? props.title : "No Album Title Found";
   const album_url = (props.album_src) ? props.album_src : "https://www.google.com/search?q=sad+face";
-  const album_page_url = (props.album_spotify_id) ? `/dashboard/aotd/album/${props.album_spotify_id}` : album_url;
+  const album_page_url = (props.album_mbid) ? `/dashboard/aotd/album/${props.album_mbid}` : album_url;
   const album_img_src = (props.album_img_src) ? props.album_img_src : "/images/DALL-E_Album_Not_Found.webp";
   // Artist props checks
   const artist_name = (props.artist && props.artist['name']) ? props.artist['name'] : "Artist Name not Found";
@@ -56,7 +56,7 @@ export default async function AlbumDisplay(props) {
   // Check that user is authenticated
   const userAuth = (props.member_status) ? props.member_status : true;
   // Rating props check
-  const avg_rating = (props.album_spotify_id && showAlbumRating) ? await getAlbumAvgRating(props.album_spotify_id, false, historical_date): 0.0;
+  const avg_rating = (props.album_mbid && showAlbumRating) ? await getAlbumAvgRating(props.album_mbid, false, historical_date): 0.0;
   // Vertical Override
   const vertical = (props.vertical) ? props.vertical : false;
   

@@ -29,21 +29,23 @@ def run():
     'User-Agent': 'CordPal/0.0.1 ( www.cordpal.app )'
   }
   for spot_album in spot_album_objects:
+    print(f"Attempting to migrate {spot_album.title} by {spot_album.artist} ({index}/{len(spot_album_objects)})...")
     try:
       newAlbum = Album.objects.get(legacy_album=spot_album)
-      spot_album.mbid = newAlbum.mbid
+      spot_album.mbid = newAlbum.mbid.strip()
       spot_album.save()
-      print(f"Migrated album for {spot_album.title} already found, skipping...")
+      print(f"\tMigrated album for {spot_album.title} already found, skipping...")
       index += 1
       continue
     except Exception as e:
-      print(f"Migrated album for {spot_album.title} not found...")
-      pass
+      print(f"\tMigrated album for {spot_album.title} not found...")
     # Sleep for 1 second no matter what, to avoid rate limiting (this is wasting time but I want to play it safe)
     time.sleep(1)
     try:
       if(spot_album.mbid):
-        print(f"Unmigrated album mbid provided, searching using mbid...")
+        spot_album.mbid = spot_album.mbid.strip()
+        spot_album.save()
+        print(f"\tUnmigrated album mbid provided, searching using mbid...")
         # MBID provided but no matching album found post-migration, this lets us pull remasters and manually located mbids
         url = f"https://musicbrainz.org/ws/2/release/{spot_album.mbid}"
         params = {
@@ -60,7 +62,7 @@ def run():
           'query': f"release:\"{spot_album.title}\" AND artist:\"{spot_album.artist}\"",
           'fmt': 'json'
         }
-        print(f"Making request to musicbrainz search url for album {spot_album.title} by {spot_album.artist} ({index}/{len(spot_album_objects)})...")
+        print(f"\tMaking request to musicbrainz search url for album {spot_album.title} by {spot_album.artist} ({index}/{len(spot_album_objects)})...")
         response = requests.get(url, params=params, headers=headers)
         data = response.json()
         try:
@@ -72,7 +74,9 @@ def run():
           if(album_data == None):
             raise Exception("Album not found in inital search...")
         except:
-          print(f"Did not locate album based on artist and album title search, using just album title and only accepting various artists as artist...")
+          # Sleep for 1 second no matter what, to avoid rate limiting (this is wasting time but I want to play it safe)
+          time.sleep(1)
+          print(f"\tDid not locate album based on artist and album title search, using just album title and only accepting various artists as artist...")
           url = f"https://musicbrainz.org/ws/2/release"
           params = {
             'query': f"release:\"{spot_album.title}\" AND artist:\"Various Artists\"",
@@ -81,6 +85,8 @@ def run():
           response = requests.get(url, params=params, headers=headers)
           data = response.json()
           album_data = data['releases'][0]
+        # Sleep for 1 second no matter what, to avoid rate limiting (this is wasting time but I want to play it safe)
+        time.sleep(1)
         # Build Tracks Url
         url = f"https://musicbrainz.org/ws/2/release/{album_data['id']}"
         params = {
@@ -127,8 +133,8 @@ def run():
       spot_album.mbid = newAotdAlbum.mbid
       spot_album.save()
     except Exception as e:
-      print(f"FAILED TO MIGRATE FOR: {spot_album.title}")
-      print(f"ERROR: {e}")
+      print(f"\tFAILED TO MIGRATE FOR: {spot_album.title}")
+      print(f"\tERROR: {e}")
       failed_update.append((spot_album, e))
     # Increment Index
     index += 1

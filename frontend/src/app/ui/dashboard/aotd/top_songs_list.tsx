@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 
 import { useState, useEffect } from "react";
-import { getSpotifyTopItems } from "@/app/lib/spotify_utils";
+import { getSpotifyTopItems } from "@/app/lib/aotd_utils";
 import { Conditional } from "../conditional";
 import {Spinner} from "@heroui/spinner";
 

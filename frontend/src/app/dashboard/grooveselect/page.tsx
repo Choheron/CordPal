@@ -1,4 +1,4 @@
-import { getSpotifyBearerToken } from "@/app/lib/spotify_utils";
+import { getSpotifyBearerToken } from "@/app/lib/aotd_utils";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import PlaylistDisplay from "./ui/playlist_button";
 

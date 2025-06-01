@@ -1,0 +1,67 @@
+from django.http import HttpRequest, HttpResponse, JsonResponse
+
+from .utils import (
+  getUserObj,
+  isUserAotdParticipant,
+  getAotdUserObj
+)
+
+from .models import (
+  AotdUserData,
+)
+from users.models import (
+  User
+)
+
+import logging
+import requests
+from dotenv import load_dotenv
+import os
+import json
+
+# Declare logging
+logger = logging.getLogger('django')
+
+# Determine runtime enviornment
+APP_ENV = os.getenv('APP_ENV') or 'DEV'
+load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
+
+
+## =========================================================================================================================================================================================
+## OAuth METHODS
+## =========================================================================================================================================================================================
+
+###
+# Check if a user has connected spotify to their account
+###
+def isAotdParticipant(request: HttpRequest):
+  '''Check if a user has connected spotify to their account'''
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("isAotdParticipant called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get user discord id
+  userObj = getAotdUserObj(request.session.get("discord_id"))
+  # return jsonResponse containing status
+  return JsonResponse({'connected': (userObj != None)})
+
+
+def enrollUser(request: HttpRequest):
+  '''Enroll a user as an AOtD participant'''
+  # Make sure request is a get request
+  if(request.method != "POST"):
+    logger.warning("enrollUser called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get user discord id
+  userObj = getUserObj(request.session.get("discord_id"))
+  # Create a AotdUserData Object
+  newUser = AotdUserData(
+    user=userObj
+  )
+  newUser.save()
+  # Return jsonResponse containing status
+  return HttpResponse()

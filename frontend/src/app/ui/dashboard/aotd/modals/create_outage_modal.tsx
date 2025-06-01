@@ -15,13 +15,12 @@ import {
   parseDate, 
   DateDuration
 } from "@internationalized/date";
-import {Input} from "@heroui/react";
 import {Textarea} from "@heroui/input";
 
 import { Conditional } from "../../conditional";
 import { useEffect, useState } from "react";
 import { RiArrowRightLine, RiErrorWarningLine } from "react-icons/ri";
-import { createOutage, getUserOutages } from "@/app/lib/spotify_utils";
+import { createOutage, getUserOutages } from "@/app/lib/aotd_utils";
 
 // Modal to allow users to submit an outage
 // Expected Props:

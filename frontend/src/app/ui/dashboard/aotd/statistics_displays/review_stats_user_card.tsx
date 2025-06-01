@@ -5,7 +5,7 @@ import { Button, Link } from "@heroui/react"
 
 import UserCard from "@/app/ui/general/userUiItems/user_card"
 import StarRating from "@/app/ui/general/star_rating"
-import { getAlbum } from "@/app/lib/spotify_utils"
+import { getAlbum } from "@/app/lib/aotd_utils"
 import { ratingToTailwindBgColor } from "@/app/lib/utils"
 
 // User Card showing the review stats for a user

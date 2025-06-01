@@ -41,7 +41,7 @@ export default async function Page({
         />
         <UserSpotifyDataDisplay 
           userId={userid}
-          spotifyConnected={userData['spotify_connected']}
+          spotifyConnected={userData['aotd_enrolled']}
         />
       </div>
     </main>

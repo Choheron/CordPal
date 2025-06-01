@@ -1,6 +1,6 @@
 "use server"
 
-import { getSpotifyBearerToken } from "@/app/lib/spotify_utils"
+import { getSpotifyBearerToken } from "@/app/lib/aotd_utils"
 import SwipePage from "../ui/swipe-page"
 import PageTitle from "@/app/ui/dashboard/page_title"
 

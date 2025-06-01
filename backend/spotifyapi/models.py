@@ -153,7 +153,7 @@ class DailyAlbum(models.Model):
 # Model for a User's review of an album.
 class Review(models.Model):
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="aotd_reviews")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="spot_aotd_reviews")
     score = models.FloatField()  # Score out of 10
     review_text = models.TextField(null=True, blank=True)
     review_date = models.DateTimeField(auto_now_add=True)
@@ -240,7 +240,7 @@ class Review(models.Model):
 
 # Model for a User's older review of an album.
 class ReviewHistory(models.Model):
-    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name="history")
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name="spot_history")
     score = models.IntegerField()
     review_text = models.TextField(null=True, blank=True)
     review_date = models.DateTimeField()  # Original date of the review
@@ -279,6 +279,7 @@ class UserAlbumOutage(models.Model):
   user = models.ForeignKey(
     User,
     on_delete=models.CASCADE,
+    related_name="spot_outages"
   )
   start_date = models.DateField()
   end_date = models.DateField()
@@ -288,7 +289,7 @@ class UserAlbumOutage(models.Model):
     User, 
     on_delete=models.SET_NULL, 
     default=None, 
-    related_name="outage_admin_enactor", 
+    related_name="spot_outage_admin_enactor", 
     null=True 
   ) 
   creation_timestamp = models.DateTimeField(auto_now_add=True)
@@ -342,7 +343,7 @@ class UserChanceCache(models.Model):
   spotify_user = models.OneToOneField(
     SpotifyUserData, 
     on_delete=models.CASCADE,
-    related_name="aotd_chance"
+    related_name="spot_aotd_chance"
   )
   chance_percentage = models.FloatField() # Percentage that user will be selected.
   block_type = models.CharField(max_length=50, null=True) # Should be either "OUTAGE", "INACTIVITY", or None

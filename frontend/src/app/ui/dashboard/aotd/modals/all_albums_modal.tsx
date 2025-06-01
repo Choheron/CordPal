@@ -19,7 +19,7 @@ import {
 import { Avatar, Button, Spinner, Input, Checkbox } from "@heroui/react";
 import React from "react";
 import { useRouter } from 'next/navigation';
-import { getAllAlbums, getAllAlbumsNoCache } from "@/app/lib/spotify_utils";
+import { getAllAlbums, getAllAlbumsNoCache } from "@/app/lib/aotd_utils";
 import { convertToLocalTZString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import Link from "next/link";
 import { Conditional } from "../../conditional";

@@ -2,8 +2,8 @@
 
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { Conditional } from "@/app/ui/dashboard/conditional";
-import SpotifyLoginBox from "@/app/ui/dashboard/aotd/spotify_login_box";
-import { getAllAlbums, getLastXSubmissions, getSpotifyData, isSpotifyLinked } from "@/app/lib/spotify_utils";
+import SpotifyLoginBox from "@/app/ui/dashboard/aotd/aotd_enroll_box";
+import { getLastXSubmissions, isAotdParticipant } from "@/app/lib/aotd_utils";
 import AlbumOfTheDayBox from "@/app/ui/dashboard/aotd/album_of_the_day";
 import RecentSubmissions from "@/app/ui/dashboard/aotd/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/aotd/statistics_displays/music_stats_box";
@@ -12,7 +12,7 @@ import AllTopSongsBox from "@/app/ui/dashboard/aotd/all_top_songs_box";
 import { Alert } from "@heroui/react";
 
 export default async function music() {
-  const spot_authenticated = await isSpotifyLinked();
+  const aotd_participant = await isAotdParticipant();
   const recentSubmissionsResponse = await getLastXSubmissions(10);
   // Fetch all albums on the serverside to reduce loading time of modal
   // const allAlbumsList = await getAllAlbums()
@@ -20,24 +20,10 @@ export default async function music() {
   return (
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text="Album Of The Day" />
-      {/* <Alert
-        title={`Spotify is currently experiencing outages`}
-        description={
-          <div>
-            <p>As soon as Spotify is back up, the site will automatically be able to retrieve your data, there will be NO ADDITIONAL OUTAGE.</p>
-            <div className="flex flex-col ml-3">
-              <a href="https://x.com/SpotifyStatus" className="text-blue-400 hover:underline">Spotify Status Twitter</a>
-            </div>
-          </div>
-        }
-        color="danger"
-        variant="faded"
-        className="w-full md:w-fit my-2"
-      /> */}
-      <Conditional showWhen={!spot_authenticated}>
+      <Conditional showWhen={!aotd_participant}>
         <SpotifyLoginBox />
       </Conditional>
-      <Conditional showWhen={spot_authenticated}>
+      <Conditional showWhen={aotd_participant}>
         <div className="flex flex-col w-full lg:w-[650px] justify-center xl:flex-row md:w-4/5 gap-2">
           <AlbumOfTheDayBox title={"Album Of The Day"} />
           <div className="w-full max-w-full lg:max-w-[350px] flex flex-col">
@@ -50,7 +36,7 @@ export default async function music() {
         </div>
         <MusicStatsBox />
       </Conditional>
-      <Conditional showWhen={spot_authenticated}>
+      <Conditional showWhen={aotd_participant}>
         <AllTopSongsBox />
       </Conditional>
     </div>
