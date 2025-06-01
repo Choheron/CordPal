@@ -86,6 +86,7 @@ export default async function Page({
     return status
   }
   
+
   return (
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text={`${albumData("title")}`} />
@@ -102,7 +103,7 @@ export default async function Page({
               submission_date={albumData("submission_date")}
               release_date={albumData('release_date')}
               release_date_precision={albumData("release_date_precision")}
-              trackCount={JSON.parse(albumData("raw_album_data"))['album']['total_tracks']}
+              trackCount={albumData("track_list")['tracks'].length}
             />
             <Conditional showWhen={isAdmin || isUploader}>
               <div className="absolute -top-1 right-1 ">

@@ -232,6 +232,7 @@ def getAlbum(request: HttpRequest, mbid: str):
   out['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
   out['release_date_str'] = albumObj.release_date_str
   out['release_date'] = albumObj.release_date.strftime("%m/%d/%Y, %H:%M:%S")
+  out['track_list'] = albumObj.track_list if albumObj.track_list else {"tracks": []}
   # Return final object
   return JsonResponse(out)
 

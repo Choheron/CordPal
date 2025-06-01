@@ -141,7 +141,7 @@ export async function isUserAlbumUploader(album_mbid: string, discord_id: string
   if(sessionCookie === "") {
     return false;
   }
-  const isUserUploaderResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/isUserAlbumUploader/${album_mbid}${(discord_id === "") ? '' : '/' + discord_id}`, {
+  const isUserUploaderResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/isUserAlbumUploader/${album_mbid}${(discord_id === "") ? '' : '/' + discord_id}`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',

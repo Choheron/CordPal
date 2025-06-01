@@ -8,7 +8,6 @@ import AlbumOfTheDayBox from "@/app/ui/dashboard/aotd/album_of_the_day";
 import RecentSubmissions from "@/app/ui/dashboard/aotd/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/aotd/statistics_displays/music_stats_box";
 import AllAlbumsModal from "@/app/ui/dashboard/aotd/modals/all_albums_modal";
-import AllTopSongsBox from "@/app/ui/dashboard/aotd/all_top_songs_box";
 import { Alert } from "@heroui/react";
 
 export default async function music() {
@@ -35,9 +34,6 @@ export default async function music() {
           </div>
         </div>
         <MusicStatsBox />
-      </Conditional>
-      <Conditional showWhen={aotd_participant}>
-        <AllTopSongsBox />
       </Conditional>
     </div>
   );
