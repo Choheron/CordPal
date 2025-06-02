@@ -68,5 +68,7 @@ def enrollUser(request: HttpRequest):
       user=userObj
     )
     newUser.save()
+    userObj.aotd_enrolled = True
+    userObj.save()
   # Return jsonResponse containing status
   return JsonResponse({ "enrolled": True})

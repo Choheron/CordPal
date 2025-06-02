@@ -124,11 +124,10 @@ export default function AddAlbumModal(props) {
       if(selectedValue == "") {
         return;
       }
-      const albumErrData = await checkIfAlbumAlreadyExists(selectedValue)
+      const albumErrData = await checkIfAlbumAlreadyExists((selectedAlbum) ? selectedAlbum['release-group']['id'] : null)
       setAlbumErrorData(albumErrData)
       setAlbumError(albumErrData['exists'])
     }
-    checkIfAlbumAlreadySubmitted()
     if(searchAlbumsResponse['releases']) {
       setSelectedAlbum(null)
       setAlbumError(false)
@@ -141,6 +140,8 @@ export default function AddAlbumModal(props) {
         }
       }
     }
+    console.log(selectedAlbum)
+    checkIfAlbumAlreadySubmitted()
   }, [selectedValue])
 
 
@@ -340,7 +341,7 @@ export default function AddAlbumModal(props) {
                         <p className="text-base italic">{selectedAlbum['date']}</p>
                         <p className="text-sm">{selectedAlbum['track-count']} Tracks</p>
                         <a href={`https://musicbrainz.org/release/${selectedAlbum['id']}`} target="_noreferrer" className="text-lg text-blue-600 hover:underline">
-                          MusicBranz Link for Verification
+                          MusicBrainz Link for Verification
                         </a>
                       </div>
                     </div>

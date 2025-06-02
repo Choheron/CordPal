@@ -31,6 +31,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 //  - trackCount: Boolean - (Optional) Number of songs in the album, if provided, will show.
 //  - member_status: Boolean - (Optional) Is the user a member of the desired server?
 //  - vertical: Boolean - (Optional) Is this to be a vertical display instead of side by side?
+//  - trackList: List of Objects - (Optional) The tracks contained in the album
 export default async function AlbumDisplay(props) {
   // Configuration Props
   const showAlbumRating = (props.showAlbumRating == false) ? props.showAlbumRating : true;
@@ -59,6 +60,8 @@ export default async function AlbumDisplay(props) {
   const avg_rating = (props.album_mbid && showAlbumRating) ? await getAlbumAvgRating(props.album_mbid, false, historical_date): 0.0;
   // Vertical Override
   const vertical = (props.vertical) ? props.vertical : false;
+  // Track List
+  const track_list = (props.trackList) ? props.trackList : null;
   
 
   const dateToCalUrl = (dateStr) => {
@@ -68,6 +71,21 @@ export default async function AlbumDisplay(props) {
     const dateArr = dateStr.split("-")
 
     return `${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`
+  }
+
+  const calcAlbumLength = () => {
+    if(track_list) {
+      const milliseconds = track_list.reduce((sum, curr) => sum + curr['length'], 0)
+    
+      const seconds = Math.floor((milliseconds / 1000) % 60)
+      const minutes = Math.floor((milliseconds / (1000 * 60)) % 60)
+      const hours = Math.floor(milliseconds / (1000 * 60 * 60))
+
+      const m = minutes.toString().padStart(2, '0')
+      const s = seconds.toString().padStart(2, '0')
+
+      return hours > 0 ? `${hours}h ${m}m ${s}s` : `${m}m ${s}s`
+    }
   }
 
   return (
@@ -104,7 +122,10 @@ export default async function AlbumDisplay(props) {
             </div>
           </Conditional>
           <Conditional showWhen={trackCount}>
-            <p className="text-sm -my-1">Song Count: {trackCount}</p>
+            <p className="text-sm -my-1">{trackCount} songs</p>
+          </Conditional>
+          <Conditional showWhen={track_list}>
+            <p className="text-sm -my-1">{calcAlbumLength()}</p>
           </Conditional>
           <Conditional showWhen={userAuth && props.submitter}>
             <div className="">

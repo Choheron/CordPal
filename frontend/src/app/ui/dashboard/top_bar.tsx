@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import SettingsModal from "./settings_modal";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Link } from "@heroui/react";
 import { useState } from "react";
+import { RiAlbumLine, RiHome2Line, RiImageLine, RiInformationLine, RiMusic2Line, RiQuillPenLine, RiSettings3Line } from "react-icons/ri";
 
 // Expected props:
 //  - isMember: Boolean indicating if the current session user is a member of the desired server
@@ -22,13 +23,13 @@ export default function TopBar(props) {
   // Map of links to display in the side navigation.
   // This should be moved to a database once it reaches a certian size
   const links = [
-    { name: 'Home', href: '/dashboard', conditional: true, disabled: false },
+    { name: 'Home', href: '/dashboard', conditional: true, disabled: false, icon: <RiHome2Line /> },
     // { name: 'Clips', href: '/dashboard/clips', conditional: props['isMember'], disabled: false },
-    { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'], disabled: false },
-    { name: 'Quotes', href: '/dashboard/quotes', conditional: props['isMember'], disabled: false },
-    { name: 'Album Of the Day', href: '/dashboard/aotd', conditional: props['isMember'], disabled: false },
-    { name: 'Functionality Requests', href: '/dashboard/fr', conditional: props['isMember'], disabled: true },
-    { name: 'About', href: '/dashboard/about', conditional: true, disabled: false },
+    { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'], disabled: false, icon: <RiImageLine /> },
+    { name: 'Quotes', href: '/dashboard/quotes', conditional: props['isMember'], disabled: false, icon: <RiQuillPenLine /> },
+    { name: 'Album Of the Day', href: '/dashboard/aotd', conditional: props['isMember'], disabled: false, icon: <RiAlbumLine /> },
+    { name: 'Functionality Requests', href: '/dashboard/fr', conditional: props['isMember'], disabled: true, icon: <RiSettings3Line /> },
+    { name: 'About', href: '/dashboard/about', conditional: true, disabled: false, icon: <RiInformationLine /> },
   ];
 
 
@@ -106,17 +107,24 @@ export default function TopBar(props) {
                   key={index}
                   showWhen={link.conditional}
                 >
-                  <Link 
-                    key={index}
-                    href={link.href}
-                    isDisabled={link.disabled}
-                    size="sm"
-                    className={clsx("px-8 py-1 my-auto text-center rounded-full text-white",
+                  <div 
+                    className={clsx("flex gap-1 px-4 py-1 my-auto text-center rounded-full text-white",
                       {'text-decoration-line: underline bg-gradient-to-r from-neutral-900/0 via-neutral-900 to-neutral-900/0': pathname === link.href},
                       {'line-through': link.disabled})}
                   >
-                    {link.name}
-                  </Link>
+                    <div className="text-xl">
+                      {link.icon}
+                    </div>
+                    <Link 
+                      key={index}
+                      href={link.href}
+                      isDisabled={link.disabled}
+                      size="sm"
+                      className="text-center rounded-full text-white"
+                    >
+                      {link.name}
+                    </Link>
+                  </div>
                 </Conditional>
               );
             })

@@ -45,7 +45,7 @@ export default function ProfileUserDisplay(props) {
           </div>
           <div className="w-full flex justify-between font-extralight">
             <p>Album of the Day Participant:</p>
-            <div dangerouslySetInnerHTML={{__html: boolToEmoji(userData['spotify_connected'])}}></div>
+            <div dangerouslySetInnerHTML={{__html: boolToEmoji(userData['aotd_enrolled'])}}></div>
           </div>
           <div className="w-full flex justify-between font-extralight">
             <p>Current Timezone:</p>

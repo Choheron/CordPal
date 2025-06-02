@@ -215,12 +215,12 @@ export async function getAllAotdUsersList() {
 // Check the backend to see if an album has already been submitted by a user
 // - RETURN: Boolean
 //
-export async function checkIfAlbumAlreadyExists(mbid) {
+export async function checkIfAlbumAlreadyExists(release_group_id) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Check if a user has already submitted this album
   console.log("checkIfAlbumAlreadyExists: Sending request to backend '/aotd/checkIfAlbumAlreadyExists'")
-  const aotdAlbumExistsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/checkIfAlbumAlreadyExists/${mbid}`, {
+  const aotdAlbumExistsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/checkIfAlbumAlreadyExists/${release_group_id}`, {
     method: "GET",
     credentials: "include",
     cache: 'no-cache',

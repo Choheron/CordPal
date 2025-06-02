@@ -97,7 +97,8 @@ export default async function Page({
               submission_date={albumData("submission_date")}
               release_date={albumData('release_date')}
               release_date_precision={albumData("release_date_precision")}
-              trackCount={albumData("track_list")['tracks'].length}
+              trackCount={albumData("track_list")['tracks']?.length}
+              trackList={albumData("track_list")['tracks']}
               showAlbumRating={false}
             />
             <Conditional showWhen={isAdmin || isUploader}>

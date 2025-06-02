@@ -125,7 +125,7 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
 ###
 # Check if an album already exists in the database
 ###
-def checkIfAlbumAlreadyExists(request: HttpRequest, mbid: str):
+def checkIfAlbumAlreadyExists(request: HttpRequest, release_group_id: str):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("checkIfAlbumAlreadyExists called with a non-GET method, returning 405.")
@@ -133,12 +133,14 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, mbid: str):
     res.status_code = 405
     return res
   # Convert response to Json
-  logger.info(f"Checking if album with ID {mbid} is already submitted...")
+  logger.info(f"Checking if album with a release group ID {release_group_id} is already submitted...")
   # Declare out dict
   out = {}
   # Get album from database
   try:
-    albumObject = Album.objects.get(mbid=mbid)
+    kwargs = {'raw_data__release-group__id': release_group_id}
+    albumObject = Album.objects.get(**kwargs)
+    # Check if any other album of the same release-group exists
     if(albumObject):
       logger.info(f"Album does already exist, name: {albumObject.title}!")
     out['exists'] = True

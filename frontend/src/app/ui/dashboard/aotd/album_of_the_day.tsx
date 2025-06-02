@@ -80,6 +80,7 @@ export default async function AlbumOfTheDayBox(props) {
             submission_date={albumData("submission_date")}
             release_date={albumData("release_date")}
             release_date_precision={albumData("release_date_precision")}
+            trackList={albumData("track_list")['tracks']}
           />
           <div className="w-full sm:w-3/4 mx-auto backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-black/20 border border-neutral-800">
             <p className="text-xs italic text-gray-300">
