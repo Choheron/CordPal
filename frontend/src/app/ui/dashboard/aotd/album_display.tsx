@@ -77,11 +77,12 @@ export default async function AlbumDisplay(props) {
           href={album_page_url}
           className="relative shrink-0 h-[125px] w-[125px] md:h-[300px] md:w-[300px]"
         >
-          <img 
+          <Image
+            src={`/dashboard/aotd/api/album-cover/${props.album_mbid}`}
             title={`Album Cover for ${title} by ${artist_name}`}
-            src={album_img_src}
-            className='rounded-2xl mx-auto object-cover'
             alt={`Album Cover for ${title} by ${artist_name}`}
+            className='rounded-2xl mx-auto object-cover'
+            fill={true}
           />
         </Link>
         <div className="w-full max-w-full flex flex-col lg:gap-2 pl-2 lg:pl-4 pt-1 lg:pt-2 my-auto">

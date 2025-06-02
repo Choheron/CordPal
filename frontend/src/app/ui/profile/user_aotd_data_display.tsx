@@ -10,10 +10,10 @@ import ReviewCountChartBox from "./review_count_chart_box";
 // Display user favorite and least favorite albums
 // EXPECTED PROPS:
 // - userId: String [REQUIRED] - Discord User ID for data fetching from backend
-// - spotifyConnected: Boolean [REQUIRED] - Boolean if a user's spotify is connected, for security of site
-export default async function UserSpotifyDataDisplay(props) {
+// - aotdParticipant: Boolean [REQUIRED] - Boolean if a user is a participant in album of the day
+export default async function UserAotdDataDisplay(props) {
   const userId = props.userId
-  const spotifyConnected = (props.spotifyConnected) ? props.spotifyConnected : false;
+  const aotdParticipant = (props.aotdParticipant) ? props.aotdParticipant : false;
   // Get user fav and least fav album data
   // Review Stats Format:
   // {
@@ -28,16 +28,16 @@ export default async function UserSpotifyDataDisplay(props) {
   //   highest_score_album: '3TSMSh5dai7WEnEGOoMXBZ',
   //   highest_score_date: '12/05/2024, 18:20:59'
   // }
-  const reviewStats = (spotifyConnected) ? await getUserReviewStats(userId) : null ; 
+  const reviewStats = (aotdParticipant) ? await getUserReviewStats(userId) : null ; 
   // Get a object of all user reviews for this profile
-  const userReviewsObj = (spotifyConnected) ? await getAllUserReviews(userId) : null;
+  const userReviewsObj = (aotdParticipant) ? await getAllUserReviews(userId) : null;
 
   return (
     <div className="w-full mx-auto flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
       <p className="w-fit mx-auto text-xl underline">
         Album of the Day Stats
       </p>
-      {(spotifyConnected) ? (
+      {(aotdParticipant) ? (
         <div>
           {/* Favorite and Hated Album Display */}
           <div className="flex justify-evenly">

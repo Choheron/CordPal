@@ -5,6 +5,7 @@ import CustomPercentageDisplay from "@/app/ui/general/charts/custom_percentage_d
 import { RosenBarChartHorizontal } from "@/app/ui/general/charts/rosen_barchart_horizontal";
 import StarRating from "@/app/ui/general/star_rating";
 import { Divider, Tab, Tabs, User } from "@heroui/react"
+import Image from "next/image";
 
 
 // Expected Props:
@@ -62,10 +63,10 @@ export default function MonthlyUserStats(props) {
                 >
                   <a 
                     href={`/dashboard/aotd/album/${album['album_id']}`}
-                    className="flex flex-col h-full w-full justify-center py-0 px-1"
+                    className="relative flex flex-col h-full w-full justify-center py-0 px-1"
                   >
                     <img 
-                      src={(album['cover_url']) ? album['cover_url'] : album['album_img_src']}
+                      src={`/dashboard/aotd/api/album-cover/${(album['album_id']) ? album['album_id'] : album['mbid']}`}
                       className='h-full w-full rounded-2xl mx-auto'
                       alt={`Album Cover for ${album['title']} by ${getArtist(album)}`}
                     />

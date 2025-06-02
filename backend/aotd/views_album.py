@@ -22,6 +22,7 @@ import os
 import json
 import datetime
 import pytz
+import requests
 
 # Declare logging
 logger = logging.getLogger('django')
@@ -29,6 +30,18 @@ logger = logging.getLogger('django')
 # Determine runtime enviornment
 APP_ENV = os.getenv('APP_ENV') or 'DEV'
 load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
+
+
+## Helper Method
+def parseReleaseDate(date_str):
+  if(len(date_str) > 7):
+    return datetime.datetime.strptime(date_str, "%Y-%m-%d")
+  elif(len(date_str) > 4): 
+    return datetime.datetime.strptime(date_str, "%Y-%m")
+  elif(len(date_str) > 0):
+    return datetime.datetime.strptime(date_str, "%Y")
+  else:
+    return None
 
 ## =========================================================================================================================================================================================
 ## ALBUM METHODS
@@ -158,10 +171,33 @@ def submitAlbum(request: HttpRequest):
   except ObjectDoesNotExist as e:
     # Get user from database
     user = getUserObj(request.session.get('discord_id'))
-    
+    # Query musicbrainz to get track list
+    # Build Tracks Url
+    url = f"https://musicbrainz.org/ws/2/release/{reqBody['album']['id']}"
+    params = {
+      'inc': 'recordings',
+      'fmt': 'json'
+    }
+    headers = {
+      'User-Agent': 'CordPal/0.0.1 ( www.cordpal.app )'
+    }
+    response = requests.get(url, params=params, headers=headers)
+    data = response.json()
     # Declare new album object
     newAlbum = Album(
-      
+      mbid=reqBody['album']['id'],
+      title=reqBody['album']['title'],
+      artist=reqBody['album']['artist-credit'][0]['name'],
+      artist_url=f"https://musicbrainz.org/artist/{reqBody['album']['artist-credit'][0]['artist']['id']}",
+      cover_url=f"https://coverartarchive.org/release/{reqBody['album']['id']}/front",
+      album_url=f"https://musicbrainz.org/release/{reqBody['album']['id']}",
+      submitted_by=user,
+      user_comment=reqBody['user_comment'] if (reqBody['user_comment'] != "") else "No Comment Provided",
+      disambiguation=reqBody['album']['disambiguation'] if ('disambiguation' in reqBody['album'].keys()) else "",
+      release_date=parseReleaseDate(reqBody['album']['date']),
+      release_date_str=reqBody['album']['date'],
+      raw_data=reqBody['album'],
+      track_list={ 'tracks': data['media'][0]['tracks'] },
     )
     # Save new album data
     newAlbum.save()

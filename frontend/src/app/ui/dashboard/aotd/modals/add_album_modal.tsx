@@ -78,7 +78,7 @@ export default function AddAlbumModal(props) {
     if((searchArtist != "") && (searchArtist != null)) {
       albumSearchData.artist = searchArtist
     } else {
-      setSearchArtist(null)
+      setSearchArtist("")
     }
     setSearchObj(albumSearchData)
   }

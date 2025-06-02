@@ -89,6 +89,7 @@ export default async function Page({
             <AlbumDisplay 
               title={albumData("title")}
               album_img_src={albumData("album_img_src")}
+              album_mbid={albumData("album_id")}
               album_src={albumData("album_src")}
               artist={albumData("artist")}
               submitter={albumData("submitter")}
@@ -97,6 +98,7 @@ export default async function Page({
               release_date={albumData('release_date')}
               release_date_precision={albumData("release_date_precision")}
               trackCount={albumData("track_list")['tracks'].length}
+              showAlbumRating={false}
             />
             <Conditional showWhen={isAdmin || isUploader}>
               <div className="absolute -top-1 right-1 ">

@@ -60,7 +60,7 @@ def isUserAotdParticipant(request: HttpRequest):
 # Get album's average rating (by mbid passed in [NOT ALBUM OBJECT])
 def getAlbumRating(mbid, rounded=True, date: str = None):
   # Get most recent aotd date if date is not provided
-  aotd_date = date if (date) else DailyAlbum.objects.filter(mbid=mbid).latest('date').date
+  aotd_date = date if (date) else DailyAlbum.objects.filter(album__mbid=mbid).latest('date').date
   # Attempt to get aotd from database
   aotd = DailyAlbum.objects.get(date=aotd_date)
   # If there is already a value in the databse for this date (not an 11) then return that, else calculate rating 

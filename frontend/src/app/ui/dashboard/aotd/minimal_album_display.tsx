@@ -6,6 +6,7 @@ import { getAlbumAvgRating } from '@/app/lib/aotd_utils';
 import { Badge, Button, Tooltip } from "@heroui/react";
 import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
+import Image from "next/image";
 
 // MINIMAL GUI Display for an Album
 // Expected Props:
@@ -119,7 +120,7 @@ export default async function MinimalAlbumDisplay(props) {
           isDisabled={!props.album_mbid}
         >
           <img 
-            src={album_img_src}
+            src={`/dashboard/aotd/api/album-cover/${props.album_mbid}`}
             className={`${sizingOverride} w-full`}
             alt={`Album Cover for ${title} by ${artist_name}`}
           />

@@ -40,7 +40,7 @@ export default async function RecentSubmissions(props) {
                       description={"Submitted by: " + submission['submitter']}
                       avatarProps={{
                         name: submission['title'],
-                        src: submission['album_img_src'],
+                        src: `/dashboard/aotd/api/album-cover/${submission['album_id']}`,
                         size: "lg",
                         radius: "md"
                       }}

@@ -193,7 +193,7 @@ export default function AllAlbumsModal(props) {
               variant="light"
             >
               <Avatar
-                src={album['album_img_src']}
+                src={`/dashboard/aotd/api/album-cover/${album['album_id']}`}
                 className='my-auto shrink-0'
                 radius="sm"
               />
