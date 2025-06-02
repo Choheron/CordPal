@@ -47,6 +47,7 @@ def getAotdUsersObj(request: HttpRequest):
     out[tempDict['discord_id']] = tempDict
   return JsonResponse(out)
 
+
 ###
 # Get a list of users who have connected Aotd as a raw list
 ###

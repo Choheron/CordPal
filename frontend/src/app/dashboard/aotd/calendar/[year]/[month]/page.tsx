@@ -137,9 +137,9 @@ export default async function Page({
             showAlbumRating={true}
             ratingOverride={albumGet("rating")}
             title={albumGet("title")}
-            album_mbid={albumGet("mbid")}
+            album_mbid={albumGet("album_id")}
             album_img_src={albumGet("album_img_src")}
-            album_src={albumGet("spotify_url")}
+            album_src={albumGet("album_src")}
             artist={albumGet("artist")}
             submitter={albumGet("submitter")}
             submitter_comment={albumGet("submitter_comment")}

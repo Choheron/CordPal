@@ -23,10 +23,11 @@ class AotdUserData(models.Model):
     User,
     on_delete=models.CASCADE,
     primary_key=True,
-    related_name="aotd_data"
+    related_name="aotd_data",
+    unique=True
   )
   # Automatic Fields
-  creation_timestamp = models.DateTimeField(auto_now_add=True)
+  creation_timestamp = models.DateTimeField() # TODO: AFTER MIGRATE ADD BACK auto_now_add=True
   # Flag for if their albums are currently blocked
   selection_blocked_flag = models.BooleanField(default=False)
 
@@ -142,7 +143,7 @@ class Review(models.Model):
     score = models.FloatField()  # Score out of 10
     review_text = models.TextField(null=True, blank=True)
     review_date = models.DateTimeField(null=True, default=now)
-    last_updated = models.DateTimeField(auto_now=True)  # Track the latest update
+    last_updated = models.DateTimeField()  # Track the latest update # TODO: AFTER MIGRATE ADD BACK auto_now=True
     first_listen = models.BooleanField(default=None, null=True) # Is this review a result of a first listen?
     aotd_date = models.DateField(null=False) # Attach each review to the aotd date in which it was provided
     # Add review versioning for display
@@ -235,7 +236,7 @@ class ReviewHistory(models.Model):
     aotd_date = models.DateField(null=False) # Attach each review to the aotd date in which it was provided
     # Add review versioning for display
     version = models.IntegerField(default=1)
-    recorded_at = models.DateTimeField(auto_now_add=True)  # When the history record was created
+    recorded_at = models.DateTimeField()  # When the history record was created # TODO: AFTER MIGRATE ADD BACK auto_now_add=True
 
     def toJSON(self, full: bool = False):
       """

@@ -1,4 +1,5 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
 
 from .utils import (
   getUserObj,
@@ -58,10 +59,14 @@ def enrollUser(request: HttpRequest):
     return res
   # Get user discord id
   userObj = getUserObj(request.session.get("discord_id"))
-  # Create a AotdUserData Object
-  newUser = AotdUserData(
-    user=userObj
-  )
-  newUser.save()
+  # Check if a user already exists
+  try:
+    aotdUserObj = AotdUserData.objects.get(user=userObj)
+  except ObjectDoesNotExist:
+    # Create a AotdUserData Object
+    newUser = AotdUserData(
+      user=userObj
+    )
+    newUser.save()
   # Return jsonResponse containing status
   return JsonResponse({ "enrolled": True})

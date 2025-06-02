@@ -7,7 +7,7 @@ import MonthlySelectionCountsPie from "./monthly/monthly_selection_counts_pie";
 import MonthlySubmissionCountsPie from "./monthly/monthly_submission_counts_pie";
 import MonthlyUserStats from "./monthly/monthly_user_stats";
 import UserCard from "@/app/ui/general/userUiItems/user_card";
-import { getAllSpotifyUsersList, getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/app/lib/aotd_utils";
+import { getAllAotdUsersList, getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/app/lib/aotd_utils";
 
 // Display monthy statistics for the AOtD
 // Expected Props:
@@ -22,7 +22,7 @@ export default async function MonthlyStatsBox(props) {
   const aotdData = (props.aotdData) ? props.aotdData : (await getAOtDByMonth(year, padNumber(Number(month))));
   const subData = (props.subData) ? props.subData : (await getSubmissionsByMonth(year, padNumber(Number(month))));
   const reviewData = (props.reviewData) ? props.reviewData : (await getReviewStatsByMonth(year, padNumber(Number(month))));
-  const spotifyUserData = (props.spotifyUserData) ? props.spotifyUserData : (await getAllSpotifyUsersList())
+  const spotifyUserData = (props.spotifyUserData) ? props.spotifyUserData : (await getAllAotdUsersList())
   const aotdStats = (aotdData) ? aotdData['stats'] : null;
   // Data Parsing from props
   const highest_album = (aotdStats) ? aotdData[aotdStats['highest_aotd_date']] : "Not Found";

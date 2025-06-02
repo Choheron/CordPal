@@ -36,7 +36,7 @@ export default function SimilarRatingsBox(props) {
               variant="light"
             >
               <Avatar 
-                src={album['album_img_src']} 
+                src={album['cover_url']} 
                 name={album['title']}
                 className="w-20 h-20 text-large -mx-1"
                 radius="sm"

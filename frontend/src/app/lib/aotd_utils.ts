@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 
 // Below Code allows for serverside computing of cookie stuff!
 const getCookie = async (name: string) => {
-  return cookies().get(name)?.value ?? '';
+  return (await cookies()).get(name)?.value ?? '';
 }
 
 // 
@@ -88,7 +88,7 @@ export async function getAotdUserCount() {
   const userListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAotdUserCount`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    cache: 'force-cache',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
@@ -194,12 +194,12 @@ export async function getAllAotdUsersObj() {
 // Retrieve user data from all users in aotd backend db.
 // - RETURN: JSON Objects 
 //
-export async function getAlllAotdUsersList() {
+export async function getAllAotdUsersList() {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Retrieve list of users that are members of AOTD from backend
-  console.log("getAlllAotdUsersList: Sending request to backend '/aotd/getAlllAotdUsersList'")
-  const aotdUserData = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAlllAotdUsersList`, {
+  console.log("getAlllAotdUsersList: Sending request to backend '/aotd/getAotdUsersList'")
+  const aotdUserData = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAotdUsersList`, {
     method: "GET",
     credentials: "include",
     next: { revalidate: 60 },

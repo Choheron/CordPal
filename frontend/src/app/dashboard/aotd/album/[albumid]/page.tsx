@@ -10,6 +10,7 @@ import ReviewDisplay from "@/app/ui/dashboard/aotd/review_display"
 import DeleteModal from "@/app/ui/general/modals/delete_modal"
 import { Button, Divider } from "@heroui/react"
 import Link from "next/link"
+import AlbumDeleteButton from "@/app/ui/dashboard/aotd/album_delete_button"
 
 // Page to display data for a specific album
 export default async function Page({
@@ -78,14 +79,6 @@ export default async function Page({
     }
   }
 
-  // Handle deletion of album by making a backend request to delete the album
-  const handleDelete = async (reason) => {
-    "use server"
-    console.log(`Delete confimed for album ${albumid}...`)
-    const status = deleteAlbumFromBackend(albumid, reason)
-    return status
-  }
-  
 
   return (
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
@@ -107,17 +100,7 @@ export default async function Page({
             />
             <Conditional showWhen={isAdmin || isUploader}>
               <div className="absolute -top-1 right-1 ">
-                <DeleteModal 
-                  confirmCallback={handleDelete}
-                  cancelCallback={null}
-                  isButtonDisabled={aotd_dates.length > 0}
-                  tooltipContent={(aotd_dates.length > 0) ? "Album cannot be deleted, it has been AOtD!" : "Delete Album"}
-                  titleText={`Delete "${albumData('title')}"?`}
-                  bodyText={`Are you sure you want to delete "${albumData('title')}"? You cannot undo this action.`}
-                  redirectText={'/dashboard/aotd'}
-                  textboxDescription={"Reason for deletion (Optional)"}
-                  textboxPlaceholder="(Optional) Input a reason for deleting the album."
-                />
+                <AlbumDeleteButton albumid={albumid} albumTitle={albumData("title")} aotd_dates={aotd_dates}/>
               </div>
             </Conditional>
           </div>
