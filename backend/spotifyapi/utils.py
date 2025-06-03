@@ -57,7 +57,7 @@ def updateSpotifyAuthData(spotUserDataObj: SpotifyUserData, spotifyResJSON: json
     spotUserDataObj.refresh_token = spotifyResJSON['refresh_token']
   spotUserDataObj.save()
   # Make sure user is flagged as connected 
-  spotUserDataObj.user.spotify_connected = True
+  spotUserDataObj.user.aotd_enrolled = True
   spotUserDataObj.user.save()
   # Return True
   return True
@@ -145,7 +145,7 @@ def createSpotifyUserFromResponse(request: HttpRequest, spotifyResJSON: json, sp
   # Save Spotify User Data Obj
   spotifyUser.save()
   # Toggle User's 'spotify_connected' Field
-  site_user.spotify_connected = True
+  site_user.aotd_enrolled = True
   site_user.save()
   logger.info(f"New Spotify data created for discord ID {discord_id} (User {site_user.nickname})!")
   # Return True
@@ -163,7 +163,7 @@ def isUserSpotifyConnected(request: HttpRequest):
     if(isSpotifyTokenExpired(request)):
       refreshSpotifyToken(request)
     # Return boolean of spotify connection status
-    return site_user.spotify_connected
+    return site_user.aotd_enrolled
   except Exception as e:
     logger.error(f"USER COOKIE OR SPOTIFY DATA REFRESH ERROR!!! ERROR: {e}")
     return False
