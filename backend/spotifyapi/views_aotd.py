@@ -314,7 +314,7 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
   # Get current chance object from cache
   spotUser: SpotifyUserData = (getSpotifyUser(user_discord_id) if (user_discord_id != "") else getSpotifyUser(request.session.get("discord_id"))).spotify_data
   # Get user percentage
-  out: UserChanceCache = spotUser.aotd_chance
+  out: UserChanceCache = spotUser.spot_aotd_chance
   # Return object
   return JsonResponse(out.toJSON())
 
