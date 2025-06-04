@@ -1,4 +1,4 @@
-import { getAlbum } from '@/app/lib/spotify_utils'
+import { getAlbum } from '@/app/lib/aotd_utils'
 import { NextRequest, NextResponse } from 'next/server'
 import NodeCache from 'node-cache'
 
@@ -28,7 +28,11 @@ export async function GET(
     })
   }
 
-  const imageUrl = `https://coverartarchive.org/release/${mbid}/front`
+  const albumData = await getAlbum(mbid)
+  console.log(albumData)
+  const release_group_mbid = JSON.parse(albumData['release_group'])['id']
+  console.log(release_group_mbid)
+  const imageUrl = `https://coverartarchive.org/release-group/${release_group_mbid}/front`
 
   try {
     let result = await fetch(imageUrl, {
@@ -38,9 +42,7 @@ export async function GET(
     })
 
     if (result.status === 404) {
-      const albumData = getAlbum(mbid)
-      const release_group_mbid = albumData['raw_album_data']['release-group']['id']
-      result = await fetch(`https://coverartarchive.org/release-group/${release_group_mbid}/`, {
+      result = await fetch(`https://coverartarchive.org/release/${mbid}/front`, {
         headers: {
           'User-Agent': 'CordPal/0.0.1 (www.cordpal.app)',
         },

@@ -255,8 +255,8 @@ def getAlbum(request: HttpRequest, mbid: str):
   albumObj = Album.objects.get(mbid=mbid)
   # Build return object
   out = {}
-  out['raw_data'] = model_to_dict(albumObj)
   out['raw_album_data'] = json.dumps(albumObj.raw_data)
+  out['release_group'] = json.dumps(albumObj.raw_data['release-group'])
   out['title'] = albumObj.title
   out['album_id'] = albumObj.mbid
   out['album_img_src'] = albumObj.cover_url
