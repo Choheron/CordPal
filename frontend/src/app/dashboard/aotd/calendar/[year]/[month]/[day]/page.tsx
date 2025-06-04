@@ -15,11 +15,9 @@ import { RiArrowLeftCircleFill, RiArrowLeftCircleLine, RiArrowRightCircleLine, R
 export default async function Page({
   params,
 }: {
-  params: { year: string, month: string, day: string }
+  params: Promise<{ year: string, month: string, day: string }> 
 }) {
-  const year = (await params).year
-  const month = (await params).month
-  const day = (await params).day
+  const { year, month, day } = (await params)
   // Decalre date string
   const date = `${year}-${month}-${day}`
   const albumOfTheDayObj = await getAlbumOfTheDayData(date)

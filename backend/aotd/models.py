@@ -91,7 +91,7 @@ class Album(models.Model):
     out['submitter'] = self.submitted_by.nickname
     out['submitter_id'] = self.submitted_by.discord_id
     out['submission_date'] = self.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
-    out['release_date'] = self.release_date
+    out['release_date_str'] = self.release_date_str
     out['user_comment'] = self.user_comment
     out['raw_album'] = self.raw_data
     return out

@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 
 // Below Code allows for serverside computing of cookie stuff!
 const getCookie = async (name: string) => {
-  return cookies().get(name)?.value ?? '';
+  return (await cookies()).get(name)?.value ?? '';
 }
 
 // 

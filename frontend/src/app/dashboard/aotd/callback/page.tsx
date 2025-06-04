@@ -2,12 +2,13 @@
 import { redirect } from 'next/navigation'
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation'
+import { use } from "react";
 
 import Image from "next/image";
 
-export default function Callback({ searchParams, }: { searchParams: { [key: string]: string | string[] | undefined }; }) {
+export default function Callback({params}: {params: Promise<{ code: string }>}) {
   const router = useRouter();
-  const code = searchParams["code"] ?? "NO CODE";
+  const { code } = use(params)
   // Redirect user to login page if code is bad
   if(code == "NO CODE") {
     redirect('/')

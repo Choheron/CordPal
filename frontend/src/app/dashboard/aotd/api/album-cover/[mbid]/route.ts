@@ -6,9 +6,9 @@ const cache = new NodeCache({ stdTTL: 60 * 60 * 24 }) // 24 hours in seconds
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { mbid: string } }
+  { params } : { params: Promise<{ mbid: string }> }
 ) {
-  const mbid = (await params).mbid
+  const { mbid } = await params
 
   if (!mbid) {
     return NextResponse.json({ error: 'Missing MBID' }, { status: 400 })

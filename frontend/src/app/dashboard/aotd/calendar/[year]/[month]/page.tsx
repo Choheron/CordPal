@@ -18,10 +18,9 @@ import { RiArrowLeftCircleLine, RiArrowRightCircleLine, RiThumbDownFill, RiThumb
 export default async function Page({
   params,
 }: {
-  params: { year: string, month: string }
+  params: Promise<{ year: string, month: string }> 
 }) {
-  const year = (await params).year
-  const month = (await params).month
+  const { year, month } = (await params)
   // Get month and day data
   const monthName = monthToName(month)
   const dayCount = daysInMonth(year, month)
