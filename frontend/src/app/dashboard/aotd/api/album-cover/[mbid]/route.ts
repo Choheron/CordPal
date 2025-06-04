@@ -1,3 +1,4 @@
+import { getAlbum } from '@/app/lib/spotify_utils'
 import { NextRequest, NextResponse } from 'next/server'
 import NodeCache from 'node-cache'
 
@@ -37,7 +38,9 @@ export async function GET(
     })
 
     if (result.status === 404) {
-      result = await fetch(`https://placehold.co/300x300?text=Album+Cover+Not+Available+in+CAA`, {
+      const albumData = getAlbum(mbid)
+      const release_group_mbid = albumData['raw_album_data']['release-group']['id']
+      result = await fetch(`https://coverartarchive.org/release-group/${release_group_mbid}/`, {
         headers: {
           'User-Agent': 'CordPal/0.0.1 (www.cordpal.app)',
         },
