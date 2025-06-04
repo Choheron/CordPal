@@ -29,9 +29,7 @@ export async function GET(
   }
 
   const albumData = await getAlbum(mbid)
-  console.log(albumData)
   const release_group_mbid = JSON.parse(albumData['release_group'])['id']
-  console.log(release_group_mbid)
   const imageUrl = `https://coverartarchive.org/release-group/${release_group_mbid}/front`
 
   try {
