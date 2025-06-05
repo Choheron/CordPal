@@ -1,5 +1,6 @@
 from django.http import HttpRequest
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Sum
 
 import logging
 from dotenv import load_dotenv
@@ -240,3 +241,38 @@ def getAlbumPartialReviewScore(album: Album = None, timestamp: datetime.datetime
   # Calculate average
   average = (sum/count)
   return average
+
+# Update a user review's stats in database
+# First step in an attempt at optimizing user review stat retrieval
+def calculateUserReviewData(aotdUserObj: AotdUserData):
+  user = aotdUserObj.user
+  # Get query set of all reviews left by user
+  all_reviews = Review.objects.filter(user=user)
+  # Get a count of total reviews 
+  total_reviews = all_reviews.count()
+  # Get the score of all reviews
+  review_sum = all_reviews.aggregate(Sum('score'))['score__sum']
+  # Calculate average review score
+  average_review_score = review_sum/total_reviews
+  # Get lowest scored album
+  lowest_review = all_reviews.order_by('score').first()
+  lowest_review_score = lowest_review.score
+  lowest_review_mbid = lowest_review.album.mbid
+  lowest_review_date =lowest_review.aotd_date
+  # Get highest scored album
+  highest_review = all_reviews.order_by('score').last()
+  highest_review_score = highest_review.score
+  highest_review_mbid = highest_review.album.mbid
+  highest_review_date =highest_review.aotd_date
+  # Update user data
+  aotdUserObj.total_reviews = total_reviews
+  aotdUserObj.review_score_sum = review_sum
+  aotdUserObj.average_review_score = average_review_score
+  aotdUserObj.lowest_score_given = lowest_review_score
+  aotdUserObj.lowest_score_mbid = lowest_review_mbid
+  aotdUserObj.lowest_score_date = lowest_review_date
+  aotdUserObj.highest_score_given = highest_review_score
+  aotdUserObj.highest_score_mbid = highest_review_mbid
+  aotdUserObj.highest_score_date = highest_review_date
+  # Save user data
+  aotdUserObj.save()

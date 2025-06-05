@@ -30,8 +30,12 @@ export default async function ReviewStatsUserCard(props) {
   const highestReviewData = await getAlbum(reviewData['highest_score_album'])
 
   function convertToHistoricalDateUrl(reviewDate: string) {
-    const dateArr = reviewDate.split(',')[0].split("/")
-    return (dateArr[2] + "/" + dateArr[0] + "/" + dateArr[1])
+    try {
+      const dateArr = reviewDate.split(',')[0].split("/")
+      return (dateArr[2] + "/" + dateArr[0] + "/" + dateArr[1])
+    } catch {
+      return ""
+    }
   }
 
   return (
@@ -88,9 +92,9 @@ export default async function ReviewStatsUserCard(props) {
           >
             <div>
               <img 
-                src={highestReviewData['album_img_src']}
+                src={`/dashboard/aotd/api/album-cover/${highestReviewData['mbid']}`}
                 className='h-[100px] w-[100px] rounded-2xl mx-auto'
-                alt={`Album Cover for ${highestReviewData['title']} by ${highestReviewData['artist']['name']}`}
+                alt={`Album Cover for ${highestReviewData['title']} by ${(highestReviewData['artist']) ? highestReviewData['artist']['name'] : "UNKNOWN"}`}
               />
               <StarRating 
                 rating={reviewData['highest_score_given']} 
@@ -111,9 +115,9 @@ export default async function ReviewStatsUserCard(props) {
           >
             <div>
               <img 
-                src={lowestReviewData['album_img_src']}
+                src={`/dashboard/aotd/api/album-cover/${lowestReviewData['mbid']}`}
                 className='h-[100px] w-[100px] rounded-2xl mx-auto'
-                alt={`Album Cover for ${lowestReviewData['title']} by ${lowestReviewData['artist']['name']}`}
+                alt={`Album Cover for ${lowestReviewData['title']} by ${(lowestReviewData['artist']) ? lowestReviewData['artist']['name'] : "UNKNOWN"}}`}
               />
               <StarRating 
                 rating={reviewData['lowest_score_given']} 

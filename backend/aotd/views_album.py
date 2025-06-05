@@ -251,27 +251,30 @@ def getAlbum(request: HttpRequest, mbid: str):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Retrieve album from database
-  albumObj = Album.objects.get(mbid=mbid)
-  # Build return object
-  out = {}
-  out['raw_album_data'] = json.dumps(albumObj.raw_data)
-  out['release_group'] = json.dumps(albumObj.raw_data['release-group'])
-  out['disambiguation'] = albumObj.disambiguation
-  out['title'] = albumObj.title
-  out['album_id'] = albumObj.mbid
-  out['album_img_src'] = albumObj.cover_url
-  out['album_src'] = albumObj.album_url
-  out['artist'] = {}
-  out['artist']['name'] = albumObj.artist
-  out['artist']['href'] = (albumObj.artist_url if albumObj.artist_url != "" else albumObj.raw_data['album']['artists'][0]['external_urls']['aotd'])
-  out['submitter'] = albumObj.submitted_by.discord_id
-  out['submitter_nickname'] = albumObj.submitted_by.nickname
-  out['submitter_comment'] = albumObj.user_comment
-  out['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
-  out['release_date_str'] = albumObj.release_date_str
-  out['release_date'] = parseReleaseDate(albumObj.release_date_str)
-  out['track_list'] = albumObj.track_list if albumObj.track_list else {"tracks": []}
+  try:
+    # Retrieve album from database
+    albumObj = Album.objects.get(mbid=mbid)
+    # Build return object
+    out = {}
+    out['raw_album_data'] = json.dumps(albumObj.raw_data)
+    out['release_group'] = json.dumps(albumObj.raw_data['release-group'])
+    out['disambiguation'] = albumObj.disambiguation
+    out['title'] = albumObj.title
+    out['album_id'] = albumObj.mbid
+    out['album_img_src'] = albumObj.cover_url
+    out['album_src'] = albumObj.album_url
+    out['artist'] = {}
+    out['artist']['name'] = albumObj.artist
+    out['artist']['href'] = (albumObj.artist_url if albumObj.artist_url != "" else albumObj.raw_data['album']['artists'][0]['external_urls']['aotd'])
+    out['submitter'] = albumObj.submitted_by.discord_id
+    out['submitter_nickname'] = albumObj.submitted_by.nickname
+    out['submitter_comment'] = albumObj.user_comment
+    out['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+    out['release_date_str'] = albumObj.release_date_str
+    out['release_date'] = parseReleaseDate(albumObj.release_date_str)
+    out['track_list'] = albumObj.track_list if albumObj.track_list else {"tracks": []}
+  except:
+    out = {}
   # Return final object
   return JsonResponse(out)
 

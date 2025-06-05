@@ -30,6 +30,16 @@ class AotdUserData(models.Model):
   creation_timestamp = models.DateTimeField(auto_now_add=True)
   # Flag for if their albums are currently blocked
   selection_blocked_flag = models.BooleanField(default=False)
+  # Track review stats
+  total_reviews = models.IntegerField(default=None, null=True)
+  review_score_sum = models.FloatField(default=0)
+  average_review_score = models.FloatField(default=0)
+  lowest_score_given = models.FloatField(default=None, null=True)
+  lowest_score_mbid = models.CharField(max_length=256, null=True, default=None)
+  lowest_score_date = models.DateField(null=True, default=None)
+  highest_score_given = models.FloatField(default=None, null=True)
+  highest_score_mbid = models.CharField(max_length=256, null=True, default=None)
+  highest_score_date = models.DateField(null=True, default=None)
 
   # toString Method
   def __str__(self):

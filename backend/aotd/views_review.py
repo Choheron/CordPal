@@ -14,7 +14,8 @@ from .models import (
 )
 
 from .utils import (
-  checkSelectionFlag
+  checkSelectionFlag,
+  calculateUserReviewData
 )
 from reactions.utils import (
   createReaction
@@ -81,6 +82,8 @@ def submitReview(request: HttpRequest):
     newReview.save()
   # Update user selection_blocked flag status
   checkSelectionFlag(AotdUserData.objects.get(user=userObj))
+  # Update review stats
+  calculateUserReviewData(AotdUserData.objects.get(user=userObj))
   return HttpResponse(200)
 
 
@@ -174,41 +177,27 @@ def getAllUserReviewStats(request: HttpRequest):
     res.status_code = 405
     return res
   # Get all user reviews
-  all_reviews = Review.objects.all()
+  all_users = AotdUserData.objects.all()
   # Declare reviewData object and populate
   reviewData = {}
-  totalReviews = 0
-  for review in all_reviews:
-    # Increment total review count
-    totalReviews += 1
-    # If user has not appeared before, create new object for user
-    if(review.user.discord_id not in reviewData.keys()):
-      reviewData[review.user.discord_id] = {
-        "discord_id": review.user.discord_id,
-        "total_reviews": 0, 
-        "review_score_sum": 0,
-        "average_review_score": -1, # This will be calculated at the end
-        "lowest_score_given": -1,
-        "lowest_score_album": None,
-        "lowest_score_date": None,
-        "highest_score_given": -1,
-        "highest_score_album": None,
-        "highest_score_date": None,
-        }
-    # Update review data for user based on current review
-    reviewData[review.user.discord_id]['total_reviews'] += 1
-    reviewData[review.user.discord_id]['review_score_sum'] += review.score
-    if((reviewData[review.user.discord_id]['lowest_score_given'] == -1) or (reviewData[review.user.discord_id]['lowest_score_given'] > review.score)):
-      reviewData[review.user.discord_id]['lowest_score_given'] = review.score
-      reviewData[review.user.discord_id]['lowest_score_album'] = review.album.mbid
-      reviewData[review.user.discord_id]['lowest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
-    if((reviewData[review.user.discord_id]['highest_score_given'] == -1) or (reviewData[review.user.discord_id]['highest_score_given'] <= review.score)):
-      reviewData[review.user.discord_id]['highest_score_given'] = review.score
-      reviewData[review.user.discord_id]['highest_score_album'] = review.album.mbid
-      reviewData[review.user.discord_id]['highest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
-  # Calcualte averages 
-  for userReviewData in reviewData.keys():
-    reviewData[userReviewData]['average_review_score'] = reviewData[userReviewData]['review_score_sum']/reviewData[userReviewData]['total_reviews']
+  totalReviews = Review.objects.all().count()
+  for aotdUser in all_users:
+    # If this user has not had their data calculated, calculate it
+    if(aotdUser.total_reviews == None):
+      calculateUserReviewData(aotdUser)
+    # Create a new object for the user
+    reviewData[aotdUser.user.discord_id] = {
+      "discord_id": aotdUser.user.discord_id,
+      "total_reviews": aotdUser.total_reviews, 
+      "review_score_sum": aotdUser.review_score_sum,
+      "average_review_score": aotdUser.average_review_score,
+      "lowest_score_given": aotdUser.lowest_score_given,
+      "lowest_score_album": aotdUser.lowest_score_mbid,
+      "lowest_score_date": aotdUser.lowest_score_date,
+      "highest_score_given": aotdUser.highest_score_given,
+      "highest_score_album": aotdUser.highest_score_mbid,
+      "highest_score_date": aotdUser.highest_score_date,
+      }
   # Convert user reviews object to list
   outList = []
   for user in reviewData:
@@ -232,35 +221,26 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
     userId = request.session.get('discord_id')
   # Get user object from DB
   user = User.objects.get(discord_id=userId)
-  # Create dict for data return
+  # Get AotdUser Object
+  aotdUser = AotdUserData.objects.get(user=user)
+  # If this user has not had their data calculated, calculate it
+  if(aotdUser.total_reviews == None):
+    calculateUserReviewData(aotdUser)
+  # Create a new object for the user
   out = {
-    "discord_id": user.discord_id,
-    "total_reviews": 0.0, 
-    "review_score_sum": 0,
-    "average_review_score": -1, # This will be calculated at the end
-    "lowest_score_given": -1,
-    "lowest_score_album": None,
-    "lowest_score_date": None,
-    "highest_score_given": -1,
-    "highest_score_album": None,
-    "highest_score_date": None,
-    "score_counts": [] # A list of objects for listing score counts
+    "discord_id": aotdUser.user.discord_id,
+    "total_reviews": aotdUser.total_reviews, 
+    "review_score_sum": aotdUser.review_score_sum,
+    "average_review_score": aotdUser.average_review_score,
+    "lowest_score_given": aotdUser.lowest_score_given,
+    "lowest_score_album": aotdUser.lowest_score_mbid,
+    "lowest_score_date": aotdUser.lowest_score_date,
+    "highest_score_given": aotdUser.highest_score_given,
+    "highest_score_album": aotdUser.highest_score_mbid,
+    "highest_score_date": aotdUser.highest_score_date,
   }
   # Get all reviews left by user
   user_reviews = Review.objects.filter(user=user)
-  # Iterate reviews and update review data for user based on current review
-  for review in user_reviews:
-    # Increment sums, counters, and check for highest and lowest rating
-    out['total_reviews'] += 1
-    out['review_score_sum'] += review.score
-    if((out['lowest_score_given'] == -1) or (out['lowest_score_given'] > review.score)):
-      out['lowest_score_given'] = review.score
-      out['lowest_score_album'] = review.album.mbid
-      out['lowest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
-    if((out['highest_score_given'] == -1) or (out['highest_score_given'] <= review.score)):
-      out['highest_score_given'] = review.score
-      out['highest_score_album'] = review.album.mbid
-      out['highest_score_date'] = review.review_date.strftime("%m/%d/%Y, %H:%M:%S")
   # Convert get list of objects per score
   index = 0.0
   tempList = []
@@ -270,8 +250,6 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
     index += 0.5
   # Attach score counts to user object
   out['score_counts'] = tempList
-  # Calculate average review score
-  out['average_review_score'] = out['review_score_sum']/(out['total_reviews'] if (out['total_reviews'] != 0) else 1)
   # Get final data on lowest and highest albums
   try:
     out['highest_album'] = Album.objects.get(mbid=out['highest_score_album']).toJSON()
