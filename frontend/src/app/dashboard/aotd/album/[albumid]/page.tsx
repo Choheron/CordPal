@@ -88,6 +88,7 @@ export default async function Page({
           <div className="relative w-fit lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
             <AlbumDisplay 
               title={albumData("title")}
+              disambiguation={albumData("disambiguation")}
               album_img_src={albumData("album_img_src")}
               album_mbid={albumData("album_id")}
               album_src={albumData("album_src")}

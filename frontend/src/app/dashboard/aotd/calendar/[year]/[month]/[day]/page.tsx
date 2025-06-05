@@ -94,6 +94,7 @@ export default async function Page({
             </div>
             <AlbumDisplay
               title={albumData("title")}
+              disambiguation={albumData("disambiguation")}
               album_id={albumData("album_id")}
               album_img_src={albumData("album_img_src")}
               album_src={albumData("album_src")}
