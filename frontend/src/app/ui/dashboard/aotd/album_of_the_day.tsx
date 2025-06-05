@@ -70,6 +70,7 @@ export default async function AlbumOfTheDayBox(props) {
           </div>
           <AlbumDisplay 
             title={albumData("title")}
+            disambiguation={albumData("disambiguation")}
             album_img_src={albumData("album_img_src")}
             album_id={albumData("album_id")}
             album_src={albumData("album_src")}

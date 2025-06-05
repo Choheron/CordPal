@@ -14,6 +14,7 @@ import ClientTimestamp from "../../general/client_timestamp";
 // GUI Display for an Album
 // Expected Props:
 //  - title: String - Title of the Album
+//  - disambiguation: String - Disambiguation of the album
 //  - album_img_src: string - Url to access the album image [EXTERNAL]
 //  - album_src: string - Url for user to access the album [EXTERNAL]
 //  - artist: Object - Object of Artist Data (Expected fields in object below)
@@ -38,6 +39,7 @@ export default async function AlbumDisplay(props) {
   const trackCount = (props.trackCount) ? props.trackCount : null;
   // Album props checks
   const title = (props.title) ? props.title : "No Album Title Found";
+  const disambiguation = (props.disambiguation) ? props.disambiguation : "Standard Edition"
   const album_url = (props.album_src) ? props.album_src : "https://www.google.com/search?q=sad+face";
   const album_page_url = (props.album_mbid) ? `/dashboard/aotd/album/${props.album_mbid}` : album_url;
   const album_img_src = (props.album_img_src) ? props.album_img_src : "/images/DALL-E_Album_Not_Found.webp";
@@ -107,6 +109,7 @@ export default async function AlbumDisplay(props) {
           <a title={title} href={album_url} target="_noreferrer" className="text-xl lg:text-3xl hover:underline w-fit line-clamp-1">
             <b>{title}</b>
           </a>
+          <p className="-mt-2 italic">{disambiguation}</p>
           <a title={artist_name} href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline -mt-2 w-fit">
             {artist_name}
           </a>
