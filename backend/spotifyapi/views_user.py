@@ -107,11 +107,12 @@ def getSpotifyData(request: HttpRequest):
   # Retrieve user object
   userObj = getSpotifyUser(request.session.get('discord_id'))
   # Ensure user has authenticated with spotify before
-  if(userObj.spotify_connected):
+  if(userObj.aotd_enrolled):
     userSpotObj = SpotifyUserData.objects.filter(user = userObj).first()
     dir_response = model_to_dict(userSpotObj)
     dir_response['user'] = userSpotObj.user.nickname
     dir_response['user_discord_id'] = userSpotObj.user.discord_id
+    dir_response['spotify_connected'] = userSpotObj.user.aotd_enrolled
     return JsonResponse(dir_response)
   else:
     return JsonResponse({})

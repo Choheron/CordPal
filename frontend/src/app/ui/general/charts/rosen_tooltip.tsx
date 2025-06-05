@@ -107,7 +107,7 @@ TooltipTrigger.displayName = TRIGGER_NAME;
 
 const CONTENT_NAME = "TooltipContent";
 
-const TooltipContent = React.forwardRef<HTMLDivElement, { children: React.ReactNode }>((props) => {
+const TooltipContent = React.forwardRef<HTMLDivElement, { children: React.ReactNode }>((props, forwardedRef) => {
   const { children } = props;
   const context = useTooltipContext(CONTENT_NAME);
   const runningOnClient = typeof document !== "undefined";

@@ -42,11 +42,12 @@ export default function ReviewCountChartBox(props) {
             }
           >
           <a 
-            href={`/dashboard/spotify/review/${review['id']}`}
+            href={`/dashboard/aotd/review/${review['id']}`}
             className="flex flex-col h-full w-full justify-center py-0 mx-1"
           >
             <img 
-              src={album['album_img_src']}
+              // src={album['cover_url']}
+              src={`/dashboard/aotd/api/album-cover/${album['mbid']}`}
               className='h-full w-full rounded-2xl mx-auto group-hover:blur-sm duration-700 ease-in-out group-hover:brightness-50'
               alt={`Album Cover for ${album['title']} by ${album['artist']}`}
             />

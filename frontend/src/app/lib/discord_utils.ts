@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 // Below Code allows for serverside computing of cookie stuff!
 const getCookie = async (name: string) => {
-  return await cookies().get(name)?.value ?? '';
+  return (await cookies()).get(name)?.value ?? '';
 }
 
 // 

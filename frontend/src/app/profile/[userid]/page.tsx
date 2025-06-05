@@ -1,8 +1,7 @@
-import { isMember } from "@/app/lib/discord_utils";
 import { getUserData, isUserOnline } from "@/app/lib/user_utils";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import ProfileUserDisplay from "@/app/ui/profile/profile_user_display";
-import UserSpotifyDataDisplay from "@/app/ui/profile/user_spotify_data_display";
+import UserAotdDataDisplay from "@/app/ui/profile/user_aotd_data_display";
 import { Button } from "@heroui/react";
 import { revalidateTag } from "next/cache";
 import Link from "next/link";
@@ -16,7 +15,7 @@ export default async function Page({
 }) {
   const userid = (await params).userid
   // Force revalidation of user data every time a profile is loaded
-  revalidateTag("user-data")
+  // revalidateTag("user-data")
   // Retreive data from backend
   const userData = await getUserData(userid);
   // Get status of user being online
@@ -39,9 +38,9 @@ export default async function Page({
           userData={userData}
           onlineData={onlineData}
         />
-        <UserSpotifyDataDisplay 
+        <UserAotdDataDisplay 
           userId={userid}
-          spotifyConnected={userData['spotify_connected']}
+          aotdParticipant={userData['aotd_enrolled']}
         />
       </div>
     </main>

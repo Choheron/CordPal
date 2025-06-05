@@ -5,8 +5,8 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'i.scdn.co',
-        pathname: '/image/**',
+        hostname: 'coverartarchive.org',
+        pathname: '**',
       },
     ],
   },

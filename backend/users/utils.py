@@ -11,10 +11,9 @@ import logging
 # Declare logging
 logger = logging.getLogger('django')
 
-###
-# Create a new user
-###
+
 def createUserFromDiscordJSON(discordDataJson):
+  '''Create a new user from discord Json data'''
   logger.info(f"Creating a new user for discord user id {discordDataJson['id']} with a username of {discordDataJson['username']}...")
   # Create user instance
   user = User(
@@ -32,10 +31,9 @@ def createUserFromDiscordJSON(discordDataJson):
   postToDiscordWebhook(discordDataJson, f"User created for username: **{discordDataJson['username']}**!")
   return True
 
-###
-# Check if a user exists
-###
+
 def doesUserExist(id):
+  '''Check if a user exists'''
   logger.info(f"Checking if user with id {id} exists...")
   # Return check if user exists
   try:
@@ -45,10 +43,16 @@ def doesUserExist(id):
     return False
   
 
-###
-# Return User Object corresponding to discord id
-###
 def getSpotifyUser(discord_id):
+  '''Return User Object corresponding to discord id'''
+  try:
+    return User.objects.filter(discord_id=discord_id).first()
+  except ObjectDoesNotExist:
+    return None
+  
+
+def getUserObj(discord_id):
+  """Return User Object corresponding to discord id"""
   try:
     return User.objects.filter(discord_id=discord_id).first()
   except ObjectDoesNotExist:

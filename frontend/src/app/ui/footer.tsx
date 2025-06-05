@@ -28,22 +28,22 @@ export default function Footer(props) {
             Powered by
           </p>
           <a 
-            href="https://www.spotify.com" 
+            href="https://musicbrainz.org/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="my-auto"
           >
             <Image 
-              src="/images/branding/Spotify_Full_Logo_RGB_Green.png" 
-              alt="Spotify Logo" 
+              src="/images/branding/MusicBrainz_logo_square.svg" 
+              alt="MusicBrainz Logo" 
               height="auto"
-              width="75px"
+              width="30px"
               className="text-center"
             />
           </a>
         </div>
         <p className="text-xs gap-1 ">
-          This application uses the Spotify API but is not endorsed by Spotify.
+          This application utilizes the MusicBranz API but is not officially endorsed by MusicBrainz.
         </p>
       </div>
     </div>

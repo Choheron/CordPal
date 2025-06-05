@@ -2,15 +2,12 @@
 
 import { Conditional } from "./conditional";
 import { usePathname } from 'next/navigation';
-import {Divider} from "@heroui/divider";
 import {User} from "@heroui/user";
 
 import clsx from 'clsx';
 
 import SettingsModal from "./settings_modal";
-import Image from "next/image";
-import { isDecember } from "@/app/lib/utils";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Link } from "@heroui/react";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Link } from "@heroui/react";
 import { useState } from "react";
 import { RiAlbumLine, RiHome2Line, RiImageLine, RiInformationLine, RiMusic2Line, RiQuillPenLine, RiSettings3Line } from "react-icons/ri";
 
@@ -30,8 +27,7 @@ export default function TopBar(props) {
     // { name: 'Clips', href: '/dashboard/clips', conditional: props['isMember'], disabled: false },
     { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'], disabled: false, icon: <RiImageLine /> },
     { name: 'Quotes', href: '/dashboard/quotes', conditional: props['isMember'], disabled: false, icon: <RiQuillPenLine /> },
-    { name: 'Album Of the Day', href: '/dashboard/spotify', conditional: props['isMember'], disabled: false, icon: <RiAlbumLine /> },
-    { name: 'GrooveSelect Beta', href: '/dashboard/grooveselect', conditional: props['isMember'], disabled: false, icon: <RiMusic2Line /> },
+    { name: 'Album Of the Day', href: '/dashboard/aotd', conditional: props['isMember'], disabled: false, icon: <RiAlbumLine /> },
     { name: 'Functionality Requests', href: '/dashboard/fr', conditional: props['isMember'], disabled: true, icon: <RiSettings3Line /> },
     { name: 'About', href: '/dashboard/about', conditional: true, disabled: false, icon: <RiInformationLine /> },
   ];

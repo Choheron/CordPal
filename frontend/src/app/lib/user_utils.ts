@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 
 // Below Code allows for serverside computing of cookie stuff!
 const getCookie = async (name: string) => {
-  return cookies().get(name)?.value ?? '';
+  return (await cookies()).get(name)?.value ?? '';
 }
 
 
@@ -134,14 +134,14 @@ export async function isUserAdmin(discord_id = "") {
 // - Discord ID String (Conditional on if we are searching for a different user)
 // RETURN: boolean
 //
-export async function isUserAlbumUploader(album_spotify_id: string, discord_id: string = "") {
+export async function isUserAlbumUploader(album_mbid: string, discord_id: string = "") {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Reurn false if cookie is missing
   if(sessionCookie === "") {
     return false;
   }
-  const isUserUploaderResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/spotifyapi/isUserAlbumUploader/${album_spotify_id}${(discord_id === "") ? '' : '/' + discord_id}`, {
+  const isUserUploaderResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/isUserAlbumUploader/${album_mbid}${(discord_id === "") ? '' : '/' + discord_id}`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',

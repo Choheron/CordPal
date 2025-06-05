@@ -82,7 +82,7 @@ export default async function quotes({searchParams}) {
   // Map quote objects through top level info
   const quoteListRenderTopLevel: ReactNode = Object.keys(quotesJson).sort(sortHandlerTopLevel(sortMethod)).map((key) => {
     return quotesJson[key]['quoteList'].map((quoteObj) => {
-      return <QuoteItem key={quoteObj['timestamp']} cursive={cursive} quoteObject={quoteObj} speaker={capitalizeFirstLetter(quotesJson[key]['nickname'])} />
+      return <QuoteItem key={quoteObj['timestamp']} cursive={cursive} quoteObject={quoteObj} speaker={key} speaker_nickname={capitalizeFirstLetter(quotesJson[key]['nickname'])} />
     })
   });
 
@@ -91,7 +91,7 @@ export default async function quotes({searchParams}) {
     // Convert quote back to expected format
     let quoteObj = {"timestamp": quoteListItem['quote_timestamp'], "text": quoteListItem['quote_text'], "addedBy": quoteListItem['quote_addedBy']};
     // Return the object
-    return <QuoteItem key={quoteListItem['quote_timestamp']} cursive={cursive} quoteObject={quoteObj} speaker={capitalizeFirstLetter(quoteListItem['userNickname'])} />
+    return <QuoteItem key={quoteListItem['quote_timestamp']} cursive={cursive} quoteObject={quoteObj} speaker={quoteListItem['userID']} speaker_nickname={capitalizeFirstLetter(quoteListItem['userNickname'])} />
   });
 
   return (

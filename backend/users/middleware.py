@@ -51,6 +51,8 @@ class LastSeenMiddleware:
       if(isinstance(e, User.DoesNotExist)):
         # Log method call (With username)
         self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}")
+      elif(full_path.startswith("/aotd")):
+        self.logger.info("AOTD TESTING")
       else:
         if(full_path == "/metrics"):
           self.logger.info(f"Reporting metrics to prometheus")
