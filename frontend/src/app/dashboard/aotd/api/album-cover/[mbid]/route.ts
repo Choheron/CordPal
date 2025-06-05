@@ -1,9 +1,6 @@
 import { getAlbum } from '@/app/lib/aotd_utils'
 import { NextRequest, NextResponse } from 'next/server'
-import NodeCache from 'node-cache'
-
-// Cache for 24 hours
-const cache = new NodeCache({ stdTTL: 60 * 60 * 24 }) // 24 hours in seconds
+import { albumCoverCache as cache } from '@/app/lib/caches'
 
 export async function GET(
   request: NextRequest,
@@ -19,6 +16,7 @@ export async function GET(
   const cached = cache.get<Buffer>(cacheKey)
 
   if (cached) {
+    console.log(`Cover art cache hit for mbid: ${mbid}`)
     return new NextResponse(cached, {
       status: 200,
       headers: {
@@ -27,6 +25,7 @@ export async function GET(
       },
     })
   }
+  console.log(`Cover art cache MISS for mbid: ${mbid}`)
 
   const albumData = await getAlbum(mbid)
   const release_group_mbid = JSON.parse(albumData['release_group'])['id']

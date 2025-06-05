@@ -586,7 +586,7 @@ export async function getAlbum(mbid: string) {
       Cookie: `sessionid=${sessionCookie};`
     },
   });
-  console.log(`getAlbum: Attempted request to backend '/aotd/getAlbum/${mbid}' -> Data Generated: ${allAlbumsResponse.headers.get('X-Generated-At')}`)
+  console.log(`getAlbum: Attempted request to backend '/aotd/getAlbum/${mbid}'`)
   const allAlbumsJson = await allAlbumsResponse.json()
   return allAlbumsJson;
 }
