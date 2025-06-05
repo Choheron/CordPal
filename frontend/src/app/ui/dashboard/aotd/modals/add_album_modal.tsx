@@ -198,8 +198,7 @@ export default function AddAlbumModal(props) {
             onPress={onOpen}
             radius="none"
             variant="solid"
-            // isDisabled={!userAllowedToSubmit}
-            isDisabled={true} // Disabiling album submission until migration takes place
+            isDisabled={!userAllowedToSubmit}
           >
             <b>Submit An Album</b>
           </Button>
