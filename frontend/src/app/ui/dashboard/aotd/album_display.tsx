@@ -8,7 +8,7 @@ import { getAlbumAvgRating } from '@/app/lib/aotd_utils';
 import Image from "next/image";
 import { Badge, Button, Tooltip } from "@heroui/react";
 import Link from 'next/link'
-import { ratingToTailwindBgColor } from "@/app/lib/utils";
+import { milliToString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";
 
 // GUI Display for an Album
@@ -78,15 +78,7 @@ export default async function AlbumDisplay(props) {
   const calcAlbumLength = () => {
     if(track_list) {
       const milliseconds = track_list.reduce((sum, curr) => sum + curr['length'], 0)
-    
-      const seconds = Math.floor((milliseconds / 1000) % 60)
-      const minutes = Math.floor((milliseconds / (1000 * 60)) % 60)
-      const hours = Math.floor(milliseconds / (1000 * 60 * 60))
-
-      const m = minutes.toString().padStart(2, '0')
-      const s = seconds.toString().padStart(2, '0')
-
-      return hours > 0 ? `${hours}h ${m}m ${s}s` : `${m}m ${s}s`
+      return milliToString(milliseconds)
     }
   }
 

@@ -257,6 +257,7 @@ def getAlbum(request: HttpRequest, mbid: str):
   out = {}
   out['raw_album_data'] = json.dumps(albumObj.raw_data)
   out['release_group'] = json.dumps(albumObj.raw_data['release-group'])
+  out['disambiguation'] = albumObj.disambiguation
   out['title'] = albumObj.title
   out['album_id'] = albumObj.mbid
   out['album_img_src'] = albumObj.cover_url

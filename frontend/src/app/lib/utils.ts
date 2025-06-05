@@ -183,3 +183,14 @@ export function dateToString(dateStr: string) {
 
   return `${monthToName(dateArr[1])} ${dateArr[2]}, ${dateArr[0]}`
 }
+
+export function milliToString(milliseconds) {
+  const seconds = Math.floor((milliseconds / 1000) % 60)
+  const minutes = Math.floor((milliseconds / (1000 * 60)) % 60)
+  const hours = Math.floor(milliseconds / (1000 * 60 * 60))
+
+  const m = minutes.toString()
+  const s = seconds.toString().padStart(2, '0')
+
+  return hours > 0 ? `${hours}h ${m.padStart(2, '0')}m ${s}s` : `${m}m ${s}s`
+}
