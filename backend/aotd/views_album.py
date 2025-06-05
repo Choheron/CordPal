@@ -261,6 +261,7 @@ def getAlbum(request: HttpRequest, mbid: str):
     out['disambiguation'] = albumObj.disambiguation
     out['title'] = albumObj.title
     out['album_id'] = albumObj.mbid
+    out['mbid'] = albumObj.mbid
     out['album_img_src'] = albumObj.cover_url
     out['album_src'] = albumObj.album_url
     out['artist'] = {}
