@@ -37,7 +37,8 @@ export default async function MinimalAlbumDisplay(props) {
   // Album props checks
   const title = (props.title) ? props.title : "No Album Title Found";
   const album_url = (props.album_src) ? props.album_src : "https://www.google.com/search?q=sad+face";
-  const album_img_src = (props.album_img_src) ? props.album_img_src : "/images/DALL-E_Album_Not_Found.webp";
+  const album_cover_src = (props.album_img_src) ? props.album_img_src : "/images/DALL-E_Album_Not_Found.webp";
+  const album_cover_url = (props.album_mbid) ? `/dashboard/aotd/api/album-cover/${props.album_mbid}` : album_cover_src;
   // Artist props checks
   const artist_name = (props.artist && props.artist['name']) ? props.artist['name'] : "Artist Name not Found";
   const artist_url = (props.artist && props.artist['href']) ? props.artist['href'] : "https://www.google.com/search?q=sad+face";
@@ -120,7 +121,7 @@ export default async function MinimalAlbumDisplay(props) {
           isDisabled={!props.album_mbid}
         >
           <img 
-            src={`/dashboard/aotd/api/album-cover/${props.album_mbid}`}
+            src={album_cover_url}
             className={`${sizingOverride} w-full`}
             alt={`Album Cover for ${title} by ${artist_name}`}
           />

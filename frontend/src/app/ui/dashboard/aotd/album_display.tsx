@@ -42,8 +42,9 @@ export default async function AlbumDisplay(props) {
   const disambiguation = (props.disambiguation) ? props.disambiguation : "Standard Edition"
   const album_url = (props.album_src) ? props.album_src : "https://www.google.com/search?q=sad+face";
   const album_page_url = (props.album_mbid) ? `/dashboard/aotd/album/${props.album_mbid}` : album_url;
-  const album_img_src = (props.album_img_src) ? props.album_img_src : "/images/DALL-E_Album_Not_Found.webp";
-  // Artist props checks
+  const album_src = (props.album_img_src) ? props.album_img_src : "/images/DALL-E_Album_Not_Found.webp";
+  const album_cover_url = (props.album_mbid) ? `/dashboard/aotd/api/album-cover/${props.album_mbid}` : album_src;
+  // Artist props
   const artist_name = (props.artist && props.artist['name']) ? props.artist['name'] : "Artist Name not Found";
   const artist_url = (props.artist && props.artist['href']) ? props.artist['href'] : "https://www.google.com/search?q=sad+face";
   // User rating props checks
@@ -90,7 +91,7 @@ export default async function AlbumDisplay(props) {
           className="relative shrink-0 h-[125px] w-[125px] md:h-[300px] md:w-[300px]"
         >
           <Image
-            src={`/dashboard/aotd/api/album-cover/${props.album_mbid}`}
+            src={album_cover_url}
             title={`Album Cover for ${title} by ${artist_name}`}
             alt={`Album Cover for ${title} by ${artist_name}`}
             className='rounded-2xl mx-auto object-cover'

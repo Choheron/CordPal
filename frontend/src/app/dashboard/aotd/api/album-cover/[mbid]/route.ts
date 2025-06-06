@@ -27,9 +27,16 @@ export async function GET(
   }
   console.log(`Cover art cache MISS for mbid: ${mbid}`)
 
-  const albumData = await getAlbum(mbid)
-  const release_group_mbid = JSON.parse(albumData['release_group'])['id']
-  const imageUrl = `https://coverartarchive.org/release-group/${release_group_mbid}/front`
+  let imageUrl = ""
+  if(mbid == "null") {
+    // If not album art is provided, get a placemonkey image 
+    imageUrl = `https://placehold.co/300x300/transparent/FOO?text=No+AOTD`
+  } else {
+    // Continue with normal process if the mbid is not null
+    const albumData = await getAlbum(mbid)
+    const release_group_mbid = JSON.parse(albumData['release_group'])['id']
+    imageUrl = `https://coverartarchive.org/release-group/${release_group_mbid}/front`
+  }
 
   try {
     let result = await fetch(imageUrl, {
@@ -74,7 +81,7 @@ export async function GET(
       }
 
       const fallbackBuffer = Buffer.from(await fallbackRes.arrayBuffer())
-      cache.set(cacheKey, fallbackBuffer)
+      cache.set(cacheKey, fallbackBuffer, 60)
 
       return new NextResponse(fallbackBuffer, {
         status: 200,

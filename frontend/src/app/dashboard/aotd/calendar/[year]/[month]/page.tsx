@@ -137,7 +137,7 @@ export default async function Page({
             ratingOverride={albumGet("rating")}
             title={albumGet("title")}
             album_mbid={albumGet("album_id")}
-            album_img_src={albumGet("album_img_src")}
+            album_img_src={`/dashboard/aotd/api/album-cover/${albumGet("album_id")}`}
             album_src={albumGet("album_src")}
             artist={albumGet("artist")}
             submitter={albumGet("submitter")}

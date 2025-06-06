@@ -292,7 +292,7 @@ export default function AddAlbumModal(props) {
                         <div className="flex">
                           <div className="shrink-0">
                             <Image
-                              src={`https://coverartarchive.org/release/${album['id']}/front`}
+                              src={`/dashboard/aotd/api/album-cover/${album['id']}`}
                               fallbackSrc="https://placehold.co/100x100?text=Cover+Not+Found"
                               alt={`Album Art for ${album['title']}`}
                               width={100}
@@ -323,7 +323,7 @@ export default function AddAlbumModal(props) {
                     <p>Selected Album:</p>
                     <div className="flex">
                       <Image
-                        src={`https://coverartarchive.org/release/${selectedAlbum['id']}/front`}
+                        src={`/dashboard/aotd/api/album-cover/${selectedAlbum['id']}`}
                         fallbackSrc="https://placehold.co/150x150?text=Cover+Not+Found"
                         alt={`Album Art for ${selectedAlbum['title']}`}
                         width={150}
