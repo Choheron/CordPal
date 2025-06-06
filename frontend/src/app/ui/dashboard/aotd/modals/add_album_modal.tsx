@@ -118,7 +118,7 @@ export default function AddAlbumModal(props) {
   // }, [searchQuery])
 
 
-  // UseEffect to map album data from spotify to a selectable listItem
+  // UseEffect to map album data from musicbrainz to a selectable listItem
   React.useEffect(() => {
     const checkIfAlbumAlreadySubmitted = async () => {
       if(selectedValue == "") {
@@ -292,7 +292,7 @@ export default function AddAlbumModal(props) {
                         <div className="flex">
                           <div className="shrink-0">
                             <Image
-                              src={`/dashboard/aotd/api/album-cover/${album['id']}`}
+                              src={`/dashboard/aotd/api/album-cover/${album['release-group']['id']}`}
                               fallbackSrc="https://placehold.co/100x100?text=Cover+Not+Found"
                               alt={`Album Art for ${album['title']}`}
                               width={100}

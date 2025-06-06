@@ -106,7 +106,7 @@ export default async function Page({
     // }
     const trackObj = (trackData, index = 0) => {
       const lengthString = milliToString(trackData['length'])
-      const artistCredit = (trackData['artist-credit']) ? trackData['artist-credit'] : []
+      const artistCredit = ((trackData['artist-credit']) ? trackData['artist-credit'] : ((trackData['artist']) ? trackData['artist'] : []))
 
       return (
         <div key={index}>
