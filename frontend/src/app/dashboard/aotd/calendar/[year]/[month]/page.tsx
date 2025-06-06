@@ -120,7 +120,7 @@ export default async function Page({
             <MinimalAlbumDisplay
               showAlbumRating={true}
               title={"Future Album"}
-              album_img_src={"https://www.placemonkeys.com/500?greyscale&random"}
+              album_img_src={`https://www.placemonkeys.com/500?greyscale&random=${dateArr[2]}`}
               artist={{'name': "Monke"}}
               sizingOverride="w-full h-full"
               albumCoverOverride="rounded-b-2xl"
