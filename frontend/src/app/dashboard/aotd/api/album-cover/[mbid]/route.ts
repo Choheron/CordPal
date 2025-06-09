@@ -1,6 +1,7 @@
 import { getAlbum } from '@/app/lib/aotd_utils'
 import { NextRequest, NextResponse } from 'next/server'
-import { albumCoverCache as cache } from '@/app/lib/caches'
+import { inMemoryCache as cache } from '@/app/lib/caches'
+import redis from '@/app/lib/caches'
 
 export async function GET(
   request: NextRequest,
@@ -13,7 +14,7 @@ export async function GET(
   }
 
   const cacheKey = `cover-${mbid}`
-  const cached = cache.get<Buffer>(cacheKey)
+  const cached = await redis.getBuffer(cacheKey)
 
   if (cached) {
     console.log(`Cover art cache hit for mbid: ${mbid}`)
@@ -33,8 +34,16 @@ export async function GET(
     imageUrl = `https://placehold.co/300x300/transparent/FOO?text=No+AOTD`
   } else {
     // Continue with normal process if the mbid is not null
-    const albumData = await getAlbum(mbid)
-    const release_group_mbid = JSON.parse(albumData['release_group'])['id']
+    let release_group_mbid = ""
+    try {
+      // Check if this is a call for a backend album
+      const albumData = await getAlbum(mbid)
+      release_group_mbid = JSON.parse(albumData['release_group'])['id']
+    } catch {
+      // In the event that this album doesnt exist in the backend just make a direct call with the passed in MBID
+      // (Most of the time this is due to the request being for album searching)
+      release_group_mbid = mbid
+    }
     imageUrl = `https://coverartarchive.org/release-group/${release_group_mbid}/front`
   }
 
@@ -60,8 +69,8 @@ export async function GET(
     const arrayBuffer = await result.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    // Cache the buffer
-    cache.set(cacheKey, buffer)
+    // Cache for 30 days
+    await redis.set(cacheKey, buffer, 'EX', 60 * 60 * 24 * 30)
 
     return new NextResponse(buffer, {
       status: 200,
@@ -81,7 +90,8 @@ export async function GET(
       }
 
       const fallbackBuffer = Buffer.from(await fallbackRes.arrayBuffer())
-      cache.set(cacheKey, fallbackBuffer, 60)
+      // Cache for 1 day (As a real album cover couldnt be found)
+      await redis.set(cacheKey, fallbackBuffer, 'EX', 60 * 60 * 24)
 
       return new NextResponse(fallbackBuffer, {
         status: 200,
