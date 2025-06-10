@@ -267,7 +267,7 @@ def calculateAOTDChances(request: HttpRequest):
       # Store data
       userChanceObj.chance_percentage = 0.00
       userChanceObj.block_type = "INACTIVITY"
-      userChanceObj.reason = f"Inactivity, user has not reviewed in over three days. Last review was {days_since.days} days ago."
+      userChanceObj.reason = f"Inactivity, user has not reviewed in over two days. Last review was {days_since.days} days ago."
     # Check if user is currently under an outage
     elif(user.discord_id in user_outage_map):
       outage = UserAlbumOutage.objects.filter(user=user).get(start_date__lte=tomorrow, end_date__gte=tomorrow)

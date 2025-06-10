@@ -47,31 +47,6 @@ def parseReleaseDate(date_str):
 ## ALBUM METHODS
 ## =========================================================================================================================================================================================
 
-###
-# Check if an album already exists in the database
-###
-def checkIfAlbumAlreadyExists(request: HttpRequest, mbid: str):
-  # Make sure request is a get request
-  if(request.method != "GET"):
-    logger.warning("checkIfAlbumAlreadyExists called with a non-GET method, returning 405.")
-    res = HttpResponse("Method not allowed")
-    res.status_code = 405
-    return res
-  # Convert response to Json
-  logger.info(f"Checking if album with ID {mbid} is already submitted...")
-  # Declare out dict
-  out = {}
-  # Get album from database
-  try:
-    albumObject = Album.objects.get(mbid = mbid)
-    if(albumObject):
-      logger.info(f"Album does already exist, name: {albumObject.title}!")
-    out['exists'] = True
-  except ObjectDoesNotExist as e:
-    out['exists'] = False
-  # Return aotd Response
-  return JsonResponse(out)
-
 
 ###
 # If the user meets the criteria to be able to submit an album.

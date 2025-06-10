@@ -107,9 +107,9 @@ def checkSelectionFlag(aotd_user: AotdUserData):
     return
   except UserAlbumOutage.DoesNotExist as e:
     logger.debug(f"User {user.nickname} is not under an outage")
-  # Get the next midnight, then subtract 3 days to determine validity of user
-  selection_timeout = (datetime.date.today() + timedelta(days=1)) - timedelta(days=3)
-  # Get list of reviews from the past 3 days
+  # Get the next midnight, then subtract 2 days to determine validity of user
+  selection_timeout = (datetime.date.today() + timedelta(days=1)) - timedelta(days=2)
+  # Get list of reviews from the past 2 days
   recent_review_users = list(Review.objects.filter(review_date__gte=selection_timeout).values_list('user__discord_id', flat=True).distinct())
   logger.debug(f"Checking selection blocked flag for user: {aotd_user.user.nickname} [Flag is currently: {aotd_user.selection_blocked_flag}]...")
   # Check if user is in the list of recent reviewers
