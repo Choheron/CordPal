@@ -133,7 +133,7 @@ export default function UploadPhotoModal(props) {
                 />
                 <UserDropdown 
                   label="Creator"
-                  isRequired
+                  isRequired={true}
                   placeholder="Who created this image?"
                   isMultipleChoice={false} 
                   setSelectionCallback={setCreator} 

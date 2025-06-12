@@ -8,7 +8,7 @@ import PhotoFilterBlock from "@/app/ui/dashboard/photos/photo_filter_block";
 
 export default async function photos({searchParams}) {
   // Get url params
-  const {uploader, artist, tagged} = searchParams;
+  const {uploader, artist, tagged} = await searchParams;
   // Make requests to bakend to get uploader list and artist list
   const uploaderList = await getAllUploaders();
   const artistList = await getAllArtists();
