@@ -106,28 +106,9 @@ export default function AddAlbumModal(props) {
     setIsSearchLoading(false)
   }, [searchAlbumsResponse])
 
-  // // UseEffect to get selected album data
-  // React.useEffect(() => {
-  //   const getSearchResults = async () => {
-  //     if(searchQuery == "") {
-  //       return;
-  //     }
-  //     setSearchAlbumsResponse((await spotifySearch("album", searchQuery, 5, 0))['albums'])
-  //   }
-  //   getSearchResults()
-  // }, [searchQuery])
-
 
   // UseEffect to map album data from musicbrainz to a selectable listItem
   React.useEffect(() => {
-    const checkIfAlbumAlreadySubmitted = async () => {
-      if(selectedValue == "") {
-        return;
-      }
-      const albumErrData = await checkIfAlbumAlreadyExists((selectedAlbum) ? selectedAlbum['release-group']['id'] : null)
-      setAlbumErrorData(albumErrData)
-      setAlbumError(albumErrData['exists'])
-    }
     if(searchAlbumsResponse['releases']) {
       setSelectedAlbum(null)
       setAlbumError(false)
@@ -140,9 +121,22 @@ export default function AddAlbumModal(props) {
         }
       }
     }
+  }, [selectedValue])
+
+  // UseEffect to set of album is already submitted
+  React.useEffect(() => {
+    const checkIfAlbumAlreadySubmitted = async () => {
+      if(selectedValue == "") {
+        return;
+      }
+      const albumErrData = await checkIfAlbumAlreadyExists((selectedAlbum) ? selectedAlbum['release-group']['id'] : null)
+      setAlbumErrorData(albumErrData)
+      setAlbumError(albumErrData['exists'])
+    }
+
     console.log(selectedAlbum)
     checkIfAlbumAlreadySubmitted()
-  }, [selectedValue])
+  }, [selectedAlbum])
 
 
   // Send request to upload the submitted image
