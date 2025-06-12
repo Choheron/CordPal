@@ -193,10 +193,10 @@ def getAllUserReviewStats(request: HttpRequest):
       "average_review_score": aotdUser.average_review_score,
       "lowest_score_given": aotdUser.lowest_score_given,
       "lowest_score_album": aotdUser.lowest_score_mbid,
-      "lowest_score_date": aotdUser.lowest_score_date,
+      "lowest_score_date": aotdUser.lowest_score_date.strftime("%m/%d/%Y, %H:%M:%S"),
       "highest_score_given": aotdUser.highest_score_given,
       "highest_score_album": aotdUser.highest_score_mbid,
-      "highest_score_date": aotdUser.highest_score_date,
+      "highest_score_date": aotdUser.highest_score_date.strftime("%m/%d/%Y, %H:%M:%S"),
       }
   # Convert user reviews object to list
   outList = []
@@ -234,10 +234,10 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
     "average_review_score": aotdUser.average_review_score,
     "lowest_score_given": aotdUser.lowest_score_given,
     "lowest_score_album": aotdUser.lowest_score_mbid,
-    "lowest_score_date": aotdUser.lowest_score_date,
+    "lowest_score_date": aotdUser.lowest_score_date.strftime("%m/%d/%Y, %H:%M:%S"),
     "highest_score_given": aotdUser.highest_score_given,
     "highest_score_album": aotdUser.highest_score_mbid,
-    "highest_score_date": aotdUser.highest_score_date,
+    "highest_score_date": aotdUser.highest_score_date.strftime("%m/%d/%Y, %H:%M:%S"),
   }
   # Get all reviews left by user
   user_reviews = Review.objects.filter(user=user)

@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.contenttypes.models import ContentType
 
 from reactions.models import Reaction
 from spotifyapi.models import Review as SpotReview
@@ -11,7 +12,10 @@ from aotd.models import Review
 def run():
   failed_update = []
   # Retreive all Spotify Album objects
-  spot_review_objects = Review.objects.all()
+  spot_review_objects = SpotReview.objects.all()
+  # Get content types
+  old_review_ct = ContentType.objects.get_for_model(SpotReview)
+  new_review_ct = ContentType.objects.get_for_model(Review)
   # Iterate album objects and create a new Album Object in AOTD (sleep for 1 second after to avoid rate limiting)
   index = 1
   for spot_review in spot_review_objects:
@@ -22,10 +26,13 @@ def run():
       index += 1
       continue
     # Get corresponding new review
-    new_review: Review = Review.objects.get(album=spot_review.album, user=spot_review.user, score=spot_review.score, review_date=spot_review.review_date)
+    new_review: Review = Review.objects.get(album__legacy_album=spot_review.album, user=spot_review.user, score=spot_review.score, review_date=spot_review.review_date)
     reaction: Reaction
     for reaction in reaction_objects:
-      reaction.content_object = new_review
+      # Update reaction to point to the new review
+      reaction.content_type = new_review_ct
+      reaction.object_id = new_review.pk
+      reaction.save()
     # Print confirm, inc index, cont
     print(f"Successfully migrated reactions")
     index += 1
