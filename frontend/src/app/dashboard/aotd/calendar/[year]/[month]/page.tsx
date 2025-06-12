@@ -231,7 +231,7 @@ export default async function Page({
             <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Monday</th>
             <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Tuesday</th>
             <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Wednesday</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Tursday</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Thursday</th>
             <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Friday</th>
             <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 truncate">Saturday</th>
           </tr>
