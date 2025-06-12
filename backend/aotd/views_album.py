@@ -357,7 +357,7 @@ def getLastXAlbums(request: HttpRequest, count: int):
     res.status_code = 405
     return res
   # Get last X count of albums
-  last_X = Album.objects.all().order_by('-id')[:count]
+  last_X = Album.objects.all().order_by('-submission_date')[:count]
   # Build list of custom Album Objects
   album_list = []
   for album in last_X:
