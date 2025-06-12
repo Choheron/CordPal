@@ -362,7 +362,7 @@ export default function AllAlbumsModal(props) {
                     }
                   >
                     {(item: any) => (
-                      <TableRow key={`${item['title']} - ${item['artist']['name']} - ${item['submitter_nickname']}`}>
+                      <TableRow key={`${item['album_id']} - ${item['title']} - ${item['artist']['name']} - ${item['submitter_nickname']}`}>
                         {(columnKey) => <TableCell className="w-fit">{renderCell(item, columnKey)}</TableCell>}
                       </TableRow>
                     )}
