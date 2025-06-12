@@ -12,7 +12,7 @@ import { Alert } from "@heroui/react";
 
 export default async function music() {
   const aotd_participant = await isAotdParticipant();
-  const recentSubmissionsResponse = await getLastXSubmissions(10);
+  const recentSubmissionsResponse = await getLastXSubmissions(8);
   // Fetch all albums on the serverside to reduce loading time of modal
   // const allAlbumsList = await getAllAlbums()
 

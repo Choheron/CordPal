@@ -365,6 +365,7 @@ def getLastXAlbums(request: HttpRequest, count: int):
     albumObj['title'] = album.title
     albumObj['album_id'] = album.mbid
     albumObj['album_img_src'] = album.cover_url
+    albumObj['artist'] = album.artist
     albumObj['album_src'] = album.album_url
     albumObj['submitter'] = album.submitted_by.nickname
     albumObj['submission_date'] = album.submission_date

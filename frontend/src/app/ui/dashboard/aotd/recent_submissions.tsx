@@ -27,22 +27,27 @@ export default async function RecentSubmissions(props) {
                   as={Link}
                   href={"/dashboard/aotd/album/" + submission['album_id']}
                   radius="lg"
-                  className={`h-fit w-full hover:underline text-white pt-1`}
+                  className={`group h-fit w-full hover:underline text-white pt-1`}
                   variant="light"
                 >
                   <div className="w-full">
                     <User
                       name={(
-                        <p className="hover:underline line-clamp-1 max-w-56">
+                        <p className="group-hover:underline line-clamp-1 max-w-56 text-lg">
                           {submission['title']}
                         </p>
                       )}
-                      description={"Submitted by: " + submission['submitter']}
+                      description={
+                        <div>
+                          <p>{submission['artist']}</p>
+                          <p className="text-xs">{"Submitted by: " + submission['submitter']}</p>
+                        </div>
+                      }
                       avatarProps={{
                         name: submission['title'],
                         src: `/dashboard/aotd/api/album-cover/${submission['album_id']}`,
-                        size: "lg",
-                        radius: "md"
+                        className: "size-16",
+                        radius: "sm"
                       }}
                     />
                   </div>
