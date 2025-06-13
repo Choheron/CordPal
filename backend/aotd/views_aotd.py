@@ -259,8 +259,19 @@ def calculateAOTDChances(request: HttpRequest):
         'reason': None,
       }
     )[0]
-    # Check if user's selections are currently blocked, return 0% chance
-    if(aotdUser.selection_blocked_flag):
+    # Check if user is currently under an outage
+    if(user.pk in user_outage_map):
+      logger.info(f"\t{aotdUser.user.nickname} is under an outage!")
+      outage = UserAlbumOutage.objects.filter(start_date__lte=tomorrow, end_date__gte=tomorrow).get(user=user)
+      logger.info(f"User {user.nickname} is currently under an outage, lasts until {outage.end_date.strftime('%Y-%m-%d')}!")
+      # Create outage return json
+      userChanceObj.chance_percentage = 0.00
+      userChanceObj.block_type = "OUTAGE"
+      userChanceObj.outage = outage
+      userChanceObj.reason = f"{outage.reason}"
+    elif(aotdUser.selection_blocked_flag):
+      # Check if user's selections are currently blocked, return 0% chance
+      logger.info(f"\t{aotdUser.user.nickname} is blocked from selection!")
       # Get user's last review
       lastReview = Review.objects.filter(user=aotdUser.user).order_by('-aotd_date').first()
       days_since = day - (lastReview.aotd_date if (lastReview != None) else day)
@@ -268,17 +279,6 @@ def calculateAOTDChances(request: HttpRequest):
       userChanceObj.chance_percentage = 0.00
       userChanceObj.block_type = "INACTIVITY"
       userChanceObj.reason = f"Inactivity, user has not reviewed in over two days. Last review was {days_since.days} days ago."
-    # Check if user is currently under an outage
-    elif(user.discord_id in user_outage_map):
-      outage = UserAlbumOutage.objects.filter(user=user).get(start_date__lte=tomorrow, end_date__gte=tomorrow)
-      logger.info(f"User {user.nickname} is currently under an outage, lasts until {outage.end_date.strftime('%Y-%m-%d')}!")
-      # Create outage return json
-      userChanceObj.chance_percentage = 0.00
-      userChanceObj.block_type = "OUTAGE"
-      userChanceObj.outage = outage
-      userChanceObj.reason = f"{outage.reason}"
-      # Continue onto next user
-      continue
     else:
       # Get counts needed to determine percentage
       user_submissions_count = Album.objects.filter(submitted_by=user).count()
