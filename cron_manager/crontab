@@ -1,3 +1,4 @@
-0 0 * * * curl -X POST https://cordpalapi.cordpal.app/aotd/setAlbumOfDay && curl -X POST https://www.cordpal.app/dashboard/aotd/api/revalidateAOtD
+0 0 * * * curl -X POST https://cordpalapi.cordpal.app/aotd/setAlbumOfDay; curl -X POST https://www.cordpal.app/dashboard/aotd/api/revalidateAOtD
 30 * * * * curl -X POST https://cordpalapi.cordpal.app/aotd/calculateAOTDChances
 # Don't remove the empty line at the end of this file. It is required to run the cron job
+
