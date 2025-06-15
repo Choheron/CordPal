@@ -44,7 +44,7 @@ export async function GET(
       // (Most of the time this is due to the request being for album searching)
       release_group_mbid = mbid
     }
-    imageUrl = `https://coverartarchive.org/release-group/${release_group_mbid}/front`
+    imageUrl = `https://coverartarchive.org/release-group/${release_group_mbid}/front-500.jpg`
   }
 
   try {
