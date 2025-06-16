@@ -10,6 +10,7 @@ import SettingsModal from "./settings_modal";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Link } from "@heroui/react";
 import { useState } from "react";
 import { RiAlbumLine, RiHome2Line, RiImageLine, RiInformationLine, RiMusic2Line, RiQuillPenLine, RiSettings3Line } from "react-icons/ri";
+import Image from 'next/image'
 
 // Expected props:
 //  - isMember: Boolean indicating if the current session user is a member of the desired server
@@ -40,7 +41,7 @@ export default function TopBar(props) {
           {/* User Settings Modal and Profile Display */}
           <User
             as="button"
-            className="fixed lg:static top-2.5 left-0 z-10 w-auto ml-5 pt-5 px-2 lg:pt-0 lg:mr-10 lg:-ml-[100%]"
+            className="fixed lg:absolute top-4 right-4 z-10 w-auto ml-5 pt-5 px-2 lg:pt-0"
             name={props.userInfo['nickname']}
             avatarProps={{
               isBordered: true,
@@ -78,8 +79,15 @@ export default function TopBar(props) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-between max-w-full sm:px-0 pt-20 lg:pt-0 pb-0">
-      <div className="hidden lg:flex w-full max-w-full">
+    <div className="relative flex flex-col items-center justify-between max-w-full sm:px-0 pt-20 sm:pt-0 pb-0">
+      <div className="hidden lg:flex flex-col w-full max-w-full">
+        <div className="relative w-[222px] h-[41px] 2xl:w-[444px] 2xl:h-[82px]">
+          <Image
+            fill
+            src="/svgs/logos/CordPal_Logo_Large_V1.svg"
+            alt="CordPal Logo"
+          />
+        </div>
         <a
           className="pointer-events-none w-fit p-8 ml-1 lg:ml-1 font-mono text-sm lg:pointer-events-auto lg:p-0 text-gray-500 italic"
           href="https://homelab.nanophage.win"
@@ -100,7 +108,7 @@ export default function TopBar(props) {
           setIsOpenOverride={setSettingsOpen}
         />
         {/* Navigation Pages */}
-        <div className="w-full max-w-full h-full my-auto items-center justify-center font-mono text-sm flex flex-col lg:flex-row lg:pt-0">
+        <div className="w-full max-w-full h-full my-auto items-center justify-center font-mono text-sm flex flex-col lg:flex-row lg:pt-0 xl:absolute xl:top-1">
           {links.map((link, index) => {
               return(
                 <Conditional 
@@ -130,8 +138,8 @@ export default function TopBar(props) {
             })
           }
         </div>
-        {userActionsDropdown()}
       </div>
+      {userActionsDropdown()}
     </div>
   );
 }
