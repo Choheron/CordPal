@@ -89,7 +89,7 @@ export default function TopBar(props) {
           />
         </div>
         <a
-          className="pointer-events-none w-fit p-8 ml-1 lg:ml-1 font-mono text-sm lg:pointer-events-auto lg:p-0 text-gray-500 italic"
+          className="pointer-events-none w-fit p-8 ml-1 lg:ml-1 font-mono text-sm lg:pointer-events-auto lg:p-0 text-gray-500 italic z-50"
           href="https://homelab.nanophage.win"
           target="_blank"
           rel="noopener noreferrer"
