@@ -108,7 +108,7 @@ export default function TopBar(props) {
           setIsOpenOverride={setSettingsOpen}
         />
         {/* Navigation Pages */}
-        <div className="w-full max-w-full h-full my-auto items-center justify-center font-mono text-sm flex flex-col lg:flex-row lg:pt-0 xl:absolute xl:top-1">
+        <div className="w-full max-w-full h-full my-auto items-center justify-center font-mono text-sm flex flex-col lg:flex-row lg:pt-0 2xl:absolute 2xl:top-1">
           {links.map((link, index) => {
               return(
                 <Conditional 
