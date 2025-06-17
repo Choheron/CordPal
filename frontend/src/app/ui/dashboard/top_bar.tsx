@@ -81,7 +81,7 @@ export default function TopBar(props) {
   return (
     <div className="relative flex flex-col items-center justify-between max-w-full sm:px-0 pt-20 sm:pt-0 pb-0">
       <div className="hidden lg:flex flex-col w-full max-w-full">
-        <div className="relative w-[222px] h-[41px] 2xl:w-[444px] 2xl:h-[82px] ml-1 mt-1">
+        <div className="relative w-[222px] h-[41px] 2xl:w-[333px] 2xl:h-[60px] 3xl:w-[444px] 3xl:h-[82px] ml-1 mt-1">
           <Image
             fill
             src="/svgs/logos/CordPal_Logo_Large_V1.svg"
@@ -108,7 +108,7 @@ export default function TopBar(props) {
           setIsOpenOverride={setSettingsOpen}
         />
         {/* Navigation Pages */}
-        <div className="w-full max-w-full h-full my-auto items-center justify-center font-mono text-sm flex flex-col lg:flex-row lg:pt-0 2xl:absolute 2xl:top-1">
+        <div className="w-full max-w-full h-full my-auto items-center justify-center font-mono text-sm flex flex-col lg:flex-row lg:pt-0 xl:absolute xl:top-1">
           {links.map((link, index) => {
               return(
                 <Conditional 
