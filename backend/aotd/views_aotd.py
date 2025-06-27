@@ -422,6 +422,16 @@ def getDayTimelineData(request: HttpRequest, aotd_date: str):
   try:
     aotd_obj = DailyAlbum.objects.get(date=datetime.datetime.strptime(aotd_date, "%Y-%m-%d"))
   except:
+    logger.error(f"AOTD Object not found for passed in date: {aotd_date}")
     return JsonResponse({"timeline": []})
+  # Check if aotd object has a timeline (if its not today and doesnt have a timeline, something is wrong)
+  # Get current date
+  day = datetime.date.today()
+  aotd_date_obj = datetime.datetime.strptime(aotd_date, "%Y-%m-%d")
+  if((day != aotd_date_obj.date()) and (aotd_obj.rating_timeline == {"timeline": []})):
+    logger.error(f"ATTENTION: AOTD \"{aotd_obj.album.mbid}\" for date: {aotd_date} DID NOT HAVE A TIMELINE -- ATTEMPTING TO GENERATE ONE NOW")
+    generateDayRatingTimeline(aotd_obj)
+    aotd_obj.rating = getAlbumRating(aotd_obj.album.mbid, False, aotd_date)
+    aotd_obj.save()
   # Return object data
   return JsonResponse(aotd_obj.rating_timeline)
