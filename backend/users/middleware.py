@@ -55,7 +55,7 @@ class LastSeenMiddleware:
         self.logger.info("AOTD TESTING")
       else:
         if(full_path == "/metrics"):
-          self.logger.info(f"Reporting metrics to prometheus")
+          self.logger.debug(f"Reporting metrics to prometheus")
         elif(full_path in self.no_user_validation_paths):
           self.logger.info(f"Incoming request to path {full_path} without a discord_id in request... Possibly a cron?")
         else:

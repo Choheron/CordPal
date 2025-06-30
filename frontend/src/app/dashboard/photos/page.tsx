@@ -43,7 +43,7 @@ export default async function photos({searchParams}) {
             { list.map((id: string, index: number) => (
               <PhotoModal
                 key={id}
-                imageSrc={`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/photos/image/${id}`}
+                imageSrc={`/dashboard/photos/api/get-image/${id}`}
                 imageID={id}
               />
             ))}
