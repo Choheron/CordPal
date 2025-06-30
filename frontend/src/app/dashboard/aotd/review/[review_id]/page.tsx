@@ -38,7 +38,8 @@ export default async function Page({
   // Determine if today is the current review date
   const returnUrl = (isReviewToday) ? `/dashboard/aotd` : `/dashboard/aotd/calendar/${reviewDateObj.getFullYear()}/${padNumber(reviewDateObj.getMonth() + 1)}/${padNumber(reviewDateObj.getDate())}`
 
-  const performReplacements = async(reviewText) => {
+
+  const doEmbedReplacements = async(reviewText) => {
     // Parse review text to display embeds 
     // Regex for youtube video embedding
     const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\?[\w=&%-]*)?(?:&t=(\d+h)?(\d+m)?(\d+s)?)?/g;
@@ -81,6 +82,17 @@ export default async function Page({
     // Return final message text
     return temp
   }
+
+
+  // Replace overall review message embeds
+  const reviewMessage = await doEmbedReplacements(review_data['comment'])
+  const parsedTrackComments = review_data['advanced'] ? await Promise.all(
+      Object.values(review_data['trackData']).sort((a: any, b: any) => a.number - b.number).map(async (songObj: any) => {
+        const parsedComment = await doEmbedReplacements(songObj['cordpal_comment']);
+        return { ...songObj, parsedComment };
+      })
+    ) : [];
+
 
   return (
     <div className="flex flex-col w-full items-center p-3 pb-36 pt-10 overflow-x-hidden">
@@ -159,13 +171,13 @@ export default async function Page({
         </Conditional>
         <div 
           className="w-full prose prose-invert prose-sm !max-w-none mb-2 font-normal"
-          dangerouslySetInnerHTML={{__html: await performReplacements(review_data['comment'])}}
+          dangerouslySetInnerHTML={{__html: reviewMessage}}
         />
         {/* If advanced review, display song breakdown */}
         <Conditional showWhen={review_data['advanced']}>
           <p className="mt-[6px] text-lg mr-auto ml-0">Track by Track:</p>
           {
-            Object.values(review_data['trackData']).sort((a: any, b: any) => a['number'] - b['number']).map(async(songObj: any) => (
+            parsedTrackComments.map(async(songObj: any) => (
               <div 
                 key={songObj['number']}
                 className="text-left w-full"
@@ -181,7 +193,7 @@ export default async function Page({
                 <Conditional showWhen={(songObj['cordpal_comment'] != "No Comment Provided...") && (songObj['cordpal_comment'] != "<p></p>")}>
                   <div 
                     className="prose prose-invert prose-sm mx-2 p-1 pb-5" 
-                    dangerouslySetInnerHTML={{__html: await performReplacements(songObj['cordpal_comment'])}}
+                    dangerouslySetInnerHTML={{__html: songObj['parsedComment']}}
                   />
                 </Conditional>
               </div>
