@@ -76,8 +76,6 @@ export default async function ReviewAvatarCard(props) {
       })
     ) : [];
 
-  console.log(parsedTrackComments)
-
 
   return (
     <div className="mx-auto" key={props.index}>

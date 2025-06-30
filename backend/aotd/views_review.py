@@ -79,7 +79,7 @@ def submitReview(request: HttpRequest):
       review_text=reqBody['comment'],
       first_listen=reqBody['first_listen'],
       advanced=reqBody['advanced'],
-      advancedReviewDict=reqBody['trackData'],
+      advancedReviewDict=reqBody['trackData'] if reqBody['advanced'] else None,
       aotd_date=date,
       version=2
     )
