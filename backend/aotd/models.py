@@ -160,6 +160,9 @@ class Review(models.Model):
     version = models.IntegerField(default=1)
     # Add reactions relationship for easy query
     reactions = GenericRelation(Reaction)
+    # Advanced Review Support (Added in June of 2025)
+    advanced = models.BooleanField(default = False, null=False)
+    advancedReviewDict = models.JSONField(default=None, null=True)
 
     class Meta:
       unique_together = ('album', 'user', 'aotd_date')  # Prevent duplicate reviews for the same user and album
@@ -184,6 +187,8 @@ class Review(models.Model):
       outObj['first_listen'] = self.first_listen
       outObj['aotd_date'] = self.aotd_date
       outObj['version'] = self.version
+      outObj['advanced'] = self.advanced
+      outObj['trackData'] = self.advancedReviewDict
       # Get all reactions, group by reaction, and store a list 
       reactions = self.reactions.all()
       rObj = {}
@@ -218,7 +223,9 @@ class Review(models.Model):
           last_updated=old_review.last_updated,
           first_listen=old_review.first_listen,
           aotd_date=old_review.aotd_date,
-          version=old_review.version
+          version=old_review.version,
+          advanced=old_review.advanced,
+          trackData=old_review.advancedReviewDict
         )
         # Create UserAction for review update
         UserAction.objects.create(
@@ -247,6 +254,9 @@ class ReviewHistory(models.Model):
     # Add review versioning for display
     version = models.IntegerField(default=1)
     recorded_at = models.DateTimeField(auto_now_add=True)  # When the history record was created
+    # Advanced Review Support (Added in June of 2025)
+    advanced = models.BooleanField(default=False, null=False)
+    advancedReviewDict = models.JSONField(default=None, null=True)
 
     def toJSON(self, full: bool = False):
       """
@@ -261,6 +271,8 @@ class ReviewHistory(models.Model):
       outObj['first_listen'] = self.first_listen
       outObj['aotd_date'] = self.aotd_date
       outObj['version'] = self.version
+      outObj['advanced'] = self.advanced
+      outObj['trackData'] = self.advancedReviewDict
       outObj['recorded_at'] = self.recorded_at.strftime("%m/%d/%Y, %H:%M:%S")
       if(full):
         outObj['review'] = self.review.toJSON()

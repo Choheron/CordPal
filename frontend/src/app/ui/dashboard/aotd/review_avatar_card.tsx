@@ -21,6 +21,8 @@ export default async function ReviewAvatarCard(props) {
   var reviewMessage = review['comment'];
   const reviewVersion = props.review_obj['version']
   const reactionsList = props.review_obj['reactions']
+  const advanced = props.review_obj['advanced']
+  const trackData = (advanced) ? props.review_obj['trackData'] : null
   // Get user data for the current user
   const userData = await getUserData()
 
@@ -32,7 +34,7 @@ export default async function ReviewAvatarCard(props) {
   // Parse Review Text
   if(reviewVersion == 1) {
     // Do youtube link replacements [ONLY IF THIS IS A VERSION 1 REVIEW]
-    reviewMessage =  reviewMessage.replace(youtubeRegex, (match, videoId, hours, minutes, seconds) => {
+    reviewMessage = reviewMessage.replace(youtubeRegex, (match, videoId, hours, minutes, seconds) => {
       // Convert timestamp to seconds
       const h = hours ? parseInt(hours) * 3600 : 0;
       const m = minutes ? parseInt(minutes) * 60 : 0;
@@ -61,7 +63,7 @@ export default async function ReviewAvatarCard(props) {
       reviewMessage = reviewMessage.replace(match, `<img src="${gifUrl}" frameborder="0" width="300" height="auto" class="max-w-300 h-full" />`);
     });
   }
-  
+
 
   return (
     <div className="mx-auto" key={props.index}>
@@ -100,13 +102,24 @@ export default async function ReviewAvatarCard(props) {
               textSize="text-2xl"
             />
           </div>
-          <Conditional showWhen={review['first_listen'] == true}>
-            <p className="bg-green-700/90 rounded-xl px-2 py-1 border border-green-500 text-black font-bold italic text-xs">
-              First Time Listen
-            </p>
-          </Conditional>
+          {/* Display Review Tags */}
+          <div className="flex gap-2 justify-center">
+            <Conditional showWhen={review['first_listen'] == true}>
+              <p className="bg-green-700/90 rounded-xl px-2 py-1 border border-green-500 text-black font-bold italic text-xs">
+                First Time Listen
+              </p>
+            </Conditional>
+            <Conditional showWhen={advanced}>
+              <p className="bg-red-700/90 rounded-xl px-2 py-1 border border-red-500 text-black font-bold italic text-xs">
+                Advanced Review
+              </p>
+            </Conditional>
+          </div>
           {/* Review Text */}
-          <div className="mt-[6px]">
+          <Conditional showWhen={advanced}>
+            <p className="mt-[6px] text-lg mr-auto">Overall Review:</p>
+          </Conditional>
+          <div className="">
             <ScrollShadow className="w-[330px] max-h-[320px] overflow-y-scroll scrollbar-hide border rounded-xl border-neutral-800 bg-black/20" >
               <div 
                 className="prose prose-invert prose-sm mx-2 p-1 pb-5" 
@@ -114,6 +127,33 @@ export default async function ReviewAvatarCard(props) {
               />
             </ScrollShadow>
           </div>
+          {/* Advanced Review Display */}
+          <Conditional showWhen={advanced}>
+            <p className="mt-[6px] text-lg mr-auto ml-0">Track by Track:</p>
+            {
+              Object.values(trackData).sort((a: any, b: any) => a['number'] - b['number']).map((songObj: any) => (
+                <div 
+                  key={songObj['number']}
+                  className="text-left w-full"
+                >
+                  <p className="text-base ml-2">{songObj['number']}. {songObj['title']}</p>
+                  <StarRating
+                    rating={songObj['cordpal_rating']}
+                    className="text-yellow-400 my-auto"
+                    textSize="text-2xl"
+                  />
+                  <Conditional showWhen={(songObj['cordpal_comment'] != "No Comment Provided...") && (songObj['cordpal_comment'] != "<p></p>")}>
+                    <ScrollShadow className="w-[330px] max-h-[320px] overflow-y-scroll scrollbar-hide border rounded-xl border-neutral-800 bg-black/20" >
+                      <div 
+                        className="prose prose-invert prose-sm mx-2 p-1 pb-5" 
+                        dangerouslySetInnerHTML={{__html: songObj['cordpal_comment']}}
+                      />
+                    </ScrollShadow>
+                  </Conditional>
+                </div>
+              ))
+            }
+          </Conditional>
           {/* Emoji Reactions Display */}
           <ReviewEmojiMartClientWrapper 
             userData={userData}

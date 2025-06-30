@@ -38,55 +38,57 @@ export default async function Page({
   // Determine if today is the current review date
   const returnUrl = (isReviewToday) ? `/dashboard/aotd` : `/dashboard/aotd/calendar/${reviewDateObj.getFullYear()}/${padNumber(reviewDateObj.getMonth() + 1)}/${padNumber(reviewDateObj.getDate())}`
 
-  // Parse review text to display embeds 
-  // Regex for youtube video embedding
-  const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\?[\w=&%-]*)?(?:&t=(\d+h)?(\d+m)?(\d+s)?)?/g;
-  // Regex for tenor gif embedding
-  const tenorRegex = /(?:https?:\/\/)?(?:www\.)?tenor\.com\/view\/[a-zA-Z0-9_-]+-(\d+)/g;
-  // Placeholder text
-  let temp = review_data['comment']
-  // Parse Review Text
-  if(review_data['version'] == 1) {
-    // Do youtube link replacements [ONLY IF THIS IS A VERSION 1 REVIEW]
-    temp =  review_data['comment'].replace(youtubeRegex, (match, videoId, hours, minutes, seconds) => {
-      // Convert timestamp to seconds
-      const h = hours ? parseInt(hours) * 3600 : 0;
-      const m = minutes ? parseInt(minutes) * 60 : 0;
-      const s = seconds ? parseInt(seconds) : 0;
-      const startTime = h + m + s;
+  const performReplacements = async(reviewText) => {
+    // Parse review text to display embeds 
+    // Regex for youtube video embedding
+    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\?[\w=&%-]*)?(?:&t=(\d+h)?(\d+m)?(\d+s)?)?/g;
+    // Regex for tenor gif embedding
+    const tenorRegex = /(?:https?:\/\/)?(?:www\.)?tenor\.com\/view\/[a-zA-Z0-9_-]+-(\d+)/g;
+    // Placeholder text
+    let temp: any = reviewText
+    // Parse Review Text
+    if(review_data['version'] == 1) {
+      // Do youtube link replacements [ONLY IF THIS IS A VERSION 1 REVIEW]
+      temp =  review_data['comment'].replace(youtubeRegex, (match, videoId, hours, minutes, seconds) => {
+        // Convert timestamp to seconds
+        const h = hours ? parseInt(hours) * 3600 : 0;
+        const m = minutes ? parseInt(minutes) * 60 : 0;
+        const s = seconds ? parseInt(seconds) : 0;
+        const startTime = h + m + s;
 
-      const startParam = startTime > 0 ? `?start=${startTime}` : '';
-      return `<iframe width="600" height="337.5" class="mx-auto" src="https://www.youtube.com/embed/${videoId}${startParam}" frameborder="0" allowfullscreen></iframe>`;
-    })
+        const startParam = startTime > 0 ? `?start=${startTime}` : '';
+        return `<iframe width="600" height="337.5" class="mx-auto" src="https://www.youtube.com/embed/${videoId}${startParam}" frameborder="0" allowfullscreen></iframe>`;
+      })
+    }
+
+    // Do Tenor Link Replacements
+    // Extract all Tenor GIF IDs
+    const tenorMatches = [...temp.matchAll(tenorRegex)];
+    if (tenorMatches.length > 0) {
+      // Fetch all Tenor GIF URLs asynchronously
+      const gifPromises = tenorMatches.map(async ([match, gifId]) => {
+        const gifUrl = await getTenorGifData(gifId);
+        return { match, gifUrl };
+      });
+
+      const gifResults = await Promise.all(gifPromises);
+
+      // Replace Tenor URLs with their corresponding <img> tags
+      gifResults.forEach(({ match, gifUrl }) => {
+        temp = temp.replace(match, `<img src="${gifUrl}" frameborder="0" width="300" height="auto" class="max-w-300 h-full mx-auto" />`);
+      });
+    }
+    // Return final message text
+    return temp
   }
-
-  // Do Tenor Link Replacements
-  // Extract all Tenor GIF IDs
-  const tenorMatches = [...temp.matchAll(tenorRegex)];
-  if (tenorMatches.length > 0) {
-    // Fetch all Tenor GIF URLs asynchronously
-    const gifPromises = tenorMatches.map(async ([match, gifId]) => {
-      const gifUrl = await getTenorGifData(gifId);
-      return { match, gifUrl };
-    });
-
-    const gifResults = await Promise.all(gifPromises);
-
-    // Replace Tenor URLs with their corresponding <img> tags
-    gifResults.forEach(({ match, gifUrl }) => {
-      temp = temp.replace(match, `<img src="${gifUrl}" frameborder="0" width="300" height="auto" class="max-w-300 h-full mx-auto" />`);
-    });
-  }
-  // Replace final message text
-  const review_comment_final = temp
 
   return (
-    <div className="flex flex-col w-full items-center p-3 pb-36 pt-10">
+    <div className="flex flex-col w-full items-center p-3 pb-36 pt-10 overflow-x-hidden">
       <PageTitle text={`${review_data['user_nickname']}'s ${reviewDate} Review`} />
       <div className="w-full md:w-3/4 2xl:w-1/2 font-extralight">
         {/* Show Album Cover Data */}
         <div
-          className="flex flex-col float-left w-56 pr-6"
+          className="flex flex-col sm:float-left w-56 pr-6"
         >
           <a
             className="group hover:underline"
@@ -136,13 +138,56 @@ export default async function Page({
               <b>{review_data['score'].toFixed(2)}</b>
             </p>
           </div>
+          {/* Display Review Tags */}
+          <div className="flex gap-2 justify-start">
+            <Conditional showWhen={review_data['first_listen'] == true}>
+              <p className="bg-green-700/90 rounded-xl px-2 py-1 border border-green-500 text-black font-bold italic text-xs">
+                First Time Listen
+              </p>
+            </Conditional>
+            <Conditional showWhen={review_data['advanced']}>
+              <p className="bg-red-700/90 rounded-xl px-2 py-1 border border-red-500 text-black font-bold italic text-xs">
+                Advanced Review
+              </p>
+            </Conditional>
+          </div>
           <Divider className="mt-1 w-full" />
         </div>
         {/* Display Review Content */}
+        <Conditional showWhen={review_data['advanced']}>
+          <p className="mt-[6px] text-lg mr-auto ml-0">Overall Review:</p>
+        </Conditional>
         <div 
           className="w-full prose prose-invert prose-sm !max-w-none mb-2 font-normal"
-          dangerouslySetInnerHTML={{__html: review_comment_final}}
+          dangerouslySetInnerHTML={{__html: await performReplacements(review_data['comment'])}}
         />
+        {/* If advanced review, display song breakdown */}
+        <Conditional showWhen={review_data['advanced']}>
+          <p className="mt-[6px] text-lg mr-auto ml-0">Track by Track:</p>
+          {
+            Object.values(review_data['trackData']).sort((a: any, b: any) => a['number'] - b['number']).map(async(songObj: any) => (
+              <div 
+                key={songObj['number']}
+                className="text-left w-full"
+              >
+                <div className="flex flex-col md:flex-row gap-2">
+                  <p className="text-base ml-2">{songObj['number']}. <b>{songObj['title']}</b></p>
+                  <StarRating
+                    rating={songObj['cordpal_rating']}
+                    className="text-yellow-400 my-auto"
+                    textSize="text-2xl"
+                  />
+                </div>
+                <Conditional showWhen={(songObj['cordpal_comment'] != "No Comment Provided...") && (songObj['cordpal_comment'] != "<p></p>")}>
+                  <div 
+                    className="prose prose-invert prose-sm mx-2 p-1 pb-5" 
+                    dangerouslySetInnerHTML={{__html: await performReplacements(songObj['cordpal_comment'])}}
+                  />
+                </Conditional>
+              </div>
+            ))
+          }
+        </Conditional>
         <div className="flex flex-col text-gray-500">
           <div className="text-right text-sm font-extralight">
             <ClientTimestamp timestamp={review_data['last_updated']} full={true} />

@@ -64,6 +64,9 @@ def submitReview(request: HttpRequest):
     reviewObj.score = float(reqBody['score'])
     reviewObj.review_text = reqBody['comment']
     reviewObj.first_listen = reqBody['first_listen']
+    reviewObj.advanced = reqBody['advanced']
+    if(reqBody['advanced'] == True):
+      reviewObj.advancedReviewDict = reqBody['trackData']
     reviewObj.version = 2
     # Save/Update Object
     reviewObj.save()
@@ -75,6 +78,8 @@ def submitReview(request: HttpRequest):
       score=float(reqBody['score']),
       review_text=reqBody['comment'],
       first_listen=reqBody['first_listen'],
+      advanced=reqBody['advanced'],
+      advancedReviewDict=reqBody['trackData'],
       aotd_date=date,
       version=2
     )

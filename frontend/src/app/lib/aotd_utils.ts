@@ -404,18 +404,18 @@ export async function getUserReviewForAlbum(mbid, date = null) {
   const backendReview = reviewRes['review']
   // Check if a user cookie exists for aotd_review that is the same as the passed in id
   const hasCookieReview = (await cookies()).has(`aotd_review_${mbid}`)
-  if(hasCookieReview) {
-    const cookieReview = JSON.parse(await getCookie(`aotd_review_${mbid}`));
-    // Parse date from backend review, see if timestamp is newer on cookie
-    if(backendReview != null) {
-      const backendDate = Date.parse(backendReview['last_updated'])
-      const cookieDate = Date.parse(cookieReview['last_updated'])
-      if(backendDate < cookieDate) {
-        return backendDate
-      }
-    }
-    return {...cookieReview, "cookie": true, "backendExist": (backendReview != null)}
-  }
+  // if(hasCookieReview) {
+  //   const cookieReview = JSON.parse(await getCookie(`aotd_review_${mbid}`));
+  //   // Parse date from backend review, see if timestamp is newer on cookie
+  //   if(backendReview != null) {
+  //     const backendDate = Date.parse(backendReview['last_updated'])
+  //     const cookieDate = Date.parse(cookieReview['last_updated'])
+  //     if(backendDate < cookieDate) {
+  //       return backendDate
+  //     }
+  //   }
+  //   return {...cookieReview, "cookie": true, "backendExist": (backendReview != null)}
+  // }
   return backendReview;
 }
 

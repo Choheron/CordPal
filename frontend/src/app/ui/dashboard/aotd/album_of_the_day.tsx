@@ -94,9 +94,20 @@ export default async function AlbumOfTheDayBox(props) {
               user_data={user_data}
               rating={(albumReview != null) ? albumReview['score'] : null}
               comment={(albumReview != null) ? albumReview['comment'] : null}
+              isAdvanced={(albumReview != null) ? albumReview['advanced'] : null}
               first_listen={(albumReview != null) ? albumReview['first_listen']: null}
               similar_review_data={similarReviewData}
               hasUserSubmitted={(albumReview != null) ? albumReview['backendExist']: null}
+              song_data={
+                albumData("track_list")['tracks'].map((trackData) => (
+                  {
+                    "number": trackData['number'],
+                    "title": trackData['title'],
+                    "cordpal_rating": ((albumReview != null) && (albumReview['trackData'] != null)) ? albumReview['trackData'][trackData['title']]['cordpal_rating'] : 5,
+                    "cordpal_comment": ((albumReview != null) && (albumReview['trackData'] != null)) ? albumReview['trackData'][trackData['title']]['cordpal_comment'] : "No Comment Provided..."
+                  }
+                ))
+              }
             />
           </div>
           <div className="w-full flex">
