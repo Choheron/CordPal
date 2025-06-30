@@ -180,7 +180,7 @@ export default function AlbumReviewBox(props) {
         <div>
           <div className="w-full backdrop-blur-2xl px-2 py-1 md:mx-2 my-2 md:my-0 rounded-2xl bg-black/20 border border-neutral-800">
             <p className="text-xs italic text-gray-300">
-              Advanced reviews allow you to give a song by song breakdown of an album, if you leave a song's comment unchanged it will not appear in the review but the stars will.
+              Advanced reviews allow you to give a song by song breakdown of an album, if you leave a song&apos;s comment unchanged it will not appear in the review but the stars will.
             </p>
           </div>
           <p className="text-2xl">Track by Track Breakdown:</p>

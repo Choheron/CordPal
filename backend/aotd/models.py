@@ -225,7 +225,7 @@ class Review(models.Model):
           aotd_date=old_review.aotd_date,
           version=old_review.version,
           advanced=old_review.advanced,
-          trackData=old_review.advancedReviewDict
+          advancedReviewDict=old_review.advancedReviewDict
         )
         # Create UserAction for review update
         UserAction.objects.create(
