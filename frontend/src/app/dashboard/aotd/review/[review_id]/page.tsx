@@ -107,7 +107,7 @@ export default async function Page({
             href={returnUrl}
           >
             <img
-              src={album_data['album_img_src']}
+              src={`/dashboard/aotd/api/album-cover/${album_data['mbid']}`}
               alt={`Album Cover for ${album_data['title']}`}
               className="w-56 h-auto mb-1 rounded-2xl shadow-md"
             />

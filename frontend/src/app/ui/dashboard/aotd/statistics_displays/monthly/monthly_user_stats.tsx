@@ -62,7 +62,7 @@ export default function MonthlyUserStats(props) {
                   key={index}
                 >
                   <a 
-                    href={`/dashboard/aotd/album/${album['album_id']}`}
+                    href={`/dashboard/aotd/album/${(album['album_id']) ? album['album_id'] : album['mbid']}`}
                     className="relative flex flex-col h-full w-full justify-center py-0 px-1"
                   >
                     <img 
