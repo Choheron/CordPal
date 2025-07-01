@@ -77,7 +77,7 @@ def getAlbumRating(mbid, rounded=True, date: str = None):
   review_sum = 0.0
   for review in reviewList:
     review_sum += float(review.score)
-  # Calculate Average
+  # Calculate Average [DO NOT STORE IN DB UNTIL DAY IS OVER (Handled in Aotd selection method)]
   if(rounded):
     rating = (round((review_sum/float(len(reviewList)))*2)/2 if len(reviewList) > 0 else 0.0)
     # Return rating

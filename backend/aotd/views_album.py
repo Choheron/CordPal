@@ -441,11 +441,11 @@ def getLowestHighestAlbumStats(request: HttpRequest):
   if((os.getenv("APP_ENV") == "PROD")):
     daily_albums = [album for album in daily_albums if (album.getReviewCount() >= 4)]
   # Get the last album
-  lowest_daily_album = daily_albums.last()
+  lowest_daily_album = list(daily_albums)[-1]
   lowest_album = lowest_daily_album.album
   lowest_album_date = lowest_daily_album.date
   # Get the first album
-  highest_daily_album = daily_albums.first()
+  highest_daily_album = list(daily_albums)[0]
   highest_album = highest_daily_album.album
   highest_album_date = highest_daily_album.date
   # Populate out objects
