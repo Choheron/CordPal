@@ -2,7 +2,7 @@
 
 import { getAlbum, getReviewHistoricalByID, getTenorGifData } from "@/app/lib/aotd_utils"
 import { getUserData } from "@/app/lib/user_utils"
-import { convertToLocalTZString, generateDateFromUTCString, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
+import { convertToLocalTZString, generateDateFromUTCString, padNumber, ratingToTailwindBgColor, songRatingToString } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import ReviewHistoryAccordion from "@/app/ui/dashboard/aotd/review_history_accordion"
@@ -182,13 +182,9 @@ export default async function Page({
                 key={songObj['number']}
                 className="text-left w-full"
               >
-                <div className="flex flex-col md:flex-row gap-2">
-                  <p className="text-base ml-2">{songObj['number']}. <b>{songObj['title']}</b></p>
-                  <StarRating
-                    rating={songObj['cordpal_rating']}
-                    className="text-yellow-400 my-auto"
-                    textSize="text-2xl"
-                  />
+                <div className="flex gap-1">
+                  <p className="text-base ml-2 line-clamp-1">{songObj['number']}. {songObj['title']}</p>
+                  <p className={`w-fit flex-shrink-0 rounded-2xl px-2 text-center text-black ${ratingToTailwindBgColor(songObj['cordpal_rating'] * 2)}`}><b>{songRatingToString(songObj['cordpal_rating'])}</b></p>
                 </div>
                 <Conditional showWhen={(songObj['cordpal_comment'] != "No Comment Provided...") && (songObj['cordpal_comment'] != "<p></p>")}>
                   <div 

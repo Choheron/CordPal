@@ -11,6 +11,7 @@ import { Conditional } from "../conditional";
 import { Link, ScrollShadow, Tooltip } from "@heroui/react";
 import ReviewEmojiMartClientWrapper from "./reviewsWrappers/client_review_reacton_emoji_wrapper.tsx";
 import { getUserData } from "@/app/lib/user_utils";
+import { ratingToTailwindBgColor, songRatingToString } from "@/app/lib/utils";
 
 // GUI Display for a single review as a popover/avatar combo
 // Expected Props:
@@ -146,14 +147,12 @@ export default async function ReviewAvatarCard(props) {
               parsedTrackComments.map(async(songObj: any) => (
                 <div 
                   key={songObj['number']}
-                  className="text-left w-full"
+                  className="text-left w-full py-[2px]"
                 >
-                  <p className="text-base ml-2">{songObj['number']}. {songObj['title']}</p>
-                  <StarRating
-                    rating={songObj['cordpal_rating']}
-                    className="text-yellow-400 my-auto"
-                    textSize="text-2xl"
-                  />
+                  <div className="flex justify-between w-full gap-1">
+                    <p className="text-base ml-2 line-clamp-1">{songObj['number']}. {songObj['title']}</p>
+                    <p className={`w-fit flex-shrink-0 rounded-2xl px-2 text-center text-black ${ratingToTailwindBgColor(songObj['cordpal_rating'] * 2)}`}><b>{songRatingToString(songObj['cordpal_rating'])}</b></p>
+                  </div>
                   <Conditional showWhen={(songObj['cordpal_comment'] != "No Comment Provided...") && (songObj['cordpal_comment'] != "<p></p>")}>
                     <ScrollShadow className="w-[330px] max-h-[320px] overflow-y-scroll scrollbar-hide border rounded-xl border-neutral-800 bg-black/20" >
                       <div 

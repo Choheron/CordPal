@@ -10,6 +10,7 @@ import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@heroui/react
 import { setReviewCookie, submitReviewToBackend } from "@/app/lib/aotd_utils";
 import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 import { Conditional } from "../conditional";
+import { ratingToTailwindBgColor } from "@/app/lib/utils";
 
 
 // GUI Display for an Album Review Box
@@ -59,6 +60,34 @@ export default function AlbumReviewBox(props) {
     }), {})
   )
 
+  // Get steps for song by song ratings
+  const getSongSteps = () => {
+    let steps: any = [
+      {
+        value: 0,
+        label: "TRASH",
+      },
+      {
+        value: 1,
+        label: "Not Good",
+      },
+      {
+        value: 2,
+        label: "Mid",
+      },
+      {
+        value: 3,
+        label: "Its Good",
+      },
+      {
+        value: 4,
+        label: "GAS",
+      },
+    ]
+    return steps
+  }
+
+  // Get Numeric Steps
   const getSteps = () => {
     let steps: any = []
     for(let i = 0; i < 11; i++) {
@@ -161,12 +190,6 @@ export default function AlbumReviewBox(props) {
       onMouseLeave={() => setTooltipOpen(false)}
     >
       <div className="w-full flex flex-col lg:flex-row gap-2 my-2 px-2 justify-between">
-        <Checkbox
-          isSelected={isFirstListen}
-          onValueChange={setIsFirstListen}
-        >
-          First Time Listen?
-        </Checkbox>
         <Switch 
           isSelected={advanced} 
           onValueChange={setAdvanced}
@@ -196,28 +219,23 @@ export default function AlbumReviewBox(props) {
                   <Slider   
                     size="sm"
                     radius="sm"
-                    step={0.5}
-                    marks={getSteps()}
+                    step={1}
+                    marks={getSongSteps()}
                     color="warning"
-                    label="Track Rating"
-                    hideValue={true}
-                    maxValue={10} 
+                    maxValue={4}
                     minValue={0} 
                     value={songReviewObj[song['title']]['cordpal_rating']}
                     onChange={(rating) => handleTrackUpdate(song['title'], rating, songReviewObj[song['title']]['cordpal_comment'])}
                     renderThumb={(props) => (
                       <div
                         {...props}
-                        className="group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
+                        className={`group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing`}
                       >
-                        <span className="transition-transform bg-yellow-600 shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80" />
+                        <span className={`transition-transform shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80 ${ratingToTailwindBgColor(songReviewObj[song['title']]['cordpal_rating'] * 2)}`} />
                       </div>
                     )}
-                    className="max-w-full px-0 pr-5 mx-auto" 
+                    className="max-w-full px-5 mx-auto" 
                   />
-                  <div className="w-8 max-w-8 h-full my-auto">
-                    <p className="text-2xl mx-auto">{songReviewObj[song['title']]['cordpal_rating']}</p>
-                  </div>
                 </div>
                 <ReviewTipTap 
                   content={songReviewObj[song['title']]['cordpal_comment']}
@@ -280,7 +298,13 @@ export default function AlbumReviewBox(props) {
       <p className="text-xs mx-2 text-gray-400 mb-1">
         Enter an optional comment to go with your review of this album. Tenor links will be updated on the display end.
       </p>
-      <div className="w-full flex flex-col lg:flex-row gap-2 justify-end">
+      <div className="w-full flex flex-col lg:flex-row gap-2 justify-between">
+        <Checkbox
+          isSelected={isFirstListen}
+          onValueChange={setIsFirstListen}
+        >
+          First Time Listen?
+        </Checkbox>
         <div className="flex flex-col gap-1">
           <Checkbox
             isSelected={isReady}

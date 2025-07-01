@@ -194,3 +194,14 @@ export function milliToString(milliseconds) {
 
   return hours > 0 ? `${hours}h ${m.padStart(2, '0')}m ${s}s` : `${m}m ${s}s`
 }
+
+export function songRatingToString(songReview) {
+  switch(songReview) {
+    case 0: return "TRASH"
+    case 1: return "Not Good"
+    case 2: return "Mid"
+    case 3: return "Its Good"
+    case 4: return "GAS"
+    default: return "UNKNOWN"
+  }
+}
