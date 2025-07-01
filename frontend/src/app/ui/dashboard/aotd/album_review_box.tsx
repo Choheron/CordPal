@@ -69,7 +69,7 @@ export default function AlbumReviewBox(props) {
       },
       {
         value: 1,
-        label: "Not Good",
+        label: "Bad",
       },
       {
         value: 2,
@@ -77,7 +77,7 @@ export default function AlbumReviewBox(props) {
       },
       {
         value: 3,
-        label: "Its Good",
+        label: "Good",
       },
       {
         value: 4,
