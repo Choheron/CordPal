@@ -429,8 +429,6 @@ def getLowestHighestAlbumStats(request: HttpRequest):
     return res
   # Declare out object
   out = {}
-  # Get all albums from album of the day
-  all_albums = DailyAlbum.objects.all()
   # Declare placeholders 
   lowest_album = None
   lowest_album_rating = 11
@@ -438,25 +436,18 @@ def getLowestHighestAlbumStats(request: HttpRequest):
   highest_album = None
   highest_album_rating = -1
   highest_album_date = None
-  # Iterate through and retreive data
-  for dailyAlbum in all_albums:
-    album_rating = getAlbumRating(dailyAlbum.album.mbid, rounded=False, date=dailyAlbum.date)
-    # If album rating is none, skip
-    if(album_rating == None):
-      continue
-    # Check to see if album meets review requirements (must have 4 or more reviews) [ONLY MAKE THIS CHECK IF IN PROD]
-    if((os.getenv("APP_ENV") == "PROD") and (Review.objects.filter(album=dailyAlbum.album, aotd_date=dailyAlbum.date).count() < 4)):
-      continue
-    # Check for lowest album
-    if((lowest_album == None) or ((album_rating != None) and (album_rating < lowest_album_rating))):
-      lowest_album = dailyAlbum.album
-      lowest_album_rating = album_rating
-      lowest_album_date = dailyAlbum.date
-    # Check for highest album
-    if(highest_album == None or (album_rating != None and album_rating > highest_album_rating)):
-      highest_album = dailyAlbum.album
-      highest_album_rating = album_rating
-      highest_album_date = dailyAlbum.date
+  # Query albums that have been aotd and sort by rating
+  daily_albums = DailyAlbum.objects.all().exclude(rating=11.0).exclude(rating=None).order_by('-rating', '-date')
+  if((os.getenv("APP_ENV") == "PROD")):
+    daily_albums = [album for album in daily_albums if (album.getReviewCount() >= 4)]
+  # Get the last album
+  lowest_daily_album = daily_albums.last()
+  lowest_album = lowest_daily_album.album
+  lowest_album_date = lowest_daily_album.date
+  # Get the first album
+  highest_daily_album = daily_albums.first()
+  highest_album = highest_daily_album.album
+  highest_album_date = highest_daily_album.date
   # Populate out objects
   out['lowest_album'] = lowest_album.toJSON() if lowest_album else {}
   out['lowest_album']['rating'] = getAlbumRating(lowest_album.mbid, rounded=False) if lowest_album else 0.0

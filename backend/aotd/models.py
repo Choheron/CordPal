@@ -138,6 +138,9 @@ class DailyAlbum(models.Model):
     rating_timeline = models.JSONField(default=generateTimelineDict, null=True)
     rating = models.FloatField(default=11.0, null=True) # Score for this day, will only be populated after the day is over (11 means it was not populated yet, Null means no reviews were made)
 
+    def getReviewCount(self):
+      return Review.objects.filter(aotd_date=self.date, album=self.album).count()
+
     def dateToCalString(self):
       return self.date.strftime('%Y-%m-%d')
 
@@ -148,7 +151,7 @@ class DailyAlbum(models.Model):
 
 # Model for a User's review of an album.
 class Review(models.Model):
-    album = models.ForeignKey(Album, on_delete=models.CASCADE)
+    album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name="reviews")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="aotd_reviews")
     score = models.FloatField()  # Score out of 10
     review_text = models.TextField(null=True, blank=True)
