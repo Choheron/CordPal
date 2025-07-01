@@ -13,7 +13,7 @@ export default async function AboutBlock(props) {
   return (
     <div className="max-w-7xl w-auto md:w-full p-5 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit border bg-gray-200  lg:bg-zinc-800/30">
       <h2 className="text-3xl italic">
-        Welcome, to the Nanophage Discord Site!
+        Welcome to CordPal!
       </h2>
       <hr/>
       <div className="max-w-7xl pt-2 pl-1">

@@ -7,7 +7,7 @@ export default function Footer(props) {
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-0 justify-center w-fit sm:w-full 2xl:w-3/4 mx-auto py-3 bg-gradient-to-r from-black/30 via-slate-800/25 to-black/30">
       <div className="flex flex-col w-fit text-slate-500 text-center mx-auto sm:mx-0">
         <p className="text-sm sm:text-base mx-auto">
-          &copy; Copyright {currYear} -  Cord-Pal - All Rights Reserved
+          &copy; Copyright 2024-{currYear} -  Cord-Pal - All Rights Reserved
         </p>
         <div className="flex w-fit mx-auto text-xs sm:text-sm gap-1 justify-center">
           <p>
