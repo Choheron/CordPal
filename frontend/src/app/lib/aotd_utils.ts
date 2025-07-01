@@ -317,7 +317,7 @@ export async function getAlbumAvgRating(mbid, rounded = true, date = null) {
     },
   });
   const albumAvgRatingData = await avgRatingResponse.json()
-  return (albumAvgRatingData['rating'] != null) ? (albumAvgRatingData['rating']) : (0.0);
+  return (albumAvgRatingData['rating'] != null) ? (albumAvgRatingData['rating']) : (11);
 }
 
 

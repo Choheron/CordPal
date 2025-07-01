@@ -60,7 +60,7 @@ export default async function AlbumDisplay(props) {
   // Check that user is authenticated
   const userAuth = (props.member_status) ? props.member_status : true;
   // Rating props check
-  const avg_rating = (props.album_mbid && showAlbumRating) ? await getAlbumAvgRating(props.album_mbid, false, historical_date): 0.0;
+  const avg_rating = (props.album_mbid && showAlbumRating) ? await getAlbumAvgRating(props.album_mbid, false, historical_date): 11;
   // Vertical Override
   const vertical = (props.vertical) ? props.vertical : false;
   // Track List
@@ -164,7 +164,7 @@ export default async function AlbumDisplay(props) {
               <ClientTimestamp className="italic pl-1" timestamp={submission_date} full={false}/>
             </div>
           </Conditional>
-          <Conditional showWhen={(avg_rating != 0) && ((avg_rating != null) && showAlbumRating)}>
+          <Conditional showWhen={(avg_rating != 11) && ((avg_rating != null) && showAlbumRating)}>
             <div className="text-xs lg:text-base">
               <div className="flex mb-1">
                 <p>Average {(userAuth) ? "User":"Member"} Rating: </p>
