@@ -339,10 +339,13 @@ def getAlbumSTD(request: HttpRequest, mbid: str, date: str = None):
     return res
   # Get all ratings for an album
   reviewList = Review.objects.filter(album__mbid=mbid).filter(aotd_date=aotd_date)
-  # Iterate review list and get scores
-  reviewScores = [rev.score for rev in reviewList]
-  # Get standard deviation
-  standardDev = numpy.std(reviewScores)
+  # If reviewlist is empty return 0.00'
+  standardDev = 0.00
+  if(len(reviewList) != 0):
+    # Iterate review list and get scores
+    reviewScores = [rev.score for rev in reviewList]
+    # Get standard deviation
+    standardDev = numpy.std(reviewScores)
   return JsonResponse({"standard_deviation": standardDev})
 
 

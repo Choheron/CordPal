@@ -22,7 +22,7 @@ export default async function Page({
   // Retrieve data about album from backend
   const albumObj = await getAlbum(albumid)
   // Parse track data list from album data
-  const trackList = ((albumObj['track_list']) ? albumObj['track_list']['tracks'] : { "tracks": [] })
+  const trackList = ((albumObj['track_list']) ? albumObj['track_list']['tracks'] : [])
   // Retrieve aotd_dates list from backend
   const aotd_dates = await getAotdDates(albumid)
   // Store average ratings in object
@@ -47,7 +47,7 @@ export default async function Page({
           >
             <div className="flex w-full">
               <p className={`w-fit h-fit my-auto ${ratingToTailwindBgColor(ratingsObj[date])} px-2 py-1 rounded-full text-black`}>
-                <b>{ratingsObj[date]}</b>
+                <b>{(ratingsObj[date] == 11.00) ? "--" : ratingsObj[date]}</b>
               </p>
               <p className="w-fit ml-auto text-xl rounded-tr-2xl rounded-bl-2xl bg-zinc-800/30 border border-neutral-800 px-2 -mr-2 py-2 -mt-2">
                 {monthToName(dateArr[1])} {dateArr[2]}, {dateArr[0]}
@@ -107,7 +107,6 @@ export default async function Page({
     const trackObj = (trackData, index = 0) => {
       const lengthString = milliToString(trackData['length'])
       const artistCredit = ((trackData['artist-credit']) ? trackData['artist-credit'] : ((trackData['artist']) ? trackData['artist'] : []))
-
       return (
         <div key={index}>
           <div className="flex gap-1">
@@ -127,15 +126,21 @@ export default async function Page({
         </div>
       )
     }
+    
 
     return (
       <div className="relative w-fit lg:max-w-[1080px] flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
         <p className="text-xl lg:text-2xl mx-auto">Tracklist:</p>
-        {trackList.map((track, index) => {
-          return (
-            trackObj(track, index)
-          )
-        })}
+        {
+          (trackList.length != 0) ? 
+            trackList.map((track, index) => {
+              return (
+                trackObj(track, index)
+              )
+            })
+          :
+          <p>Track Data not Found!</p>
+        }
       </div>
     )
   }
