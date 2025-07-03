@@ -11,6 +11,7 @@ import { setReviewCookie, submitReviewToBackend } from "@/app/lib/aotd_utils";
 import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 import { Conditional } from "../conditional";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
+import InfoPopover from "../../general/info_popover";
 
 
 // GUI Display for an Album Review Box
@@ -303,7 +304,9 @@ export default function AlbumReviewBox(props) {
           isSelected={isFirstListen}
           onValueChange={setIsFirstListen}
         >
-          First Time Listen?
+          <div className="flex gap-1">
+            First Time Listen
+          </div>
         </Checkbox>
         <div className="flex flex-col gap-1">
           <Checkbox
@@ -311,7 +314,7 @@ export default function AlbumReviewBox(props) {
             onValueChange={setIsReady}
             isDisabled={!isReviewUpdated}
           >
-            Ready to {(props.hasUserSubmitted)? "Update" : "Submit"}?
+            Ready to {(props.hasUserSubmitted)? "Update" : "Submit"}
           </Checkbox>
           <Button
             isDisabled={!isReady}

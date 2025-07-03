@@ -101,7 +101,7 @@ export default async function ReviewAvatarCard(props) {
           </div>
         </PopoverTrigger>
         <PopoverContent
-          className="relative w-[338px]"
+          className="relative w-[330px] max-h-dvh"
         >
           <UserCard 
             userDiscordID={review['user_id']} 
@@ -128,6 +128,18 @@ export default async function ReviewAvatarCard(props) {
               </p>
             </Conditional>
           </div>
+          {/* Conditional link display for Review Page with Advanced Reviews */}
+          <Conditional showWhen={advanced}>
+            <div className="w-full text-center h-fit pt-2 px-1">
+              <Link
+                href={`/dashboard/aotd/review/${review['id']}`}
+                underline="hover"
+                className="text-xs"
+              >
+                View Full Page Review
+              </Link>
+            </div>
+          </Conditional>
           {/* Review Text */}
           <Conditional showWhen={advanced}>
             <p className="mt-[6px] text-lg mr-auto">Overall Review:</p>
@@ -140,31 +152,6 @@ export default async function ReviewAvatarCard(props) {
               />
             </ScrollShadow>
           </div>
-          {/* Advanced Review Display */}
-          <Conditional showWhen={advanced}>
-            <p className="mt-[6px] text-lg mr-auto ml-0">Track by Track:</p>
-            {
-              parsedTrackComments.map(async(songObj: any) => (
-                <div 
-                  key={songObj['number']}
-                  className="text-left w-full py-[2px]"
-                >
-                  <div className="flex justify-between w-full gap-1">
-                    <p className="text-base ml-2 line-clamp-1">{songObj['number']}. {songObj['title']}</p>
-                    <p className={`w-fit flex-shrink-0 rounded-2xl px-2 text-center text-black ${ratingToTailwindBgColor(songObj['cordpal_rating'] * 2)}`}><b>{songRatingToString(songObj['cordpal_rating'])}</b></p>
-                  </div>
-                  <Conditional showWhen={(songObj['cordpal_comment'] != "No Comment Provided...") && (songObj['cordpal_comment'] != "<p></p>")}>
-                    <ScrollShadow className="w-[330px] max-h-[320px] overflow-y-scroll scrollbar-hide border rounded-xl border-neutral-800 bg-black/20" >
-                      <div 
-                        className="prose prose-invert prose-sm mx-2 p-1 pb-5" 
-                        dangerouslySetInnerHTML={{__html: songObj['parsedComment']}}
-                      />
-                    </ScrollShadow>
-                  </Conditional>
-                </div>
-              ))
-            }
-          </Conditional>
           {/* Emoji Reactions Display */}
           <ReviewEmojiMartClientWrapper 
             userData={userData}
@@ -172,6 +159,33 @@ export default async function ReviewAvatarCard(props) {
             albumMbid={review['album_id']}
             reactionsList={reactionsList}
           />
+          {/* Advanced Review Display */}
+          <Conditional showWhen={advanced}>
+            <p className="mt-[6px] text-lg mr-auto ml-0">Track by Track:</p>
+            <div className="max-h-[400px] overflow-x-auto rounded-lg">
+              {
+                parsedTrackComments.map(async(songObj: any) => (
+                  <div 
+                    key={songObj['number']}
+                    className="text-left w-full py-[2px]"
+                  >
+                    <div className="flex justify-between w-full gap-1">
+                      <p className="text-base ml-2 line-clamp-1">{songObj['number']}. {songObj['title']}</p>
+                      <p className={`w-fit flex-shrink-0 rounded-2xl px-1 text-center text-black ${ratingToTailwindBgColor(songObj['cordpal_rating'] * 2)}`}><b>{songRatingToString(songObj['cordpal_rating'])}</b></p>
+                    </div>
+                    <Conditional showWhen={(songObj['cordpal_comment'] != "No Comment Provided...") && (songObj['cordpal_comment'] != "<p></p>")}>
+                      <ScrollShadow className="w-[300px] max-h-[300px] overflow-y-scroll scrollbar-hide border rounded-xl border-neutral-800 bg-black/20" >
+                        <div 
+                          className="prose prose-invert prose-sm mx-2 p-1 pb-5" 
+                          dangerouslySetInnerHTML={{__html: songObj['parsedComment']}}
+                        />
+                      </ScrollShadow>
+                    </Conditional>
+                  </div>
+                ))
+              }
+            </div>
+          </Conditional>
           {/* Tenor Disclaimer Display */}
           <div className="w-fit backdrop-blur-2xl px-2 py-1 rounded-2xl border border-neutral-800">
             <p className="text-sm italic my-auto">
@@ -187,13 +201,13 @@ export default async function ReviewAvatarCard(props) {
               Last Updated: <ClientTimestamp timestamp={review['last_updated']} full={true} />
             </div>
           </Conditional>
-          <div className="w-full text-right h-fit pt-2 px-1">
+          <div className="w-full text-center h-fit pt-2 px-1">
             <Link
               href={`/dashboard/aotd/review/${review['id']}`}
               underline="hover"
               className="text-xs"
             >
-              View Full Review
+              View Full Review on Review Page
             </Link>
           </div>
         </PopoverContent>
