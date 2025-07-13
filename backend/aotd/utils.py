@@ -242,6 +242,7 @@ def getAlbumPartialReviewScore(album: Album = None, timestamp: datetime.datetime
   average = (sum/count)
   return average
 
+
 # Update a user review's stats in database
 # First step in an attempt at optimizing user review stat retrieval
 def calculateUserReviewData(aotdUserObj: AotdUserData):
@@ -276,3 +277,28 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   aotdUserObj.highest_score_date = highest_review_date
   # Save user data
   aotdUserObj.save()
+
+
+def update_user_streak(user: User, date_override: datetime.date | None = None):
+  '''Update a user's aotd review streak, user passed in should be a base level user'''
+  date = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
+  # Get required vars
+  profile: AotdUserData = user.aotd_data
+  today = date_override if (date_override != None) else date.today()
+  # Grab most recent aotd date
+  most_recent_aotd = DailyAlbum.objects.filter(date__lt=today).order_by("-date").first()
+
+  if profile.last_review_date == today:
+    return  # Already submitted today
+
+  # Check to ensure that we grab the previous aotd date instead of just yesterday (in the event of missing AOTDs)
+  if profile.last_review_date == most_recent_aotd.date:
+    profile.current_streak += 1
+  else:
+    profile.current_streak = 1  # reset streak
+
+  if profile.current_streak > profile.longest_streak:
+    profile.longest_streak = profile.current_streak
+
+  profile.last_review_date = today
+  profile.save()

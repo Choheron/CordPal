@@ -71,6 +71,8 @@ urlpatterns = [
   path('deleteReviewReaction', views_review.deleteReviewReaction),
   path('getReviewByID/<int:id>', views_review.getReviewByID),
   path('getReviewHistoricalByID/<int:id>', views_review.getReviewHistoricalByID),
+  # Cronjob to check review streaks
+  path('resetStreaks', views_review.resetStreaks),
   ## ============================================================================================================
   ## Album Of the Day Views
   ## ============================================================================================================

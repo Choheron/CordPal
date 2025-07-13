@@ -23,6 +23,7 @@ export default async function ReviewAvatarCard(props) {
   const reviewVersion = props.review_obj['version']
   const reactionsList = props.review_obj['reactions']
   const advanced = props.review_obj['advanced']
+  const streakData = props.review_obj['user_streak_data']
   const trackData = (advanced) ? props.review_obj['trackData'] : null
   // Get user data for the current user
   const userData = await getUserData()
@@ -116,7 +117,7 @@ export default async function ReviewAvatarCard(props) {
             />
           </div>
           {/* Display Review Tags */}
-          <div className="flex gap-2 justify-center">
+          <div className="flex gap-2 justify-center pb-1">
             <Conditional showWhen={review['first_listen'] == true}>
               <p className="bg-green-700/90 rounded-xl px-2 py-1 border border-green-500 text-black font-bold italic text-xs">
                 First Time Listen
@@ -125,6 +126,11 @@ export default async function ReviewAvatarCard(props) {
             <Conditional showWhen={advanced}>
               <p className="bg-red-700/90 rounded-xl px-2 py-1 border border-red-500 text-black font-bold italic text-xs">
                 Advanced Review
+              </p>
+            </Conditional>
+            <Conditional showWhen={streakData['current_streak'] && (streakData['current_streak'] >= 3)}>
+              <p className="bg-yellow-500/90 rounded-xl px-2 py-1 border border-yellow-500 text-black font-bold text-xs">
+                🔥 {streakData['current_streak']} 
               </p>
             </Conditional>
           </div>

@@ -15,7 +15,8 @@ from .models import (
 
 from .utils import (
   checkSelectionFlag,
-  calculateUserReviewData
+  calculateUserReviewData,
+  update_user_streak
 )
 from reactions.utils import (
   createReaction
@@ -26,6 +27,7 @@ from dotenv import load_dotenv
 import os
 import json
 import datetime
+from datetime import timedelta
 import pytz
 
 # Declare logging
@@ -60,31 +62,37 @@ def submitReview(request: HttpRequest):
   albumObj = Album.objects.get(mbid=reqBody['album_id'])
   # Check if a review already exists for this user
   try:
-    reviewObj = Review.objects.get(album=albumObj, user=userObj, aotd_date=date)
-    reviewObj.score = float(reqBody['score'])
-    reviewObj.review_text = reqBody['comment']
-    reviewObj.first_listen = reqBody['first_listen']
-    reviewObj.advanced = reqBody['advanced']
-    if(reqBody['advanced'] == True):
-      reviewObj.advancedReviewDict = reqBody['trackData']
-    reviewObj.version = 2
-    # Save/Update Object
-    reviewObj.save()
-  except Review.DoesNotExist:
-    # Declare new Review object
-    newReview = Review(
-      album=albumObj,
-      user=userObj,
-      score=float(reqBody['score']),
-      review_text=reqBody['comment'],
-      first_listen=reqBody['first_listen'],
-      advanced=reqBody['advanced'],
-      advancedReviewDict=reqBody['trackData'] if reqBody['advanced'] else None,
-      aotd_date=date,
-      version=2
-    )
-    # Save new Review data
-    newReview.save()
+    try:
+      reviewObj = Review.objects.get(album=albumObj, user=userObj, aotd_date=date)
+      reviewObj.score = float(reqBody['score'])
+      reviewObj.review_text = reqBody['comment']
+      reviewObj.first_listen = reqBody['first_listen']
+      reviewObj.advanced = reqBody['advanced']
+      if(reqBody['advanced'] == True):
+        reviewObj.advancedReviewDict = reqBody['trackData']
+      reviewObj.version = 2
+      # Save/Update Object
+      reviewObj.save()
+    except Review.DoesNotExist:
+      # Declare new Review object
+      newReview = Review(
+        album=albumObj,
+        user=userObj,
+        score=float(reqBody['score']),
+        review_text=reqBody['comment'],
+        first_listen=reqBody['first_listen'],
+        advanced=reqBody['advanced'],
+        advancedReviewDict=reqBody['trackData'] if reqBody['advanced'] else None,
+        aotd_date=date,
+        version=2
+      )
+      # Save new Review data
+      newReview.save()
+      # Update user's streak data
+      update_user_streak(userObj)
+  except:
+    logger.error(f"ERROR: Failed to save review for user \"{userObj.nickname}\" ({userObj.discord_id}) targeting album {albumObj.mbid} for date {date}!")
+    return HttpResponse(500)
   # Update user selection_blocked flag status
   checkSelectionFlag(AotdUserData.objects.get(user=userObj))
   # Update review stats
@@ -130,6 +138,14 @@ def getReviewsForAlbum(request: HttpRequest, mbid: str, date: str = None):
   outList = []
   for review in reviewsObj:
     outObj = review.toJSON()
+    userAotdData: AotdUserData = review.user.aotd_data
+    streakData = {
+      "current_streak": userAotdData.current_streak,
+      "longest_streak": userAotdData.longest_streak,
+      "last_review_date": userAotdData.last_review_date,
+      "streak_at_risk": userAotdData.isStreakAtRisk()
+    }
+    outObj['user_streak_data'] = streakData
     # Append to list
     outList.append(outObj)
   # Return list of reviews
@@ -202,7 +218,11 @@ def getAllUserReviewStats(request: HttpRequest):
       "highest_score_given": aotdUser.highest_score_given,
       "highest_score_album": aotdUser.highest_score_mbid,
       "highest_score_date": aotdUser.highest_score_date.strftime("%m/%d/%Y, %H:%M:%S"),
-      }
+      "current_streak": aotdUser.current_streak,
+      "longest_streak": aotdUser.longest_streak,
+      "last_review_date": aotdUser.last_review_date,
+      "streak_at_risk": aotdUser.isStreakAtRisk()
+    }
   # Convert user reviews object to list
   outList = []
   for user in reviewData:
@@ -546,3 +566,30 @@ def getReviewHistoricalByID(request: HttpRequest, id: int):
   out['historical'].insert(0, tempCurr)
   # Return
   return JsonResponse(out)
+
+
+###
+# Get All Reviews for a specific album.
+###
+def resetStreaks(request: HttpRequest):
+  # Make sure request is a post request
+  if(request.method != "POST"):
+    logger.warning("getReviewsForAlbum called with a non-POST method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  try:
+    # Get required dates
+    date = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
+    prev_aotd = DailyAlbum.objects.filter(date__lt=date).order_by("-date").first()
+    # Get all users who diddnt review previous aotd date or today (rare but possible)
+    no_review_users = AotdUserData.objects.all().exclude(last_review_date=prev_aotd.date).exclude(last_review_date=date.date())
+    # Iterate users and set current streak to 0
+    for user in no_review_users:
+      user.current_streak = 0
+      user.save()
+  except Exception as e:
+    logger.error(f"FATAL ERROR: {e}")
+    return HttpResponse(status=500)
+  return HttpResponse(status=200)
+  

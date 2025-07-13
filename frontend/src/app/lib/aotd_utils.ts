@@ -625,7 +625,7 @@ export async function getAllUserReviewStats() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['review_submissions'] },
+    next: { tags: ['review_submissions', 'ATOD'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },

@@ -67,6 +67,12 @@ export default async function ReviewStatsUserCard(props) {
             {reviewData['total_reviews']}
           </p>
         </div>
+        <div className='flex justify-between w-full'>
+          <p className="my-auto">Current Review Streak:</p>
+          <p className="my-auto px-2 py-1 rounded-full">
+            🔥 {reviewData['current_streak']}
+          </p>
+        </div>
         <div className='w-full'>
           <div className='flex justify-between w-full'>
             <p className="my-auto">Average Review Given:</p>

@@ -40,10 +40,22 @@ class AotdUserData(models.Model):
   highest_score_given = models.FloatField(default=None, null=True)
   highest_score_mbid = models.CharField(max_length=256, null=True, default=None)
   highest_score_date = models.DateField(null=True, default=None)
+  # Track Review Streaks
+  current_streak = models.PositiveIntegerField(default=0)
+  '''User's current aotd Review streak'''
+  longest_streak = models.PositiveIntegerField(default=0)
+  '''User's longest aotd Review streak'''
+  last_review_date = models.DateField(null=True, blank=True)
+  '''User's last review date (DateField)'''
 
   # toString Method
   def __str__(self):
     return "AOTD User Data:" + self.user.nickname
+  
+  # Return true if streak is set to expire today (they havent reviewed for today's aotd)
+  def isStreakAtRisk(self):
+    date_now = timezone.now().date()
+    return True if (self.last_review_date.strftime("%Y-%m-%d") != date_now.strftime("%Y-%m-%d")) else False
   
 
 # Model for an album that has been submitted for album of the day
