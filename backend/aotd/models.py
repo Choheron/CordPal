@@ -4,6 +4,8 @@ from django.utils.timezone import now
 from django.utils import timezone
 
 import logging
+import pytz
+import datetime
 
 from users.models import User
 from spotifyapi.models import Album as SpotAlbum
@@ -54,7 +56,7 @@ class AotdUserData(models.Model):
   
   # Return true if streak is set to expire today (they havent reviewed for today's aotd)
   def isStreakAtRisk(self):
-    date_now = timezone.now().date()
+    date_now = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
     return True if (self.last_review_date.strftime("%Y-%m-%d") != date_now.strftime("%Y-%m-%d")) else False
   
 

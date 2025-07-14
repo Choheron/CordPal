@@ -128,9 +128,9 @@ export default async function ReviewAvatarCard(props) {
                 Advanced Review
               </p>
             </Conditional>
-            <Conditional showWhen={streakData['current_streak'] && (streakData['current_streak'] >= 3)}>
+            <Conditional showWhen={streakData && streakData['current_streak'] && (streakData['current_streak'] >= 3)}>
               <p className="bg-yellow-500/90 rounded-xl px-2 py-1 border border-yellow-500 text-black font-bold text-xs">
-                🔥 {streakData['current_streak']} 
+                🔥 {streakData ? streakData['current_streak'] : "--" } 
               </p>
             </Conditional>
           </div>

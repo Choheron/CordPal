@@ -7,6 +7,7 @@ import UserCard from "@/app/ui/general/userUiItems/user_card"
 import StarRating from "@/app/ui/general/star_rating"
 import { getAlbum } from "@/app/lib/aotd_utils"
 import { ratingToTailwindBgColor } from "@/app/lib/utils"
+import { Conditional } from "../../conditional"
 
 // User Card showing the review stats for a user
 // Expected Props:
@@ -51,7 +52,7 @@ export default async function ReviewStatsUserCard(props) {
           />
         </div>
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent className="max-w-[350px]">
         <UserCard 
           userDiscordID={props.userDiscordID}
           avatarClassNameOverride="size-[40px]"
@@ -70,15 +71,25 @@ export default async function ReviewStatsUserCard(props) {
         <div className='flex justify-between w-full'>
           <p className="my-auto">Current Review Streak:</p>
           <p className="my-auto px-2 py-1 rounded-full">
-            🔥 {reviewData['current_streak']} 
+            🔥 {reviewData['current_streak']} {(reviewData['streak_at_risk'] ? "⌛" : "")}
           </p>
         </div>
+        <Conditional showWhen={reviewData['current_streak'] == reviewData['total_reviews']}>
+          <div className='flex justify-between w-full border bg-yellow-500 border-yellow-600 p-1 rounded-2xl'>
+            <p className="my-auto text-black text-xs">🎉 <b>This user has a perfect streak&#33;</b></p>
+          </div>
+        </Conditional>
         <div className='flex justify-between w-full'>
           <p className="my-auto">Longest Streak:</p>
           <p className="my-auto px-2 py-1 rounded-full">
             🔥 {reviewData['longest_streak']}
           </p>
         </div>
+         <Conditional showWhen={reviewData['current_streak'] == reviewData['longest_streak']}>
+          <div className='flex justify-between w-full border bg-yellow-500 border-yellow-600 p-1 rounded-2xl'>
+            <p className="my-auto text-black text-xs">🎉 <b>This user is on their longest streak&#33;</b></p>
+          </div>
+        </Conditional>
         <div className='w-full'>
           <div className='flex justify-between w-full'>
             <p className="my-auto">Average Review Given:</p>

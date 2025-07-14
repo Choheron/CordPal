@@ -121,10 +121,10 @@ def setAlbumOfDay(request: HttpRequest):
     # Filter out blocked users albums
     tempAlbum = random.choice(albumPool)
     logger.info(f"Temp album selected: {tempAlbum.title}")
-    try:
-      albumCheck = DailyAlbum.objects.filter(date__gte=one_year_ago).get(album=tempAlbum)
+    albumCheck = DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album=tempAlbum).count()
+    if(albumCheck != 0):
       albumPool = albumPool.exclude(mbid=tempAlbum.mbid)
-    except DailyAlbum.DoesNotExist:
+    else:
       albumOfTheDay = tempAlbum
       selected = True
   # Create an album of the day object
