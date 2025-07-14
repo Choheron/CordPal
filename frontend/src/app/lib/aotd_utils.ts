@@ -161,6 +161,7 @@ export async function getAotdData() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
+    next: { tags: [`review_submissions`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }

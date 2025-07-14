@@ -26,7 +26,7 @@ export default async function music() {
           radius="full"
           hideIcon={true}
         >
-          <div className="flex">
+          <div className="flex gap-2">
             <p className="text-2xl">⚠️</p>
             <p className="my-auto">
               You have not yet reviewed today! If you dont review by midnight central you will lose your {aotdUserData['current_streak']} day streak!
