@@ -104,10 +104,11 @@ def getAotdData(request: HttpRequest):
   userObj = getUserObj(request.session.get('discord_id'))
   # Ensure user has authenticated with Aotd before
   if(userObj.aotd_enrolled):
-    userSpotObj = AotdUserData.objects.filter(user = userObj).first()
-    dir_response = model_to_dict(userSpotObj)
-    dir_response['user'] = userSpotObj.user.nickname
-    dir_response['user_discord_id'] = userSpotObj.user.discord_id
+    userAOTDObj = AotdUserData.objects.filter(user = userObj).first()
+    dir_response = model_to_dict(userAOTDObj)
+    dir_response['user'] = userAOTDObj.user.nickname
+    dir_response['user_discord_id'] = userAOTDObj.user.discord_id
+    dir_response['streak_at_risk'] = userAOTDObj.isStreakAtRisk()
     return JsonResponse(dir_response)
   else:
     return JsonResponse({})

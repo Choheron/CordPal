@@ -3,7 +3,7 @@
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { Conditional } from "@/app/ui/dashboard/conditional";
 import SpotifyLoginBox from "@/app/ui/dashboard/aotd/aotd_enroll_box";
-import { getLastXSubmissions, isAotdParticipant } from "@/app/lib/aotd_utils";
+import { getAotdData, getLastXSubmissions, isAotdParticipant } from "@/app/lib/aotd_utils";
 import AlbumOfTheDayBox from "@/app/ui/dashboard/aotd/album_of_the_day";
 import RecentSubmissions from "@/app/ui/dashboard/aotd/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/aotd/statistics_displays/music_stats_box";
@@ -13,12 +13,27 @@ import { Alert } from "@heroui/react";
 export default async function music() {
   const aotd_participant = await isAotdParticipant();
   const recentSubmissionsResponse = await getLastXSubmissions(8);
-  // Fetch all albums on the serverside to reduce loading time of modal
-  // const allAlbumsList = await getAllAlbums()
+  // If the user is an AOTD participant, check if they are about to lose a review streak
+  const aotdUserData = (aotd_participant) ? (await getAotdData()) : (null)
 
   return (
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text="Album Of The Day" />
+      <Conditional showWhen={aotdUserData['streak_at_risk'] && (aotdUserData['current_streak'] > 0)}>
+        <Alert
+          className="w-full lg:w-[1350px] xl:flex-row md:w-4/5 gap-2"
+          color="warning"
+          radius="full"
+          hideIcon={true}
+        >
+          <div className="flex">
+            <p className="text-2xl">⚠️</p>
+            <p className="my-auto">
+              You have not yet reviewed today! If you dont review by midnight central you will lose your {aotdUserData['current_streak']} day streak!
+            </p>
+          </div>
+        </Alert>
+      </Conditional>
       <Conditional showWhen={!aotd_participant}>
         <SpotifyLoginBox />
       </Conditional>
