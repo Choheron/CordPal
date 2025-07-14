@@ -34,7 +34,7 @@ export default async function ReviewAvatarCard(props) {
     // Regex for youtube video embedding
     const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\?[\w=&%-]*)?(?:&t=(\d+h)?(\d+m)?(\d+s)?)?/g;
     // Regex for tenor gif embedding
-    const tenorRegex = /(?:https?:\/\/)?(?:www\.)?tenor\.com\/view\/[a-zA-Z0-9_-]+-(\d+)/g;
+    const tenorRegex = /(?:https?:\/\/)?(?:www\.)?tenor\.com\/view\/[a-zA-Z0-9_'-]+-(\d+)/g;
     // Parse Review Text
     if(reviewVersion == 1) {
       // Do youtube link replacements [ONLY IF THIS IS A VERSION 1 REVIEW]
