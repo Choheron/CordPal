@@ -1,6 +1,6 @@
 'use server'
 
-import { getAllUserReviews, getUserReviewStats } from "@/app/lib/aotd_utils";
+import { getAllUserReviews, getAotdData, getUserReviewStats } from "@/app/lib/aotd_utils";
 import MinimalAlbumDisplay from "../dashboard/aotd/minimal_album_display";
 import StarRating from "../general/star_rating";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
@@ -104,6 +104,12 @@ export default async function UserAotdDataDisplay(props) {
                   <p>Total Reviews: </p>
                   <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
                     {reviewStats['total_reviews']}
+                  </p>
+                </div>
+                <div className="flex flex-col text-center">
+                  <p>First Time Listen %: </p>
+                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                    {(reviewStats['first_listen_percentage']*100).toFixed(2)}%
                   </p>
                 </div>
               </div>

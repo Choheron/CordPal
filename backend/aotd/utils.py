@@ -255,6 +255,9 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   review_sum = all_reviews.aggregate(Sum('score'))['score__sum']
   # Calculate average review score
   average_review_score = review_sum/total_reviews
+  # Calculate first time review percentage
+  ft_reviews = all_reviews.filter(first_listen=True).count()
+  first_time_listen_percentage = ft_reviews/total_reviews
   # Get lowest scored album
   lowest_review = all_reviews.order_by('score').first()
   lowest_review_score = lowest_review.score
@@ -269,6 +272,7 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   aotdUserObj.total_reviews = total_reviews
   aotdUserObj.review_score_sum = review_sum
   aotdUserObj.average_review_score = average_review_score
+  aotdUserObj.first_listen_percentage = first_time_listen_percentage
   aotdUserObj.lowest_score_given = lowest_review_score
   aotdUserObj.lowest_score_mbid = lowest_review_mbid
   aotdUserObj.lowest_score_date = lowest_review_date

@@ -35,6 +35,7 @@ class AotdUserData(models.Model):
   # Track review stats
   total_reviews = models.IntegerField(default=None, null=True)
   review_score_sum = models.FloatField(default=0)
+  first_listen_percentage = models.FloatField(default=0)
   average_review_score = models.FloatField(default=0)
   lowest_score_given = models.FloatField(default=None, null=True)
   lowest_score_mbid = models.CharField(max_length=256, null=True, default=None)
