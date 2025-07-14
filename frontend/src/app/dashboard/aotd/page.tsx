@@ -19,7 +19,7 @@ export default async function music() {
   return (
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text="Album Of The Day" />
-      <Conditional showWhen={aotdUserData['streak_at_risk'] && (aotdUserData['current_streak'] > 0)}>
+      <Conditional showWhen={aotdUserData['streak_at_risk'] && (aotdUserData['current_streak'] > 2)}>
         <Alert
           className="w-full lg:w-[1350px] xl:flex-row md:w-4/5 gap-2"
           color="warning"
