@@ -45,6 +45,9 @@ urlpatterns = [
   path('checkIfUserCanSubmit', views_album.checkIfUserCanSubmit),
   # Statistics Endpoints
   path('getAlbumsStats', views_album.getAlbumsStats),
+  # Below URL has two variations (one for lack of URL Param)
+  path('getUserAlbumsStats/<str:user_discord_id>', views_album.getUserAlbumsStats),
+  path('getUserAlbumsStats', views_album.getUserAlbumsStats),
   path('getLowestHighestAlbumStats', views_album.getLowestHighestAlbumStats), 
   path('getSubmissionsByMonth/<str:year>/<str:month>', views_album.getSubmissionsByMonth),
   # Below URL has two variations (one for lack of URL Param)

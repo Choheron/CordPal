@@ -686,6 +686,31 @@ export async function getAllUserReviews(userId: string = "") {
 }
 
 
+
+//
+// Get all submission stats for a user
+// - RETURN: Json object
+//
+export async function getUserAlbumsStats(userId: string = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Determine url tail
+  const urlTail = `${(userId == "") ? "" : `/${userId}`}`
+  console.log(`getUserAlbumsStats: Sending request to backend '/aotd/getUserAlbumsStats${urlTail}'`)
+  const allUserReviewsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getUserAlbumsStats${urlTail}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: [`AOTD`, 'album_submissions'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const allUserReviewsJson = await allUserReviewsResponse.json()
+  return allUserReviewsJson;
+}
+
+
 //
 // Tenor Integration to get GIF Data from Tenor based on passed in URL or Gif ID
 // Params:

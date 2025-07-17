@@ -1,9 +1,9 @@
 'use server'
 
-import { getAllUserReviews, getAotdData, getUserReviewStats } from "@/app/lib/aotd_utils";
+import { getAllUserReviews, getAotdData, getUserAlbumsStats, getUserReviewStats } from "@/app/lib/aotd_utils";
 import MinimalAlbumDisplay from "../dashboard/aotd/minimal_album_display";
 import StarRating from "../general/star_rating";
-import { ratingToTailwindBgColor } from "@/app/lib/utils";
+import { boolToEmoji, ratingToTailwindBgColor } from "@/app/lib/utils";
 import ReviewScoreCountBarChart from "../general/charts/review_score_bar_chart";
 import ReviewCountChartBox from "./review_count_chart_box";
 
@@ -31,6 +31,8 @@ export default async function UserAotdDataDisplay(props) {
   const reviewStats = (aotdParticipant) ? await getUserReviewStats(userId) : null ; 
   // Get a object of all user reviews for this profile
   const userReviewsObj = (aotdParticipant) ? await getAllUserReviews(userId) : null;
+  // Get album stats
+  const userAlbumStats = (aotdParticipant) ? await getUserAlbumsStats(userId) : null;
 
   return (
     <div className="w-full mx-auto flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
@@ -39,6 +41,47 @@ export default async function UserAotdDataDisplay(props) {
       </p>
       {(aotdParticipant) ? (
         <div>
+          {/* Album and AOTD Stats */}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-around">
+              <div className="flex flex-col text-center">
+                <p>Albums Submitted: </p>
+                <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                  {userAlbumStats['submission_count']}
+                </p>
+              </div>
+              <div className="flex flex-col text-center">
+                <p>Albums Selected: </p>
+                <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                  {userAlbumStats['aotd_count']}
+                </p>
+              </div>
+              <div className="flex flex-col text-center">
+                <p>Albums Unselected: </p>
+                <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                  {userAlbumStats['unpicked_count']}
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-around">
+              <div className="flex flex-col text-center">
+                <p>Last AOTD Date: </p>
+                <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                  {userAlbumStats['last_selected_date']}
+                </p>
+              </div>
+              <div className="flex flex-col text-center">
+                <p>Days Since Last Selection: </p>
+                <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                  {userAlbumStats['days_since_selected']}
+                </p>
+              </div>
+              <div className="flex flex-col text-center">
+                <p>Currently Blocked: </p>
+                <div dangerouslySetInnerHTML={{__html: boolToEmoji(userAlbumStats['selection_blocked'])}}></div>
+              </div>
+            </div>
+          </div>
           {/* Favorite and Hated Album Display */}
           <div className="flex justify-evenly">
             {/* Favorite Album Display */}
@@ -87,7 +130,7 @@ export default async function UserAotdDataDisplay(props) {
             </p>
             <div className="flex flex-col">
               <div className="flex justify-around">
-                <div className="mb-2">
+                <div className="">
                   <div className="flex w-full justify-center">
                     <p>Average Rating Given: </p>
                     <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(reviewStats['average_review_score'])}`}>
@@ -101,7 +144,7 @@ export default async function UserAotdDataDisplay(props) {
                   />
                 </div>
                 <div className="flex flex-col text-center">
-                  <p>Total Reviews: </p>
+                  <p>Reviews: </p>
                   <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
                     {reviewStats['total_reviews']}
                   </p>
@@ -110,6 +153,20 @@ export default async function UserAotdDataDisplay(props) {
                   <p>First Time Listen %: </p>
                   <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
                     {(reviewStats['first_listen_percentage']*100).toFixed(2)}%
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-around mb-2">
+                <div className="flex flex-col text-center">
+                  <p>Current Review Streak: </p>
+                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                    {reviewStats['current_streak']} {(reviewStats['streak_at_risk'] ? "⌛" : "")}
+                  </p>
+                </div>
+                <div className="flex flex-col text-center">
+                  <p>Longest Review Streak: </p>
+                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                    {reviewStats['longest_streak']}
                   </p>
                 </div>
               </div>

@@ -1,5 +1,7 @@
-import { getReviewsForAlbum, getAotdUserCount } from "@/app/lib/aotd_utils";
+import { getReviewsForAlbum, getAotdUserCount, getAotdData } from "@/app/lib/aotd_utils";
 import ReviewAvatarCard from "./review_avatar_card";
+import { Conditional } from "../conditional";
+import { Alert } from "@heroui/react";
 
 // GUI Display for reviews of an album
 // Expected Props:
@@ -10,6 +12,8 @@ export default async function ReviewDisplay(props) {
   const reviews = (props.review_list != null) ? props.review_list : await getReviewsForAlbum(props.album_id, props.date);
   // Get count of users in website
   const userCount = await getAotdUserCount();
+  // If the user is an AOTD participant, check if they are about to lose a review streak
+  const aotdUserData = await getAotdData();
 
   return (
     <div className="w-full min-w-[250px] max-w-full my-2 flex flex-col flex-shrink-0 gap-2">
@@ -17,6 +21,21 @@ export default async function ReviewDisplay(props) {
         <p>User Reviews:</p>
         <p>{reviews.length}/{userCount}</p>
       </div>
+      <Conditional showWhen={aotdUserData['streak_at_risk'] && (aotdUserData['current_streak'] > 2)}>
+        <Alert
+          className="w-full gap-2 text-sm"
+          color="warning"
+          radius="md"
+          hideIcon={true}
+        >
+          <div className="flex gap-2">
+            <p className="text-2xl">⚠️</p>
+            <p className="my-auto">
+              Review by midnight CT to keep your {aotdUserData['current_streak']}-day streak!
+            </p>
+          </div>
+        </Alert>
+      </Conditional>
       {reviews.length === 0 ? (
           <div className="w-full text-center">
             <p className="mx-auto font-extralight pt-10">No Reviews.</p>

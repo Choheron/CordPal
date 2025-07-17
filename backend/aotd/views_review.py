@@ -265,6 +265,10 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
     "highest_score_given": aotdUser.highest_score_given,
     "highest_score_album": aotdUser.highest_score_mbid,
     "highest_score_date": aotdUser.highest_score_date.strftime("%m/%d/%Y, %H:%M:%S"),
+    "current_streak": aotdUser.current_streak,
+    "longest_streak": aotdUser.longest_streak,
+    "last_review_date": aotdUser.last_review_date,
+    "streak_at_risk": aotdUser.isStreakAtRisk()
   }
   # Get all reviews left by user
   user_reviews = Review.objects.filter(user=user)

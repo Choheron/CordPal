@@ -23,6 +23,7 @@ import json
 import datetime
 import pytz
 import requests
+from datetime import timedelta
 
 # Declare logging
 logger = logging.getLogger('django')
@@ -419,6 +420,48 @@ def getAlbumsStats(request: HttpRequest):
   out['user_objs'] = userStatsList
   # Return Object
   return JsonResponse(out)
+
+
+###
+# Get a specific user's Album Stats
+###
+def getUserAlbumsStats(request: HttpRequest, user_discord_id: str | None = None):
+  # Avoid circular import
+  from .views_aotd import getChanceOfAotdSelect
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning("getAlbumsStats called with a non-GET method, returning 405.")
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get all aotd users
+  spotUser = AotdUserData.objects.get(user__discord_id=user_discord_id) if user_discord_id else AotdUserData.objects.get(user__discord_id=(request.session.get('discord_id')))
+  # Get user Data
+  userData = {}
+  userData['submission_count'] = Album.objects.filter(submitted_by=spotUser.user).count()
+  userData['aotd_count'] = DailyAlbum.objects.filter(album__submitted_by=spotUser.user).count()
+  try:
+    last_selected_date = DailyAlbum.objects.filter(album__submitted_by=spotUser.user).order_by("-date").first().date
+    time_since_last_selection: timedelta = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date() - last_selected_date
+    userData['last_selected_date'] = last_selected_date.strftime("%Y-%m-%d")
+    userData['days_since_selected'] = time_since_last_selection.days
+  except:
+    userData['last_selected_date'] = "--"
+    userData['days_since_selected'] = (datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date() - spotUser.creation_timestamp.date()).days
+  userData['unpicked_count'] = f"{(Album.objects.filter(submitted_by=spotUser.user).count() - DailyAlbum.objects.filter(album__submitted_by=spotUser.user).count())}/100"
+  userData['discord_id'] = spotUser.user.discord_id
+  userData['nickname'] = spotUser.user.nickname
+  chance_view_response = json.loads(getChanceOfAotdSelect(request, spotUser.user.discord_id).content)
+  userData['selection_blocked'] = (chance_view_response['block_type'] != None)
+  userData['selection_chance'] = chance_view_response['percentage']
+  userData['block_type'] = chance_view_response['block_type']
+  userData['reason'] = chance_view_response['reason']
+  userData['admin_outage'] = chance_view_response['outage']['admin_outage'] if (userData['block_type'] == "OUTAGE") else None
+  if(userData['block_type'] == "OUTAGE"):
+    userData['outage_start'] = chance_view_response['outage']['outage_start']
+    userData['outage_end'] = chance_view_response['outage']['outage_end']
+  # Return Object
+  return JsonResponse(userData)
 
 ###
 # Get Lowest and Highest Rated Albums
