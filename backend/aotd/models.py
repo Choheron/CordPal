@@ -37,6 +37,7 @@ class AotdUserData(models.Model):
   review_score_sum = models.FloatField(default=0)
   first_listen_percentage = models.FloatField(default=0)
   average_review_score = models.FloatField(default=0)
+  median_review_score = models.FloatField(default=0)
   lowest_score_given = models.FloatField(default=None, null=True)
   lowest_score_mbid = models.CharField(max_length=256, null=True, default=None)
   lowest_score_date = models.DateField(null=True, default=None)

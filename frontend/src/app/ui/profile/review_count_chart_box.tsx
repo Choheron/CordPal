@@ -72,7 +72,7 @@ export default function ReviewCountChartBox(props) {
 
   return (
     <div className="flex w-full h-fit">
-      <div className="h-80 -ml-5 mr-3 w-1/2">
+      <div className="h-80 -ml-5 mr-5 w-1/2">
         <ReviewScoreCountBarChart
           data={reviewStats['score_counts']}
           dataCallback={setScore}

@@ -36,13 +36,16 @@ export default async function UserAotdDataDisplay(props) {
 
   return (
     <div className="w-full mx-auto flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
-      <p className="w-fit mx-auto text-xl underline">
-        Album of the Day Stats
+      <p className="w-fit mr-auto text-xl underline border border-neutral-800 -m-[9px] p-2 rounded-tl-2xl rounded-br-2xl mb-1">
+        Album of the Day Information
       </p>
       {(aotdParticipant) ? (
         <div>
           {/* Album and AOTD Stats */}
           <div className="flex flex-col gap-2">
+            <p className="w-fit mx-auto underline text-large">
+              Album Stats
+            </p>
             <div className="flex justify-around">
               <div className="flex flex-col text-center">
                 <p>Albums Submitted: </p>
@@ -124,13 +127,42 @@ export default async function UserAotdDataDisplay(props) {
             </div>
           </div>
           {/* Review Statistics Display */}
-          <div className="flex flex-col">
-            <p className="w-fit mx-auto underline">
+          <div className="flex flex-col mt-2">
+            <p className="w-fit mx-auto underline text-large">
               Review Stats
             </p>
             <div className="flex flex-col">
               <div className="flex justify-around">
-                <div className="">
+                <div className="flex flex-col text-center w-full">
+                  <p>Reviews: </p>
+                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                    {reviewStats['total_reviews']}
+                  </p>
+                </div>
+                <div className="flex flex-col text-center w-full">
+                  <p>First Time Listen %: </p>
+                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                    {(reviewStats['first_listen_percentage']*100).toFixed(2)}%
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-around mb-2">
+                <div className="flex flex-col text-center w-full">
+                  <p>Current Review Streak: </p>
+                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                    {reviewStats['current_streak']} {(reviewStats['streak_at_risk'] ? "⌛" : "")}
+                  </p>
+                </div>
+                <div className="flex flex-col text-center w-full">
+                  <p>Longest Review Streak: </p>
+                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                    {reviewStats['longest_streak']}
+                  </p>
+                </div>
+              </div>
+              {/* Star Displays for Average and Median Review Scoring */}
+              <div className="flex justify-around">
+                <div className="w-full">
                   <div className="flex w-full justify-center">
                     <p>Average Rating Given: </p>
                     <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(reviewStats['average_review_score'])}`}>
@@ -143,31 +175,18 @@ export default async function UserAotdDataDisplay(props) {
                     textSize="text-xl lg:text-3xl"
                   />
                 </div>
-                <div className="flex flex-col text-center">
-                  <p>Reviews: </p>
-                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
-                    {reviewStats['total_reviews']}
-                  </p>
-                </div>
-                <div className="flex flex-col text-center">
-                  <p>First Time Listen %: </p>
-                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
-                    {(reviewStats['first_listen_percentage']*100).toFixed(2)}%
-                  </p>
-                </div>
-              </div>
-              <div className="flex justify-around mb-2">
-                <div className="flex flex-col text-center">
-                  <p>Current Review Streak: </p>
-                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
-                    {reviewStats['current_streak']} {(reviewStats['streak_at_risk'] ? "⌛" : "")}
-                  </p>
-                </div>
-                <div className="flex flex-col text-center">
-                  <p>Longest Review Streak: </p>
-                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
-                    {reviewStats['longest_streak']}
-                  </p>
+                <div className="w-full">
+                  <div className="flex w-full justify-center">
+                    <p>Median Rating Given: </p>
+                    <p className={`ml-2 px-2 rounded-xl text-black ${ratingToTailwindBgColor(reviewStats['median_review_score'])}`}>
+                      <b>{reviewStats['median_review_score'].toFixed(2)}</b>
+                    </p>
+                  </div>
+                  <StarRating 
+                    className="text-yellow-400"
+                    rating={reviewStats['median_review_score']} 
+                    textSize="text-xl lg:text-3xl"
+                  />
                 </div>
               </div>
               <ReviewCountChartBox 
