@@ -53,17 +53,6 @@ export default function ReviewCountChartBox(props) {
             />
           </a>
           </Tooltip>
-          
-            {/* <p className="text-center text-md line-clamp-2">
-              <b>{album['title']}</b>
-            </p>
-            <p className="text-center text-sm italic text-wrap">
-              {album['artist']}
-            </p>
-            <div className="text-center text-sm italic text-wrap">
-              <ClientTimestamp timestamp={review['review_date']} />
-            </div>
-          </a> */}
         </div>
       )
     })
