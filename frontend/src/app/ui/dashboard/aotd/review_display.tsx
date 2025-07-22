@@ -7,6 +7,7 @@ import { Alert } from "@heroui/react";
 // Expected Props:
 //  - album_id: String - Spotify Album ID to retrieve review
 //  - date: String - Date in which the album provided was AOTD (Historical Support)
+//  - historical: Boolean - Is this review display in a historical context 
 export default async function ReviewDisplay(props) {
   // Setup Props (Query backend if no reviewlist is passed in)
   const reviews = (props.review_list != null) ? props.review_list : await getReviewsForAlbum(props.album_id, props.date);
@@ -15,13 +16,14 @@ export default async function ReviewDisplay(props) {
   // If the user is an AOTD participant, check if they are about to lose a review streak
   const aotdUserData = await getAotdData();
 
+
   return (
     <div className="w-full min-w-[250px] max-w-full my-2 flex flex-col flex-shrink-0 gap-2">
       <div className="flex mx-auto gap-3">
         <p>User Reviews:</p>
         <p>{reviews.length}/{userCount}</p>
       </div>
-      <Conditional showWhen={aotdUserData['streak_at_risk'] && (aotdUserData['current_streak'] > 2)}>
+      <Conditional showWhen={aotdUserData['streak_at_risk'] && (aotdUserData['current_streak'] > 2) && (props.historical != true)}>
         <Alert
           className="w-full gap-2 text-sm"
           color="warning"
