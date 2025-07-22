@@ -70,6 +70,8 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
   out['album_id'] = dailyAlbumObj.album.mbid
   out['album_name'] = dailyAlbumObj.album.title
   out['album_data'] = json.loads(getAlbum(request, dailyAlbumObj.album.mbid).content)
+  out['manual'] = dailyAlbumObj.manual
+  out['admin_message'] = dailyAlbumObj.admin_message
   out['date'] = date
   logger.info(f"Returning Album of Day Object for Date {date}...")
   return JsonResponse(out)
@@ -158,6 +160,12 @@ def setAlbumOfDayADMIN(request: HttpRequest, date: str, mbid: str):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  # Get request body
+  try:
+    reqBody = json.loads(request.body)
+    adminMessage = reqBody['admin_message']
+  except:
+    adminMessage = None
   # Get current date
   day = datetime.datetime.strptime(date, "%Y-%m-%d")
   # Define Album Object
@@ -166,7 +174,8 @@ def setAlbumOfDayADMIN(request: HttpRequest, date: str, mbid: str):
   albumOfTheDayObj = DailyAlbum(
     album=albumOfTheDay,
     date=day,
-    manual=True
+    manual=True,
+    admin_message=adminMessage
   )
   # Save object
   albumOfTheDayObj.save()

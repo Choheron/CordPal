@@ -151,6 +151,7 @@ class DailyAlbum(models.Model):
     album = models.ForeignKey(Album, on_delete=models.PROTECT)
     date = models.DateField(unique=True)
     manual = models.BooleanField(default=False)
+    admin_message = models.TextField(null=True, blank=True)  # If set by an admin, and the admin provided a message, store that here. [The frontend will not show that an admin set this day unless a description is provided]
     rating_timeline = models.JSONField(default=generateTimelineDict, null=True)
     rating = models.FloatField(default=11.0, null=True) # Score for this day, will only be populated after the day is over (11 means it was not populated yet, Null means no reviews were made)
 

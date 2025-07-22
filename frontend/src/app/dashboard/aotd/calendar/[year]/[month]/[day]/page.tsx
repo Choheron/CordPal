@@ -7,7 +7,7 @@ import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/aotd/album_display"
 import ReviewDisplay from "@/app/ui/dashboard/aotd/review_display"
 import { AOtDScoreTimelineLineChart } from "@/app/ui/dashboard/aotd/statistics_displays/charts/aotd_score_timeline_linechart"
-import { Badge, Button, Divider } from "@heroui/react"
+import { Alert, Badge, Button, Divider } from "@heroui/react"
 import Link from "next/link"
 import { RiArrowLeftCircleFill, RiArrowLeftCircleLine, RiArrowRightCircleLine, RiCalendar2Fill } from "react-icons/ri"
 
@@ -92,6 +92,24 @@ export default async function Page({
                 <RiArrowRightCircleLine className="text-2xl" />
               </Button> 
             </div>
+            <Conditional showWhen={albumOfTheDayObj['manually_selected'] && albumOfTheDayObj['admin_message']}>
+              <Alert
+                className="w-full gap-2 text-sm mb-2"
+                color="primary"
+                radius="md"
+                hideIcon={true}
+              >
+                <div className="flex gap-2">
+                  <p className="text-2xl">&#8505;</p>
+                  <div className="">
+                    <p className="text-xs pt-1"><b>This album was manually selected by admins for this date. Reason:</b></p>
+                    <p className="my-auto">
+                      {albumOfTheDayObj['admin_message']}
+                    </p>
+                  </div>
+                </div>
+              </Alert>
+            </Conditional>
             <AlbumDisplay
               title={albumData("title")}
               disambiguation={albumData("disambiguation")}

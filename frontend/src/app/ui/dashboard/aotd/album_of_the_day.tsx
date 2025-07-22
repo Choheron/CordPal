@@ -1,6 +1,6 @@
 "use server"
 
-import { Button } from "@heroui/react";
+import { Alert, Button } from "@heroui/react";
 
 import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
@@ -17,6 +17,7 @@ import AddAlbumModal from "./modals/add_album_modal";
 import Link from "next/link";
 import { RiCalendar2Fill} from "react-icons/ri";
 import { getUserData } from "@/app/lib/user_utils";
+import { Conditional } from "../conditional";
 
 // GUI Display for the Album of the Day
 export default async function AlbumOfTheDayBox(props) {
@@ -73,6 +74,24 @@ export default async function AlbumOfTheDayBox(props) {
               <RiCalendar2Fill className="text-2xl" />
             </Button> 
           </div>
+          <Conditional showWhen={albumOfTheDayObj['manually_selected'] && albumOfTheDayObj['admin_message']}>
+            <Alert
+              className="w-full gap-2 text-sm mb-2"
+              color="primary"
+              radius="md"
+              hideIcon={true}
+            >
+              <div className="flex gap-2">
+                <p className="text-2xl">&#8505;</p>
+                <div className="">
+                  <p className="text-xs pt-1"><b>This album was manually selected by admins for this date. Reason:</b></p>
+                  <p className="my-auto">
+                    {albumOfTheDayObj['admin_message']}
+                  </p>
+                </div>
+              </div>
+            </Alert>
+          </Conditional>
           <AlbumDisplay 
             title={albumData("title")}
             disambiguation={albumData("disambiguation")}

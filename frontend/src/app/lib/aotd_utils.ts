@@ -289,6 +289,8 @@ export async function getAlbumOfTheDayData(date: string = '') {
   const albumData = await albumOfDayInfo['album_data']
   // Add Date for album of day
   albumData['AOD_date'] = albumOfDayInfo['date']
+  albumData['manually_selected'] = albumOfDayInfo['manual']
+  albumData['admin_message'] = albumOfDayInfo['admin_message']
   return albumData;
 }
 
