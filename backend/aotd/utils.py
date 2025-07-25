@@ -243,7 +243,7 @@ def getAlbumPartialReviewScore(album: Album = None, timestamp: datetime.datetime
   return average
 
 
-# Update a user review's stats in database
+# Update a user review and submission stats in database
 # First step in an attempt at optimizing user review stat retrieval
 def calculateUserReviewData(aotdUserObj: AotdUserData):
   user = aotdUserObj.user
@@ -269,7 +269,12 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   highest_review = all_reviews.order_by('score').last()
   highest_review_score = highest_review.score
   highest_review_mbid = highest_review.album.mbid
-  highest_review_date =highest_review.aotd_date
+  highest_review_date = highest_review.aotd_date
+  # Get submission stats
+  total_subs = Album.objects.filter(submitted_by=user).count()
+  total_select = DailyAlbum.objects.filter(album__submitted_by=user)
+  select_score_sum = total_select.aggregate(Sum('rating'))['rating__sum']
+  average_select_score = ((select_score_sum)/(total_select.count()))
   # Update user data
   aotdUserObj.total_reviews = total_reviews
   aotdUserObj.review_score_sum = review_sum
@@ -282,6 +287,11 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   aotdUserObj.highest_score_given = highest_review_score
   aotdUserObj.highest_score_mbid = highest_review_mbid
   aotdUserObj.highest_score_date = highest_review_date
+  # Update user Selection/Submission Data
+  aotdUserObj.total_submissions = total_subs
+  aotdUserObj.total_selected = total_select.count()
+  aotdUserObj.selection_score_sum = select_score_sum
+  aotdUserObj.average_selection_score = average_select_score
   # Save user data
   aotdUserObj.save()
 

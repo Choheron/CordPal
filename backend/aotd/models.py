@@ -51,6 +51,11 @@ class AotdUserData(models.Model):
   '''User's longest aotd Review streak'''
   last_review_date = models.DateField(null=True, blank=True)
   '''User's last review date (DateField)'''
+  # Track some submission stats
+  total_submissions = models.IntegerField(default=None, null=True)
+  total_selected = models.IntegerField(default=None, null=True)
+  selection_score_sum = models.FloatField(default=0)
+  average_selection_score = models.FloatField(default=0)
 
   # toString Method
   def __str__(self):

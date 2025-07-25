@@ -6,6 +6,7 @@ import numpy
 
 from .utils import (
   getAlbumRating,
+  calculateUserReviewData
 )
 from users.utils import getUserObj
 from .models import (
@@ -179,6 +180,8 @@ def submitAlbum(request: HttpRequest):
     )
     # Save new album data
     newAlbum.save()
+    # Update user data
+    calculateUserReviewData(AotdUserData.objects.get(user=user))
     return HttpResponse(status=200)
 
 
