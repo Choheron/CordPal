@@ -56,6 +56,7 @@ export default async function Page({
             <ReviewDisplay
               album_id={albumData("album_id")}
               date={date}
+              historical={true}
             />
             <Divider className="mb-2" />
             <Button

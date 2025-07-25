@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Router from "next/router"
 
-import { Button, Divider, Switch, Tooltip } from "@heroui/react";
+import { Accordion, AccordionItem, Button, Divider, Switch, Tooltip } from "@heroui/react";
 import ReviewTipTap from "../../general/input/Tiptap";
 import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@heroui/react";
 import { setReviewCookie, submitReviewToBackend } from "@/app/lib/aotd_utils";
@@ -33,6 +33,8 @@ export default function AlbumReviewBox(props) {
   // State management
   const [rating, setRating] = useState((props.rating != null) ? props.rating : 5);
   const [comment, setComment] = useState((props.comment != null) ? props.comment : `<p>No Comment Provided...</p>`);
+  const [collapsed, setCollapsed] = useState((props.rating != null) ? true : false)
+  const [collapseTitle, setCollapseTitle] = useState((props.rating != null) ? `Expand to edit your ${rating} star Review` : "Leave a Review")
   // const [favSong, setFavSong] = useState<Selection>(new Set([]));
   const [isReady, setIsReady] = useState(false);
   const [isFirstListen, setIsFirstListen] = useState((props.first_listen != null) ? props.first_listen : false);
@@ -54,6 +56,7 @@ export default function AlbumReviewBox(props) {
       ...prev,
       [cur['title']]: {
         "number": cur['number'],
+        "position": cur['position'],
         "title": cur['title'],
         "cordpal_rating": cur['cordpal_rating'],
         "cordpal_comment": cur['cordpal_comment']
@@ -190,140 +193,144 @@ export default function AlbumReviewBox(props) {
       className="w-full lg:w-[700px] px-2 lg:mx-auto py-2 mt-1 flex flex-col rounded-xl bg-zinc-800/30 border border-neutral-800"
       onMouseLeave={() => setTooltipOpen(false)}
     >
-      <div className="w-full flex flex-col lg:flex-row gap-2 my-2 px-2 justify-between">
-        <Switch 
-          isSelected={advanced} 
-          onValueChange={setAdvanced}
-          isDisabled={songList == null}
-        >
-          Advanced Review
-        </Switch>
-      </div>
-      {/* Advanced Review Display */}
-      <Conditional showWhen={advanced}>
-        <div>
-          <div className="w-full backdrop-blur-2xl px-2 py-1 md:mx-2 my-2 md:my-0 rounded-2xl bg-black/20 border border-neutral-800">
-            <p className="text-xs italic text-gray-300">
-              Advanced reviews allow you to give a song by song breakdown of an album, if you leave a song&apos;s comment unchanged it will not appear in the review but the stars will.
-            </p>
+      <Accordion defaultExpandedKeys={(collapsed) ? [""] : ["1"]} isCompact>
+        <AccordionItem key="1" aria-label="Accordion 1" title={collapseTitle}>
+          <div className="w-full flex flex-col lg:flex-row gap-2 my-2 px-2 justify-between">
+            <Switch 
+              isSelected={advanced} 
+              onValueChange={setAdvanced}
+              isDisabled={songList == null}
+            >
+              Advanced Review
+            </Switch>
           </div>
-          <p className="text-2xl">Track by Track Breakdown:</p>
-          <Divider />
-          {
-            songList.map((song, index) => (
-              <div 
-                key={index}
-                className="py-2"
-              >
-                <p className="text-lg">{song['number']}. <b>{song['title']}</b></p>
-                <div className="flex px-1">
-                  <Slider   
-                    size="sm"
-                    radius="sm"
-                    step={1}
-                    marks={getSongSteps()}
-                    color="warning"
-                    maxValue={4}
-                    minValue={0} 
-                    value={songReviewObj[song['title']]['cordpal_rating']}
-                    onChange={(rating) => handleTrackUpdate(song['title'], rating, songReviewObj[song['title']]['cordpal_comment'])}
-                    renderThumb={(props) => (
-                      <div
-                        {...props}
-                        className={`group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing`}
-                      >
-                        <span className={`transition-transform shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80 ${ratingToTailwindBgColor(songReviewObj[song['title']]['cordpal_rating'] * 2)}`} />
-                      </div>
-                    )}
-                    className="max-w-full px-5 mx-auto" 
-                  />
-                </div>
-                <ReviewTipTap 
-                  content={songReviewObj[song['title']]['cordpal_comment']}
-                  updateCallback={(comment) => handleTrackUpdate(song['title'], songReviewObj[song['title']]['cordpal_rating'], comment)}
-                />
-              </div> 
-            ))
-          }
-          <p className="text-2xl pt-2">Overall Review:</p>
-          <Divider />
-        </div>
-      </Conditional>
-      <div 
-        className="w-full flex flex-col lg:flex-row gap-2 justify-between"
-        onMouseEnter={() => setTooltipOpen(true)}
-        onMouseLeave={() => setTooltipOpen(false)}
-      >
-        <Tooltip 
-          className="bg-transparent/85 border-gray-600"
-          classNames={{ base: "pointer-events-none" }}
-          offset={-10}
-          content={
-            <SimilarRatingsBox 
-              rating={rating} 
-              albums={albumsByRating[Number.parseFloat(rating).toFixed(1)]}
-              timestamp={albumsByRating['metadata']['timestamp']} 
-            />
-          } 
-          showArrow={true} 
-          isOpen={tooltipOpen}
-        >
-          <Slider   
-            size="md"
-            radius="lg"
-            step={0.5}
-            marks={getSteps()}
-            color="warning"
-            label={(advanced) ? "Overall Album Rating" : "Album Rating"}
-            hideValue={true}
-            maxValue={10} 
-            minValue={0} 
-            value={rating}
-            onChange={handleSliderMove}
-            renderThumb={(props) => (
-              <div
-                {...props}
-                className="group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
-              >
-                <span className="transition-transform bg-yellow-600 shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80" />
+          {/* Advanced Review Display */}
+          <Conditional showWhen={advanced}>
+            <div>
+              <div className="w-full backdrop-blur-2xl px-2 py-1 md:mx-2 my-2 md:my-0 rounded-2xl bg-black/20 border border-neutral-800">
+                <p className="text-xs italic text-gray-300">
+                  Advanced reviews allow you to give a song by song breakdown of an album, if you leave a song&apos;s comment unchanged it will not appear in the review but the stars will.
+                </p>
               </div>
-            )}
-            className="max-w-full px-0 sm:px-10 mx-auto" 
-          />
-          </Tooltip>
-      </div>
-      <ReviewTipTap 
-        content={comment}
-        updateCallback={setComment}
-      />
-      <p className="text-xs mx-2 text-gray-400 mb-1">
-        Enter an optional comment to go with your review of this album. Tenor links will be updated on the display end.
-      </p>
-      <div className="w-full flex flex-col lg:flex-row gap-2 justify-between">
-        <Checkbox
-          isSelected={isFirstListen}
-          onValueChange={setIsFirstListen}
-        >
-          <div className="flex gap-1">
-            First Time Listen
+              <p className="text-2xl">Track by Track Breakdown:</p>
+              <Divider />
+              {
+                songList.map((song, index) => (
+                  <div 
+                    key={index}
+                    className="py-2"
+                  >
+                    <p className="text-lg">{song['number']}. <b>{song['title']}</b></p>
+                    <div className="flex px-1">
+                      <Slider   
+                        size="sm"
+                        radius="sm"
+                        step={1}
+                        marks={getSongSteps()}
+                        color="warning"
+                        maxValue={4}
+                        minValue={0} 
+                        value={songReviewObj[song['title']]['cordpal_rating']}
+                        onChange={(rating) => handleTrackUpdate(song['title'], rating, songReviewObj[song['title']]['cordpal_comment'])}
+                        renderThumb={(props) => (
+                          <div
+                            {...props}
+                            className={`group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing`}
+                          >
+                            <span className={`transition-transform shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80 ${ratingToTailwindBgColor(songReviewObj[song['title']]['cordpal_rating'] * 2)}`} />
+                          </div>
+                        )}
+                        className="max-w-full px-5 mx-auto" 
+                      />
+                    </div>
+                    <ReviewTipTap 
+                      content={songReviewObj[song['title']]['cordpal_comment']}
+                      updateCallback={(comment) => handleTrackUpdate(song['title'], songReviewObj[song['title']]['cordpal_rating'], comment)}
+                    />
+                  </div> 
+                ))
+              }
+              <p className="text-2xl pt-2">Overall Review:</p>
+              <Divider />
+            </div>
+          </Conditional>
+          <div 
+            className="w-full flex flex-col lg:flex-row gap-2 justify-between"
+            onMouseEnter={() => setTooltipOpen(true)}
+            onMouseLeave={() => setTooltipOpen(false)}
+          >
+            <Tooltip 
+              className="bg-transparent/85 border-gray-600"
+              classNames={{ base: "pointer-events-none" }}
+              offset={-10}
+              content={
+                <SimilarRatingsBox 
+                  rating={rating} 
+                  albums={albumsByRating[Number.parseFloat(rating).toFixed(1)]}
+                  timestamp={albumsByRating['metadata']['timestamp']} 
+                />
+              } 
+              showArrow={true} 
+              isOpen={tooltipOpen}
+            >
+              <Slider   
+                size="md"
+                radius="lg"
+                step={0.5}
+                marks={getSteps()}
+                color="warning"
+                label={(advanced) ? "Overall Album Rating" : "Album Rating"}
+                hideValue={true}
+                maxValue={10} 
+                minValue={0} 
+                value={rating}
+                onChange={handleSliderMove}
+                renderThumb={(props) => (
+                  <div
+                    {...props}
+                    className="group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
+                  >
+                    <span className="transition-transform bg-yellow-600 shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80" />
+                  </div>
+                )}
+                className="max-w-full px-0 sm:px-10 mx-auto" 
+              />
+              </Tooltip>
           </div>
-        </Checkbox>
-        <div className="flex flex-col gap-1">
-          <Checkbox
-            isSelected={isReady}
-            onValueChange={setIsReady}
-            isDisabled={!isReviewUpdated}
-          >
-            Ready to {(props.hasUserSubmitted)? "Update" : "Submit"}
-          </Checkbox>
-          <Button
-            isDisabled={!isReady}
-            onPress={submitReview}
-          >
-            {(props.hasUserSubmitted)? "Update" : "Submit"} Review
-          </Button>
-        </div>
-      </div>
+          <ReviewTipTap 
+            content={comment}
+            updateCallback={setComment}
+          />
+          <p className="text-xs mx-2 text-gray-400 mb-1">
+            Enter an optional comment to go with your review of this album. Tenor links will be updated on the display end.
+          </p>
+          <div className="w-full flex flex-col lg:flex-row gap-2 justify-between">
+            <Checkbox
+              isSelected={isFirstListen}
+              onValueChange={setIsFirstListen}
+            >
+              <div className="flex gap-1">
+                First Time Listen
+              </div>
+            </Checkbox>
+            <div className="flex flex-col gap-1">
+              <Checkbox
+                isSelected={isReady}
+                onValueChange={setIsReady}
+                isDisabled={!isReviewUpdated}
+              >
+                Ready to {(props.hasUserSubmitted)? "Update" : "Submit"}
+              </Checkbox>
+              <Button
+                isDisabled={!isReady}
+                onPress={submitReview}
+              >
+                {(props.hasUserSubmitted)? "Update" : "Submit"} Review
+              </Button>
+            </div>
+          </div>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }

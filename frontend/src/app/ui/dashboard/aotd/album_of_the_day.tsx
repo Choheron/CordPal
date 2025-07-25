@@ -121,6 +121,7 @@ export default async function AlbumOfTheDayBox(props) {
                 albumData("track_list")['tracks'].map((trackData) => (
                   {
                     "number": trackData['number'],
+                    "position": trackData['position'],
                     "title": trackData['title'],
                     "cordpal_rating": ((albumReview != null) && (albumReview['trackData'] != null) && (albumReview['trackData'][trackData['title']] != null)) ? albumReview['trackData'][trackData['title']]['cordpal_rating'] : 2,
                     "cordpal_comment": ((albumReview != null) && (albumReview['trackData'] != null) && (albumReview['trackData'][trackData['title']] != null)) ? albumReview['trackData'][trackData['title']]['cordpal_comment'] : "No Comment Provided..."
