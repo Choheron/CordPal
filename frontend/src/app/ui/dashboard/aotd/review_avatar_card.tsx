@@ -72,7 +72,7 @@ export default async function ReviewAvatarCard(props) {
   // Replace overall review message embeds
   reviewMessage = await doEmbedReplacements(reviewMessage)
   const parsedTrackComments = advanced ? await Promise.all(
-      Object.values(trackData).sort((a: any, b: any) => a.position - b.position).map(async (songObj: any) => {
+      Object.values(trackData).sort((a: any, b: any) => a.number - b.number).map(async (songObj: any) => {
         const parsedComment = await doEmbedReplacements(songObj['cordpal_comment']);
         return { ...songObj, parsedComment };
       })
