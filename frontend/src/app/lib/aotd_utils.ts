@@ -144,7 +144,7 @@ export async function submitAlbumToBackend(albumObject) {
   // Revalidate requests to see recent submissions
   revalidateTag('album_submissions')
   // Return Status
-  return submitAlbumResponse.status
+  return {"status": submitAlbumResponse.status, "crid": submitAlbumResponse.headers.get("X-CRID")}
 }
 
 
@@ -475,7 +475,10 @@ export async function submitReviewToBackend(reviewObject) {
   const now = new Date()
   revalidateTag(`calendar-${now.getFullYear()}-${padNumber(now.getMonth() + 1)}`)
   // Return callback code
-  return submitReviewResponse.status
+  return {
+    status: submitReviewResponse.status,
+    crid: submitReviewResponse.headers.get("X-CRID")
+  }
 }
 
 

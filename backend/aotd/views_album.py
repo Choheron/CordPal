@@ -56,7 +56,7 @@ def parseReleaseDate(date_str):
 def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("checkIfUserCanSubmit called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - checkIfUserCanSubmit called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -105,12 +105,12 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
 def checkIfAlbumAlreadyExists(request: HttpRequest, release_group_id: str):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("checkIfAlbumAlreadyExists called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - checkIfAlbumAlreadyExists called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
   # Convert response to Json
-  logger.info(f"Checking if album with a release group ID {release_group_id} is already submitted...")
+  logger.info(f"{request.crid} - Checking if album with a release group ID {release_group_id} is already submitted...")
   # Declare out dict
   out = {}
   # Get album from database
@@ -119,7 +119,7 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, release_group_id: str):
     albumObject = Album.objects.get(**kwargs)
     # Check if any other album of the same release-group exists
     if(albumObject):
-      logger.info(f"Album does already exist, name: {albumObject.title}!")
+      logger.info(f"{request.crid} - Album does already exist, name: {albumObject.title}!")
     out['exists'] = True
     out['submitter_id'] = albumObject.submitted_by.discord_id
     out['submitter_nickname'] = albumObject.submitted_by.nickname
@@ -135,7 +135,7 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, release_group_id: str):
 def submitAlbum(request: HttpRequest):
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("submitAlbum called with a non-POST method, returning 405.")
+    logger.warning(f"{request.crid} - submitAlbum called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -145,13 +145,13 @@ def submitAlbum(request: HttpRequest):
   try:
     albumObject = Album.objects.get(mbid = reqBody['album']['id'])
     if(albumObject):
-      logger.info(f"Album already exists, name: {albumObject.title}!")
+      logger.info(f"{request.crid} - Album already exists, name: {albumObject.title}!")
     return HttpResponse(status=400)
   except ObjectDoesNotExist as e:
     # Get user from database
     user = getUserObj(request.session.get('discord_id'))
     # Query musicbrainz to get full album data using mbid (to avoid issues with params)
-    url =  f"https://musicbrainz.org/ws/2/release/{reqBody['album']['id']}"
+    url =  f"https://musicbrainz.org/ws/2/release/{reqBody['album']['id']}sdwe"
     params = {
       'inc': 'artists+release-groups+recordings+genres',
       'fmt': 'json'
@@ -190,7 +190,7 @@ def submitAlbum(request: HttpRequest):
 def deleteAlbum(request: HttpRequest):
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("deleteAlbum called with a non-POST method, returning 405.")
+    logger.warning(f"{request.crid} - deleteAlbum called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -203,19 +203,19 @@ def deleteAlbum(request: HttpRequest):
     user = getUserObj(request.session['discord_id'])
     # If user has not submitted the attempted delete, throw an error (Does not apply to admins)
     if((albumObject.submitted_by != user) and (not user.is_staff)):
-      logger.warning(f"deleteAlbum: User {user.discord_id}/{user.nickname} attempted to delete Album: {reqBody['album_id']}, however did not submit said Album!")
+      logger.warning(f"{request.crid} - deleteAlbum: User {user.discord_id}/{user.nickname} attempted to delete Album: {reqBody['album_id']}, however did not submit said Album!")
       return HttpResponse(status=403)
     # Check if the album has been AOtD
     if(DailyAlbum.objects.filter(album=albumObject).count() > 0):
-      logger.warning(f"deleteAlbum: User {user.discord_id}/{user.nickname} attempted to delete Album: {reqBody['album_id']}, FAILED due to Album having been AOtD!")
+      logger.warning(f"{request.crid} - deleteAlbum: User {user.discord_id}/{user.nickname} attempted to delete Album: {reqBody['album_id']}, FAILED due to Album having been AOtD!")
       return HttpResponse(status=403)
     # Delete album object from database
     albumObject.delete(deleter=user, reason=reqBody['reason'])
-    logger.info(f"Album {reqBody['album_id']} has been deleted...")
+    logger.info(f"{request.crid} - Album {reqBody['album_id']} has been deleted...")
     return HttpResponse(status=200)
   except ObjectDoesNotExist as e:
     # Throw error if the album is not in the database
-    logger.warning(f"deleteAlbum: Album {reqBody['album_id']} does not exist in Albums DB")
+    logger.warning(f"{request.crid} - deleteAlbum: Album {reqBody['album_id']} does not exist in Albums DB")
     return HttpResponse(status=404)
   
 
@@ -225,7 +225,7 @@ def deleteAlbum(request: HttpRequest):
 def getAlbum(request: HttpRequest, mbid: str):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("submitAlbum called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - submitAlbum called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -264,7 +264,7 @@ def getAlbum(request: HttpRequest, mbid: str):
 def getAllAlbums(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAllAlbums called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAllAlbums called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -319,7 +319,7 @@ def getAlbumAvgRating(request: HttpRequest, mbid: str, rounded: str = "true", da
     rounded = False
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAlbumAvgRating called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAlbumAvgRating called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -336,7 +336,7 @@ def getAlbumSTD(request: HttpRequest, mbid: str, date: str = None):
   aotd_date = date if (date) else DailyAlbum.objects.filter(album__mbid=mbid).latest('date').date
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAlbumSTD called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAlbumSTD called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -358,7 +358,7 @@ def getAlbumSTD(request: HttpRequest, mbid: str, date: str = None):
 def getLastXAlbums(request: HttpRequest, count: int):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getLastXAlbums called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getLastXAlbums called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -388,7 +388,7 @@ def getAlbumsStats(request: HttpRequest):
   from .views_aotd import getChanceOfAotdSelect
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAlbumsStats called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAlbumsStats called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -432,7 +432,7 @@ def getUserAlbumsStats(request: HttpRequest, user_discord_id: str | None = None)
   from .views_aotd import getChanceOfAotdSelect
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAlbumsStats called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAlbumsStats called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -471,7 +471,7 @@ def getUserAlbumsStats(request: HttpRequest, user_discord_id: str | None = None)
 def getLowestHighestAlbumStats(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getLowestHighestAlbumStats called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getLowestHighestAlbumStats called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -513,7 +513,7 @@ def getLowestHighestAlbumStats(request: HttpRequest):
 def getSubmissionsByMonth(request: HttpRequest, year: str, month: str):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getSubmissionsByMonth called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getSubmissionsByMonth called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -561,7 +561,7 @@ def getSubmissionsByMonth(request: HttpRequest, year: str, month: str):
 def isUserAlbumUploader(request: HttpRequest, mbid: str, user_discord_id: str = None):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("isUserAlbumUploader called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - isUserAlbumUploader called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res

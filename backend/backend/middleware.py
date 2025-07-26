@@ -7,6 +7,7 @@ from users.models import (
 
 import logging
 import json
+import uuid
 
 class metadataMiddleware:
 
@@ -17,7 +18,9 @@ class metadataMiddleware:
 
   def __call__(self, request: HttpRequest):
 
-    # Do nothing beforehand, so far... (NOTE: There are some actions in the users middlewware.)
+    # Generate a request ID and attach it to the headers on the incoming request
+    crid = str(uuid.uuid4()) # CRID = Cordpal Request ID
+    request.crid = crid
     
     # Code above this line is executed before the view is called
     # Retrieving the response 
@@ -27,11 +30,16 @@ class metadataMiddleware:
     # If the response is a JsonResponse, attach or override the response metadata timestamp
     if isinstance(response, JsonResponse):
       data = json.loads(response.content)
-      data['meta'] = { 'timestamp': timezone.now().strftime("%d/%m/%Y, %H:%M:%S") }
+      data['meta'] = { 
+        'timestamp': timezone.now().strftime("%d/%m/%Y, %H:%M:%S"),
+        'crid': request.crid
+      }
       response.content = json.dumps(data)
     # Attach a header to show that this was not a cache hit
     response['X-Generated-At'] = timezone.now().strftime("%d/%m/%Y, %H:%M:%S") + " " + timezone.get_current_timezone_name()
     response["Access-Control-Expose-Headers"] = "X-Generated-At"
+    # Attach header for CRID
+    response['X-CRID'] = request.crid
     
     # Returning the response
     return response

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Router from "next/router"
 
-import { Accordion, AccordionItem, Button, Divider, Switch, Tooltip } from "@heroui/react";
+import { Accordion, AccordionItem, addToast, Button, Divider, Switch, Tooltip } from "@heroui/react";
 import ReviewTipTap from "../../general/input/Tiptap";
 import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@heroui/react";
 import { setReviewCookie, submitReviewToBackend } from "@/app/lib/aotd_utils";
@@ -63,6 +63,8 @@ export default function AlbumReviewBox(props) {
       }
     }), {})
   )
+  // Track loading state for submit review button
+  const [awaitingResponse, setAwaitingResponse] = useState(false)
 
   // Get steps for song by song ratings
   const getSongSteps = () => {
@@ -159,10 +161,28 @@ export default function AlbumReviewBox(props) {
       out['trackData'] = songReviewObj
     }
 
-    await submitReviewToBackend(out)
+    setIsReviewUpdated(false)
+    setAwaitingResponse(true)
+    const response = await submitReviewToBackend(out)
+    // Toggle off waiting for response
+    setAwaitingResponse(false)
+    // Alert user based on response
+    if(response.status == 200) {
+      addToast({
+        title: `Successfully submitted Review!`,
+        description: `Your ${out['score']} star review has been submitted and confirmed!`,
+        color: "success",
+      })
+    } else {
+      addToast({
+        title: `Failed to submit Review!`,
+        description: `Review submission failure with the following HTTP error code: ${response.status}. Please contact server administrators with CRID: ${response.crid}.`,
+        color: "danger",
+      })
+    }
     // Turn off review ready checkmark
     setIsReady(false)
-    setIsReviewUpdated(false)
+    
     // Refresh page
     router.refresh();
   }
@@ -324,6 +344,7 @@ export default function AlbumReviewBox(props) {
               <Button
                 isDisabled={!isReady}
                 onPress={submitReview}
+                isLoading={awaitingResponse}
               >
                 {(props.hasUserSubmitted)? "Update" : "Submit"} Review
               </Button>

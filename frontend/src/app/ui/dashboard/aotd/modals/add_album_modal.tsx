@@ -146,9 +146,9 @@ export default function AddAlbumModal(props) {
     albumData['user_comment'] = commentValue
     albumData['album'] = selectedAlbum
     // Call backend to submit album
-    const status = await submitAlbumToBackend(albumData)
+    const responseObj = await submitAlbumToBackend(albumData)
     // Alert user of action status
-    if((status == 200) && (selectedAlbum != null)) {
+    if((responseObj['status'] == 200) && (selectedAlbum != null)) {
       addToast({
         title: `Successfully submitted "${selectedAlbum['title']}"!`,
         description: `${selectedAlbum['title']} has been added to the Album of the Day Selecton Pool!`,
@@ -157,7 +157,7 @@ export default function AddAlbumModal(props) {
     } else {
       addToast({
         title: `Failed to submit album!`,
-        description: `Album failiure submitted with the following error code: ${status}. Please contact server administrators.`,
+        description: `Album failiure submitted with the following error code: ${responseObj['status']}. Please contact server administrators with CRID: ${responseObj['crid']}.`,
         color: "danger",
       })
     }
@@ -192,7 +192,7 @@ export default function AddAlbumModal(props) {
             onPress={onOpen}
             radius="none"
             variant="solid"
-            isDisabled={!userAllowedToSubmit}
+            // isDisabled={!userAllowedToSubmit}
           >
             <b>Submit An Album</b>
           </Button>
