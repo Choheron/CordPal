@@ -38,7 +38,7 @@ class LastSeenMiddleware:
         if(full_path == "/users/heartbeat"):
           # Update timezone if timezone is in request
           user.timezone_string = json.loads(request.body)['heartbeat']['timezone']
-          self.logger.info(f"Setting timezone to {str(user.timezone_string)} for user {user.nickname}")
+          self.logger.info(f"{request.crid} - Setting timezone to {str(user.timezone_string)} for user {user.nickname}")
         user.last_heartbeat_timestamp = time
         self.logger.debug(f"Setting last_heartbeat_timestamp to {str(time)} for user {user.nickname}")
         user.save()
@@ -50,16 +50,14 @@ class LastSeenMiddleware:
     except Exception as e:
       if(isinstance(e, User.DoesNotExist)):
         # Log method call (With username)
-        self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}")
-      elif(full_path.startswith("/aotd")):
-        self.logger.info("AOTD TESTING")
+        self.logger.info(f"{request.crid} - Incoming Request from user \"UNKNOWN\": {full_path}")
       else:
         if(full_path == "/metrics"):
-          self.logger.debug(f"Reporting metrics to prometheus")
+          self.logger.debug(f"{request.crid} - Reporting metrics to prometheus")
         elif(full_path in self.no_user_validation_paths):
-          self.logger.info(f"Incoming request to path {full_path} without a discord_id in request... Possibly a cron?")
+          self.logger.info(f"{request.crid} - Incoming request to path {full_path} without a discord_id in request... Possibly a cron?")
         else:
-          self.logger.error(f"ERROR IN USER MIDDLEWARE: PATH: {full_path} TRACEBACK: {traceback.print_exc()}")
+          self.logger.error(f"{request.crid} - ERROR IN USER MIDDLEWARE: PATH: {full_path} TRACEBACK: {traceback.print_exc()}")
     
     # Code above this line is executed before the view is called
     # Retrieving the response 
