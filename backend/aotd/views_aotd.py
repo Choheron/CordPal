@@ -224,7 +224,7 @@ def calculateAOTDChances(request: HttpRequest):
   one_year_ago = day - datetime.timedelta(days=365)
   # Get user list
   user_list = AotdUserData.objects.all().annotate(
-    total_submissions=Count('user__album', distinct=True),
+    total_album_submissions=Count('user__album', distinct=True),
     recent_picks=Count(
       'user__album__dailyalbum',
       filter=Q(user__album__dailyalbum__date__gte=one_year_ago),
@@ -246,7 +246,7 @@ def calculateAOTDChances(request: HttpRequest):
   eligible_users = aotd_users.filter(
     selection_blocked_flag=False
   ).exclude(user_id__in=user_outage_map).select_related('user').annotate(
-    total_submissions=Count('user__album', distinct=True),
+    total_album_submissions=Count('user__album', distinct=True),
     recent_picks=Count(
       'user__album__dailyalbum',
       filter=Q(user__album__dailyalbum__date__gte=one_year_ago),
@@ -293,7 +293,7 @@ def calculateAOTDChances(request: HttpRequest):
       user_submissions_count = Album.objects.filter(submitted_by=user).count()
       user_eligible_count = user_submissions_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=user).count())
       total_eligible_count = sum(
-        user.total_submissions - user.recent_picks for user in eligible_users
+        user.total_album_submissions - user.recent_picks for user in eligible_users
       )
       # Do math for percentage
       try:

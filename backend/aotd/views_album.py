@@ -151,7 +151,7 @@ def submitAlbum(request: HttpRequest):
     # Get user from database
     user = getUserObj(request.session.get('discord_id'))
     # Query musicbrainz to get full album data using mbid (to avoid issues with params)
-    url =  f"https://musicbrainz.org/ws/2/release/{reqBody['album']['id']}sdwe"
+    url =  f"https://musicbrainz.org/ws/2/release/{reqBody['album']['id']}"
     params = {
       'inc': 'artists+release-groups+recordings+genres',
       'fmt': 'json'
