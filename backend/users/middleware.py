@@ -30,7 +30,7 @@ class LastSeenMiddleware:
       # Get user object 
       user = User.objects.get(discord_id=request.session['discord_id'])
       # Log method call (With username)
-      self.logger.info(f"Incoming Request from user \"{user.nickname}\": {full_path}")
+      self.logger.info(f"Incoming Request - CRID: {request.crid} - User \"{user.nickname}\": {full_path}")
       # Get current timestamp
       time = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
       # Update only heartbeat timestamp if its a heartbeat call, otherwise update last_request_timestamp
