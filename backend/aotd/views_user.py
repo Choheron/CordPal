@@ -32,7 +32,7 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 def getAotdUsersObj(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAotdUsersObj called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAotdUsersObj called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -54,7 +54,7 @@ def getAotdUsersObj(request: HttpRequest):
 def getAotdUsersList(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAotdUsersList called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAotdUsersList called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -78,7 +78,7 @@ def getAotdUsersList(request: HttpRequest):
 def getAotdUserCount(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAotdUserCount called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAotdUserCount called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -96,7 +96,7 @@ def getAotdUserCount(request: HttpRequest):
 def getAotdData(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAotdData called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAotdData called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -120,7 +120,7 @@ def getAotdData(request: HttpRequest):
 def getSelectionBlockedFlag(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getSelectionBlockedFlag called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getSelectionBlockedFlag called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -128,5 +128,5 @@ def getSelectionBlockedFlag(request: HttpRequest):
   user = getUserObj(request.session.get('discord_id'))
   # Retrieve and return that user's flag status
   flag_status = (AotdUserData.objects.get(user=user)).selection_blocked_flag
-  logger.info(f"Returning selection blocked flag status of {flag_status} for user {user.discord_id}...")
+  logger.info(f"{request.crid} - Returning selection blocked flag status of {flag_status} for user {user.discord_id}...")
   return JsonResponse({"selection_blocked": flag_status})

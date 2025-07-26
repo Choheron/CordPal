@@ -182,7 +182,7 @@ export default function AlbumReviewBox(props) {
     }
     // Turn off review ready checkmark
     setIsReady(false)
-    
+    setCollapsed(true)
     // Refresh page
     router.refresh();
   }

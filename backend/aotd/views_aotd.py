@@ -49,7 +49,7 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
     date = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d')
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAlbumOfDay called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAlbumOfDay called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -73,7 +73,7 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
   out['manual'] = dailyAlbumObj.manual
   out['admin_message'] = dailyAlbumObj.admin_message
   out['date'] = date
-  logger.info(f"Returning Album of Day Object for Date {date}...")
+  logger.info(f"{request.crid} - Returning Album of Day Object for Date {date}...")
   return JsonResponse(out)
 
 
@@ -85,7 +85,7 @@ def setAlbumOfDay(request: HttpRequest):
   management.call_command("clearsessions", verbosity=0)
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("setAlbumOfDay called with a non-POST method, returning 405.")
+    logger.warning(f"{request.crid} - setAlbumOfDay called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -97,10 +97,10 @@ def setAlbumOfDay(request: HttpRequest):
   # Check if a current album of the day already exists
   try:
     currDayAlbum = DailyAlbum.objects.get(date=day)
-    logger.warning(f"WARN: Album of the day already selected: {currDayAlbum}")
+    logger.warning(f"{request.crid} - WARN: Album of the day already selected: {currDayAlbum}")
     return HttpResponse(f"WARN: Album of the day already selected: {currDayAlbum}", status=425)
   except DailyAlbum.DoesNotExist:
-    logger.info("Today does not yet have an album, selecting one...")
+    logger.info(f"{request.crid} - {request.crid} - Today does not yet have an album, selecting one...")
   # Get Date a year ago to filter by
   one_year_ago = day - datetime.timedelta(days=365)
   # Define a boolean for selecting the right album
@@ -109,20 +109,20 @@ def setAlbumOfDay(request: HttpRequest):
   albumOfTheDay = None
   # Get all users currently in an outage
   outage_users = list(UserAlbumOutage.objects.filter(start_date__lte=day, end_date__gte=day).values_list('user__discord_id', flat=True))
-  logger.warning(f"Outage Users: {outage_users}")
+  logger.warning(f"{request.crid} - Outage Users: {outage_users}")
   # Get list of all users who are currently AOtD selection blocked
   blocked_users = list(AotdUserData.objects.filter(selection_blocked_flag=True).values_list('user__discord_id', flat=True))
-  logger.warning(f"Blocked Users: {blocked_users}")
+  logger.warning(f"{request.crid} - Blocked Users: {blocked_users}")
   # Get set of all eligible albums
   albumPool = Album.objects.all().exclude(submitted_by__discord_id__in=blocked_users).exclude(submitted_by__discord_id__in=outage_users)
   while(not selected):
     # If no eligible albums, error out..
     if(len(albumPool) == 0):
-      logger.error(f"WARNING! NO ELIGIBLE ALBUMS FOR SELECTION! NO ALBUM WILL BE SELECTED")
+      logger.error(f"{request.crid} - WARNING! NO ELIGIBLE ALBUMS FOR SELECTION! NO ALBUM WILL BE SELECTED")
       return HttpResponse(f'No albums eligible for selection!', status=404)
     # Filter out blocked users albums
     tempAlbum = random.choice(albumPool)
-    logger.info(f"Temp album selected: {tempAlbum.title}")
+    logger.info(f"{request.crid} - Temp album selected: {tempAlbum.title}")
     albumCheck = DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album=tempAlbum).count()
     if(albumCheck != 0):
       albumPool = albumPool.exclude(mbid=tempAlbum.mbid)
@@ -144,9 +144,9 @@ def setAlbumOfDay(request: HttpRequest):
     yesterday_aotd.rating = getAlbumRating(yesterday_aotd.album.mbid, False, yesterday.strftime("%Y-%m-%d"))
     yesterday_aotd.save()
   except:
-    logger.error(f"ERROR IN GENERATING TIMELINE DATA FOR DATE: {yesterday.strftime('%Y-%m-%d')} TRACEBACK: {traceback.print_exc()}")
+    logger.error(f"{request.crid} - ERROR IN GENERATING TIMELINE DATA FOR DATE: {yesterday.strftime('%Y-%m-%d')} TRACEBACK: {traceback.print_exc()}")
   # Print success
-  logger.info(f'Successfully selected album of the day: \"{albumOfTheDayObj}\" submitted by: \"{albumOfTheDay.submitted_by.nickname}\"')
+  logger.info(f'{request.crid} - Successfully selected album of the day: \"{albumOfTheDayObj}\" submitted by: \"{albumOfTheDay.submitted_by.nickname}\"')
   return HttpResponse(f'Successfully selected album of the day: \"{albumOfTheDayObj}\" submitted by: \"{albumOfTheDay.submitted_by.nickname}\"')
 
 
@@ -156,7 +156,7 @@ def setAlbumOfDay(request: HttpRequest):
 def setAlbumOfDayADMIN(request: HttpRequest, date: str, mbid: str):
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("setAlbumOfDayADMIN called with a non-POST method, returning 405.")
+    logger.warning(f"{request.crid} - setAlbumOfDayADMIN called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -180,7 +180,7 @@ def setAlbumOfDayADMIN(request: HttpRequest, date: str, mbid: str):
   # Save object
   albumOfTheDayObj.save()
   # Print success
-  logger.info(f'Successfully set album of the day for {date}: {albumOfTheDayObj}')
+  logger.info(f'{request.crid} - Successfully set album of the day for {date}: {albumOfTheDayObj}')
   return HttpResponse(f'Successfully set album of the day for {date}: {albumOfTheDayObj}')
 
 
@@ -190,7 +190,7 @@ def setAlbumOfDayADMIN(request: HttpRequest, date: str, mbid: str):
 def getAotdDates(request: HttpRequest, mbid: str):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAotdDates called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAotdDates called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -213,7 +213,7 @@ def getAotdDates(request: HttpRequest, mbid: str):
 def calculateAOTDChances(request: HttpRequest):
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("calculateAOTDChances called with a non-POST method, returning 405.")
+    logger.warning(f"{request.crid} - calculateAOTDChances called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -255,7 +255,7 @@ def calculateAOTDChances(request: HttpRequest):
   )
   # Iterate all aotd users and calculate aotd chances
   for aotdUser in aotd_users:
-    logger.info(f"Calculating chance percentage for user {aotdUser.user.nickname}")
+    logger.info(f"{request.crid} - Calculating chance percentage for user {aotdUser.user.nickname}")
     # Retrieve user from aotd data
     user = aotdUser.user
     # Get the user's chance object
@@ -270,9 +270,9 @@ def calculateAOTDChances(request: HttpRequest):
     )[0]
     # Check if user is currently under an outage
     if(user.pk in user_outage_map):
-      logger.info(f"\t{aotdUser.user.nickname} is under an outage!")
+      logger.info(f"{request.crid} - \t{aotdUser.user.nickname} is under an outage!")
       outage = UserAlbumOutage.objects.filter(start_date__lte=tomorrow, end_date__gte=tomorrow).get(user=user)
-      logger.info(f"User {user.nickname} is currently under an outage, lasts until {outage.end_date.strftime('%Y-%m-%d')}!")
+      logger.info(f"{request.crid} - User {user.nickname} is currently under an outage, lasts until {outage.end_date.strftime('%Y-%m-%d')}!")
       # Create outage return json
       userChanceObj.chance_percentage = 0.00
       userChanceObj.block_type = "OUTAGE"
@@ -280,7 +280,7 @@ def calculateAOTDChances(request: HttpRequest):
       userChanceObj.reason = f"{outage.reason}"
     elif(aotdUser.selection_blocked_flag):
       # Check if user's selections are currently blocked, return 0% chance
-      logger.info(f"\t{aotdUser.user.nickname} is blocked from selection!")
+      logger.info(f"{request.crid} - \t{aotdUser.user.nickname} is blocked from selection!")
       # Get user's last review
       lastReview = Review.objects.filter(user=aotdUser.user).order_by('-aotd_date').first()
       days_since = day - (lastReview.aotd_date if (lastReview != None) else day)
@@ -316,7 +316,7 @@ def calculateAOTDChances(request: HttpRequest):
 def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getChanceOfAotdSelect called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getChanceOfAotdSelect called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -336,7 +336,7 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
 def getAOtDByMonth(request: HttpRequest, year: str, month: str):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAOtDByMonth called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAOtDByMonth called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -423,7 +423,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
 def getDayTimelineData(request: HttpRequest, aotd_date: str):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getDayTimelineData called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getDayTimelineData called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -431,14 +431,14 @@ def getDayTimelineData(request: HttpRequest, aotd_date: str):
   try:
     aotd_obj = DailyAlbum.objects.get(date=datetime.datetime.strptime(aotd_date, "%Y-%m-%d"))
   except:
-    logger.error(f"AOTD Object not found for passed in date: {aotd_date}")
+    logger.error(f"{request.crid} - AOTD Object not found for passed in date: {aotd_date}")
     return JsonResponse({"timeline": []})
   # Check if aotd object has a timeline (if its not today and doesnt have a timeline, something is wrong)
   # Get current date
   day = datetime.date.today()
   aotd_date_obj = datetime.datetime.strptime(aotd_date, "%Y-%m-%d")
   if((day != aotd_date_obj.date()) and (aotd_obj.rating_timeline == {"timeline": []})):
-    logger.error(f"ATTENTION: AOTD \"{aotd_obj.album.mbid}\" for date: {aotd_date} DID NOT HAVE A TIMELINE -- ATTEMPTING TO GENERATE ONE NOW")
+    logger.error(f"{request.crid} - ATTENTION: AOTD \"{aotd_obj.album.mbid}\" for date: {aotd_date} DID NOT HAVE A TIMELINE -- ATTEMPTING TO GENERATE ONE NOW")
     generateDayRatingTimeline(aotd_obj)
     aotd_obj.rating = getAlbumRating(aotd_obj.album.mbid, False, aotd_date)
     aotd_obj.save()

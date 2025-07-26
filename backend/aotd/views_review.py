@@ -50,7 +50,7 @@ def submitReview(request: HttpRequest):
   date = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d')
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("submitReview called with a non-POST method, returning 405.")
+    logger.warning(f"{request.crid} - submitReview called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -91,7 +91,7 @@ def submitReview(request: HttpRequest):
       # Update user's streak data
       update_user_streak(userObj)
   except:
-    logger.error(f"ERROR: Failed to save review for user \"{userObj.nickname}\" ({userObj.discord_id}) targeting album {albumObj.mbid} for date {date}!")
+    logger.error(f"{request.crid} - ERROR: Failed to save review for user \"{userObj.nickname}\" ({userObj.discord_id}) targeting album {albumObj.mbid} for date {date}!")
     return HttpResponse(500)
   # Update user selection_blocked flag status
   checkSelectionFlag(AotdUserData.objects.get(user=userObj))
@@ -106,7 +106,7 @@ def submitReview(request: HttpRequest):
 def getReviewsForAlbum(request: HttpRequest, mbid: str, date: str = None):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getReviewsForAlbum called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getReviewsForAlbum called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -158,7 +158,7 @@ def getReviewsForAlbum(request: HttpRequest, mbid: str, date: str = None):
 def getUserReviewForAlbum(request: HttpRequest, mbid: str, date: str = None):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getUserReviewForAlbum called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getUserReviewForAlbum called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -193,7 +193,7 @@ def getUserReviewForAlbum(request: HttpRequest, mbid: str, date: str = None):
 def getAllUserReviewStats(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAllUserReviewStats called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAllUserReviewStats called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -236,7 +236,7 @@ def getAllUserReviewStats(request: HttpRequest):
 def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getUserReviewStats called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getUserReviewStats called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -320,7 +320,7 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
 def getSimilarReviewsForRatings(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getSimilarReviewsForRating called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getSimilarReviewsForRating called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -352,7 +352,7 @@ def getSimilarReviewsForRatings(request: HttpRequest):
 def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAllUserReviews called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getAllUserReviews called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -380,7 +380,7 @@ def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
 def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getReviewStatsByMonth called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getReviewStatsByMonth called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -466,7 +466,7 @@ def submitReviewReaction(request: HttpRequest):
   from reactions.models import Reaction
   # Make sure request is a POST request
   if(request.method != "POST"):
-    logger.warning("submitReviewReaction called with a non-POST method, returning 405.")
+    logger.warning(f"{request.crid} - submitReviewReaction called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -494,7 +494,7 @@ def submitReviewReaction(request: HttpRequest):
     # Return success object 
     return HttpResponse(status=200)
   except Exception as e:
-    logger.error(f"Error when submitting review reaction. Error: {e}")
+    logger.error(f"{request.crid} - Error when submitting review reaction. Error: {e}")
     return HttpResponse(status=500)
   
 
@@ -505,7 +505,7 @@ def deleteReviewReaction(request: HttpRequest):
   from reactions.models import Reaction
   # Make sure request is a POST request
   if(request.method != "POST"):
-    logger.warning("deleteReviewReaction called with a non-POST method, returning 405.")
+    logger.warning(f"{request.crid} - deleteReviewReaction called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -524,12 +524,12 @@ def deleteReviewReaction(request: HttpRequest):
       # Delete reaction
       reaction.delete(deleter=user)
     except Reaction.DoesNotExist as e:
-      logger.error(f"Could not delete, no reaction found!")
+      logger.error(f"{request.crid} - Could not delete, no reaction found!")
       raise e
     # Return success object 
     return HttpResponse(status=200)
   except Exception as e:
-    logger.error(f"Error when deleting review reaction. Error: {e}")
+    logger.error(f"{request.crid} - Error when deleting review reaction. Error: {e}")
     return HttpResponse(status=500)
   
   
@@ -539,7 +539,7 @@ def deleteReviewReaction(request: HttpRequest):
 def getReviewByID(request: HttpRequest, id: int):
    # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getReviewByID called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getReviewByID called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -555,7 +555,7 @@ def getReviewByID(request: HttpRequest, id: int):
 def getReviewHistoricalByID(request: HttpRequest, id: int):
    # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getReviewByID called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - getReviewByID called with a non-GET method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -582,7 +582,7 @@ def getReviewHistoricalByID(request: HttpRequest, id: int):
 def resetStreaks(request: HttpRequest):
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("getReviewsForAlbum called with a non-POST method, returning 405.")
+    logger.warning(f"{request.crid} - getReviewsForAlbum called with a non-POST method, returning 405.")
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -597,7 +597,7 @@ def resetStreaks(request: HttpRequest):
       user.current_streak = 0
       user.save()
   except Exception as e:
-    logger.error(f"FATAL ERROR: {e}")
+    logger.error(f"{request.crid} - FATAL ERROR: {e}")
     return HttpResponse(status=500)
   return HttpResponse(status=200)
   
