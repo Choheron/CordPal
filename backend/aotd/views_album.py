@@ -150,11 +150,10 @@ def submitAlbum(request: HttpRequest):
   except ObjectDoesNotExist as e:
     # Get user from database
     user = getUserObj(request.session.get('discord_id'))
-    # Query musicbrainz to get track list
-    # Build Tracks Url
-    url = f"https://musicbrainz.org/ws/2/release/{reqBody['album']['id']}"
+    # Query musicbrainz to get full album data using mbid (to avoid issues with params)
+    url =  f"https://musicbrainz.org/ws/2/release/{reqBody['album']['id']}"
     params = {
-      'inc': 'recordings',
+      'inc': 'artists+release-groups+recordings+genres',
       'fmt': 'json'
     }
     headers = {
@@ -164,18 +163,18 @@ def submitAlbum(request: HttpRequest):
     data = response.json()
     # Declare new album object
     newAlbum = Album(
-      mbid=reqBody['album']['id'],
-      title=reqBody['album']['title'],
-      artist=reqBody['album']['artist-credit'][0]['name'],
-      artist_url=f"https://musicbrainz.org/artist/{reqBody['album']['artist-credit'][0]['artist']['id']}",
-      cover_url=f"https://coverartarchive.org/release/{reqBody['album']['id']}/front",
-      album_url=f"https://musicbrainz.org/release/{reqBody['album']['id']}",
+      mbid=data['id'],
+      title=data['title'],
+      artist=data['artist-credit'][0]['name'],
+      artist_url=f"https://musicbrainz.org/artist/{data['artist-credit'][0]['artist']['id']}",
+      cover_url=f"https://coverartarchive.org/release/{data['id']}/front",
+      album_url=f"https://musicbrainz.org/release/{data['id']}",
       submitted_by=user,
       user_comment=reqBody['user_comment'] if (reqBody['user_comment'] != "") else "No Comment Provided",
-      disambiguation=reqBody['album']['disambiguation'] if ('disambiguation' in reqBody['album'].keys()) else "",
-      release_date=parseReleaseDate(reqBody['album']['date']),
-      release_date_str=reqBody['album']['date'],
-      raw_data=reqBody['album'],
+      disambiguation=data['disambiguation'] if ('disambiguation' in data.keys()) else "",
+      release_date=parseReleaseDate(data['date']),
+      release_date_str=data['date'],
+      raw_data=data,
       track_list={ 'tracks': data['media'][0]['tracks'] },
     )
     # Save new album data
