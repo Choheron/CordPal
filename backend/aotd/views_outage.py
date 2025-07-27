@@ -28,7 +28,7 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 def createOutage(request: HttpRequest):
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("createOutage called with a non-POST method, returning 405.")
+    logger.warning("createOutage called with a non-POST method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -45,7 +45,7 @@ def createOutage(request: HttpRequest):
   # Ensure that start_date is over three days away from the current date
   earlist_start = datetime.now(pytz.timezone('America/Chicago')) + timedelta(days=2)
   if(start_date < earlist_start):
-    logger.warning("Request for creation of an outage had a date within 3 days... Rejecting and returning error message.")
+    logger.warning("Request for creation of an outage had a date within 3 days... Rejecting and returning error message.", extra={'crid': request.crid})
     return HttpResponse("Creation Failed. Start Date cannot be within 3 days of current time.", status=400, content_type="text/plain")
   # Store new outage in database
   outage = Outages(
@@ -67,7 +67,7 @@ def createOutage(request: HttpRequest):
 def deleteOutage(request: HttpRequest):
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("deleteOutage called with a non-POST method, returning 405.")
+    logger.warning("deleteOutage called with a non-POST method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -79,20 +79,20 @@ def deleteOutage(request: HttpRequest):
     reason = reqBody['reason']
     outage = Outages.objects.get(pk=reqBody['outageId'])
   except User.DoesNotExist as e:
-    logger.warning(f"Unable to find user with provided data in request body!")
+    logger.warning(f"Unable to find user with provided data in request body!", extra={'crid': request.crid})
     return HttpResponse("User with passed in Discord ID not found.", status=404, content_type="text/plain")
   except Outages.DoesNotExist as e:
-    logger.warning(f"Unable to find outage with passed in ID of: {reqBody['outageId']}")
+    logger.warning(f"Unable to find outage with passed in ID of: {reqBody['outageId']}", extra={'crid': request.crid})
     return HttpResponse("User Outage with passed in ID not found.", status=404, content_type="text/plain")
   except Exception as e:
-    logger.warning(f"Failiure to delete outage, request body lacking required information...")
-    logger.debug(f"Request Body: {reqBody}")
+    logger.warning(f"Failiure to delete outage, request body lacking required information...", extra={'crid': request.crid})
+    logger.debug(f"Request Body: {reqBody}", extra={'crid': request.crid})
     return HttpResponse("Unable to delete user outage, this is most likely the result of an internal error. Please contact Admins...", status=400, content_type="text/plain")
   # Delete outage
   try:
     outage.delete(deleter, reason)
   except:
-    logger.error(f"FAILIURE WHEN DELETING OUTAGE: {outage.pk}")
+    logger.error(f"FAILIURE WHEN DELETING OUTAGE: {outage.pk}", extra={'crid': request.crid})
     return HttpResponse("Unable to delete user outage, this is most likely the result of an internal error. Please contact Admins...", status=400, content_type="text/plain")
   # Return status 200
   return HttpResponse("Deletion Complete", status=200, content_type="text/plain")
@@ -104,7 +104,7 @@ def deleteOutage(request: HttpRequest):
 def getUserOutages(request: HttpRequest, user_discord_id: str = None):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getOutages called with a non-GET method, returning 405.")
+    logger.warning("getOutages called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -128,7 +128,7 @@ def getUserOutages(request: HttpRequest, user_discord_id: str = None):
 def getCurrentOutages(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getCurrentOutages called with a non-GET method, returning 405.")
+    logger.warning("getCurrentOutages called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -152,7 +152,7 @@ def getCurrentOutages(request: HttpRequest):
 def getOutagesByDate(request: HttpRequest, date: str = None):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getOutagesByDate called with a non-GET method, returning 405.")
+    logger.warning("getOutagesByDate called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -160,7 +160,7 @@ def getOutagesByDate(request: HttpRequest, date: str = None):
   try:
     date = datetime.strptime(date, "%Y-%m-%d")
   except:
-    logger.error(f"Failure parsing date: {date}.")
+    logger.error(f"Failure parsing date: {date}.", extra={'crid': request.crid})
     return HttpResponse("Invalid request, a date must be provided in YYYY-MM-DD format.", status=400)
   # Get all outages that apply to the provided date
   outages = Outages.objects.filter(start_date__lte=date, end_date__gte=date)

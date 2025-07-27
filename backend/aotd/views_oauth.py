@@ -39,7 +39,7 @@ def isAotdParticipant(request: HttpRequest):
   '''Check if a user has connected aotd to their account'''
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning(f"{request.crid} - isAotdParticipant called with a non-GET method, returning 405.")
+    logger.warning(f"{request.crid} - isAotdParticipant called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -53,7 +53,7 @@ def enrollUser(request: HttpRequest):
   '''Enroll a user as an AOtD participant'''
   # Make sure request is a POST request
   if(request.method != "POST"):
-    logger.warning(f"{request.crid} - enrollUser called with a non-POST method, returning 405.")
+    logger.warning(f"{request.crid} - enrollUser called with a non-POST method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res

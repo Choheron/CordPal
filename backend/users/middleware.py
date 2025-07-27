@@ -30,7 +30,7 @@ class LastSeenMiddleware:
       # Get user object 
       user = User.objects.get(discord_id=request.session['discord_id'])
       # Log method call (With username)
-      self.logger.info(f"Incoming Request - CRID: {request.crid} - User: {user.discord_id}/\"{user.nickname}\" - Path: {full_path}")
+      self.logger.info(f"Incoming Request - User: {user.discord_id}/\"{user.nickname}\"", extra={'crid': request.crid})
       # Get current timestamp
       time = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
       # Update only heartbeat timestamp if its a heartbeat call, otherwise update last_request_timestamp
@@ -38,26 +38,26 @@ class LastSeenMiddleware:
         if(full_path == "/users/heartbeat"):
           # Update timezone if timezone is in request
           user.timezone_string = json.loads(request.body)['heartbeat']['timezone']
-          self.logger.info(f"{request.crid} - Setting timezone to {str(user.timezone_string)} for user {user.nickname}")
+          self.logger.info(f"Setting timezone to {str(user.timezone_string)} for user {user.nickname}", extra={'crid': request.crid})
         user.last_heartbeat_timestamp = time
-        self.logger.debug(f"Setting last_heartbeat_timestamp to {str(time)} for user {user.nickname}")
+        self.logger.debug(f"Setting last_heartbeat_timestamp to {str(time)} for user {user.nickname}", extra={'crid': request.crid})
         user.save()
       else:
         user.last_heartbeat_timestamp = time # Also update heartbeat, why not
         user.last_request_timestamp = time
-        self.logger.debug(f"Setting last_request_timestamp to {str(time)} for user {user.nickname}")
+        self.logger.debug(f"Setting last_request_timestamp to {str(time)} for user {user.nickname}", extra={'crid': request.crid})
         user.save()
     except Exception as e:
       if(isinstance(e, User.DoesNotExist)):
         # Log method call (With username)
-        self.logger.info(f"{request.crid} - Incoming Request from user \"UNKNOWN\": {full_path}")
+        self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}", extra={'crid': request.crid})
       else:
         if(full_path == "/metrics"):
-          self.logger.debug(f"{request.crid} - Reporting metrics to prometheus")
+          self.logger.debug(f"Reporting metrics to prometheus", extra={'crid': request.crid})
         elif(full_path in self.no_user_validation_paths):
-          self.logger.info(f"{request.crid} - Incoming request to path {full_path} without a discord_id in request... Possibly a cron?")
+          self.logger.info(f"Incoming request without a discord_id in request... Possibly a cron?", extra={'crid': request.crid})
         else:
-          self.logger.error(f"{request.crid} - ERROR IN USER MIDDLEWARE: PATH: {full_path} TRACEBACK: {traceback.print_exc()}")
+          self.logger.error(f"ERROR IN USER MIDDLEWARE TRACEBACK: {e}", extra={'crid': request.crid})
     
     # Code above this line is executed before the view is called
     # Retrieving the response 

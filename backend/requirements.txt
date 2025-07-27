@@ -6,6 +6,8 @@ python-dotenv
 django[argon2]
 requests
 pytz
+# Logging Libraries
+json-log-formatter
 # DB Connection Libraries
 psycopg
 psycopg2-binary
