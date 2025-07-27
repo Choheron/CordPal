@@ -29,7 +29,7 @@ import datetime
 import pytz
 
 # Declare logging
-logger = logging.getLogger('django')
+logger = logging.getLogger()
 
 # Determine runtime enviornment
 APP_ENV = os.getenv('APP_ENV') or 'DEV'

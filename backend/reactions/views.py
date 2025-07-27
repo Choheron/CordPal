@@ -4,4 +4,4 @@ import logging
 import json
 
 # Declare logging
-logger = logging.getLogger('django')
+logger = logging.getLogger()

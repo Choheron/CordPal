@@ -14,7 +14,7 @@ class metadataMiddleware:
   def __init__(self, get_response):
     self.get_response = get_response
     # Declare logging
-    self.logger = logging.getLogger('django')
+    self.logger = logging.getLogger()
 
   def __call__(self, request: HttpRequest):
 

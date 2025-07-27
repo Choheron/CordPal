@@ -16,7 +16,7 @@ import json
 import logging
 
 # Declare logging
-logger = logging.getLogger('django')
+logger = logging.getLogger()
 
 
 def storeDiscordTokenInDatabase(request: HttpRequest, token_data: json):

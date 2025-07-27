@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import os
 
 # Declare logging
-logger = logging.getLogger('django')
+logger = logging.getLogger()
 
 # Determine runtime enviornment
 APP_ENV = os.getenv('APP_ENV') or 'DEV'

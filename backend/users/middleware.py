@@ -16,7 +16,7 @@ class LastSeenMiddleware:
   def __init__(self, get_response):
     self.get_response = get_response
     # Declare logging
-    self.logger = logging.getLogger('django')
+    self.logger = logging.getLogger()
     self.heartbeat_endpoint_paths = ["/users/heartbeat", "/users/getAllOnlineData", "/discordapi/checkToken"]
     self.no_user_validation_paths = ["/metrics", "/discordapi/checkToken", "/discordapi/token", "/spotifyapi/setAlbumOfDay", "/users/traditionalLogin"]
     # Determine runtime enviornment

@@ -11,7 +11,7 @@ from .models import Image
 from users.models import User
 
 # Declare logging
-logger = logging.getLogger('django')
+logger = logging.getLogger()
 
 # Determine runtime enviornment
 APP_ENV = os.getenv('APP_ENV') or 'DEV'

@@ -9,7 +9,7 @@ from .models import User
 import logging
 
 # Declare logging
-logger = logging.getLogger('django')
+logger = logging.getLogger()
 
 
 def createUserFromDiscordJSON(discordDataJson):

@@ -6,7 +6,7 @@ from users.models import User
 from .models import Reaction
 
 # Declare logging
-logger = logging.getLogger('django')
+logger = logging.getLogger()
 
 
 def createReaction(target_obj, user: User, emoji):
