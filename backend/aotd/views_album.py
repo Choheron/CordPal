@@ -249,8 +249,8 @@ def getAlbum(request: HttpRequest, mbid: str):
     out['submitter_nickname'] = albumObj.submitted_by.nickname
     out['submitter_comment'] = albumObj.user_comment
     out['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
-    out['release_date_str'] = albumObj.release_date_str
-    out['release_date'] = parseReleaseDate(albumObj.release_date_str)
+    out['release_date_str'] = albumObj.raw_data['release-group']['first-release-date'] if ('first-release-date' in albumObj.raw_data['release-group'].keys()) else albumObj.release_date_str
+    out['release_date'] = parseReleaseDate(out['release_date_str'])
     out['track_list'] = albumObj.track_list if albumObj.track_list else {"tracks": []}
   except:
     out = {}
