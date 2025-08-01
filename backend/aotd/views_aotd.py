@@ -297,9 +297,9 @@ def calculateAOTDChances(request: HttpRequest):
       )
       # Do math for percentage
       try:
-        chance = round((float(user_eligible_count)/float(total_eligible_count)) * 100.00, 2)
+        chance = round((float(user_eligible_count)/float(total_eligible_count)) * 100.00, 3)
       except:
-        chance = round(0, 2)
+        chance = round(0, 3)
       # Update with correct data
       userChanceObj.chance_percentage = chance
       userChanceObj.block_type = None

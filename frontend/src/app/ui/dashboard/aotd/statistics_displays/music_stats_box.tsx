@@ -20,7 +20,7 @@ export default async function MusicStatsBox(props) {
   const userReviewStatsJson = await getAllUserReviewStats();
 
 
-  const albumUserStatsTable = albumStatsJson['user_objs'].sort((a, b) => a['submission_count'] < b['submission_count'] ? 1 : -1).map((user, index) => {
+  const albumUserStatsTable = albumStatsJson['user_objs'].sort((a, b) => a['selection_chance'] < b['selection_chance'] ? 1 : -1).map((user, index) => {
     return (
       <tr 
         key={`${user['submission_count']} ${user['nickname']}`}
@@ -45,7 +45,7 @@ export default async function MusicStatsBox(props) {
               >
                 <div className="flex">
                   {(user['selection_blocked']) ? ((user['block_type'] == "OUTAGE") ? (<p>✖️</p>) : (<p>&#9940;</p>)) : (<p>&#9989;</p>)}
-                  <p>{user['selection_chance'].toFixed(2)}%</p>
+                  <p>{user['selection_chance'].toFixed(3)}%</p>
                 </div>
               </Tooltip>
             )}
