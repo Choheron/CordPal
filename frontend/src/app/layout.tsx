@@ -27,7 +27,14 @@ export default function RootLayout({
   // Render App
   return (
     <html lang="en" className='dark'>
-      <body className={`${inter.className} dark min-h-screen flex flex-col`}>
+      <body className={`${inter.className} dark min-h-screen flex flex-col relative`}>
+        {/* From https://patterncraft.fun/ */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            background: "radial-gradient(125% 125% at 53% 100%, #000000 72%, #350136 100%)",
+          }}
+        />
         {/* Placeholder Component to implement heartbeat */}
         <Heartbeat />
         {/* Only display if it is December (Holiday Display) */}
@@ -65,10 +72,10 @@ export default function RootLayout({
             </>
           ) : (<></>)}
         <Providers>
-        <div className="flex flex-col min-h-screen">
-          <div className="flex-grow">{children}</div>
-          <Footer />
-        </div>
+          <div className="flex flex-col min-h-screen bg-inherit relative">
+            <div className="flex-grow">{children}</div>
+            <Footer />
+          </div>
         </Providers>
         {/* Only display if it is December (Holiday Display) */}
         {(isDecember()) ? (<ClientSnowfall />) : (<></>)}
