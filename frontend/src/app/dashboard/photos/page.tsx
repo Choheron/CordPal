@@ -22,27 +22,25 @@ export default async function photos({searchParams}) {
     const fileList = fileListString.split(',')
     // Cut list into 3 different columns (into a terribly named var)
     var fileListList: any[] = [[],[],[]]
-    var currList = 0;
     for (let i = 0; i < fileList.length; i++) {
+      // Show images in reverse order (newest uploads first)
       const photoindex = (fileList.length - (i + 1))
+      // Show images newest from top left to bottom right
+      const listIndex = (i - 1) % 3
       if(fileList[photoindex] == "") {
         continue
       }
-      if(currList == 0) {
+      if(listIndex == 0) {
         fileListList[0].push(fileList[photoindex])
-      }else if(currList == 1) {
+      }else if(listIndex == 1) {
         fileListList[1].push(fileList[photoindex])
       } else {
         fileListList[2].push(fileList[photoindex])
       }
-      currList++;
-      if(currList == 3) {
-        currList = 0;
-      }
     }
 
     return (
-      <div className="flex flex-col lg:flex-row gap-6 w-11/12 lg:w-3/4">
+      <div className="flex flex-col lg:flex-row gap-6 w-full 2xl:w-3/4">
         { fileListList.map((list: string[], listIndex: number) => (
           <div key={listIndex} className="w-full flex flex-col gap-6 items-center pt-3">
             { list.map((id: string, index: number) => (
