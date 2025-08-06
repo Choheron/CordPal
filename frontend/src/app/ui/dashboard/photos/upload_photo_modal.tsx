@@ -8,7 +8,7 @@ import {
   ModalFooter,
   useDisclosure
 } from "@heroui/modal";
-import { Button } from "@heroui/react";
+import { addToast, Button } from "@heroui/react";
 import {Input} from "@heroui/react";
 import {Textarea} from "@heroui/input";
 import React from "react";
@@ -32,7 +32,7 @@ export default function UploadPhotoModal(props) {
   const router = useRouter();
 
   // Send request to upload the submitted image
-  const uploadPress = () => {
+  const uploadPress = async () => {
     // Boolean for deciding upload
     let upload = true
     // Build FormData
@@ -55,7 +55,21 @@ export default function UploadPhotoModal(props) {
     // Check if upload is to happen
     if(upload) {
       // Send form data to backend
-      uploadImageToBackend(uploadFormData)
+      const responseObj = await uploadImageToBackend(uploadFormData)
+      // Alert user of success or failure to upload image
+      if((responseObj['status'] == 200)) {
+      addToast({
+        title: `Successfully submitted "${titleValue}"!`,
+        description: `${titleValue} has been uploaded to CordPal servers!`,
+        color: "success",
+      })
+    } else {
+      addToast({
+        title: `Failed to submit image!`,
+        description: `Album failiure submitted with the following error code: ${responseObj['status']}. Please contact server administrators with CRID: ${responseObj['crid']}.`,
+        color: "danger",
+      })
+    }
     }
     // Call cancel functionality to clear systems
     cancelPress()

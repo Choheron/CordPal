@@ -22,17 +22,22 @@ export default async function photos({searchParams}) {
     const fileList = fileListString.split(',')
     // Cut list into 3 different columns (into a terribly named var)
     var fileListList: any[] = [[],[],[]]
-    var step = fileList.length/3;
+    var currList = 0;
     for (let i = 0; i < fileList.length; i++) {
-      if(fileList[i] == "") {
+      const photoindex = (fileList.length - (i + 1))
+      if(fileList[photoindex] == "") {
         continue
       }
-      if(i < step) {
-        fileListList[0].push(fileList[i])
-      }else if(i < step*2) {
-        fileListList[1].push(fileList[i])
+      if(currList == 0) {
+        fileListList[0].push(fileList[photoindex])
+      }else if(currList == 1) {
+        fileListList[1].push(fileList[photoindex])
       } else {
-        fileListList[2].push(fileList[i])
+        fileListList[2].push(fileList[photoindex])
+      }
+      currList++;
+      if(currList == 3) {
+        currList = 0;
       }
     }
 

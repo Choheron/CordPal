@@ -105,7 +105,10 @@ export async function uploadImageToBackend(formData) {
   });
   // Revalidate photoshops tag
   revalidateTag('all_photoshops')
-  return uploadResponse.status;
+  return {
+    status: uploadResponse.status,
+    crid: uploadResponse.headers.get("X-CRID")
+  }
 }
 
 

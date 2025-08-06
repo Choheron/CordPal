@@ -22,7 +22,7 @@ APP_ENV = os.getenv('APP_ENV') or 'DEV'
 def getAllImages(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAllImages called with a non-GET method, returning 405.")
+    logger.warning("getAllImages called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -39,48 +39,54 @@ def getAllImages(request: HttpRequest):
 def uploadImage(request: HttpRequest):
   # Make sure request is a POST request
   if(request.method != "POST"):
-    logger.warning("uploadImage called with a non-POST method, returning 405.")
+    logger.warning("uploadImage called with a non-POST method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Take in form data to local vars
-  img_title = request.POST.get('title')
-  img_description = request.POST.get('description')
-  img_tagged_users = request.POST.get('tagged_users')
-  img_creator = request.POST.get('creator')
-  img_image_binary = request.FILES['attached_image']
-  img_filename = request.POST.get('filename')
-  img_filetype = request.POST.get('filetype')
-  # Retrieve additional needed data for DB field (Handle lack of provided image creator)
-  if(img_creator != ""):
-    img_creator = User.objects.get(discord_id = img_creator)
-  else:
-    img_creator = None
-  img_uploader = User.objects.get(discord_id = request.session['discord_id'])
-  # Generate list of tagged users (Only populate if not empty)
-  img_tagged_users_list = []
-  if(img_tagged_users != ""):
-    for userID in img_tagged_users.split(","):
-      img_tagged_users_list.append(User.objects.get(discord_id = userID))
-  # Generate new filename
-  img_filename = uuid.uuid4().hex + "_" + img_filename
-  # Create new image object
-  imageDB_entry = Image(
-    title = img_title,
-    description = img_description if img_description != "" else "No description provided.",
-    uploader = img_uploader,
-    artist = img_creator,
-    filename = img_filename,
-    filetype = img_filetype
-  )
+  try:
+    # Take in form data to local vars
+    img_title = request.POST.get('title')
+    img_description = request.POST.get('description')
+    img_tagged_users = request.POST.get('tagged_users')
+    img_creator = request.POST.get('creator')
+    img_image_binary = request.FILES['attached_image']
+    img_filename = request.POST.get('filename')
+    img_filetype = request.POST.get('filetype')
+    # Retrieve additional needed data for DB field (Handle lack of provided image creator)
+    if(img_creator != ""):
+      img_creator = User.objects.get(discord_id = img_creator)
+    else:
+      img_creator = None
+    img_uploader = User.objects.get(discord_id = request.session['discord_id'])
+    # Generate list of tagged users (Only populate if not empty)
+    img_tagged_users_list = []
+    if(img_tagged_users != ""):
+      for userID in img_tagged_users.split(","):
+        img_tagged_users_list.append(User.objects.get(discord_id = userID))
+    # Generate new filename
+    img_filename = uuid.uuid4().hex + "_" + img_filename
+    # Create new image object
+    imageDB_entry = Image(
+      title = img_title,
+      description = img_description if img_description != "" else "No description provided.",
+      uploader = img_uploader,
+      artist = img_creator,
+      filename = img_filename,
+      filetype = img_filetype
+    )
+  except:
+    logger.exception("Unable to create database entry for image.", extra={'crid': request.crid})
+    error_res = HttpResponse("Creating image data on database failed.")
+    error_res.status_code = 500
+    return error_res
   # Write out image to filesystem
   write_path = os.getenv('PHOTOSHOP_PATH') + img_filename
-  logger.info(f"Attempting to write out image to {write_path}...")
+  logger.info(f"Attempting to write out image to {write_path}...", extra={'crid': request.crid})
   try:
     file_storage = FileSystemStorage(location=os.path.dirname(write_path))
     file_storage.save(img_filename, img_image_binary)
   except:
-    logger.exception("UNABLE TO WRITE IMAGE TO BACKEND!")
+    logger.exception("UNABLE TO WRITE IMAGE TO BACKEND!", extra={'crid': request.crid})
     error_res = HttpResponse("Writing image to backend filesystem failed.")
     error_res.status_code = 500
     return error_res
@@ -102,13 +108,13 @@ def uploadImage(request: HttpRequest):
 def getImageInfo(request: HttpRequest, imageID: int):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getImageInfo called with a non-GET method, returning 405.")
+    logger.warning("getImageInfo called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
   # Make sure the request included an imageID
   if(not imageID):
-    logger.warning("getImageInfo called without an imageID.")
+    logger.warning("getImageInfo called without an imageID.", extra={'crid': request.crid})
     res = HttpResponse("Missing Image ID")
     res.status_code = 422 
     return res
@@ -138,13 +144,13 @@ def getImageInfo(request: HttpRequest, imageID: int):
 def getImage(request: HttpRequest, imageID: int):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getImage called with a non-GET method, returning 405.")
+    logger.warning("getImage called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
   # Make sure the request included an imageID
   if(not imageID):
-    logger.warning("getImage called without an imageID.")
+    logger.warning("getImage called without an imageID.", extra={'crid': request.crid})
     res = HttpResponse("Missing Image ID")
     res.status_code = 422 
     return res
@@ -165,7 +171,7 @@ def getImageIds(request: HttpRequest):
   body_params = json.loads(request.body)
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("getImageIds called with a non-POST method, returning 405.")
+    logger.warning("getImageIds called with a non-POST method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -192,7 +198,7 @@ def getImageIds(request: HttpRequest):
 def getAllUploaders(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAllUploaders called with a non-GET method, returning 405.")
+    logger.warning("getAllUploaders called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -217,7 +223,7 @@ def getAllUploaders(request: HttpRequest):
 def getAllArtists(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAllArtists called with a non-GET method, returning 405.")
+    logger.warning("getAllArtists called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
