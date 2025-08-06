@@ -7,10 +7,6 @@ export default function PhotoGallery(props) {
   const fileListString: any = props.photos
   // Track screen width
   const [windowWidth, setWindowWidth] = useState(0);
-  // Return basic string if no photos found
-  if(fileListString.length == 0) {
-    return (<p>No Photos meet Filter Criteria</p>)
-  }
 
   useEffect(() => {
     // Get Window Width
@@ -60,6 +56,11 @@ export default function PhotoGallery(props) {
     )
   }
 
+  
+  // Return basic string if no photos found
+  if(fileListString.length == 0) {
+    return (<p>No Photos meet Filter Criteria</p>)
+  }
   return(
     <>
       {loadImages()}
