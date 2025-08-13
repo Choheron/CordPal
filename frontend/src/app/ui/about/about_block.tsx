@@ -30,9 +30,7 @@ export default async function AboutBlock(props) {
             What is this website?
           </h3>
           <p className="pl-2">
-            This website serves as a frontend for a collection of data on a discord server with a group of my friends. It also serves as a form of a frontend for a discord bot that also runs on this homelab. I created that discord bot as a way to track user quotes and 
-            create other fun commands to play with. Users of certain servers (<i>Currently just the one</i>) can click &quot;Login with Discord&quot; and access data from the discord bot, as well as see other related information. If you click on this link and are not a member of the server, you will
-            just be greeted with some user data and a little message that asks you why you are here.
+            CordPal is a companion site for Discord servers that allows users to login with their Discord account and participate in Quotes, Photoshops, and Album of the Day! Cordpal allows users to extend discord and create an even more inclusive and enjoyable community for everyone.
           </p>
         </Conditional>
         <h3 className="text-2xl italic pt-1">
