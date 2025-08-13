@@ -30,7 +30,7 @@ class LastSeenMiddleware:
       # Get user object 
       user = User.objects.get(discord_id=request.session['discord_id'])
       # Log method call (With username)
-      self.logger.info(f"Incoming Request - User: {user.discord_id}/\"{user.nickname}\"", extra={'crid': request.crid})
+      self.logger.debug(f"Incoming Request - User: {user.discord_id}/\"{user.nickname}\"", extra={'crid': request.crid})
       # Get current timestamp
       time = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
       # Update only heartbeat timestamp if its a heartbeat call, otherwise update last_request_timestamp
@@ -50,7 +50,7 @@ class LastSeenMiddleware:
     except Exception as e:
       if(isinstance(e, User.DoesNotExist)):
         # Log method call (With username)
-        self.logger.info(f"Incoming Request from user \"UNKNOWN\": {full_path}", extra={'crid': request.crid})
+        self.logger.debug(f"Incoming Request from user \"UNKNOWN\": {full_path}", extra={'crid': request.crid})
       else:
         if(full_path == "/metrics"):
           self.logger.debug(f"Reporting metrics to prometheus", extra={'crid': request.crid})
