@@ -84,7 +84,7 @@ def getUserData(request: HttpRequest, user_discord_id: str = ""):
     request_id = str(request.session['discord_id'])
   # Retrieve user data from database, if its not there create one.
   try:
-    logger.info(f"Attempting to retreive user data for user id: {user_discord_id}...")
+    logger.debug(f"Attempting to retreive user data for user id: {user_discord_id}...")
     userData = User.objects.get(discord_id = request_id)
   except:
     res = HttpResponse("User Not Found")
@@ -144,7 +144,7 @@ def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
     request_id = str(request.session['discord_id'])
   # Retrieve user data from database, if its not there create one.
   try:
-    logger.info(f"Attempting to retreive user data for user id: {user_discord_id}...")
+    logger.debug(f"Attempting to retreive user data for user id: {user_discord_id}...")
     userData = User.objects.get(discord_id = request_id)
   except:
     res = HttpResponse("User Not Found")
