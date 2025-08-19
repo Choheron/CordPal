@@ -60,6 +60,8 @@ def submitReview(request: HttpRequest):
   userObj = getUserObj(request.session.get('discord_id'))
   # Get Album from the database
   albumObj = Album.objects.get(mbid=reqBody['album_id'])
+  # Log Review Information
+  logger.info(f"Incoming review submission from user {userObj.nickname} for album {albumObj.title}...", extra={'crid': request.crid})
   # Check if a review already exists for this user
   try:
     try:
@@ -97,6 +99,8 @@ def submitReview(request: HttpRequest):
   checkSelectionFlag(AotdUserData.objects.get(user=userObj))
   # Update review stats
   calculateUserReviewData(AotdUserData.objects.get(user=userObj))
+  # Log success
+  logger.info(f"Successfully saved review submission from user {userObj.nickname} for album {albumObj.title}...", extra={'crid': request.crid})
   return HttpResponse(200)
 
 
