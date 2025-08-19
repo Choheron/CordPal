@@ -37,7 +37,7 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 def getDiscordToken(request: HttpRequest):
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("getDiscordToken called with a non-POST method, returning 405.")
+    logger.warning("getDiscordToken called with a non-POST method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -58,24 +58,24 @@ def getDiscordToken(request: HttpRequest):
     'client_secret': os.getenv('DISCORD_CLIENT_SECRET')
   }
   # Make request to discord api
-  logger.info("Making request to discord api...")
+  logger.debug("Making request to discord api...", extra={'crid': request.crid})
   discordRes = requests.post(f"{os.getenv('DISCORD_API_ENDPOINT')}/oauth2/token", headers=reqHeaders, data=reqData, auth=(os.getenv('DISCORD_CLIENT_ID'), os.getenv('DISCORD_CLIENT_SECRET')))
   if(discordRes.status_code != 200):
-    print("Error in request:\n" + str(discordRes.json()))
+    logger.error("Error in request:\n" + str(discordRes.json()), extra={'crid': request.crid})
     discordRes.raise_for_status()
   # Convert response to Json
-  logger.info("Discord api returned, converting to json...")
+  logger.debug("Discord api returned, converting to json...", extra={'crid': request.crid})
   discordResJSON = discordRes.json()
   # Retrieving discord data to create a user account
   reqHeaders = { 
     'Authorization': f"{discordResJSON['token_type']} {discordResJSON['access_token']}"
   }
   # Send Request to API
-  logger.info("Making request to discord api...")
+  logger.debug("Making request to discord api...", extra={'crid': request.crid})
   try:
     discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
     if(discordRes.status_code != 200):
-      print("Error in request:\n" + str(discordRes.json()))
+      logger.error("Error in request:\n" + str(discordRes.json()), extra={'crid': request.crid})
       discordRes.raise_for_status()
   except:
     return HttpResponse(status=500)
@@ -91,7 +91,7 @@ def getDiscordToken(request: HttpRequest):
   # Write success message
   messageOut = { 'message': "Success" }
   # Return Code
-  logger.info("Returning HTTP 200 Response...")
+  logger.debug("Returning HTTP 200 Response...", extra={'crid': request.crid})
   return HttpResponse(content=messageOut, content_type='text/json', status=200)
 
 
@@ -101,7 +101,7 @@ def getDiscordToken(request: HttpRequest):
 def getDiscordUserData(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getDiscordUserData called with a non-GET method, returning 405.")
+    logger.warning("getDiscordUserData called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -112,18 +112,18 @@ def getDiscordUserData(request: HttpRequest):
     try:
       refreshDiscordToken(request)
     except Exception as e:
-      logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}")
+      logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}", extra={'crid': request.crid})
       return HttpResponse("/", status=302)
   # Prep request data and headers to discord api
   reqHeaders = { 
     'Authorization': f"{tokenData.token_type} {tokenData.access_token}"
   }
   # Send Request to API
-  logger.info("Making request to discord api...")
+  logger.info("Making request to discord api...", extra={'crid': request.crid})
   try:
     discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
     if(discordRes.status_code != 200):
-      print("Error in request:\n" + str(discordRes.json()))
+      logger.error("Error in request:\n" + str(discordRes.json()), extra={'crid': request.crid})
       discordRes.raise_for_status()
   except:
     return HttpResponse(status=500)
@@ -144,7 +144,7 @@ def getDiscordUserData(request: HttpRequest):
 def validateServerMember(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("validateServerMember called with a non-GET method, returning 405.")
+    logger.warning("validateServerMember called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -154,7 +154,7 @@ def validateServerMember(request: HttpRequest):
   try:
     tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get("discord_id"))
   except DiscordTokens.DoesNotExist as e:
-    logger.error("Discord token does not exist for this user, will need to revalidate.")
+    logger.error("Discord token does not exist for this user, will need to revalidate.", extra={'crid': request.crid})
     out = {}
     out['member'] = False
     out['role'] = False
@@ -164,7 +164,7 @@ def validateServerMember(request: HttpRequest):
     if(isDiscordTokenExpired(request)):
       refreshDiscordToken(request)
   except Exception as e:
-    logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}")
+    logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}", extra={'crid': request.crid})
     # Clear session cookie on fail
     response = HttpResponse("/", status=302)
     response.delete_cookie("session_id")
@@ -172,7 +172,7 @@ def validateServerMember(request: HttpRequest):
   # Check if member status already exists in session store
   if(("server_member" in request.session) and (datetime.strptime(request.session.get("server_member_expiry"), cookie_time_fmt) < datetime.now())):
     status = request.session.get("server_member")
-    logger.info(f"Session has cached membership value of: {status}")
+    logger.debug(f"Session has cached membership value of: {status}", extra={'crid': request.crid})
     member = status
     hasRole = status
   else:
@@ -181,7 +181,7 @@ def validateServerMember(request: HttpRequest):
       'Authorization': f"{tokenData.token_type} {tokenData.access_token}"
     }
     # Send Request to API
-    logger.info("Making request to discord api for server member object to check member and role...")
+    logger.debug("Making request to discord api for server member object to check member and role...", extra={'crid': request.crid})
     try:
       discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me/guilds/{os.getenv('CORD_SERVER_ID')}/member", headers=reqHeaders)
       # NOTE: Not handling error code response here due to the nature of how im handling validation
@@ -190,21 +190,21 @@ def validateServerMember(request: HttpRequest):
     # Convert response to List
     discordResList: dict = discordRes.json()
     # Determine if user has been given an error response, meaning they are not a member of the guild
-    logger.info("Checking if user is in server...")
+    logger.debug("Checking if user is in server...", extra={'crid': request.crid})
     member = not('message' in discordResList.keys())
     # print message
     if(not member):
-      logger.info(discordResList)
+      logger.debug(discordResList, extra={'crid': request.crid})
     # If user IS a member of the server, check that they have the required role
     hasRole = False
     if(member):
       hasRole = os.getenv('CORD_ROLE_ID') in discordResList['roles']
     # Store member status in session to skip this process for 5 mins
-    logger.info(f"Setting session storage to avoid discordapi calls for 5 mins...")
+    logger.debug(f"Setting session storage to avoid discordapi calls for 5 mins...", extra={'crid': request.crid})
     request.session['server_member'] = (member and hasRole)
     request.session['server_member_expiry'] = (datetime.now() + timedelta(minutes=5)).strftime(cookie_time_fmt) 
   # Return JsonResponse containing true or false in body
-  logger.info("Returning member status...")
+  logger.debug("Returning member status...", extra={'crid': request.crid})
   out = {}
   out['member'] = member
   out['role'] = hasRole
@@ -219,13 +219,13 @@ def validateServerMember(request: HttpRequest):
 def checkIfPrevAuth(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("checkIfPrevAuth called with a non-GET method, returning 405.")
+    logger.warning("checkIfPrevAuth called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
   # Check if session is still valid
   validSession = (request.session.get('discord_id') != None) and (DiscordTokens.objects.get(user__discord_id = request.session.get('discord_id')).access_token != None)
-  logger.info(f"Valid Session After Expiry Check: {validSession}")
+  logger.debug(f"Valid Session After Expiry Check: {validSession}", extra={'crid': request.crid})
   # If session is invalid, return false
   if(not validSession):
     out = {}
@@ -233,7 +233,7 @@ def checkIfPrevAuth(request: HttpRequest):
     out['reason'] = "DIS"
     return JsonResponse(out)
   # Check if user sessionid token is valid
-  logger.info("Ensuring sessionid is valid...")
+  logger.debug("Ensuring sessionid is valid...", extra={'crid': request.crid})
   # Set output var if session exists
   if(validSession):
     validSession = checkPreviousAuthorization(request)
@@ -242,10 +242,10 @@ def checkIfPrevAuth(request: HttpRequest):
     try:
       refreshDiscordToken(request)
     except Exception as e:
-      logger.error(f"Filed to refresh discord token! Returning False. Error: {e}")
+      logger.error(f"Filed to refresh discord token! Returning False. Error: {e}", extra={'crid': request.crid})
       validSession = False
   # Return JsonResponse containing true or false in body
-  logger.info(f"Returning prevAuth status of: {validSession}...")
+  logger.debug(f"Returning prevAuth status of: {validSession}...", extra={'crid': request.crid})
   out = {}
   out['valid'] = validSession
   return JsonResponse(out)
@@ -257,21 +257,21 @@ def checkIfPrevAuth(request: HttpRequest):
 def logout(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("logout called with a non-GET method, returning 405.")
+    logger.warning("logout called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
   # Check if id exists in session
   discord_id = request.session.get('discord_id')
   if(discord_id == None):
-    logger.error(f"LOGOUT CALLED WITH NO DISCORD ID! RETURNING 500...")
+    logger.error(f"LOGOUT CALLED WITH NO DISCORD ID! RETURNING 500...", extra={'crid': request.crid})
     return HttpResponse(status=500)
   # Ensure user is logged in
   if(isDiscordTokenExpired(request)):
     try:
       refreshDiscordToken(request)
     except Exception as e:
-      logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}")
+      logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}", extra={'crid': request.crid})
       return HttpResponse("/", status=302)
   # Get token data from session
   tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get('discord_id'))
@@ -285,22 +285,22 @@ def logout(request: HttpRequest):
     'token': tokenData.access_token
   }
   # Make API request to discord to revoke user token
-  logger.info("Making token revoke request to discord api...")
+  logger.info("Making token revoke request to discord api...", extra={'crid': request.crid})
   try:
     discordRes = requests.post(f"{os.getenv('DISCORD_API_ENDPOINT')}/oauth2/token/revoke", headers=reqHeaders, data=reqData)
     if(discordRes.status_code != 200):
-      print("Error in request:\n" + str(discordRes.json()))
+      logger.error("Error in request:\n" + str(discordRes.json()), extra={'crid': request.crid})
       discordRes.raise_for_status()
   except:
     return HttpResponse(status=500)
   # Delete key data from database
   tokenData.clearTokens()
   # Clear session data
-  logger.info("Flushing session...")
+  logger.debug("Flushing session...", extra={'crid': request.crid})
   request.session.flush()
   request.session.modified = True
   # Return JsonResponse containing true or false in body
-  logger.info("Returning revoked status...")
+  logger.debug("Returning revoked status...", extra={'crid': request.crid})
   out = {}
   out['status'] = True
   # Log user out
