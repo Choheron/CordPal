@@ -23,7 +23,7 @@ def storeDiscordTokenInDatabase(request: HttpRequest, token_data: json):
   # Attempt to retreive user from session (discord_id should be the only stored session value)
   try:
     user = User.objects.get(discord_id = token_data['id'])
-    logger.info(f"Storing discord token data in database for user {user.nickname}...")
+    logger.info(f"Storing discord token data in database for user {user.nickname}...", extra={'crid': request.crid})
     # Get user's discord data, if it doesnt exist, create an entry
     try:
       # Get token data for user
@@ -35,7 +35,7 @@ def storeDiscordTokenInDatabase(request: HttpRequest, token_data: json):
       tokenData.refresh_token = (token_data['refresh_token'])
       tokenData.scope = (token_data['scope'])
     except ObjectDoesNotExist as e:
-      logger.info(f"User does not yet have discord token data, creating...")
+      logger.info(f"User does not yet have discord token data, creating...", extra={'crid': request.crid})
       # Create new token data
       tokenData = DiscordTokens(
         user = user,
@@ -49,12 +49,12 @@ def storeDiscordTokenInDatabase(request: HttpRequest, token_data: json):
     tokenData.save()
     return True
   except ObjectDoesNotExist as e:
-    logger.error(f"Unable to find user for request session, {request}...")
+    logger.error(f"Unable to find user for request session, {request}...", extra={'crid': request.crid})
     raise e
   
 
 def isDiscordTokenExpired(request: HttpRequest):
-  logger.info("Checking if discord token is expired...")
+  logger.info("Checking if discord token is expired...", extra={'crid': request.crid})
   # Get user from database
   user = User.objects.get(discord_id = request.session.get('discord_id'))
   tokenData = DiscordTokens.objects.get(user = user)
@@ -64,14 +64,14 @@ def isDiscordTokenExpired(request: HttpRequest):
   tokenExpireTime = tokenData.expiry_date
   # Check if request session's discord token is out of date
   if(curTime > tokenExpireTime):
-    logger.info("Token IS expired...")
+    logger.info("Token IS expired...", extra={'crid': request.crid})
     return True
   # Return false if not expired
   return False
 
 
 def refreshDiscordToken(request: HttpRequest, discord_user_id: str = ""):
-  logger.info("Refreshing Discord Token...")
+  logger.info("Refreshing Discord Token...", extra={'crid': request.crid})
   userDiscordId = discord_user_id if (discord_user_id != "") else request.session.get("discord_id")
   # Get token data
   tokenData = DiscordTokens.objects.get(user__discord_id = userDiscordId)
@@ -88,8 +88,8 @@ def refreshDiscordToken(request: HttpRequest, discord_user_id: str = ""):
   # Make request to discord api
   discordRes = requests.post(f"{os.getenv('DISCORD_API_ENDPOINT')}/oauth2/token", headers=reqHeaders, data=reqData, auth=(os.getenv('DISCORD_CLIENT_ID'), os.getenv('DISCORD_CLIENT_SECRET')))
   if(discordRes.status_code != 200):
-    logger.error("Error in request: " + discordRes.reason)
-    logger.info("More Info: " + json.dumps(discordRes.json()))
+    logger.error("Error in request: " + discordRes.reason, extra={'crid': request.crid})
+    logger.info("More Info: " + json.dumps(discordRes.json()), extra={'crid': request.crid})
     discordRes.raise_for_status()
   # Convert response to Json
   discordResJSON = discordRes.json()
@@ -114,7 +114,7 @@ def refreshDiscordProfilePic(request: HttpRequest):
   avatar_res = requests.get(user.get_avatar_url())
   # If 404, refresh avatar data
   if(avatar_res.status_code == 404):
-    logger.info("Refreshing user's discord profile picture...")
+    logger.info("Refreshing user's discord profile picture...", extra={'crid': request.crid})
     # Ensure user is logged in
     if(isDiscordTokenExpired(request)):
       refreshDiscordToken(request)
@@ -123,11 +123,11 @@ def refreshDiscordProfilePic(request: HttpRequest):
       'Authorization': f"{tokenData.token_type} {tokenData.access_token}"
     }
     # Send Request to API
-    logger.info("Making request to discord api...")
+    logger.info("Making request to discord api...", extra={'crid': request.crid})
     try:
       discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
       if(discordRes.status_code != 200):
-        print("Error in request:\n" + str(discordRes.json()))
+        logger.warning("Error in request:\n" + str(discordRes.json()), extra={'crid': request.crid}, extra={'crid': request.crid})
         discordRes.raise_for_status()
     except:
       return HttpResponse(status=500)
@@ -141,7 +141,7 @@ def refreshDiscordProfilePic(request: HttpRequest):
 
 def checkPreviousAuthorization(request: HttpRequest):
   # Check if session is stored in data
-  logger.info("Checking if sessionid exists...")
+  logger.info("Checking if sessionid exists...", extra={'crid': request.crid})
   try:
     # Get user instance and data
     user = User.objects.get(discord_id = request.session.get('discord_id'))
@@ -150,8 +150,8 @@ def checkPreviousAuthorization(request: HttpRequest):
     return True
   except Exception as e:
     if(isinstance(e, (User.DoesNotExist, DiscordTokens.DoesNotExist))):
-      logger.debug(f"User not found, returning false.")
+      logger.debug(f"User not found, returning false.", extra={'crid': request.crid})
     else:
-      logger.warning(f"Error when checking previous auth! WORTH INVESTIGATING!! Error: {e}")
+      logger.warning(f"Error when checking previous auth! WORTH INVESTIGATING!! Error: {e}", extra={'crid': request.crid})
     return False
 

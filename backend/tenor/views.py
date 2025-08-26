@@ -25,7 +25,7 @@ def getGifUrl(request: HttpRequest, gifId: str):
     callUrl = f"https://tenor.googleapis.com/v2/posts?ids={gifId}&key={os.getenv('TENOR_API_KEY')}&client_key={os.getenv('TENOR_CLIENT_KEY')}&media_filter=gif"
     tenorRes = requests.get(callUrl)
     if(tenorRes.status_code != 200):
-      print("Error in request:\n" + str(tenorRes.json()))
+      logger.warning("Error in tenor request:\n" + str(tenorRes.json()), extra={'crid': request.crid})
       tenorRes.raise_for_status()
   except:
     return HttpResponse(status=500)

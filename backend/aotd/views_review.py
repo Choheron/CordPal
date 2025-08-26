@@ -120,7 +120,7 @@ def getReviewsForAlbum(request: HttpRequest, mbid: str, date: str = None):
   except:
     out = {}
     out['review_list'] = []
-    print(f'Album {mbid} not found in AOtD List...')
+    logger.warning(f'Album {mbid} not found in AOtD List...', extra={'crid': request.crid})
     return JsonResponse(out)
   # Get Album from the database
   try:
@@ -128,7 +128,7 @@ def getReviewsForAlbum(request: HttpRequest, mbid: str, date: str = None):
   except Album.DoesNotExist:
     out = {}
     out['review_list'] = []
-    print(f'Album {mbid} not found...')
+    logger.warning(f'Album {mbid} not found...', extra={'crid': request.crid})
     return JsonResponse(out)
   # Get all reivews for album
   try:
@@ -136,7 +136,7 @@ def getReviewsForAlbum(request: HttpRequest, mbid: str, date: str = None):
   except Review.DoesNotExist:
     out = {}
     out['review_list'] = []
-    print(f'No reviews found for album {mbid}...')
+    logger.warning(f'No reviews found for album {mbid}...', extra={'crid': request.crid})
     return JsonResponse(out)
   # Declare outlist and populate
   outList = []
@@ -172,7 +172,7 @@ def getUserReviewForAlbum(request: HttpRequest, mbid: str, date: str = None):
   except:
     out = {}
     out['review_list'] = []
-    print(f'Album {mbid} not found in AOtD List...')
+    logger.warning(f'Album {mbid} not found in AOtD List...', extra={'crid': request.crid})
     return JsonResponse(out)
   # Get User from the database
   try: 

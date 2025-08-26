@@ -28,7 +28,7 @@ from users.models import User
 def getUserCount(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getUserCount called with a non-GET method, returning 405.")
+    logger.warning("getUserCount called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -46,7 +46,7 @@ def getUserCount(request: HttpRequest):
 def getUserList(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getUserList called with a non-GET method, returning 405.")
+    logger.warning("getUserList called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -73,7 +73,7 @@ def getUserList(request: HttpRequest):
 def getUserData(request: HttpRequest, user_discord_id: str = ""):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getUserData called with a non-GET method, returning 405.")
+    logger.warning("getUserData called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -84,7 +84,7 @@ def getUserData(request: HttpRequest, user_discord_id: str = ""):
     request_id = str(request.session['discord_id'])
   # Retrieve user data from database, if its not there create one.
   try:
-    logger.debug(f"Attempting to retreive user data for user id: {user_discord_id}...")
+    logger.debug(f"Attempting to retreive user data for user id: {user_discord_id}...", extra={'crid': request.crid})
     userData = User.objects.get(discord_id = request_id)
   except:
     res = HttpResponse("User Not Found")
@@ -105,7 +105,7 @@ def getUserData(request: HttpRequest, user_discord_id: str = ""):
 def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
   # Make sure request is a GET request
   if(request.method != "GET"):
-    logger.warning("getUserAvatarURL called with a non-GET method, returning 405.")
+    logger.warning("getUserAvatarURL called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -133,7 +133,7 @@ def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
 def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("isUserAdmin called with a non-GET method, returning 405.")
+    logger.warning("isUserAdmin called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -144,7 +144,7 @@ def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
     request_id = str(request.session['discord_id'])
   # Retrieve user data from database, if its not there create one.
   try:
-    logger.debug(f"Attempting to retreive user data for user id: {user_discord_id}...")
+    logger.debug(f"Attempting to retreive user data for user id: {user_discord_id}...", extra={'crid': request.crid})
     userData = User.objects.get(discord_id = request_id)
   except:
     res = HttpResponse("User Not Found")
@@ -164,7 +164,7 @@ def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
 def updateUserData(request: HttpRequest):
   # Make sure request is a post request
   if(request.method != "POST"):
-    logger.warning("updateUserData called with a non-POST method, returning 405.")
+    logger.warning("updateUserData called with a non-POST method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -182,7 +182,7 @@ def updateUserData(request: HttpRequest):
 def isOnline(request: HttpRequest, user_discord_id: str):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("isOnline called with a non-GET method, returning 405.")
+    logger.warning("isOnline called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -205,7 +205,7 @@ def isOnline(request: HttpRequest, user_discord_id: str):
 def getAllOnlineData(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getAllOnlineData called with a non-GET method, returning 405.")
+    logger.warning("getAllOnlineData called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -232,7 +232,7 @@ def getAllOnlineData(request: HttpRequest):
 def getUsersByTimezone(request: HttpRequest):
   # Make sure request is a get request
   if(request.method != "GET"):
-    logger.warning("getUsersByTimezone called with a non-GET method, returning 405.")
+    logger.warning("getUsersByTimezone called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -264,15 +264,15 @@ def getUsersByTimezone(request: HttpRequest):
 def heartbeat(request: HttpRequest):
   # Make sure request is a POST request
   if(request.method != "POST"):
-    logger.warning("Heartbeat called with a non-POST method, returning 405.")
+    logger.warning("Heartbeat called with a non-POST method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
   try:
     user = User.objects.get(discord_id=request.session['discord_id'])
-    logger.debug(f"Heartbeat received from {user.nickname}...")
+    logger.debug(f"Heartbeat received from {user.nickname}...", extra={'crid': request.crid})
   except:
-    logger.warning(f"HEARTBEAT RECIEVED FROM UNKNOWN USER!")
+    logger.warning(f"HEARTBEAT RECIEVED FROM UNKNOWN USER!", extra={'crid': request.crid})
     response = HttpResponse("/")
     response.status_code = 302
     return response
@@ -288,7 +288,7 @@ def heartbeat(request: HttpRequest):
 def isFieldUnique(request: HttpRequest):
   # Make sure request is a POST request
   if(request.method != "POST"):
-    logger.warning("isFieldUnique called with a non-POST method, returning 405.")
+    logger.warning("isFieldUnique called with a non-POST method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -304,11 +304,11 @@ def isFieldUnique(request: HttpRequest):
     valuesList = User.objects.values_list(reqBody['field'], flat=True)
     if(reqBody['value'] in valuesList):
       isUnique = False
-      logger.debug(f"Field \"{reqBody['field']}\" with value \"{reqBody['value']}\" is NOT unique across users!") 
+      logger.debug(f"Field \"{reqBody['field']}\" with value \"{reqBody['value']}\" is NOT unique across users!"), extra={'crid': request.crid} 
     else:
-      logger.debug(f"Field \"{reqBody['field']}\" is unique across users.")
+      logger.debug(f"Field \"{reqBody['field']}\" is unique across users.", extra={'crid': request.crid})
   except Exception as e:
-    logger.error(f"Failure when checking unqiue field: {e}")
+    logger.error(f"Failure when checking unqiue field: {e}", extra={'crid': request.crid})
     return JsonResponse(status = 500)
   # Return response
   response = JsonResponse({"unique": isUnique})
@@ -321,7 +321,7 @@ def isFieldUnique(request: HttpRequest):
 def getLoginMethods(request: HttpRequest, user_discord_id: str = ""):
   # Make sure request is a GET request
   if(request.method != "GET"):
-    logger.warning("getLoginMethods called with a non-GET method, returning 405.")
+    logger.warning("getLoginMethods called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -339,7 +339,7 @@ def getLoginMethods(request: HttpRequest, user_discord_id: str = ""):
     token = DiscordTokens.objects.get(user=user)
     methods.append("Discord")
   except:
-    logger.debug(f"User does not have a discord id in database.")
+    logger.debug(f"User does not have a discord id in database.", extra={'crid': request.crid})
   # If the user has a password
   if(user.password != None):
     methods.append("Username/Password")
@@ -354,7 +354,7 @@ def getLoginMethods(request: HttpRequest, user_discord_id: str = ""):
 def getPasswordValidators(request: HttpRequest, user_discord_id: str = ""):
   # Make sure request is a GET request
   if(request.method != "GET"):
-    logger.warning("getPasswordValidators called with a non-GET method, returning 405.")
+    logger.warning("getPasswordValidators called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -369,7 +369,7 @@ def getPasswordValidators(request: HttpRequest, user_discord_id: str = ""):
 def updateUserPassword(request: HttpRequest):
   # Make sure request is a POST request
   if(request.method != "POST"):
-    logger.warning("updateUserPassword called with a non-POST method, returning 405.")
+    logger.warning("updateUserPassword called with a non-POST method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -409,7 +409,7 @@ def updateUserPassword(request: HttpRequest):
     out['message'] = "Password successfully updated!"
     return JsonResponse(out)
   except Exception:
-    logger.error(f"System Error setting password! {traceback.format_exc()}")
+    logger.error(f"System Error setting password! {traceback.format_exc()}", extra={'crid': request.crid})
     out = {}
     out['success'] = False
     out['errorType'] = "SYS"
@@ -423,7 +423,7 @@ def updateUserPassword(request: HttpRequest):
 def traditionalLogin(request: HttpRequest):
   # Make sure request is a POST request
   if(request.method != "POST"):
-    logger.warning("updateUserPassword called with a non-POST method, returning 405.")
+    logger.warning("updateUserPassword called with a non-POST method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
@@ -437,7 +437,7 @@ def traditionalLogin(request: HttpRequest):
     try:
       user = User.objects.get(nickname=username)
     except User.DoesNotExist as e:
-      logger.warning(f"Attempted login with nickname {username}. User not found!")
+      logger.warning(f"Attempted login with nickname {username}. User not found!", extra={'crid': request.crid})
       out = {}
       out['success'] = False
       out['errorType'] = "USER"
@@ -445,7 +445,7 @@ def traditionalLogin(request: HttpRequest):
       return JsonResponse(out)
     # Check the password for the user
     if(not user.check_password(password)):
-      logger.warning(f"Attempted login with nickname {username}. Incorrect Password!")
+      logger.warning(f"Attempted login with nickname {username}. Incorrect Password!", extra={'crid': request.crid})
       out = {}
       out['success'] = False
       out['errorType'] = "PASS"
@@ -460,7 +460,7 @@ def traditionalLogin(request: HttpRequest):
     out["message"] = "Successful Login, Redirecting to Dashboard... Please Wait."
     return JsonResponse(out)
   except Exception:
-    logger.error(f"System Error during traditional login! {traceback.format_exc()}")
+    logger.error(f"System Error during traditional login! {traceback.format_exc()}", extra={'crid': request.crid})
     out = {}
     out['success'] = False
     out['errorType'] = "SYS"

@@ -62,7 +62,7 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
   except DailyAlbum.DoesNotExist:
     out = {}
     out['err_message'] = 'Not Found'
-    print(f'Daily Album not Found for: {date}')
+    logger.warning(f'Daily Album not Found for: {date}', extra={'crid': request.crid})
     return JsonResponse(out)
   # Return album of passed in day
   out = {} 
