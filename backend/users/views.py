@@ -304,7 +304,7 @@ def isFieldUnique(request: HttpRequest):
     valuesList = User.objects.values_list(reqBody['field'], flat=True)
     if(reqBody['value'] in valuesList):
       isUnique = False
-      logger.debug(f"Field \"{reqBody['field']}\" with value \"{reqBody['value']}\" is NOT unique across users!"), extra={'crid': request.crid} 
+      logger.debug(f"Field \"{reqBody['field']}\" with value \"{reqBody['value']}\" is NOT unique across users!", extra={'crid': request.crid})
     else:
       logger.debug(f"Field \"{reqBody['field']}\" is unique across users.", extra={'crid': request.crid})
   except Exception as e:

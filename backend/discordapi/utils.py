@@ -127,7 +127,7 @@ def refreshDiscordProfilePic(request: HttpRequest):
     try:
       discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
       if(discordRes.status_code != 200):
-        logger.warning("Error in request:\n" + str(discordRes.json()), extra={'crid': request.crid}, extra={'crid': request.crid})
+        logger.warning("Error in request:\n" + str(discordRes.json()), extra={'crid': request.crid})
         discordRes.raise_for_status()
     except:
       return HttpResponse(status=500)
