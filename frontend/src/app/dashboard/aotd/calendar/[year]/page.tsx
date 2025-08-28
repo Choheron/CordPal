@@ -1,10 +1,12 @@
 import { getAOtDByMonth } from "@/app/lib/aotd_utils";
 import { monthToWeekArray } from "@/app/lib/calendar_utils";
-import { daysInMonth, monthToName, padNumber } from "@/app/lib/utils"
+import { daysInMonth, monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import MinimalAlbumDisplay from "@/app/ui/dashboard/aotd/minimal_album_display";
+import { Conditional } from "@/app/ui/dashboard/conditional";
 import PageTitle from "@/app/ui/dashboard/page_title";
-import { Button } from "@heroui/react";
+import { Button, Tooltip } from "@heroui/react";
 import Link from "next/link";
+import { RiThumbDownFill, RiThumbUpFill } from "react-icons/ri";
 
 
 export default async function Page({
@@ -44,6 +46,8 @@ export default async function Page({
     const genDay = (date_str) => {
       const day_data = month.aotd_data[date_str]
       const dateArr = date_str.split("-")
+      // Check if this day is the highest or lowest in its month
+      const is_highest_or_lowest = (((month.month_number - 1 <= today.getMonth()) && (parseInt(year) <= today.getFullYear())) ? ((date_str == month.aotd_data['stats']['highest_aotd_date']) || (date_str == month.aotd_data['stats']['lowest_aotd_date'])) : false)
       // Helper func to get data about this album
       function albumGet(field) {
         if(day_data) {
@@ -81,6 +85,20 @@ export default async function Page({
             <div className="p-[2px] w-fit text-center bg-zinc-900/90 border border-zinc-900 rounded-t-2xl rounded-br-2xl text-[8px] 3xl:text-[15px]">
               <p>{dateArr[2]}</p>
             </div>
+            <Conditional showWhen={(is_highest_or_lowest) && (date_str == month.aotd_data['stats']['highest_aotd_date'])}>
+              <Tooltip content={`Highest Rated Album for ${month.month} ${year}`}>
+                <div className="absolute right-0 bg-green-600/90 border border-green-800 top-0 p-[3px] rounded-t-2xl rounded-bl-2xl text-[10px] 3xl:text-[17px]">
+                  <RiThumbUpFill />
+                </div>
+              </Tooltip>
+            </Conditional>
+            <Conditional showWhen={(is_highest_or_lowest) && (date_str == month.aotd_data['stats']['lowest_aotd_date'])}>
+              <Tooltip content={`Lowest Rated Album for ${month.month} ${year}`}>
+                <div className="absolute right-0 bg-red-600/90 border border-red-800 top-0 p-[2px] rounded-t-2xl rounded-bl-2xl text-[10px] 3xl:text-[17px]">
+                  <RiThumbDownFill />
+                </div>
+              </Tooltip>
+            </Conditional>
             <div className="relative object-scale-down">
               {/* Album Body */}
               <MinimalAlbumDisplay
