@@ -10,6 +10,7 @@ import { Button, Tooltip } from "@heroui/react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { RiArrowLeftCircleLine, RiArrowRightCircleLine, RiThumbDownFill, RiThumbUpFill, RiVipCrownFill } from "react-icons/ri"
+import { monthToWeekArray } from "@/app/lib/calendar_utils"
 
 
 
@@ -48,28 +49,7 @@ export default async function Page({
 
   // Populate an array containing strings of dates (YYYY-MM-DD) that corresponds to where to place the days in the UI
   // Array will contain subarrays containing data from sat to sun (one week)
-  let dates: any = [[],[],[],[],[],[]]
-  let weekIndex = 0
-  let dayIndex = 1
-  for(dayIndex; dayIndex <= dayCount; dayIndex++) {
-    const date = new Date(Number(year), Number(month) - 1, dayIndex)
-    const dayOfWeek = date.getDay()
-    // Special if block for if day is first day
-    if(dayIndex == 1) {
-      let x = 0
-      while(x < dayOfWeek) {
-        // THIS IS UGLY WHAT AM I DOING LOL
-        dates[weekIndex].push(`${lastMonth.getFullYear()}-${padNumber(lastMonth.getMonth() + 1)}-${padNumber((new Date(new Date().setDate(firstDay.getDate() - (dayOfWeek - (x)))).getDate()))}`)
-        x++;
-      }
-    }
-    // Add date to array
-    dates[weekIndex].push(`${date.getFullYear()}-${padNumber(date.getMonth() + 1)}-${padNumber(date.getDate())}`)
-    // Increment week index if day is a sunday
-    if(date.getDay() == 6) {
-      weekIndex++;
-    }
-  }
+  let dates = monthToWeekArray(year, month, dayCount)
 
   // Generate a calendar for the month
   const genCalendar = () => {
@@ -105,7 +85,7 @@ export default async function Page({
       return null
     }
 
-    // If the album date is from last month, return a text block
+    // If the album date is from last month, return nothing
     if(dateStr.split("-")[1] != (firstDay.getMonth() + 1)) {
       return (
         <></>
@@ -207,12 +187,12 @@ export default async function Page({
         </Button>
         <Button 
           as={Link}
-          href={`/dashboard/aotd`}
+          href={`/dashboard/aotd/calendar/${year}`}
           radius="lg"
           className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
           variant="solid"
         >
-          <b>Today</b>
+          <b>View Whole Year</b>
         </Button>
         <Button 
           as={Link}

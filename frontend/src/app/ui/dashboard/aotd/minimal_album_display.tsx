@@ -110,19 +110,19 @@ export default async function MinimalAlbumDisplay(props) {
       <Tooltip 
         content={tooltipContent()}
         showArrow
-        className={`${sizingOverride} !max-h-fit`}
+        className={`max-h-fit`}
         isDisabled={tooltipDisabled}
       >
         <Button
           as={Link}
           href={(historical) ? `/dashboard/aotd/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
           radius="none"
-          className={`${albumCoverOverride} px-0 py-0`}
+          className={`${albumCoverOverride} px-0 py-0 min-w-0`}
           isDisabled={!props.album_mbid}
         >
           <img 
             src={album_cover_url}
-            className={`${sizingOverride} w-full`}
+            className={`${sizingOverride}`}
             alt={`Album Cover for ${title} by ${artist_name}`}
           />
         </Button>
