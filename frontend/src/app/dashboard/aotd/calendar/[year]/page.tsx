@@ -114,13 +114,13 @@ export default async function Page({
       <table className="w-full h-full table-fixed mx-auto sm:border-separate">
         <thead>
           <tr>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Su</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Mo</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Tu</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">We</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Th</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Fr</th>
-            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Sa</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Sun</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Mon</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Tue</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Wed</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Thu</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Fri</th>
+            <th className="rounded-2xl bg-zinc-800/50 font-extralight py-2 text-sm truncate">Sat</th>
           </tr>
         </thead>
         <tbody>
