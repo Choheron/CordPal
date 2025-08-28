@@ -23,6 +23,8 @@ export default async function Page({
   const { year } = (await params)
   // Create new Date object
   const yearDate = new Date(year)
+  // Get Today's Date
+  const today = new Date()
   // Generate an object to contain year data
   let yearData: Month[] = Array(12)
   for(var i = 0; i < yearData.length; i++) {
@@ -50,8 +52,29 @@ export default async function Page({
         return null
       }
       // If day is from previous month, return nothing
-      if(date_str.split("-")[1] != padNumber(month.month_number)) {
+      if (date_str.split("-")[1] != padNumber(month.month_number)) {
         return <></>
+      // If date is in the future, do special actions
+      } else if (new Date(Number(dateArr[0]), Number(dateArr[1]) - 1, Number(dateArr[2])) > today) {
+        return (
+          <div className="relative bg-neutral-800 rounded-2xl h-fit">
+            <div className="p-[2px] w-fit text-center bg-zinc-900/90 border border-zinc-900 rounded-t-2xl rounded-br-2xl text-[8px] 3xl:text-[15px]">
+              <p>{dateArr[2]}</p>
+            </div>
+            <div className="relative object-scale-down">
+              {/* Album Body */}
+              <MinimalAlbumDisplay
+                showAlbumRating={true}
+                title={"Future Album"}
+                album_img_src={`https://www.placemonkeys.com/500?greyscale&random=${dateArr[2]}`}
+                artist={{'name': "Monke"}}
+                sizingOverride="w-full h-full aspect-square"
+                albumCoverOverride="rounded-b-2xl"
+              />
+            </div>
+          </div>
+        )
+      // Handling of normal date
       } else {
         return (
           <div className="relative bg-neutral-800 rounded-2xl h-fit">
