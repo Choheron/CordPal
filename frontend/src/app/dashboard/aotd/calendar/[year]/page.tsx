@@ -129,9 +129,9 @@ export default async function Page({
     <div className="w-full">
       <PageTitle text={`Historical Daily Albums for ${year}`} />
       <div className="flex flex-col sm:flex-row flex-wrap">
-        {yearData.map((obj) => {
+        {yearData.map((obj, index) => {
           return (
-            <div className="w-full sm:w-1/3 3xl:w-1/4 px-2 py-4">
+            <div className="w-full sm:w-1/3 3xl:w-1/4 px-2 py-4" key={index}>
               <Button 
                 as={Link}
                 href={`/dashboard/aotd/calendar/${year}/${obj.month_number}`}
