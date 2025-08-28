@@ -192,7 +192,7 @@ export default async function Page({
           className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
           variant="solid"
         >
-          <b>View Whole Year</b>
+          <b>View all of {year}</b>
         </Button>
         <Button 
           as={Link}
