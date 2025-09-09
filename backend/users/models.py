@@ -87,6 +87,27 @@ class User(AbstractUser):
     else:
       return "Just Now"
     return (out + " ago")
+  
+  def toJSON(self):
+    """Return this User as a JSON. (For HTTP JSON Responses)"""
+    out={}
+    out['guid'] = self.guid
+    out['username'] = self.username
+    out['last_updated_timestamp'] = self.last_updated_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
+    out['creation_timestamp'] = self.creation_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
+    out['email'] = self.email
+    out['nickname'] = self.nickname
+    out['timezone_string'] = self.timezone_string
+    out['discord_id'] = self.discord_id
+    out['discord_discriminator'] = self.discord_discriminator
+    out['discord_is_verified'] = self.discord_is_verified
+    out['discord_avatar'] = self.discord_avatar
+    out['aotd_enrolled'] = self.aotd_enrolled
+    out['is_active'] = self.is_active
+    out['is_staff'] = self.is_staff
+    out['last_request_timestamp'] = self.last_request_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
+    out['last_heartbeat_timestamp'] = self.last_heartbeat_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
+    return out
 
   # toString Method
   def __str__(self):
