@@ -35,6 +35,8 @@ def run():
   with open(quotes_filepath, "r") as file:
     quotes: dict = json.load(file)
   for userId in quotes.keys():
+    if(userId == "last_updated"):
+      continue
     userObj = quotes[userId]
     userNickname = userObj['nickname']
     for quote in userObj['quoteList']:

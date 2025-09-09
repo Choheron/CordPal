@@ -20,7 +20,7 @@ def submitQuote(request: HttpRequest):
     res.status_code = 405
     return res
   # Load in Request Body
-  reqBody = json.loads(request.body)
+  reqBody: dict = json.loads(request.body)
   # Parse all required quote data from request
   try:
     submitterId = reqBody['submitter_data']['id']
@@ -30,9 +30,9 @@ def submitQuote(request: HttpRequest):
       text = reqBody['quote_text']
     else:
       raise Exception("Quote text is missing.")
-    timestamp = reqBody['timestamp'] if reqBody['timestamp'] else datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
+    timestamp = reqBody['timestamp'] if ("timestamp" in reqBody.keys()) else datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
   except Exception as e:
-    logger.error("Request body malformed", extra={'crid': request.crid, "error_msg": e})
+    logger.error("Request body malformed", extra={'crid': request.crid, "error_msg": repr(e)})
     return HttpResponse("Malformed Request Body.", status_code=400)
   # Attempt to retrieve user data for submitter and speaker
   submitterObj: User = userUtils.getUserObj(submitterId)
@@ -121,15 +121,16 @@ def getAllQuotesLegacy(request: HttpRequest):
   # Get all Quotes
   quotes = Quote.objects.all()
   # Format quotes list into a dict based on submitter key
+  logger.info("Iterating all quotes in DB and attempting to return legacy dict")
   quoteDict = {}
   for quote in quotes:
-      speaker_id = quote['speaker']['discord_id'] if quote['speaker'] else quote['speaker_discord_id']
+      speaker_id = quote.speaker.discord_id if quote.speaker else quote.speaker_discord_id
       if(speaker_id in quoteDict.keys()):
-          quoteDict[speaker_id]['quoteList'].append(quote)
+          quoteDict[speaker_id]['quoteList'].append(quote.toJSON())
       else:
           quoteDict[speaker_id] = {
-              "nickname": quote['speaker']['nickname'] if quote['speaker'] else quote['speaker_discord_id'],
-              "quoteList": [quote]
+              "nickname": quote.speaker.nickname if quote.speaker else quote.speaker_discord_id,
+              "quoteList": [quote.toJSON()]
           }
   # Return json
   return JsonResponse(quoteDict)

@@ -22,6 +22,8 @@ export async function getAllBotQuotes() {
       Cookie: `sessionid=${sessionCookie};`
     }
   });
-  return JSON.parse(await quoteListResponse.text());
+  let json = JSON.parse(await quoteListResponse.text());
+  delete json["meta"]
+  return json
 }
   
