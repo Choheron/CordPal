@@ -14,7 +14,7 @@ const getCookie = async (name: string) => {
 export async function getAllBotQuotes() {
   const sessionCookie = await getCookie('sessionid');
   // Query quotes endpoint for bot interaction
-  const quoteListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/botInteraction/getAllQuotes`, {
+  const quoteListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/quotes/getAllQuotesLegacy`, {
     method: "GET",
     credentials: "include",
     cache: 'no-cache',

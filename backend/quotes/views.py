@@ -110,6 +110,31 @@ def getAllQuotesList(request: HttpRequest):
   return JsonResponse({'quotes': out})
 
 
+def getAllQuotesLegacy(request: HttpRequest):
+  '''Get all quotes in the legacy format'''
+   # Make sure request is a GET request
+  if(request.method != "GET"):
+    logger.warning(f"getAllQuotesLegacy called with a non-GET method, returning 405.", extra={'crid': request.crid})
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get all Quotes
+  quotes = Quote.objects.all()
+  # Format quotes list into a dict based on submitter key
+  quoteDict = {}
+  for quote in quotes:
+      speaker_id = quote['speaker']['discord_id'] if quote['speaker'] else quote['speaker_discord_id']
+      if(speaker_id in quoteDict.keys()):
+          quoteDict[speaker_id]['quoteList'].append(quote)
+      else:
+          quoteDict[speaker_id] = {
+              "nickname": quote['speaker']['nickname'] if quote['speaker'] else quote['speaker_discord_id'],
+              "quoteList": [quote]
+          }
+  # Return json
+  return JsonResponse(quoteDict)
+
+
 def getQuoteStats(request: HttpRequest):
   # Make sure request is a GET request
   if(request.method != "GET"):

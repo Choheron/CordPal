@@ -18,7 +18,8 @@ load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 
 # Determine quotes Filepath
 if(APP_ENV=="PROD"):
-  quotes_filepath = ""
+  DISCORD_BOT_DATA_FILEPATH = os.getenv('DISCORD_BOT_DATA_FILEPATH')
+  quotes_filepath = f"{DISCORD_BOT_DATA_FILEPATH}/quotes.json"
 else:
   quotes_filepath = "./botData/cordBot/quotes.json"
 

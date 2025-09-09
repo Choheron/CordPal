@@ -7,4 +7,5 @@ urlpatterns = [
   path('submitQuote', views.submitQuote),
   path('getAllQuotesList', views.getAllQuotesList),
   path('getUserSpokenQuotes/<str:user_discord_id>', views.getUserSpokenQuotes),
+  path('getAllQuotesLegacy', views.getAllQuotesLegacy),
 ]
