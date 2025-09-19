@@ -69,6 +69,18 @@ export default async function ReviewStatsUserCard(props) {
           </p>
         </div>
         <div className='flex justify-between w-full'>
+          <p className="my-auto">Total AOTDs Missed:</p>
+          <p className="my-auto px-2 py-1 bg-gray-800 rounded-full">
+            {reviewData['missed_reviews']}
+          </p>
+        </div>
+        <div className='flex justify-between w-full'>
+          <p className="my-auto">AOTD K/D:</p>
+          <p className="my-auto px-2 py-1 bg-gray-800 rounded-full">
+            {reviewData['review_ratio'].toFixed(2)}
+          </p>
+        </div>
+        <div className='flex justify-between w-full'>
           <p className="my-auto">Current Review Streak:</p>
           <p className="my-auto px-2 py-1 rounded-full">
             🔥 {reviewData['current_streak']} {(reviewData['streak_at_risk'] ? "⌛" : "")}

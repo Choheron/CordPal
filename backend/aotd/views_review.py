@@ -208,7 +208,7 @@ def getAllUserReviewStats(request: HttpRequest):
   totalReviews = Review.objects.all().count()
   for aotdUser in all_users:
     # If this user has not had their data calculated, calculate it
-    if(aotdUser.total_reviews == None or aotdUser.total_selected == None):
+    if(aotdUser.total_reviews == None or aotdUser.total_selected == None or aotdUser.review_ratio == 0):
       calculateUserReviewData(aotdUser)
     # Create a new object for the user
     reviewData[aotdUser.user.discord_id] = {
@@ -257,7 +257,7 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
   # Get AotdUser Object
   aotdUser = AotdUserData.objects.get(user=user)
   # If this user has not had their data calculated, calculate it
-  if(aotdUser.total_reviews == None or aotdUser.total_selected == None):
+  if(aotdUser.total_reviews == None or aotdUser.total_selected == None or aotdUser.review_ratio == 0):
     calculateUserReviewData(aotdUser)
   # Create a new object for the user
   out = {
