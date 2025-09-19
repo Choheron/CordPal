@@ -214,6 +214,7 @@ def getAllUserReviewStats(request: HttpRequest):
     reviewData[aotdUser.user.discord_id] = {
       "discord_id": aotdUser.user.discord_id,
       "total_reviews": aotdUser.total_reviews, 
+      "missed_reviews": aotdUser.missed_reviews,
       "review_score_sum": aotdUser.review_score_sum,
       "first_listen_percentage": aotdUser.first_listen_percentage,
       "average_review_score": aotdUser.average_review_score,
@@ -224,6 +225,7 @@ def getAllUserReviewStats(request: HttpRequest):
       "highest_score_given": aotdUser.highest_score_given,
       "highest_score_album": aotdUser.highest_score_mbid,
       "highest_score_date": aotdUser.highest_score_date.strftime("%m/%d/%Y, %H:%M:%S"),
+      "review_ratio": aotdUser.review_ratio,
       "current_streak": aotdUser.current_streak,
       "longest_streak": aotdUser.longest_streak,
       "last_review_date": aotdUser.last_review_date,
@@ -261,6 +263,7 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
   out = {
     "discord_id": aotdUser.user.discord_id,
     "total_reviews": aotdUser.total_reviews, 
+    "missed_reviews": aotdUser.missed_reviews,
     "review_score_sum": aotdUser.review_score_sum,
     "first_listen_percentage": aotdUser.first_listen_percentage,
     "average_review_score": aotdUser.average_review_score,
@@ -271,6 +274,7 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
     "highest_score_given": aotdUser.highest_score_given,
     "highest_score_album": aotdUser.highest_score_mbid,
     "highest_score_date": aotdUser.highest_score_date.strftime("%m/%d/%Y, %H:%M:%S"),
+    "review_ratio": aotdUser.review_ratio,
     "current_streak": aotdUser.current_streak,
     "longest_streak": aotdUser.longest_streak,
     "last_review_date": aotdUser.last_review_date,

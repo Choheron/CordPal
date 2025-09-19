@@ -148,6 +148,20 @@ export default async function UserAotdDataDisplay(props) {
               </div>
               <div className="flex justify-around mb-2">
                 <div className="flex flex-col text-center w-full">
+                  <p>AOTDs Not Reviewed: </p>
+                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                    {reviewStats['missed_reviews']}
+                  </p>
+                </div>
+                <div className="flex flex-col text-center w-full">
+                  <p>Review K/D: </p>
+                  <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
+                    {reviewStats['review_ratio'].toFixed(2)}
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-around mb-2">
+                <div className="flex flex-col text-center w-full">
                   <p>Current Review Streak: </p>
                   <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
                     {reviewStats['current_streak']} {(reviewStats['streak_at_risk'] ? "⌛" : "")}

@@ -270,6 +270,18 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   highest_review_score = highest_review.score
   highest_review_mbid = highest_review.album.mbid
   highest_review_date = highest_review.aotd_date
+  # Calculate user's Review KD
+  ## Get date of user's AOTD User Data Creation
+  user_start_date = user.creation_timestamp.date()
+  ## Get count of AOTD objects since this date
+  possible_aotd_count = DailyAlbum.objects.filter(date__gte=user_start_date).count()
+  ## Calculate count of days that user did not review
+  user_missed_review_count = possible_aotd_count - total_reviews
+  ## Calculate review ratio
+  try:
+    review_ratio: float = total_reviews/user_missed_review_count
+  except ZeroDivisionError: 
+    review_ratio: float = total_reviews
   # Get submission stats
   total_subs = Album.objects.filter(submitted_by=user).count()
   total_select = DailyAlbum.objects.filter(album__submitted_by=user)
@@ -280,6 +292,7 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
     average_select_score = 0
   # Update user data
   aotdUserObj.total_reviews = total_reviews
+  aotdUserObj.missed_reviews = user_missed_review_count
   aotdUserObj.review_score_sum = review_sum
   aotdUserObj.average_review_score = average_review_score
   aotdUserObj.median_review_score = median_review_score
@@ -290,6 +303,7 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   aotdUserObj.highest_score_given = highest_review_score
   aotdUserObj.highest_score_mbid = highest_review_mbid
   aotdUserObj.highest_score_date = highest_review_date
+  aotdUserObj.review_ratio = review_ratio
   # Update user Selection/Submission Data
   aotdUserObj.total_submissions = total_subs
   aotdUserObj.total_selected = total_select.count()

@@ -34,6 +34,7 @@ class AotdUserData(models.Model):
   selection_blocked_flag = models.BooleanField(default=False)
   # Track review stats
   total_reviews = models.IntegerField(default=None, null=True)
+  missed_reviews = models.IntegerField(default=0)
   review_score_sum = models.FloatField(default=0)
   first_listen_percentage = models.FloatField(default=0)
   average_review_score = models.FloatField(default=0)
@@ -44,6 +45,7 @@ class AotdUserData(models.Model):
   highest_score_given = models.FloatField(default=None, null=True)
   highest_score_mbid = models.CharField(max_length=256, null=True, default=None)
   highest_score_date = models.DateField(null=True, default=None)
+  review_ratio = models.FloatField(default=0) # Corresponds to the number of days a user has reviewed versus the number they havent (since they joined)
   # Track Review Streaks
   current_streak = models.PositiveIntegerField(default=0)
   '''User's current aotd Review streak'''
