@@ -8,70 +8,65 @@ import {
   ModalFooter,
   useDisclosure
 } from "@heroui/modal";
-import { Button, Spinner, Checkbox, Tooltip, Textarea, addToast } from "@heroui/react";
+import { Button, Spinner, Checkbox, Tooltip, addToast, Input } from "@heroui/react";
 import React from "react";
-import { RiDeleteBin2Line, RiErrorWarningFill } from "react-icons/ri";
-import { Conditional } from "../../dashboard/conditional";
+import { RiErrorWarningFill, RiFindReplaceFill } from "react-icons/ri";
 import { useRouter } from 'next/navigation'
-
-
+import { replaceAlbumInBackend } from "@/app/lib/aotd_utils";
+import { Conditional } from "../../conditional";
 
 
 // Modal to display a confirmation window for deletion
 // NOTE: Could probably just make this into a general confirmation window
 // Expected Props:
-//   - confirmCallback: Function - Function to call when user clicks confirm
-//   - cancelCallback: Function - Function to call when a user clicks cancel
-//   - isButtonDisabled: Boolean - Function to set if the button to open the modal is disabled
-//   - tooltipContent: String - Text to show on button hover
-//   - titleText: String - Text to display in modal title
-//   - bodyText: String - Text to display in modal body
-//   - redirectText: String - Url to redirect to after successful delete (OPTIONAL)
-//   - textboxDescription: String - Description to show over text input box. If a this is provided, the callback will assume to have a text field
-//   - textboxPlaceholder: String - Default text in the textbox.
-export default function DeleteModal(props) {
-  const cancelCallback = props.cancelCallback
+//   - albumObj: Object - The Object representing the album from the backend
+//   - isButtonDisabled: Boolean - Is the button disabled?
+//   - isCurrentlyAOTD: Boolean - Is the album currently the AOTD?
+export default function ReplaceAlbumModal(props) {
   // Props
-  const isButtonDisabled = (props.isButtonDisabled) ? props.isButtonDisabled : false;
-  const tooltipContent = (props.tooltipContent) ? props.tooltipContent : "";
-  const titleText = (props.titleText) ? props.titleText : "Delete?";
-  const bodyText = (props.bodyText) ? props.bodyText : "Are you sure you would like to delete?";
-  const redirectText = (props.redirectText) ? props.redirectText : null;
-  const textboxDescription = (props.textboxDescription) ? props.textboxDescription : null;
-  const textboxPlaceholder = (props.textboxPlaceholder) ? props.textboxPlaceholder : null;
+  const albumObj = props.albumObj
+  const isButtonDisabled: boolean = props.isButtonDisabled
+  const isCurrentlyAOTD: boolean = (props.isCurrentlyAOTD != null) ? props.isCurrentlyAOTD : false
+  // Data pulled from props
+  const albumPK = albumObj['album_pk']
+  const albumTitle = albumObj['title']
   // Functionality states
   const [confirmed, setConfirmed] = React.useState(false)
   const [processing, setProcessing] = React.useState(false)
   const [errorText, setErrorText] = React.useState("")
-  const [textboxText, setTextboxText] = React.useState("")
+  const [mbidText, setMbidText] = React.useState("")
   // Modal Controller Vars
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   // Router
   const router = useRouter()
 
-  const handleDelete = async () => {
+  const handleReplace = async () => {
     setProcessing(true)
-    const responseObj = (((textboxDescription != null) && (textboxPlaceholder != null)) ? await props.confirmCallback(textboxText) : await props.confirmCallback())
+    console.log(`Replace submitted by user for album ${albumPK} with title ${albumTitle}...`)
+    const responseObj = await replaceAlbumInBackend(albumPK, mbidText, isCurrentlyAOTD)
     if(responseObj.status != 200) {
       setErrorText(`An error occured when attempting to delete the album, please contact system Admins! Error Code: ${responseObj.status} - CRID: ${responseObj.crid}`)
       setConfirmed(false)
       return
-    }
-    if(redirectText) {
-      // Redirect user to AOtD Page after successful delete
-      router.push(redirectText)
+    } else {
+      // Redirect user to correct page after successful update
+      if(isCurrentlyAOTD) {
+        router.push(`/dashboard/aotd`)
+      } else {
+        router.push(`/dashboard/aotd/album/${responseObj.new_mbid}`)
+      }
       addToast({
-        title: "Deletion Complete!",
-        description: `Successfully completed delete action for "${titleText}"`,
+        title: "Data Replacmenet Complete!",
+        description: `Successfully completed replace action for ${albumTitle}. New MBID: ${responseObj.new_mbid}`,
         color: "success",
       })
-    } else {
       handleCancel()
-    }
+    } 
   }
 
   const handleCancel = () => {
     setErrorText("")
+    setMbidText("")
     setConfirmed(false)
     setProcessing(false)
     onClose()
@@ -80,35 +75,34 @@ export default function DeleteModal(props) {
   return (
     <>
       <Tooltip 
-        content={tooltipContent} 
-        isDisabled={tooltipContent == ""}
+        content={"Replace Album Data"}
       >
         <span>
           <Button 
-            className="p-1 mx-auto my-2 bg-gradient-to-br from-red-700/80 to-red-800/80 hover:underline text-black"
+            className="p-1 mx-auto my-2 bg-gradient-to-br from-blue-700/80 to-blue-800/80 hover:underline text-black"
             size="sm"
             onPress={onOpen}
             radius="lg"
             variant="solid"
             isDisabled={isButtonDisabled}
           >
-            <RiDeleteBin2Line className="text-2xl" />
+            <RiFindReplaceFill className="text-2xl" />
           </Button>
         </span>
       </Tooltip>
       <Modal 
-        size="sm"
+        size="md"
         scrollBehavior={"inside"}
         isOpen={isOpen} 
         onOpenChange={onOpenChange} 
         backdrop="blur"
-        onClose={cancelCallback}
+        onClose={handleCancel}
       >
         <ModalContent>
           {() => (
             <>
-              <ModalHeader className="flex flex-col flex-wrap w-full gap-1 content-center">
-                <p>{titleText}</p>
+              <ModalHeader className="flex flex-col flex-wrap w-full gap-1 content-center text-center">
+                <p>{`Replace Album Data for "${albumTitle}" with new MBID Data?`}</p>
               </ModalHeader>
               <ModalBody>
                 <Conditional showWhen={errorText != ""}>
@@ -120,24 +114,26 @@ export default function DeleteModal(props) {
                     <RiErrorWarningFill className="text-2xl mx-auto text-yellow-500" />
                   </div>
                 </Conditional>
-                <p className="w-full text-center">
-                  {bodyText}
+                <p className="w-full">
+                  Input a new MBID to use for data replacement. The data for this album on the backend will be replaced with new data queried for the passed in MBID. This is to be used when
+                  and album has been incorrectly submitted or has the wrong data. 
                 </p>
+                <p>
+                  NOTE: Please do not use this functionality to replace with enitrely different albums as that will break backend
+                  function.
+                </p>
+                <Input 
+                  className="max-w-full" 
+                  label="New MBID"  
+                  onValueChange={setMbidText}
+                />
                 <Checkbox 
                   isSelected={confirmed} 
                   onValueChange={setConfirmed}
                   className="w-full ml-1"
                 >
-                  I&apos;m Sure!
+                  I&apos;m ready to replace!
                 </Checkbox>
-                <Conditional showWhen={(textboxDescription != null) && (textboxPlaceholder != null)} >
-                  <Textarea 
-                    className="max-w-xs" 
-                    label={textboxDescription} 
-                    placeholder={textboxPlaceholder} 
-                    onValueChange={setTextboxText}
-                  />
-                </Conditional>
               </ModalBody>
               <ModalFooter>
                 <div className="flex w-full justify-between">
@@ -152,10 +148,10 @@ export default function DeleteModal(props) {
                     variant="solid" 
                     className="mr-2 mt-auto bg-red-500" 
                     isDisabled={!confirmed} 
-                    onPress={handleDelete}
+                    onPress={handleReplace}
                   >
                     <Conditional showWhen={!processing}>
-                      DELETE ALBUM
+                      REPLACE ALBUM DATA
                     </Conditional>
                     <Conditional showWhen={processing}>
                       <Spinner />

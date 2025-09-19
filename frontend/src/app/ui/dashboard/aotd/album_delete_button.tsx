@@ -15,8 +15,8 @@ export default function AlbumDeleteButton({
 }) {
   const handleDelete = async (reason) => {
     console.log(`Delete confirmed for album ${albumid}...`)
-    const status = await deleteAlbumFromBackend(albumid, reason)
-    return status
+    const returnObj = await deleteAlbumFromBackend(albumid, reason)
+    return returnObj
   }
 
   return (

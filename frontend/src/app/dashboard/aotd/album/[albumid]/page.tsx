@@ -10,6 +10,7 @@ import ReviewDisplay from "@/app/ui/dashboard/aotd/review_display"
 import { Button, Divider } from "@heroui/react"
 import Link from "next/link"
 import AlbumDeleteButton from "@/app/ui/dashboard/aotd/album_delete_button"
+import ReplaceAlbumModal from "@/app/ui/dashboard/aotd/modals/replace_album_modal"
 
 // Page to display data for a specific album
 export default async function Page({
@@ -181,7 +182,13 @@ export default async function Page({
                 showAlbumRating={false}
               />
               <Conditional showWhen={isAdmin || isUploader}>
-                <div className="absolute -top-1 right-1 ">
+                <div className="absolute -top-1 right-1 flex gap-1">
+                  <Conditional showWhen={isAdmin}>
+                    <ReplaceAlbumModal 
+                      albumObj={albumObj}
+                      isButtonDisabled={!isAdmin}
+                    />
+                  </Conditional>
                   <AlbumDeleteButton albumid={albumid} albumTitle={albumData("title")} aotd_dates={aotd_dates}/>
                 </div>
               </Conditional>

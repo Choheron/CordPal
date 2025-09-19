@@ -256,7 +256,45 @@ export async function deleteAlbumFromBackend(mbid, reason = null) {
   // Revalidate requests to ensure no data is lost
   revalidateTag('album_submissions')
   revalidateTag(`album_${mbid}`)
-  return status
+  return {
+    status: status, 
+    crid: deleteAlbumResponse.headers.get("X-CRID")
+  }
+}
+
+
+//
+// Replace the data for an album in the backend pool with a new mbid
+// - RETURN: HttpResponse
+//
+export async function replaceAlbumInBackend(albumPk, new_mbid, isCurrentlyAOTD) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Backend URL
+  const url = `${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/replaceAlbum/${albumPk}/${new_mbid}`
+  // Make request to delete album
+  console.log("replaceAlbumInBackend: Sending request to backend " + url)
+  const deleteAlbumResponse = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const responseJson = await deleteAlbumResponse.json()
+  // Revalidate requests to ensure no data is lost
+  revalidateTag('album_submissions')
+  revalidateTag(`album_${responseJson['mbid']}`)
+  if(isCurrentlyAOTD) {
+    revalidateTag('AOTD')
+  }
+  return {
+    status: deleteAlbumResponse.status,
+    err_message: responseJson['err_message'],
+    new_mbid: responseJson['album_mbid'],
+    crid: deleteAlbumResponse.headers.get("X-CRID")
+  }
 }
 
 

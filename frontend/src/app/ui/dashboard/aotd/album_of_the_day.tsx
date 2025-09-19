@@ -16,11 +16,14 @@ import AddAlbumModal from "./modals/add_album_modal";
 
 import Link from "next/link";
 import { RiCalendar2Fill} from "react-icons/ri";
-import { getUserData } from "@/app/lib/user_utils";
+import { getUserData, isUserAdmin } from "@/app/lib/user_utils";
 import { Conditional } from "../conditional";
+import ReplaceAlbumModal from "./modals/replace_album_modal";
 
 // GUI Display for the Album of the Day
 export default async function AlbumOfTheDayBox(props) {
+  // Check if current user is an Admin User
+  const isAdmin = await isUserAdmin()
   // Get user Data
   const user_data = await getUserData()
   // Get album data
@@ -48,7 +51,16 @@ export default async function AlbumOfTheDayBox(props) {
   return (
     <div className="w-fit lg:max-w-[1080px] flex flex-col lg:flex-row lg:gap-2">
       <div className="backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-        <div className="w-full flex flex-col">
+        <div className="relative w-full flex flex-col">
+          <Conditional showWhen={isAdmin}>
+            <div className="absolute bottom-0 right-0">
+              <ReplaceAlbumModal
+                albumObj={albumOfTheDayObj}
+                isButtonDisabled={!isAdmin}
+                isCurrentlyAOTD={true}
+              />
+            </div>
+          </Conditional>
           <div className="flex flex-col md:flex-row w-full justify-between px-2 mt-1 mb-1">
             <Button 
               as={Link}

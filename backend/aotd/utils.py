@@ -322,3 +322,39 @@ def update_user_streak(user: User, date_override: datetime.date | None = None):
 
   profile.last_review_date = today
   profile.save()
+
+
+def get_album_from_mb(mbid: str) -> Album:
+  '''Given and mbid, query musicbrainz and get data about the album. Then return an UNSAVED Album object. 
+     WARNING: submitted_by and user comment need to be populated. 
+     
+     NOTE: ALBUM OBJECT MUST BE SAVED TO GO INTO THE DATABASE
+  '''
+  from .views_album import parseReleaseDate
+  # Query musicbrainz to get full album data using mbid (to avoid issues with params)
+  url =  f"https://musicbrainz.org/ws/2/release/{mbid}"
+  params = {
+    'inc': 'artists+release-groups+recordings+genres',
+    'fmt': 'json'
+  }
+  headers = {
+    'User-Agent': 'CordPal/0.0.1 ( www.cordpal.app )'
+  }
+  response = requests.get(url, params=params, headers=headers)
+  data = response.json()
+  # Create Album Object
+  newAlbum = Album(
+    mbid=data['id'],
+    title=data['title'],
+    artist=data['artist-credit'][0]['name'],
+    artist_url=f"https://musicbrainz.org/artist/{data['artist-credit'][0]['artist']['id']}",
+    cover_url=f"https://coverartarchive.org/release/{data['id']}/front",
+    album_url=f"https://musicbrainz.org/release/{data['id']}",
+    disambiguation=data['disambiguation'] if ('disambiguation' in data.keys()) else "",
+    release_date=parseReleaseDate(data['date']),
+    release_date_str=data['date'],
+    raw_data=data,
+    track_list={ 'tracks': data['media'][0]['tracks'] },
+  )
+  # Return 
+  return newAlbum

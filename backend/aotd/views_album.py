@@ -1,12 +1,11 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-from django.forms.models import model_to_dict
-from django.utils import timezone
 import numpy
 
 from .utils import (
   getAlbumRating,
-  calculateUserReviewData
+  calculateUserReviewData,
+  get_album_from_mb
 )
 from users.utils import getUserObj
 from .models import (
@@ -151,32 +150,10 @@ def submitAlbum(request: HttpRequest):
     # Get user from database
     user = getUserObj(request.session.get('discord_id'))
     # Query musicbrainz to get full album data using mbid (to avoid issues with params)
-    url =  f"https://musicbrainz.org/ws/2/release/{reqBody['album']['id']}"
-    params = {
-      'inc': 'artists+release-groups+recordings+genres',
-      'fmt': 'json'
-    }
-    headers = {
-      'User-Agent': 'CordPal/0.0.1 ( www.cordpal.app )'
-    }
-    response = requests.get(url, params=params, headers=headers)
-    data = response.json()
-    # Declare new album object
-    newAlbum = Album(
-      mbid=data['id'],
-      title=data['title'],
-      artist=data['artist-credit'][0]['name'],
-      artist_url=f"https://musicbrainz.org/artist/{data['artist-credit'][0]['artist']['id']}",
-      cover_url=f"https://coverartarchive.org/release/{data['id']}/front",
-      album_url=f"https://musicbrainz.org/release/{data['id']}",
-      submitted_by=user,
-      user_comment=reqBody['user_comment'] if (reqBody['user_comment'] != "") else "No Comment Provided",
-      disambiguation=data['disambiguation'] if ('disambiguation' in data.keys()) else "",
-      release_date=parseReleaseDate(data['date']),
-      release_date_str=data['date'],
-      raw_data=data,
-      track_list={ 'tracks': data['media'][0]['tracks'] },
-    )
+    newAlbum = get_album_from_mb(reqBody['album']['id'])
+    # Populate submitter and user comment
+    newAlbum.submitted_by = user
+    newAlbum.user_comment = reqBody['user_comment'] if (reqBody['user_comment'] != "") else "No Comment Provided"
     # Save new album data
     newAlbum.save()
     # Update user data
@@ -234,6 +211,7 @@ def getAlbum(request: HttpRequest, mbid: str):
     albumObj = Album.objects.get(mbid=mbid)
     # Build return object
     out = {}
+    out['album_pk'] = albumObj.pk
     out['raw_album_data'] = json.dumps(albumObj.raw_data)
     out['release_group'] = json.dumps(albumObj.raw_data['release-group'])
     out['disambiguation'] = albumObj.disambiguation
@@ -256,6 +234,79 @@ def getAlbum(request: HttpRequest, mbid: str):
     out = {}
   # Return final object
   return JsonResponse(out)
+
+
+###
+# Replace an Album via its backend primary key, as is auto-assigned by the database.
+###
+def replaceAlbum(request: HttpRequest, album_pk: str,  new_mbid: str):
+  '''Replace an Album via its backend primary key, as is auto-assigned by the database. Expected to recieve an album pk and a replacement mbid.'''
+  # Make sure request is a POST request
+  if(request.method != "POST"):
+    logger.warning(f"replaceAlbum called with a non-POST method, returning 405.", extra={'crid': request.crid})
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Declare out object
+  out = {}
+  oldAlbumRaw = None
+  newAlbumRaw = None
+  try:
+    # Retrieve old album from database
+    oldAlbum = Album.objects.get(pk=album_pk)
+    oldAlbumRaw = oldAlbum.raw_data
+    # Query musicbrainz
+    newAlbum = get_album_from_mb(new_mbid)
+    newAlbumRaw = newAlbum.raw_data
+    # Replace old album data with new album data. NOTE: NOT SAVING NEW ALBUM BECAUSE WE WANT TO REPLACE THE OLD ALBUM NOT GET A NEW ONE
+    oldAlbum.mbid=newAlbum.mbid
+    oldAlbum.title=newAlbum.title
+    oldAlbum.artist=newAlbum.artist
+    oldAlbum.artist_url=newAlbum.artist_url
+    oldAlbum.cover_url=newAlbum.cover_url
+    oldAlbum.album_url=newAlbum.album_url
+    oldAlbum.disambiguation=newAlbum.disambiguation
+    oldAlbum.release_date=newAlbum.release_date
+    oldAlbum.release_date_str=newAlbum.release_date_str
+    oldAlbum.raw_data=newAlbum.raw_data
+    oldAlbum.track_list=newAlbum.track_list
+    # Update old album
+    oldAlbum.save()
+    # Update out object
+    out['successful'] = True
+    out['status'] = 200
+    out['album_mbid'] = oldAlbum.mbid
+  except Album.DoesNotExist as e:
+    out['successful'] = False
+    out['status'] = 404
+    out['err_message'] = f"Unable to find album with PK of {album_pk}!"
+  except Exception as e:
+    out['successful'] = False
+    out['status'] = 500
+    out['err_message'] = f"Unable to complete replace action, error: {e}"
+  # Return final object
+  log_extras = {
+    "album_pk": album_pk,
+    "new_mbid": new_mbid,
+    "response_object": out,
+    "crid": request.crid,
+    "old_album_raw": oldAlbumRaw,
+    "new_album_raw": newAlbumRaw,
+    "response_obj": out
+  }
+  if(out['successful']):
+    logger.info(
+      f"Successfully replaced album {album_pk} with new mbid infomration.",
+      extra=log_extras
+    )
+  else:
+    logger.warning(
+      f"Failed to replace album {album_pk} with new mbid information.",
+      extra={**log_extras, **{"err_message": out['err_message']}}
+    )
+    logger.critical(out['err_message'])
+  # Return JSON Response
+  return JsonResponse(out, status=out['status'])
 
 
 ###

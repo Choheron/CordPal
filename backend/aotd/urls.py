@@ -30,6 +30,7 @@ urlpatterns = [
   path('checkIfAlbumAlreadyExists/<str:release_group_id>', views_album.checkIfAlbumAlreadyExists),
   path('submitAlbum', views_album.submitAlbum),
   path('deleteAlbum', views_album.deleteAlbum),
+  path('replaceAlbum/<str:album_pk>/<str:new_mbid>', views_album.replaceAlbum),
   path('getAlbum/<str:mbid>', views_album.getAlbum),
   path('getAllAlbums', views_album.getAllAlbums),
   path('getLastXAlbums/<int:count>', views_album.getLastXAlbums),
