@@ -22,6 +22,7 @@ import { Conditional } from "../../conditional";
 //   - albumObj: Object - The Object representing the album from the backend
 //   - isButtonDisabled: Boolean - Is the button disabled?
 //   - isCurrentlyAOTD: Boolean - Is the album currently the AOTD?
+//   - serverCallback: Function - Optional function to run on the server-side after running album replacement
 export default function ReplaceAlbumModal(props) {
   // Props
   const albumObj = props.albumObj
@@ -51,6 +52,9 @@ export default function ReplaceAlbumModal(props) {
     } else {
       // Redirect user to correct page after successful update
       if(isCurrentlyAOTD) {
+        if(props.serverCallback != null) {
+          props.serverCallback()
+        }
         router.push(`/dashboard/aotd`)
       } else {
         router.push(`/dashboard/aotd/album/${responseObj.new_mbid}`)

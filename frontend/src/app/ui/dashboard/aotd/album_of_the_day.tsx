@@ -19,6 +19,7 @@ import { RiCalendar2Fill} from "react-icons/ri";
 import { getUserData, isUserAdmin } from "@/app/lib/user_utils";
 import { Conditional } from "../conditional";
 import ReplaceAlbumModal from "./modals/replace_album_modal";
+import { revalidateTag } from "next/cache";
 
 // GUI Display for the Album of the Day
 export default async function AlbumOfTheDayBox(props) {
@@ -48,6 +49,12 @@ export default async function AlbumOfTheDayBox(props) {
     }
   }
 
+  // Callback to revalidate AOTD if replaced
+  async function revalidateAOTD() {
+    "use server";
+    revalidateTag('AOTD')
+  }
+
   return (
     <div className="w-fit lg:max-w-[1080px] flex flex-col lg:flex-row lg:gap-2">
       <div className="backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
@@ -58,6 +65,7 @@ export default async function AlbumOfTheDayBox(props) {
                 albumObj={albumOfTheDayObj}
                 isButtonDisabled={!isAdmin}
                 isCurrentlyAOTD={true}
+                serverCallback={revalidateAOTD}
               />
             </div>
           </Conditional>

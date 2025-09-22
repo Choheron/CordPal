@@ -279,8 +279,6 @@ def calculateAOTDChances(request: HttpRequest):
       userChanceObj.outage = outage
       userChanceObj.reason = f"{outage.reason}"
     elif(aotdUser.selection_blocked_flag):
-      # Check if user's selections are currently blocked, return 0% chance
-      logger.info(f"\t{aotdUser.user.nickname} is blocked from selection!", extra={'crid': request.crid})
       # Get user's last review
       lastReview = Review.objects.filter(user=aotdUser.user).order_by('-aotd_date').first()
       days_since = day - (lastReview.aotd_date if (lastReview != None) else day)
@@ -288,6 +286,8 @@ def calculateAOTDChances(request: HttpRequest):
       userChanceObj.chance_percentage = 0.00
       userChanceObj.block_type = "INACTIVITY"
       userChanceObj.reason = f"Inactivity, user has not reviewed in over two days. Last review was {days_since.days} days ago."
+      # Check if user's selections are currently blocked, return 0% chance
+      logger.info(f"\t{aotdUser.user.nickname} is blocked from selection!", extra={'crid': request.crid})
     else:
       # Get counts needed to determine percentage
       user_submissions_count = Album.objects.filter(submitted_by=user).count()
