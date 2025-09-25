@@ -263,7 +263,7 @@ export async function getAlbumOfTheDayData(date: string = '') {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['AOtD'] },
+    next: { tags: ['AOTD'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -732,7 +732,7 @@ export async function getAotdDates(album_spotify_id) {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['AOtD'] },
+    next: { tags: ['AOTD'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -756,7 +756,7 @@ export async function getChanceOfAotdSelect(user_discord_id: string = "") {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['AOtD', 'review_submissions', 'album_submissions', `calendar-outages`] },
+    next: { tags: ['AOTD', 'review_submissions', 'album_submissions', `calendar-outages`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
