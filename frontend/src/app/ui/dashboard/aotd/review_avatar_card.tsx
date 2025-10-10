@@ -87,7 +87,7 @@ export default async function ReviewAvatarCard(props) {
         shouldCloseOnScroll={false}
       >
         <PopoverTrigger>
-          <div className="border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl">
+          <div className="border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl transition-all hover:bg-black/40 hover:scale-105">
             <UserCard
               userDiscordID={review['user_id']}
               customDescription={
