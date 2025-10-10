@@ -87,7 +87,7 @@ export default async function ReviewAvatarCard(props) {
         shouldCloseOnScroll={false}
       >
         <PopoverTrigger>
-          <div>
+          <div className="border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl">
             <UserCard
               userDiscordID={review['user_id']}
               customDescription={
@@ -99,6 +99,12 @@ export default async function ReviewAvatarCard(props) {
               }
               avatarClassNameOverride="size-[40px]"
             />
+            <div className="ml-12 line-clamp-1 max-h-[25px]">
+              <div 
+                className="prose prose-invert prose-sm text-gray-500" 
+                dangerouslySetInnerHTML={{__html: reviewMessage}}
+              />
+            </div>
           </div>
         </PopoverTrigger>
         <PopoverContent

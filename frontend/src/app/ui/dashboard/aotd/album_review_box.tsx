@@ -210,7 +210,7 @@ export default function AlbumReviewBox(props) {
 
   return (
     <div  
-      className="w-full lg:w-[700px] px-2 lg:mx-auto py-2 mt-1 flex flex-col rounded-xl bg-zinc-800/30 border border-neutral-800"
+      className="w-full px-2 lg:mx-auto py-2 mt-1 flex flex-col rounded-xl bg-zinc-800/30 border border-neutral-800"
       onMouseLeave={() => setTooltipOpen(false)}
     >
       <Accordion defaultExpandedKeys={(collapsed) ? [""] : ["1"]} isCompact>

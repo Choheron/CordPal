@@ -18,7 +18,7 @@ export default async function ReviewDisplay(props) {
 
 
   return (
-    <div className="w-full min-w-[250px] max-w-full my-2 flex flex-col flex-shrink-0 gap-2">
+    <div className="w-[320px] my-2 flex flex-col flex-shrink-0 gap-2">
       <div className="flex mx-auto gap-3">
         <p>User Reviews:</p>
         <p>{reviews.length}/{userCount}</p>

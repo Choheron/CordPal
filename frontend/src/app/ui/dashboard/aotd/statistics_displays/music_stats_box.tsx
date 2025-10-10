@@ -84,108 +84,110 @@ export default async function MusicStatsBox(props) {
   })
 
   return (
-    <div className="w-fill min-w-[340px] mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row gap-10 backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
-      {/* Album Submission Stats */}
-      <div className='min-w-[300px] w-[300px] mx-auto flex flex-col'>
-        <p className="mx-auto text-xl underline mb-1">
-          Album Submission Stats: 
-        </p>
-        <div className="flex gap-2 justify-between w-full">
-          <p>
-            Total Albums Submitted:
-          </p>
-          <p>
-            {albumStatsJson['total_albums']}
-          </p>
+    <div className="flex flex-col w-full justify-center xl:flex-row gap-2">
+      <div className="mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row gap-10 backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
+        {/* Lowest and Highest Album Stats */}
+        <div className="w-fit flex flex-col">
+          {/* Album Highest Stats */}
+          <div className='w-full lg:w-[800px] mx-auto flex flex-col'>
+            <p className="mx-auto text-xl underline mb-2">
+              Highest Album: {dateToString(albumLowHighStatsJson['highest_album']['date'])}
+            </p>
+            <div className="mx-auto">
+              <AlbumDisplay
+                title={albumLowHighStatsJson['highest_album']["title"]}
+                album_mbid={albumLowHighStatsJson['highest_album']["mbid"]}
+                album_img_src={albumLowHighStatsJson['highest_album']["cover_url"]}
+                album_src={albumLowHighStatsJson['highest_album']["album_url"]}
+                artist={{"name": albumLowHighStatsJson['highest_album']["artist"], "href": albumLowHighStatsJson['highest_album']["artist_url"]}}
+                submitter={albumLowHighStatsJson['highest_album']["submitter_id"]}
+                submitter_comment={albumLowHighStatsJson['highest_album']["user_comment"]}
+                submission_date={albumLowHighStatsJson['highest_album']["submission_date"]}
+                historical_date={albumLowHighStatsJson['highest_album']['date']}
+                sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
+                showAlbumRating={2}
+                starTextOverride="text-3xl"
+                showCalLink={true}
+              />
+            </div>
+            <Divider className="my-1" />
+            {/* Album Lowest Stats */}
+            <p className="mx-auto text-xl underline mb-2">
+              Lowest Album: {dateToString(albumLowHighStatsJson['lowest_album']['date'])}
+            </p>
+            <div className="mx-auto">
+              <AlbumDisplay
+                title={albumLowHighStatsJson['lowest_album']["title"]}
+                album_mbid={albumLowHighStatsJson['lowest_album']["mbid"]}
+                album_img_src={albumLowHighStatsJson['lowest_album']["cover_url"]}
+                album_src={albumLowHighStatsJson['lowest_album']["album_url"]}
+                artist={{"name": albumLowHighStatsJson['lowest_album']["artist"], "href": albumLowHighStatsJson['lowest_album']["artist_url"]}}
+                submitter={albumLowHighStatsJson['lowest_album']["submitter_id"]}
+                submitter_comment={albumLowHighStatsJson['lowest_album']["user_comment"]}
+                submission_date={albumLowHighStatsJson['lowest_album']["submission_date"]}
+                historical_date={albumLowHighStatsJson['lowest_album']['date']}
+                sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
+                showAlbumRating={2}
+                starTextOverride="text-3xl"
+                showCalLink={true}
+              />
+            </div>
+          </div>
+          <div className="lg:w-[650px] mx-auto px-2 py-2 mt-2 text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
+            <p>In order to be considered for highest or lowest album, an album must have 4 or more reviews. Any album with 3 or less reviews will not be counted.</p>
+          </div>
         </div>
-        <div className="border py-1 px-2 border-neutral-800 bg-black/40 rounded-xl text-center max-w-[400px] my-1 text-sm italic font-extralight">
-          <p>
-            Selection status is shown as it would be for each user at midnight tonight, Central Time.
+        {/* Review Stats */}
+        <div className='min-w-[300px] w-[300px] mx-auto flex flex-col'>
+          <p className="mx-auto text-xl underline mb-1">
+            Review Stats: 
           </p>
-        </div>
-        <Divider className="my-1" />
-        <div className="flex flex-col justify-between h-full">
-          <table className="table-fixed w-full">
-            <thead>
-              <tr>
-                <th className="w-1/2">User</th>
-                <th className="w-1/4 pl-1">AOtD</th>
-                <th className="w-1/4 px-1">Unpicked</th>
-              </tr>
-            </thead>
-            <tbody>
-              {albumUserStatsTable}
-            </tbody>
-          </table>
-          <CreateOutageModal />
-        </div>
-      </div>
-      {/* Lowest and Highest Album Stats */}
-      <div className="w-fit flex flex-col">
-        {/* Album Highest Stats */}
-        <div className='w-full lg:w-[650px] mx-auto flex flex-col'>
-          <p className="mx-auto text-xl underline mb-2">
-            Highest Album: {dateToString(albumLowHighStatsJson['highest_album']['date'])}
-          </p>
-          <div className="mx-auto">
-            <AlbumDisplay
-              title={albumLowHighStatsJson['highest_album']["title"]}
-              album_mbid={albumLowHighStatsJson['highest_album']["mbid"]}
-              album_img_src={albumLowHighStatsJson['highest_album']["cover_url"]}
-              album_src={albumLowHighStatsJson['highest_album']["album_url"]}
-              artist={{"name": albumLowHighStatsJson['highest_album']["artist"], "href": albumLowHighStatsJson['highest_album']["artist_url"]}}
-              submitter={albumLowHighStatsJson['highest_album']["submitter_id"]}
-              submitter_comment={albumLowHighStatsJson['highest_album']["user_comment"]}
-              submission_date={albumLowHighStatsJson['highest_album']["submission_date"]}
-              historical_date={albumLowHighStatsJson['highest_album']['date']}
-              sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
-              showAlbumRating={2}
-              starTextOverride="text-3xl"
-              showCalLink={true}
-            />
+          <div className="flex gap-2 justify-between w-full">
+            <p>
+              Total Reviews Submitted:
+            </p>
+            <p>
+              {userReviewStatsJson['total_reviews']}
+            </p>
           </div>
           <Divider className="my-1" />
-          {/* Album Lowest Stats */}
-          <p className="mx-auto text-xl underline mb-2">
-            Lowest Album: {dateToString(albumLowHighStatsJson['lowest_album']['date'])}
+          {reviewUserStatsList}
+        </div>
+        {/* Album Submission Stats */}
+        <div className='min-w-[300px] w-[300px] mx-auto flex flex-col'>
+          <p className="mx-auto text-xl underline mb-1">
+            Album Submission Stats: 
           </p>
-          <div className="mx-auto">
-            <AlbumDisplay
-              title={albumLowHighStatsJson['lowest_album']["title"]}
-              album_mbid={albumLowHighStatsJson['lowest_album']["mbid"]}
-              album_img_src={albumLowHighStatsJson['lowest_album']["cover_url"]}
-              album_src={albumLowHighStatsJson['lowest_album']["album_url"]}
-              artist={{"name": albumLowHighStatsJson['lowest_album']["artist"], "href": albumLowHighStatsJson['lowest_album']["artist_url"]}}
-              submitter={albumLowHighStatsJson['lowest_album']["submitter_id"]}
-              submitter_comment={albumLowHighStatsJson['lowest_album']["user_comment"]}
-              submission_date={albumLowHighStatsJson['lowest_album']["submission_date"]}
-              historical_date={albumLowHighStatsJson['lowest_album']['date']}
-              sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
-              showAlbumRating={2}
-              starTextOverride="text-3xl"
-              showCalLink={true}
-            />
+          <div className="flex gap-2 justify-between w-full">
+            <p>
+              Total Albums Submitted:
+            </p>
+            <p>
+              {albumStatsJson['total_albums']}
+            </p>
+          </div>
+          <div className="border py-1 px-2 border-neutral-800 bg-black/40 rounded-xl text-center max-w-[400px] my-1 text-sm italic font-extralight">
+            <p>
+              Selection status is shown as it would be for each user at midnight tonight, Central Time.
+            </p>
+          </div>
+          <Divider className="my-1" />
+          <div className="flex flex-col justify-between h-full">
+            <table className="table-fixed w-full">
+              <thead>
+                <tr>
+                  <th className="w-1/2">User</th>
+                  <th className="w-1/4 pl-1">AOtD</th>
+                  <th className="w-1/4 px-1">Unpicked</th>
+                </tr>
+              </thead>
+              <tbody>
+                {albumUserStatsTable}
+              </tbody>
+            </table>
+            <CreateOutageModal />
           </div>
         </div>
-        <div className="lg:w-[650px] mx-auto px-2 py-2 mt-2 text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
-          <p>In order to be considered for highest or lowest album, an album must have 4 or more reviews. Any album with 3 or less reviews will not be counted.</p>
-        </div>
-      </div>
-      {/* Review Stats */}
-      <div className='min-w-[300px] w-[300px] mx-auto flex flex-col'>
-        <p className="mx-auto text-xl underline mb-1">
-          Review Stats: 
-        </p>
-        <div className="flex gap-2 justify-between w-full">
-          <p>
-            Total Reviews Submitted:
-          </p>
-          <p>
-            {userReviewStatsJson['total_reviews']}
-          </p>
-        </div>
-        <Divider className="my-1" />
-        {reviewUserStatsList}
       </div>
     </div>
   )

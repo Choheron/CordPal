@@ -56,7 +56,7 @@ export default async function AlbumOfTheDayBox(props) {
   }
 
   return (
-    <div className="w-fit lg:max-w-[1080px] flex flex-col lg:flex-row lg:gap-2">
+    <div className="w-fit flex flex-col lg:flex-row lg:gap-2">
       <div className="backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
         <div className="relative w-full flex flex-col">
           <Conditional showWhen={isAdmin}>

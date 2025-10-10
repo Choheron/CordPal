@@ -21,17 +21,19 @@ export default async function music() {
         <SpotifyLoginBox />
       </Conditional>
       <Conditional showWhen={aotd_participant}>
-        <div className="flex flex-col w-full lg:w-[650px] justify-center xl:flex-row md:w-4/5 gap-2">
-          <AlbumOfTheDayBox title={"Album Of The Day"} />
-          <div className="w-full max-w-full lg:max-w-[350px] flex flex-col">
-            <RecentSubmissions 
-              albumList={recentSubmissionsResponse['album_list']} 
-              timestamp={recentSubmissionsResponse['timestamp']}
-            />
-            <AllAlbumsModal />
+        <div className="w-full 2xl:w-3/5 ">
+          <div className="flex flex-col w-full justify-center xl:flex-row gap-2">
+            <AlbumOfTheDayBox title={"Album Of The Day"} />
+            <div className="w-full max-w-full lg:max-w-[350px] flex flex-col">
+              <RecentSubmissions 
+                albumList={recentSubmissionsResponse['album_list']} 
+                timestamp={recentSubmissionsResponse['timestamp']}
+              />
+              <AllAlbumsModal />
+            </div>
           </div>
+          <MusicStatsBox />
         </div>
-        <MusicStatsBox />
       </Conditional>
     </div>
   );
