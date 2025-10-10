@@ -94,7 +94,7 @@ export default async function ReviewAvatarCard(props) {
                 <StarRating
                   rating={review['score']}
                   className="text-yellow-400"
-                  textSize="text-xl xl:text-2xl"
+                  textSize="text-xl xl:text-[29px]"
                 />
               }
               avatarClassNameOverride="size-[40px]"
