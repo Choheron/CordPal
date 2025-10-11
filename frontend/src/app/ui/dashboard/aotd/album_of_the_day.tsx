@@ -117,7 +117,7 @@ export default async function AlbumOfTheDayBox(props) {
             disambiguation={albumData("disambiguation")}
             album_img_src={albumData("album_img_src")}
             album_id={albumData("album_id")}
-            album_src={albumData("album_src")}
+            album_src={`/dashboard/aotd/album/${albumData("album_id")}`}
             album_mbid={albumData("album_id")}
             artist={albumData("artist")}
             submitter={albumData("submitter")}
