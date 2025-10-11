@@ -105,11 +105,6 @@ export default async function ReviewAvatarCard(props) {
                 dangerouslySetInnerHTML={{__html: reviewMessage}}
               />
             </div>
-            <Conditional showWhen={streakData && streakData['current_streak'] && (streakData['current_streak'] >= 3)}>
-              <p className="absolute left-3.5 bottom-1 bg-yellow-500/90 rounded-xl px-2 py-1 border border-yellow-500 text-black font-bold text-[10px]">
-                🔥 {streakData ? streakData['current_streak'] : "--" } 
-              </p>
-            </Conditional>
           </div>
         </PopoverTrigger>
         <PopoverContent
