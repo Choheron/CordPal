@@ -87,7 +87,7 @@ export default async function ReviewAvatarCard(props) {
         shouldCloseOnScroll={false}
       >
         <PopoverTrigger>
-          <div className="border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl transition-all hover:bg-black/40 hover:scale-105">
+          <div className="relative border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl transition-all hover:bg-black/40 hover:scale-105">
             <UserCard
               userDiscordID={review['user_id']}
               customDescription={
@@ -105,6 +105,11 @@ export default async function ReviewAvatarCard(props) {
                 dangerouslySetInnerHTML={{__html: reviewMessage}}
               />
             </div>
+            <Conditional showWhen={streakData && streakData['current_streak'] && (streakData['current_streak'] >= 3)}>
+              <p className="absolute left-3.5 bottom-1 bg-yellow-500/90 rounded-xl px-2 py-1 border border-yellow-500 text-black font-bold text-[10px]">
+                🔥 {streakData ? streakData['current_streak'] : "--" } 
+              </p>
+            </Conditional>
           </div>
         </PopoverTrigger>
         <PopoverContent
