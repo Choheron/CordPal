@@ -131,6 +131,18 @@ class UserAction(models.Model):
   timestamp = models.DateTimeField(default=timezone.now, blank=True, null=True)
   details = models.JSONField(null=True, blank=True)  # Store extra details (e.g., old vs. new values)
 
+  def toJSON(self):
+    """Return this User Action as a JSON. (For HTTP JSON Responses)"""
+    out={}
+    out['user'] = self.user.toJSON()
+    out['avatar_url'] = self.user.get_avatar_url()
+    out['action_type'] = self.action_type
+    out['entity_type'] = self.entity_type
+    out['entity_id'] = self.entity_id
+    out['timestamp'] = self.timestamp.strftime("%m/%d/%Y, %H:%M:%S")
+    out['details'] = self.details
+    return out
+
   # toString Method
   def __str__(self):
     return f"{self.user} {self.action_type} {self.entity_type} (ID: {self.entity_id}) at {self.timestamp}"

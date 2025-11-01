@@ -179,6 +179,7 @@ export async function getUserData(discord_id = "") {
   return await userDataResponse.json();
 }
 
+
 //
 // Update user info based on passed in json
 // Params:
@@ -384,4 +385,27 @@ export async function updateUserPassword(updateBody) {
   revalidateTag('user-data')
   // Return
   return ({"code": status, "data": data})
+}
+
+
+//
+// Retrieve last 10 user actions from backend
+//
+export async function getRecentUserActions() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  const userActionsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getRecentUserActions`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: ['user-data'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  return await userActionsResponse.json();
 }

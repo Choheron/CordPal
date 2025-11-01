@@ -4,7 +4,10 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.password_validation import password_validators_help_texts, validate_password
 from django.core.exceptions import ValidationError
 
-from .models import User
+from .models import (
+  User,
+  UserAction
+)
 from discordapi.models import DiscordTokens
 
 import logging
@@ -466,3 +469,23 @@ def traditionalLogin(request: HttpRequest):
     out['errorType'] = "SYS"
     out["message"] = f"Internal server error. Please contact support with the following information: Code: LOGIN. Timestamp: {datetime.now().strftime('%m/%d/%Y, %H:%M:%S')}."
     return JsonResponse(out, status=500)
+  
+
+###
+# Get last 10 user actions
+###
+def getRecentUserActions(request: HttpRequest):
+  # Make sure request is a GET request
+  if(request.method != "GET"):
+    logger.warning("getRecentUserActions called with a non-GET method, returning 405.", extra={'crid': request.crid})
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Retrieve last 10 user actions
+  user_actions = UserAction.objects.all().order_by('-id')[:10]
+  # Iterate User Action objects and convert to JSON
+  outList = []
+  for action in user_actions:
+    outList.append(action.toJSON())
+  # Return response
+  return JsonResponse({'actions': outList})

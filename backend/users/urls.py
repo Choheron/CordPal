@@ -28,4 +28,8 @@ urlpatterns = [
     path('getPasswordValidators', views.getPasswordValidators),
     path('updateUserPassword', views.updateUserPassword),
     path('traditionalLogin', views.traditionalLogin),
+    # ===========================
+    # USER ACTIONS URLS
+    # ===========================
+    path('getRecentUserActions', views.getRecentUserActions)
 ]
