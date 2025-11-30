@@ -102,7 +102,7 @@ def setAlbumOfDay(request: HttpRequest):
   except DailyAlbum.DoesNotExist:
     logger.info(f"{request.crid} - Today does not yet have an album, selecting one...", extra={'crid': request.crid})
   # Get Date a year ago to filter by
-  one_year_ago = day - datetime.timedelta(days=365)
+  one_year_ago = day - datetime.timedelta(days=730)
   # Define a boolean for selecting the right album
   selected = False
   # Define Album Object
