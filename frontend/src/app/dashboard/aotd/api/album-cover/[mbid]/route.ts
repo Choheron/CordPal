@@ -1,13 +1,17 @@
 import { getAlbum } from '@/app/lib/aotd_utils'
 import { NextRequest, NextResponse } from 'next/server'
-import { inMemoryCache as cache } from '@/app/lib/caches'
+
 import redis from '@/app/lib/caches'
+import fs from 'fs/promises';
+import path from 'path';
+
 
 export async function GET(
   request: NextRequest,
-  { params } : { params: Promise<{ mbid: string }> }
+  context: { params: { mbid: string } }
 ) {
-  const { mbid } = await params
+  const { mbid } = await context.params;
+
 
   if (!mbid) {
     return NextResponse.json({ error: 'Missing MBID' }, { status: 400 })
@@ -27,11 +31,25 @@ export async function GET(
     })
   }
   console.log(`Cover art cache MISS for mbid: ${mbid}`)
+  console.log("MBID VALUE:", mbid);
+
 
   let imageUrl = ""
-  if(mbid == "null") {
-    // If not album art is provided, get a placemonkey image 
-    imageUrl = `https://placehold.co/300x300/transparent/FOO?text=No+AOTD`
+  
+  if (!mbid || mbid === "null" || mbid === "undefined") {
+    // If not album art is provided, get the placeholder SVG 
+    const svgPath = path.join(process.cwd(), 'public', 'svgs', 'aotd', 'NoAlbum.svg');
+    const svgContent = await fs.readFile(svgPath);
+    const svgBuffer = Buffer.from(svgContent)
+
+    return new NextResponse(svgBuffer ,{
+      status: 200,
+      headers: {
+        'Content-Type': 'image/svg+xml',
+        'Cache-Control': 'public, max-age=86400',
+        'X-Fallback': 'true',
+      },
+    })
   } else {
     // Continue with normal process if the mbid is not null
     let release_group_mbid = ""
