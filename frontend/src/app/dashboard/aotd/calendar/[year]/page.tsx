@@ -175,6 +175,7 @@ export default async function Page({
             <div className="w-full sm:w-1/3 3xl:w-1/4 px-2 py-4" key={index}>
               <Button 
                 as={Link}
+                prefetch={false}
                 href={`/dashboard/aotd/calendar/${year}/${month.month_number}`}
                 radius="lg"
                 className={`w-full hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}

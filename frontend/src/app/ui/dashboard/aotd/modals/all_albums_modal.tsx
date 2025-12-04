@@ -187,6 +187,7 @@ export default function AllAlbumsModal(props) {
           <div className="w-[400px]">
             <Button 
               as={Link}
+              prefetch={false}
               href={"/dashboard/aotd/album/" + album['album_id']}
               radius="lg"
               className={`relative w-full max-w-full justify-start h-fit px-0 hover:underline text-white py-1`}

@@ -115,6 +115,7 @@ export default async function MinimalAlbumDisplay(props) {
       >
         <Button
           as={Link}
+          prefetch={false}
           href={(historical) ? `/dashboard/aotd/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
           radius="none"
           className={`${albumCoverOverride} px-0 py-0 min-w-0`}
