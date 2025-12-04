@@ -482,7 +482,7 @@ def getRecentUserActions(request: HttpRequest):
     res.status_code = 405
     return res
   # Retrieve last 10 user actions
-  user_actions = UserAction.objects.all().order_by('-id')[:10]
+  user_actions = UserAction.objects.all().order_by('-id')[:20]
   # Iterate User Action objects and convert to JSON
   outList = []
   for action in user_actions:
