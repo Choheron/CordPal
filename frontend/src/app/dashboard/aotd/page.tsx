@@ -7,8 +7,8 @@ import { getAotdData, getLastXSubmissions, isAotdParticipant } from "@/app/lib/a
 import AlbumOfTheDayBox from "@/app/ui/dashboard/aotd/album_of_the_day";
 import RecentSubmissions from "@/app/ui/dashboard/aotd/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/aotd/statistics_displays/music_stats_box";
-import AllAlbumsModal from "@/app/ui/dashboard/aotd/modals/all_albums_modal";
-import { Alert } from "@heroui/react";
+import { Alert, Button } from "@heroui/react";
+import Link from "next/link";
 
 export default async function music() {
   const aotd_participant = await isAotdParticipant();
@@ -29,7 +29,16 @@ export default async function music() {
                 albumList={recentSubmissionsResponse['album_list']} 
                 timestamp={recentSubmissionsResponse['timestamp']}
               />
-              <AllAlbumsModal />
+              <Button
+                as={Link}
+                href={"/dashboard/aotd/album/all"}
+                className="p-2 mx-auto my-2 w-[90%] text-sm text-inheret h-fit bg-gradient-to-br from-green-700/80 to-green-800/80 hover:underline"
+                size="sm"
+                radius="lg"
+                variant="solid"
+              >
+                <b>View All Albums</b>
+              </Button>
             </div>
           </div>
           <MusicStatsBox />

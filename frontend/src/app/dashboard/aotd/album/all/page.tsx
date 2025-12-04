@@ -1,14 +1,6 @@
 'use client'
 
 import {
-  Modal, 
-  ModalContent, 
-  ModalHeader, 
-  ModalBody, 
-  ModalFooter,
-  useDisclosure
-} from "@heroui/modal";
-import {
   Table,
   TableHeader,
   TableBody,
@@ -22,26 +14,26 @@ import { useRouter } from 'next/navigation';
 import { getAllAlbums, getAllAlbumsNoCache } from "@/app/lib/aotd_utils";
 import { convertToLocalTZString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import Link from "next/link";
-import { Conditional } from "../../conditional";
+import { Conditional } from "@/app/ui/dashboard/conditional";
 import ClientTimestamp from "@/app/ui/general/client_timestamp";
 import UserDropdown from "@/app/ui/general/userUiItems/user_dropdown";
+import PageTitle from "@/app/ui/dashboard/page_title";
+import { list } from "postcss";
 
 
-// Modal to display all submitted albums
-export default function AllAlbumsModal(props) {
+// Page to display a table containing all albums
+export default function Page() {
   const [updateTimestamp, setUpdateTimestamp] = React.useState<any>("")
   const [albumListOriginal, setAlbumListOriginal] = React.useState([])
-  const [albumList, setAlbumList] = React.useState((props.albumList) ? props.albumList : null)
+  const [albumList, setAlbumList] = React.useState<Object[] | null>(null)
   // Album List Loading vars
-  const [listLoading, setListLoading] = React.useState((props.albumList) ? false : true )
+  const [listLoading, setListLoading] = React.useState(true)
   // Sorting variables
   const [sortDescriptor, setSortDescriptor] = React.useState<any>({ column: "rating", direction: "descending"})
   const [titleFilter, setTitleFilter] = React.useState("")
   const [artistFilter, setArtistFilter] = React.useState("")
   const [submitterFilter, setSubmitterFilter] = React.useState(new Set([]))
   const [aotdFilter, setAotdFilter] = React.useState(false);
-  // Modal Controller Vars
-  const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
   // Columns for Table
   const columns = [
@@ -79,6 +71,9 @@ export default function AllAlbumsModal(props) {
 
   // Custom sorting method
   const handleSortChange = (descriptor) => {
+    if(albumList == null) {
+      return
+    }
     setSortDescriptor(descriptor)
     switch(descriptor.column) {
       // Sort on rating
@@ -137,7 +132,7 @@ export default function AllAlbumsModal(props) {
 
   // UseEffect to pull Album Data on first mount (offloaded to client to make the page load faster)
   React.useEffect(() => {
-    if(isOpen) {
+    if(albumList == null) {
       const ingestData = async () => {
         setListLoading(true)
         let albumData = await getAllAlbums()
@@ -148,7 +143,7 @@ export default function AllAlbumsModal(props) {
       }
       ingestData()
     }
-  }, [isOpen])
+  }, [])
 
   // UseEffect for when filters change
   React.useEffect(() => {
@@ -262,6 +257,7 @@ export default function AllAlbumsModal(props) {
     }
   }, []);
 
+
   // Reset values on cancel button press
   const hardRefresh = () => {
     const ingestNewData = async () => {
@@ -275,125 +271,89 @@ export default function AllAlbumsModal(props) {
     ingestNewData()
   }
 
-  // Reset values on cancel button press
-  const cancelPress = () => {
-    onClose()
-    // Reload page
-    router.refresh()
-  }
 
   return (
     <>
-      <Button 
-        className="p-2 mx-auto my-2 w-[90%] text-sm text-inheret h-fit bg-gradient-to-br from-green-700/80 to-green-800/80 hover:underline"
-        size="sm"
-        onPress={onOpen}
-        radius="lg"
-        variant="solid"
-      >
-        <b>View All Albums</b>
-      </Button>
-      <Modal 
-        size="5xl" 
-        scrollBehavior={"inside"}
-        isOpen={isOpen} 
-        onOpenChange={onOpen} 
-        backdrop="blur"
-        onClose={cancelPress}
-        classNames={{
-          base: "max-w-full 2xl:max-w-[75%]",
-        }}
-      >
-        <ModalContent>
-          {() => (
-            <>
-              <ModalHeader className="flex flex-col flex-wrap w-full gap-1 content-center">
-                Album Data for {(titleFilter == "") ? "all" : ""} {albumList.length} Albums
-              </ModalHeader>
-              <ModalBody>
-                {/* Filter Inputs */}
-                <div className="flex gap-1">
-                  <Input 
-                    label="Title" 
-                    placeholder="Filter by Title" 
-                    value={titleFilter} 
-                    onValueChange={setTitleFilter}
-                  />
-                  <Input 
-                    label="Artist" 
-                    placeholder="Filter by Artist" 
-                    value={artistFilter} 
-                    onValueChange={setArtistFilter}
-                  />
-                  <UserDropdown 
-                    label={"Submitter"}
-                    setSelectionCallback={setSubmitterFilter}
-                    selectedKeys={submitterFilter}
-                  />
-                </div>
-                <Checkbox 
-                  isSelected={aotdFilter} 
-                  onValueChange={setAotdFilter}
-                  className="w-full ml-1"
-                >
-                  Only Show Albums that have been Album Of the Day
-                </Checkbox>
-                {/* Table displaying Albums */}
-                <Table 
-                  aria-label="Album Submissions"
-                  sortDescriptor={sortDescriptor}
-                  onSortChange={handleSortChange}
-                  isStriped
-                  isVirtualized
-                >
-                  <TableHeader columns={columns}>
-                    {(column) =>
-                      <TableColumn key={column.key} allowsSorting={column.sortable} className="w-fit">{column.label}</TableColumn>
-                    }
-                  </TableHeader>
-                  <TableBody 
-                    items={albumList}
-                    emptyContent={(listLoading) ? 
-                      <div>
-                        <Spinner />
-                        <p>Loading...</p>
-                      </div>
-                      : 
-                      <p>No Data Available...</p> 
-                    }
-                  >
-                    {(item: any) => (
-                      <TableRow key={`${item['album_id']} - ${item['title']} - ${item['artist']['name']} - ${item['submitter_nickname']}`}>
-                        {(columnKey) => <TableCell className="w-fit">{renderCell(item, columnKey)}</TableCell>}
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </ModalBody>
-              <ModalFooter>
-                <div className="flex w-full justify-between">
-                  <p className="my-auto">
-                    Data Last Updated: {(listLoading) ? " Loading..." : convertToLocalTZString(updateTimestamp, true)}
-                  </p>
-                  <div className="flex">
-                    <Button color="primary" variant="solid" className="mr-2 mt-auto" isDisabled={listLoading} onPress={hardRefresh}>
-                      <Conditional showWhen={!listLoading}>
-                        Hard Refresh
-                      </Conditional>
-                      <Conditional showWhen={listLoading}>
-                        <Spinner color="warning" />
-                      </Conditional>
-                    </Button>
-                    <Button color="danger" variant="bordered" onPress={onClose}>
-                      Close
-                    </Button>
-                  </div>
-                </div>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+      <PageTitle text={`Album Data for ${(titleFilter == "") ? "all" : ""} ${(albumList) ? albumList.length : "LOADING"} Albums`} />
+      <div>
+        {/* Filter Inputs */}
+        <div className="flex gap-1 w-full md:w-3/4 mx-auto">
+          <Input 
+            label="Title" 
+            placeholder="Filter by Title" 
+            value={titleFilter} 
+            onValueChange={setTitleFilter}
+          />
+          <Input 
+            label="Artist" 
+            placeholder="Filter by Artist" 
+            value={artistFilter} 
+            onValueChange={setArtistFilter}
+          />
+          <UserDropdown 
+            label={"Submitter"}
+            setSelectionCallback={setSubmitterFilter}
+            selectedKeys={submitterFilter}
+          />
+        </div>
+        <div className="w-full md:w-3/4 mx-auto my-1">
+          <Checkbox 
+            isSelected={aotdFilter} 
+            onValueChange={setAotdFilter}
+            className="w-full ml-1"
+          >
+            Only Show Albums that have been Album Of the Day
+          </Checkbox>
+        </div>
+        <div>
+          <div className="flex w-full md:w-3/4 mx-auto justify-between my-1">
+            <p className="mt-auto">
+              Data Last Updated: {(listLoading) ? " Loading..." : convertToLocalTZString(updateTimestamp, true)}
+            </p>
+            <div className="flex">
+              <Button color="primary" variant="solid" className="mr-2 mt-auto" isDisabled={listLoading} onPress={hardRefresh}>
+                <Conditional showWhen={!listLoading}>
+                  Hard Refresh
+                </Conditional>
+                <Conditional showWhen={listLoading}>
+                  <Spinner color="warning" />
+                </Conditional>
+              </Button>
+            </div>
+          </div>
+        </div>
+        {/* Table displaying Albums */}
+        <Table 
+          aria-label="Album Submissions"
+          sortDescriptor={sortDescriptor}
+          onSortChange={handleSortChange}
+          isStriped
+          className="w-full md:w-3/4 mx-auto"
+        >
+          <TableHeader columns={columns}>
+            {(column) =>
+              <TableColumn key={column.key} allowsSorting={column.sortable} className="w-fit">{column.label}</TableColumn>
+            }
+          </TableHeader>
+          <TableBody 
+            items={(albumList) ? albumList : []}
+            emptyContent={(listLoading) ? 
+              <div>
+                <Spinner />
+                <p>Loading...</p>
+              </div>
+              : 
+              <p>No Data Available...</p> 
+            }
+          >
+            {(item: any) => (
+              <TableRow key={`${item['album_id']} - ${item['title']} - ${item['artist']['name']} - ${item['submitter_nickname']}`}>
+                {(columnKey) => <TableCell className="w-fit">{renderCell(item, columnKey)}</TableCell>}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </>
   )
 }

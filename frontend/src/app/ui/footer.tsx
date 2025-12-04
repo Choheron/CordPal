@@ -4,7 +4,7 @@ export default function Footer(props) {
   const currYear = new Date().getFullYear()
 
   return (
-    <div className="flex flex-col sm:flex-row gap-1 sm:gap-0 justify-center w-fit sm:w-full 2xl:w-3/4 mx-auto py-3 bg-gradient-to-r from-black/30 via-slate-800/25 to-black/30">
+    <div className="flex flex-col sm:flex-row gap-1 sm:gap-0 justify-center w-full mt-2 mx-auto py-3 bg-gradient-to-r from-black/50 via-black/100 to-black/50">
       <div className="flex flex-col w-fit text-slate-500 text-center mx-auto sm:mx-0">
         <p className="text-sm sm:text-base mx-auto">
           &copy; Copyright 2024-{currYear} -  Cord-Pal - All Rights Reserved
