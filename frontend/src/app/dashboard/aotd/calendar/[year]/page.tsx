@@ -47,7 +47,7 @@ export default async function Page({
       const day_data = month.aotd_data[date_str]
       const dateArr = date_str.split("-")
       // Check if this day is the highest or lowest in its month
-      const is_highest_or_lowest = (((month.month_number - 1 <= today.getMonth()) && (parseInt(year) <= today.getFullYear())) ? ((date_str == month.aotd_data['stats']['highest_aotd_date']) || (date_str == month.aotd_data['stats']['lowest_aotd_date'])) : false)
+      const is_highest_or_lowest = (((month.month_number - 1 <= today.getMonth()) && (parseInt(year) <= today.getFullYear())) ? ((month.aotd_data['stats'] != null) && ((date_str == month.aotd_data['stats']['highest_aotd_date']) || (date_str == month.aotd_data['stats']['lowest_aotd_date']))) : false)
       // Helper func to get data about this album
       function albumGet(field) {
         if(day_data) {
@@ -170,20 +170,21 @@ export default async function Page({
     <div className="w-full">
       <PageTitle text={`Historical Daily Albums for ${year}`} />
       <div className="flex flex-col sm:flex-row flex-wrap">
-        {yearData.map((obj, index) => {
+        {yearData.map((month, index) => {
           return (
             <div className="w-full sm:w-1/3 3xl:w-1/4 px-2 py-4" key={index}>
               <Button 
                 as={Link}
-                href={`/dashboard/aotd/calendar/${year}/${obj.month_number}`}
+                href={`/dashboard/aotd/calendar/${year}/${month.month_number}`}
                 radius="lg"
                 className={`w-full hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
                 variant="solid"
+                isDisabled={month.aotd_data['stats'] == null}
               >
-                <p>{obj.month}</p>
+                <p>{month.month}</p>
               </Button>
               <div>
-                {genMonth(obj)}
+                {genMonth(month)}
               </div>
             </div>
           )

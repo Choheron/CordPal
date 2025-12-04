@@ -43,7 +43,8 @@ export default async function Page({
   const lastMonthAotdData = await getAOtDByMonth(`${lastMonth.getFullYear()}`, padNumber(Number(lastMonth.getMonth() + 1)))
 
   // If the user isnt supposed to be here, redirect them to the current month's page
-  if((firstDay > today) || ((Object.keys(aotdData).length == 1))) {
+  // An empty AOTD data month will not have a 'stats' key
+  if((firstDay > today) || ((Object.keys(aotdData).indexOf('stats') == -1))) {
     redirect(`/dashboard/aotd/calendar/${today.getFullYear()}/${today.getMonth() + 1}`)
   }
 
@@ -135,7 +136,7 @@ export default async function Page({
       )
     }
 
-    const is_highest_or_lowest = ((dateStr == aotdData['stats']['highest_aotd_date']) || (dateStr == aotdData['stats']['lowest_aotd_date']))
+    const is_highest_or_lowest = ((aotdData['stats'] != null) && ((dateStr == aotdData['stats']['highest_aotd_date']) || (dateStr == aotdData['stats']['lowest_aotd_date'])))
     return (
       <div className="rounded-2xl sm:px-[2px] md:px-1 max-w-full max-h-full">
         {/* Day Header */}
@@ -148,14 +149,14 @@ export default async function Page({
               <p>{albumGet("rating")?.toFixed(2)}</p>
             </div>
           </Conditional>
-          <Conditional showWhen={dateStr == aotdData['stats']['highest_aotd_date']}>
+          <Conditional showWhen={(is_highest_or_lowest) && (dateStr == aotdData['stats']['highest_aotd_date'])}>
             <Tooltip content={`Highest Rated Album for ${monthToName(month)} ${year}`}>
               <div className="absolute right-0 bg-green-600/90 border border-green-800 top-0 p-[2px] sm:p-2 rounded-t-2xl rounded-bl-2xl text-xs sm:text-2xl">
                 <RiThumbUpFill />
               </div>
             </Tooltip>
           </Conditional>
-          <Conditional showWhen={dateStr == aotdData['stats']['lowest_aotd_date']}>
+          <Conditional showWhen={(is_highest_or_lowest) && (dateStr == aotdData['stats']['lowest_aotd_date'])}>
             <Tooltip content={`Lowest Rated Album for ${monthToName(month)} ${year}`}>
               <div className="absolute right-0 bg-red-600/90 border border-red-800 top-0 p-[2px] sm:p-2 rounded-t-2xl rounded-bl-2xl text-xs sm:text-2xl">
                 <RiThumbDownFill />
@@ -180,7 +181,8 @@ export default async function Page({
           as={Link}
           href={`/dashboard/aotd/calendar/${lastMonth.getFullYear()}/${padNumber(Number(lastMonth.getMonth()) + 1)}`}
           radius="lg"
-          className={`${(Object.keys(lastMonthAotdData).length == 1) ? "invisible" : ""} w-fit hover:underline text-white`}
+          // An empty AOTD data month will not have a 'stats' key
+          className={`${(Object.keys(lastMonthAotdData).indexOf('stats') == -1) ? "invisible" : ""} w-fit hover:underline text-white`}
           variant="solid"
         >
           <RiArrowLeftCircleLine className="text-2xl" />
@@ -221,7 +223,9 @@ export default async function Page({
         </tbody>
       </table>
       {/* Monthly Statistics */}
-      <MonthlyStatsBox aotdData={aotdData} year={year} month={month}/>
+      {((Object.keys(lastMonthAotdData).indexOf('stats') != -1)) ? (
+        <MonthlyStatsBox aotdData={aotdData} year={year} month={month}/>
+      ): (<></>)}
     </div>
   )
 }
