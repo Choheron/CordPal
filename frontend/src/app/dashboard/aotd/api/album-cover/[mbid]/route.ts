@@ -8,9 +8,9 @@ import path from 'path';
 
 export async function GET(
   request: NextRequest,
-  context: { params: { mbid: string } }
+  { params } : { params: Promise<{ mbid: string }> }
 ) {
-  const { mbid } = await context.params;
+  const { mbid } = await params;
 
 
   if (!mbid) {
