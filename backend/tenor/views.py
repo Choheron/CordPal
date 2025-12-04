@@ -11,6 +11,7 @@ logger = logging.getLogger()
 # Determine runtime enviornment
 APP_ENV = os.getenv('APP_ENV') or 'DEV'
 load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
+IS_PROD = True if APP_ENV=="PROD" else False
 
 # Create your views here.
 def getGifUrl(request: HttpRequest, gifId: str):
@@ -29,7 +30,15 @@ def getGifUrl(request: HttpRequest, gifId: str):
       tenorRes.raise_for_status()
   except:
     return HttpResponse(status=500)
-  # Convert response to Json
-  tenorResGifObject = tenorRes.json()['results'][0]['media_formats']['gif']
+  # Check if results found
+  results = tenorRes.json()['results']
+  if(len(results) == 0):
+    # If no results found, return a placeholder URL
+    logger.warning(f"Tenor search resulted in no GIFs! Returning bad gif url...")
+    # Provide placeholder URL
+    tenorResGifObject = { "url": "https://placehold.co/400x200?text=GIF+NO+LONGER+AVAILABLE+ON+TENOR" }
+  else:
+    # Convert response to Json
+    tenorResGifObject = results['results'][0]['media_formats']['gif']
   # Return JsonResponse containing user data
   return JsonResponse(tenorResGifObject)
