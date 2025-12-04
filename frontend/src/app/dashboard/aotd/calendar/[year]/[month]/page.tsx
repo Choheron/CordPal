@@ -223,7 +223,7 @@ export default async function Page({
         </tbody>
       </table>
       {/* Monthly Statistics */}
-      {((Object.keys(lastMonthAotdData).indexOf('stats') != -1)) ? (
+      {((Object.keys(aotdData).indexOf('stats') != -1)) ? (
         <MonthlyStatsBox aotdData={aotdData} year={year} month={month}/>
       ): (<></>)}
     </div>
