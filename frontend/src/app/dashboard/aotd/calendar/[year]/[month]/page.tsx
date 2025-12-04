@@ -34,7 +34,7 @@ export default async function Page({
   // Get next month date
   const nextMonth = new Date(new Date(firstDay).setMonth(firstDay.getMonth() + 1));
   // Boolean to see if the viewed month is the current month
-  const currMonth = ((new Date().getMonth() + 1) == Number(month))
+  const currMonth = ((today.getMonth() + 1) == Number(month)) && ((today.getFullYear()) == Number(year))
 
   // Data retrieval from backend
   // Retrieve album data for this month
