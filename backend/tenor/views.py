@@ -39,6 +39,6 @@ def getGifUrl(request: HttpRequest, gifId: str):
     tenorResGifObject = { "url": "https://placehold.co/400x200?text=GIF+NO+LONGER+AVAILABLE+ON+TENOR" }
   else:
     # Convert response to Json
-    tenorResGifObject = results['results'][0]['media_formats']['gif']
+    tenorResGifObject = results[0]['media_formats']['gif']
   # Return JsonResponse containing user data
   return JsonResponse(tenorResGifObject)
