@@ -32,6 +32,7 @@ export default async function music() {
               <Button
                 as={Link}
                 href={"/dashboard/aotd/album/all"}
+                prefetch={false}
                 className="p-2 mx-auto my-2 w-[90%] text-sm text-inheret h-fit bg-gradient-to-br from-green-700/80 to-green-800/80 hover:underline"
                 size="sm"
                 radius="lg"
