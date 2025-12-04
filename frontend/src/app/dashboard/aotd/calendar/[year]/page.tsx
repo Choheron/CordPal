@@ -68,7 +68,7 @@ export default async function Page({
             <div className="relative object-scale-down">
               {/* Album Body */}
               <MinimalAlbumDisplay
-                showAlbumRating={true}
+                showAlbumRating={false}
                 title={"Future Album"}
                 album_img_src={`https://www.placemonkeys.com/500?greyscale&random=${dateArr[2]}`}
                 artist={{'name': "Monke"}}

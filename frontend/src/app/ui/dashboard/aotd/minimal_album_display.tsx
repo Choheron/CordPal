@@ -47,7 +47,7 @@ export default async function MinimalAlbumDisplay(props) {
   const submitter_comment = (props.submitter_comment) ? props.submitter_comment : "No Comment Provided";
   const submission_date: string = (props.submission_date) ? props.submission_date : "Not Provided";
   // Rating props check
-  const avg_rating = (props.album_mbid && (showAlbumRating != 0)) ? (await getAlbumAvgRating(props.album_mbid, false)) : 0.0;
+  const avg_rating = (props.ratingOverride != null) ? (props.ratingOverride) : ((props.album_mbid && (showAlbumRating != 0)) ? (await getAlbumAvgRating(props.album_mbid, false)) : 0.0);
   const rating_override = (props.ratingOverride) ? props.ratingOverride : false;
   // Historical props checks
   const historical = (props.historical_date) ? true : false;

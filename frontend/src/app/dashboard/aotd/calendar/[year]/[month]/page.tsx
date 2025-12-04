@@ -99,7 +99,7 @@ export default async function Page({
         return (
           <div className={sizingTailwind}>
             <MinimalAlbumDisplay
-              showAlbumRating={true}
+              showAlbumRating={false}
               title={"Future Album"}
               album_img_src={`https://www.placemonkeys.com/500?greyscale&random=${dateArr[2]}`}
               artist={{'name': "Monke"}}
@@ -189,6 +189,7 @@ export default async function Page({
         </Button>
         <Button 
           as={Link}
+          prefetch={false}
           href={`/dashboard/aotd/calendar/${year}`}
           radius="lg"
           className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
