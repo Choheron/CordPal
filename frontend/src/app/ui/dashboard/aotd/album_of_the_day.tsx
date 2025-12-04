@@ -20,6 +20,7 @@ import { getUserData, isUserAdmin } from "@/app/lib/user_utils";
 import { Conditional } from "../conditional";
 import ReplaceAlbumModal from "./modals/replace_album_modal";
 import { revalidateTag } from "next/cache";
+import { getYesterdayInTimezone } from "@/app/lib/utils";
 
 // GUI Display for the Album of the Day
 export default async function AlbumOfTheDayBox(props) {
@@ -37,7 +38,7 @@ export default async function AlbumOfTheDayBox(props) {
   // Get Todays Date
   let todayDate = new Date()
   // Get yesterday's date
-  const yesterdayString = new Date(new Date().setDate(new Date().getDate()-1)).toISOString().split('T')[0];
+  const yesterdayString = getYesterdayInTimezone("America/Chicago");
   const yesterdayStringArr = yesterdayString.split("-")
 
   // Pull data from album object, return empty string if not available
