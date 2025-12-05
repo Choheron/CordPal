@@ -26,7 +26,7 @@ export default async function UserActionsBlock(props) {
   // Generate an action card for a single user action
   const generateActionCard = (action) => {
     return (
-      <div className={`flex items-center w-full bg-zinc-800/30 rounded-xl p-1 ${getBgColorByAction(action['action_type'])}`}>
+      <div className={`flex items-center w-full rounded-xl p-1 ${getBgColorByAction(action['action_type'])}`}>
         <div className="w-1/5 pt-1 -mb-1 ml-1">
           <UserCard 
             userDiscordID={action['user']['discord_id']}
