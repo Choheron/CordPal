@@ -3,16 +3,31 @@ import UserAvatar from "../general/userUiItems/user_avatar"
 import UserCard from "../general/userUiItems/user_card"
 import ClientTimestamp from "../general/client_timestamp"
 
+import {Card} from "@heroui/react";
+
 // Display the last 10 user actions made on the site
 export default async function UserActionsBlock(props) {
   // Get user actions from backend
   const userActions = await getRecentUserActions()
 
+  // Return a tailwind background color corresponding to the action taken by the user
+  const getBgColorByAction = (action: string) => {
+    switch(action) {
+      case "CREATE":
+        return "bg-green-300/30";
+      case "UPDATE":
+        return "bg-blue-300/30";
+      case "DELETE":
+        return "bg-red-300/30";
+    }
+  }
+
+
   // Generate an action card for a single user action
   const generateActionCard = (action) => {
     return (
-      <div className="flex items-center w-full bg-zinc-800/30 rounded-xl p-1 text-center">
-        <div className="w-1/5 pt-1 -mb-1">
+      <div className={`flex items-center w-full bg-zinc-800/30 rounded-xl p-1 ${getBgColorByAction(action['action_type'])}`}>
+        <div className="w-1/5 pt-1 -mb-1 ml-1">
           <UserCard 
             userDiscordID={action['user']['discord_id']}
             avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[40px]"}
