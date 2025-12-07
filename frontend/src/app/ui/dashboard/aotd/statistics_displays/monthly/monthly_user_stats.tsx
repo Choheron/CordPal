@@ -1,11 +1,11 @@
 "use client"
 
+import { Divider, Tab, Tabs, User } from "@heroui/react"
+
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import CustomPercentageDisplay from "@/app/ui/general/charts/custom_percentage_display";
 import { RosenBarChartHorizontal } from "@/app/ui/general/charts/rosen_barchart_horizontal";
 import StarRating from "@/app/ui/general/star_rating";
-import { Divider, Tab, Tabs, User } from "@heroui/react"
-import Image from "next/image";
 
 
 // Expected Props:

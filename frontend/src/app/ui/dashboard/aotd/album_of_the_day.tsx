@@ -1,6 +1,7 @@
 "use server"
 
-import { Alert, Button } from "@heroui/react";
+import { Alert } from "@heroui/alert";
+import { Button } from "@heroui/button";
 
 import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
@@ -9,7 +10,6 @@ import {
   getAlbumOfTheDayData, 
   getReviewsForAlbum, 
   getSimilarReviewsForRatings, 
-  getAotdData, 
   getUserReviewForAlbum, 
 } from "@/app/lib/aotd_utils";
 import AddAlbumModal from "./modals/add_album_modal";
@@ -53,7 +53,7 @@ export default async function AlbumOfTheDayBox(props) {
   // Callback to revalidate AOTD if replaced
   async function revalidateAOTD() {
     "use server";
-    revalidateTag('AOTD')
+    revalidateTag('AOTD', "max")
   }
 
   return (
@@ -71,29 +71,33 @@ export default async function AlbumOfTheDayBox(props) {
             </div>
           </Conditional>
           <div className="flex flex-col md:flex-row w-full justify-between px-2 mt-1 mb-1">
-            <Button 
-              as={Link}
+            <Link
               href={`/dashboard/aotd/calendar/${yesterdayStringArr[0]}/${yesterdayStringArr[1]}/${yesterdayStringArr[2]}`}
-              radius="lg"
-              className={`min-w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
-              variant="solid"
             >
-              <b>Yesterday&apos;s Album</b>
-            </Button>
+              <Button
+                radius="lg"
+                className={`min-w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+                variant="solid"
+              >
+                <b>Yesterday&apos;s Album</b>
+              </Button>
+            </Link>
             <div className="w-full backdrop-blur-2xl px-2 py-1 md:mx-2 my-2 md:my-0 rounded-2xl bg-black/20 border border-neutral-800">
               <p className="text-xs italic text-gray-300">
                 All album artwork, track titles, artist names, and related content are the property of their respective copyright holders.
               </p>
             </div>
-            <Button 
-              as={Link}
+            <Link
               href={`/dashboard/aotd/calendar/${todayDate.toISOString().split('T')[0].split("-")[0]}/${todayDate.toISOString().split('T')[0].split("-")[1]}`}
-              radius="lg"
-              className={`min-w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
-              variant="solid"
             >
-              <RiCalendar2Fill className="text-2xl" />
-            </Button> 
+              <Button 
+                radius="lg"
+                className={`min-w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+                variant="solid"
+              >
+                <RiCalendar2Fill className="text-2xl" />
+              </Button>
+            </Link>
           </div>
           <Conditional showWhen={albumOfTheDayObj['manually_selected'] && albumOfTheDayObj['admin_message']}>
             <Alert

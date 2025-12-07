@@ -1,10 +1,11 @@
 "use client";
 
+import { Button } from "@heroui/button";
+
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 import UserDropdown from "@/app/ui/general/userUiItems/user_dropdown";
-import { Button } from "@heroui/react";
 import Link from "next/link";
 
 
@@ -73,16 +74,18 @@ export default function PhotoFilterBlock(props) {
           setSelectionCallback={setTagged}
           useNicknameKeys
         /> */}
-        <Button 
-          as={Link}
+        <Link
           href={'/dashboard/photos'}
-          radius="lg"
-          className="p-3 mt-[6px] text-sm text-inheret w-fit min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline" 
-          variant="solid"
-          onClick={handleReset}
         >
-          Reset
-        </Button>
+          <Button
+            radius="lg"
+            className="p-3 mt-[6px] text-sm text-inheret w-fit min-h-0 h-fit bg-gradient-to-br from-green-700 to-green-800 hover:underline" 
+            variant="solid"
+            onClick={handleReset}
+          >
+            Reset
+          </Button>
+        </Link>
       </div>
     </div>
   );

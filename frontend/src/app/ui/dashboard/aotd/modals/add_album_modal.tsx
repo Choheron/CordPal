@@ -8,13 +8,13 @@ import {
   ModalFooter,
   useDisclosure
 } from "@heroui/modal";
-import { addToast, Button, Divider, Link, select } from "@heroui/react";
-import {Input} from "@heroui/react";
-import {Textarea} from "@heroui/input";
+import { addToast, Button, Divider, Link } from "@heroui/react";
+import { Input } from "@heroui/input";
+import { Textarea } from "@heroui/input";
+
 import React from "react";
 import { useRouter } from 'next/navigation';
 import { Listbox,  ListboxItem} from "@heroui/listbox";
-
 import { checkIfAlbumAlreadyExists, checkIfUserCanSubmit, submitAlbumToBackend } from "@/app/lib/aotd_utils";
 import { Conditional } from "../../conditional";
 import InfoPopover from "@/app/ui/general/info_popover";

@@ -1,9 +1,10 @@
 "use client"
 
+import { Tooltip } from "@heroui/react";
+
 import { addReviewReaction, deleteReviewReaction, getReviewByID } from "@/app/lib/aotd_utils"
 import EmojiMartButton from "@/app/ui/general/input/emoji_mart_popover"
 import { Conditional } from "../../conditional";
-import { Tooltip } from "@heroui/react";
 import { useEffect, useState } from "react";
 
 // Special wrapper to allow for emoji mart reaction addition and display

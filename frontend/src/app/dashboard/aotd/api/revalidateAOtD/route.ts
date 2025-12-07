@@ -12,7 +12,7 @@ export async function POST() {
   // Revalite tags
   tags.forEach((tag, index) => {
     console.log(`revalidateAOtD - Revalidating Tag: ${tag}`)
-    revalidateTag(tag)
+    revalidateTag(tag, "max")
   })
   // Return success code
   return new Response('Success!', {

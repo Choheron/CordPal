@@ -1,6 +1,8 @@
 "use server"
 
 import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
+import { Link } from "@heroui/link";
+import { ScrollShadow } from "@heroui/scroll-shadow";
 
 import StarRating from "../../general/star_rating";
 import UserCard from "../../general/userUiItems/user_card";
@@ -8,7 +10,6 @@ import UserCard from "../../general/userUiItems/user_card";
 import { getTenorGifData } from "@/app/lib/aotd_utils";
 import ClientTimestamp from "../../general/client_timestamp";
 import { Conditional } from "../conditional";
-import { Link, ScrollShadow, Tooltip } from "@heroui/react";
 import ReviewEmojiMartClientWrapper from "./reviewsWrappers/client_review_reacton_emoji_wrapper.tsx";
 import { getUserData } from "@/app/lib/user_utils";
 import { ratingToTailwindBgColor, songRatingToString } from "@/app/lib/utils";

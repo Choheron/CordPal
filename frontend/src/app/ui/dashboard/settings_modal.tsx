@@ -6,14 +6,14 @@ import {
   ModalFooter,
   useDisclosure
 } from "@heroui/modal";
-import {User} from "@heroui/user";
-import { Badge, Button } from "@heroui/react";
-import {Input} from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Badge } from "@heroui/badge";
+import { Input } from "@heroui/input";
+
 import React, { useEffect } from "react";
 import { useRouter } from 'next/navigation';
 
 import { isUserFieldUnique, updateUserData } from "@/app/lib/user_utils";
-import ClientTimestamp from "../general/client_timestamp";
 import { boolToString } from "@/app/lib/utils";
 import EditPasswordModal from "./edit_password_modal";
 import { Conditional } from "./conditional";

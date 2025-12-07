@@ -1,9 +1,10 @@
 "use client"
 
+import { Tooltip } from "@heroui/tooltip"
+
 import { useState } from "react"
 import ReviewScoreCountBarChart from "../general/charts/review_score_bar_chart"
 import ClientTimestamp from "../general/client_timestamp"
-import { Tooltip } from "@heroui/react"
 
 // Box display review stats and reviews in a dynmic chart list combo
 // Expected Props:

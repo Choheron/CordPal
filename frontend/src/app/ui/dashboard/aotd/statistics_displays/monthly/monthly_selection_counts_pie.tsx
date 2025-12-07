@@ -1,7 +1,9 @@
 "use server"
 
+import { Divider } from "@heroui/divider";
+import { Tooltip } from "@heroui/tooltip";
+
 import { RosenPieChart } from "@/app/ui/general/charts/rosen_pie_chart";
-import { Divider, Tooltip } from "@heroui/react";
 import { RiQuestionMark } from "react-icons/ri";
 
 // Display the selection stats for a month in a pie chart, should only be called with the following props (to properly work)

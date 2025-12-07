@@ -11,6 +11,7 @@ import {
 } from "@heroui/modal";
 import { Button } from "@heroui/button";
 import { useDisclosure } from "@heroui/react";
+
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getImageData } from "@/app/lib/photos_utils";
@@ -156,16 +157,18 @@ export default function PhotoModal(props) {
                   <Conditional showWhen={!loading}>
                     <p>Uploaded: {convertToLocalTZString(uploadTimestamp)}</p>
                     <p>Filename: {imgData['filename']}</p>
-                    <Button 
-                      as={Link}
+                    <Link
                       href={props.imageSrc}
-                      target="_blank"
-                      radius="lg"
-                      className="z-40 text-white border-white bg-white hover:underline bg-opacity-0 hover:bg-opacity-40 duration-1000 ease-in-out" 
-                      variant="bordered"
                     >
-                      Download
-                    </Button> 
+                      <Button 
+                        target="_blank"
+                        radius="lg"
+                        className="z-40 text-white border-white bg-white hover:underline bg-opacity-0 hover:bg-opacity-40 duration-1000 ease-in-out" 
+                        variant="bordered"
+                      >
+                        Download
+                      </Button> 
+                    </Link>
                   </Conditional>
                 </ModalFooter>
               </Conditional>

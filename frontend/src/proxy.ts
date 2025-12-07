@@ -10,7 +10,7 @@ function checkNonUserAccess(request: NextRequest) {
   return (nonUserPages.indexOf(request.nextUrl.pathname) != -1);
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   console.log("MIDDLEWARE: Running for Path: " + request.nextUrl.pathname)
   // Check if user is authorized, if not, redirect to login
   try {

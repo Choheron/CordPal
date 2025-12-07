@@ -1,9 +1,8 @@
 'use server'
 
-import {User} from "@heroui/user";
-import { Button } from "@heroui/react";
+import { User } from "@heroui/user";
+import { Button } from "@heroui/button";
 
-import { convertToLocalTZString } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";
 import Link from "next/link";
 
@@ -23,36 +22,39 @@ export default async function RecentSubmissions(props) {
           ) : (
             recentSubs.map((submission, index) => (
               <div className="ml-1" key={index}>
-                <Button 
-                  as={Link}
-                  prefetch={false}
+                <Link
                   href={"/dashboard/aotd/album/" + submission['album_id']}
-                  radius="lg"
-                  className={`group h-fit w-full hover:underline text-white pt-1`}
-                  variant="light"
+                  prefetch={false}
+                  className="flex w-full p-0 items-start"
                 >
-                  <div className="w-full">
-                    <User
-                      name={(
-                        <p className="group-hover:underline line-clamp-1 max-w-56 text-lg">
-                          {submission['title']}
-                        </p>
-                      )}
-                      description={
-                        <div>
-                          <p>{submission['artist']}</p>
-                          <p className="text-xs">{"Submitted by: " + submission['submitter']}</p>
-                        </div>
-                      }
-                      avatarProps={{
-                        name: submission['title'],
-                        src: `/dashboard/aotd/api/album-cover/${submission['album_id']}`,
-                        className: "size-16",
-                        radius: "sm"
-                      }}
-                    />
-                  </div>
-                </Button>
+                  <Button
+                    radius="lg"
+                    className={`group h-fit w-full hover:underline text-white pt-1 text-left`}
+                    variant="light"
+                  >
+                    <div className="w-full">
+                      <User
+                        name={(
+                          <p className="group-hover:underline line-clamp-1 max-w-56 text-lg">
+                            {submission['title']}
+                          </p>
+                        )}
+                        description={
+                          <div>
+                            <p>{submission['artist']}</p>
+                            <p className="text-xs">{"Submitted by: " + submission['submitter']}</p>
+                          </div>
+                        }
+                        avatarProps={{
+                          name: submission['title'],
+                          src: `/dashboard/aotd/api/album-cover/${submission['album_id']}`,
+                          className: "size-16",
+                          radius: "sm"
+                        }}
+                      />
+                    </div>
+                  </Button>
+                </Link>
               </div>
             ))
           )

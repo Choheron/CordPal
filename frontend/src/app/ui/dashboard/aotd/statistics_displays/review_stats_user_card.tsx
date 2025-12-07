@@ -1,7 +1,9 @@
 'use server'
 
-import { Popover, PopoverTrigger, PopoverContent, Divider} from "@heroui/react"
-import { Button, Link } from "@heroui/react"
+import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover"
+import { Divider } from "@heroui/divider"
+import { Button} from "@heroui/button"
+import { Link } from "@heroui/link"
 
 import UserCard from "@/app/ui/general/userUiItems/user_card"
 import StarRating from "@/app/ui/general/star_rating"
@@ -118,48 +120,52 @@ export default async function ReviewStatsUserCard(props) {
         {/* Album Highest Stats */}
         <div className='w-full flex flex-col align-middle pt-1'>
           <p className="my-auto mx-auto">Highest Rated Album:</p>
-          <Button 
-            as={Link}
+          <Link
             href={"/dashboard/aotd/calendar/" + convertToHistoricalDateUrl(reviewData['highest_score_date'])}
-            radius="lg"
-            className={`w-fit hover:underline text-white h-fit py-2 mx-auto ${ratingToTailwindBgColor(reviewData['highest_score_given'])} bg-opacity-50 shadow-lg`}
-            variant="bordered"
           >
-            <div>
-              <img 
-                src={`/dashboard/aotd/api/album-cover/${highestReviewData['mbid']}`}
-                className='h-[100px] w-[100px] rounded-2xl mx-auto'
-                alt={`Album Cover for ${highestReviewData['title']} by ${(highestReviewData['artist']) ? highestReviewData['artist']['name'] : "UNKNOWN"}`}
-              />
-              <StarRating 
-                rating={reviewData['highest_score_given']} 
-                className="text-yellow-400 text-lg my-auto justify-center" 
-              />
-            </div>
-          </Button>
+            <Button 
+              radius="lg"
+              className={`w-fit hover:underline text-white h-fit py-2 mx-auto ${ratingToTailwindBgColor(reviewData['highest_score_given'])} bg-opacity-50 shadow-lg`}
+              variant="bordered"
+            >
+              <div>
+                <img 
+                  src={`/dashboard/aotd/api/album-cover/${highestReviewData['mbid']}`}
+                  className='h-[100px] w-[100px] rounded-2xl mx-auto'
+                  alt={`Album Cover for ${highestReviewData['title']} by ${(highestReviewData['artist']) ? highestReviewData['artist']['name'] : "UNKNOWN"}`}
+                />
+                <StarRating 
+                  rating={reviewData['highest_score_given']} 
+                  className="text-yellow-400 text-lg my-auto justify-center" 
+                />
+              </div>
+            </Button>
+          </Link>
         </div>
         {/* Album Lowest Stats */}
         <div className='w-full flex flex-col align-middle'>
           <p className="my-auto mx-auto">Lowest Rated Album:</p>
-          <Button 
-            as={Link}
+          <Link
             href={"/dashboard/aotd/calendar/" + convertToHistoricalDateUrl(reviewData['lowest_score_date'])}
-            radius="lg"
-            className={`w-fit hover:underline text-white h-fit py-2 mx-auto ${ratingToTailwindBgColor(reviewData['lowest_score_given'])} bg-opacity-50 shadow-lg`}
-            variant="bordered"
           >
-            <div>
-              <img 
-                src={`/dashboard/aotd/api/album-cover/${lowestReviewData['mbid']}`}
-                className='h-[100px] w-[100px] rounded-2xl mx-auto'
-                alt={`Album Cover for ${lowestReviewData['title']} by ${(lowestReviewData['artist']) ? lowestReviewData['artist']['name'] : "UNKNOWN"}}`}
-              />
-              <StarRating 
-                rating={reviewData['lowest_score_given']} 
-                className="text-yellow-400 text-lg my-auto justify-center" 
-              />
-            </div>
-          </Button>
+            <Button
+              radius="lg"
+              className={`w-fit hover:underline text-white h-fit py-2 mx-auto ${ratingToTailwindBgColor(reviewData['lowest_score_given'])} bg-opacity-50 shadow-lg`}
+              variant="bordered"
+            >
+              <div>
+                <img 
+                  src={`/dashboard/aotd/api/album-cover/${lowestReviewData['mbid']}`}
+                  className='h-[100px] w-[100px] rounded-2xl mx-auto'
+                  alt={`Album Cover for ${lowestReviewData['title']} by ${(lowestReviewData['artist']) ? lowestReviewData['artist']['name'] : "UNKNOWN"}}`}
+                />
+                <StarRating 
+                  rating={reviewData['lowest_score_given']} 
+                  className="text-yellow-400 text-lg my-auto justify-center" 
+                />
+              </div>
+            </Button>
+          </Link>
         </div>
       </PopoverContent>
     </Popover>

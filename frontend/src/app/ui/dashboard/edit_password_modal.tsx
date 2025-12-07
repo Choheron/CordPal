@@ -6,13 +6,17 @@ import {
   ModalFooter,
   useDisclosure
 } from "@heroui/modal";
-import { addToast, Alert, Badge, Button, Spinner } from "@heroui/react";
-import {Input} from "@heroui/react";
+import {addToast } from "@heroui/toast";
+import { Alert } from "@heroui/alert";
+import { Badge } from "@heroui/badge";
+import { Button } from "@heroui/button";
+import { Spinner } from "@heroui/spinner";
+import { Input } from "@heroui/input";
+
 import React, { useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { getPasswordValidators, updateUserPassword } from "@/app/lib/user_utils";
 import { Conditional } from "./conditional";
-import { revalidateTag } from "next/cache";
 
 
 // Expected props:

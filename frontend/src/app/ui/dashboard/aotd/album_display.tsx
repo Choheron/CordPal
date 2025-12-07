@@ -1,15 +1,17 @@
 'use server'
 
 import { Conditional } from "../conditional"
-import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
 import { getAlbumAvgRating } from '@/app/lib/aotd_utils';
 import Image from "next/image";
-import { Badge, Button, Tooltip } from "@heroui/react";
 import Link from 'next/link'
 import { milliToString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import ClientTimestamp from "../../general/client_timestamp";
+
+import { Badge } from "@heroui/badge";
+import { Button } from "@heroui/button";
+import { Tooltip } from "@heroui/tooltip";
 
 // GUI Display for an Album
 // Expected Props:
@@ -182,14 +184,16 @@ export default async function AlbumDisplay(props) {
             </div>
           </Conditional>
           <Conditional showWhen={historical && showCalLink}>
-            <Button 
-              as={Link}
-              className="bg-gradient-to-br from-green-700/80 to-green-800/80"
+            <Link
               href={`/dashboard/aotd/calendar/${dateToCalUrl(historical_date)}`}
-              variant="solid"
             >
-              Go to {dateToCalUrl(historical_date)}
-            </Button>
+              <Button 
+                className="bg-gradient-to-br from-green-700/80 to-green-800/80"
+                variant="solid"
+              >
+                Go to {dateToCalUrl(historical_date)}
+              </Button>
+            </Link>
           </Conditional>
         </div>
       </div>

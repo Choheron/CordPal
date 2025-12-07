@@ -1,13 +1,15 @@
 "use client";
 
+import { User } from "@heroui/user";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/dropdown";
+import { Link } from "@heroui/link";
+
 import { Conditional } from "./conditional";
 import { usePathname } from 'next/navigation';
-import {User} from "@heroui/user";
 
 import clsx from 'clsx';
 
 import SettingsModal from "./settings_modal";
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Link } from "@heroui/react";
 import { useState } from "react";
 import { RiAlbumLine, RiHome2Line, RiImageLine, RiInformationLine, RiMusic2Line, RiQuillPenLine, RiSettings3Line } from "react-icons/ri";
 import Image from 'next/image'

@@ -1,9 +1,6 @@
 import { getRecentUserActions } from "@/app/lib/user_utils"
-import UserAvatar from "../general/userUiItems/user_avatar"
 import UserCard from "../general/userUiItems/user_card"
 import ClientTimestamp from "../general/client_timestamp"
-
-import {Card} from "@heroui/react";
 
 // Display the last 10 user actions made on the site
 export default async function UserActionsBlock(props) {

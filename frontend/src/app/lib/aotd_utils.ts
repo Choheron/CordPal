@@ -1,6 +1,6 @@
 "use server"
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag, updateTag } from "next/cache";
 import { padNumber } from "@/app/lib/utils"
 import { cookies } from "next/headers";
 
@@ -142,7 +142,7 @@ export async function submitAlbumToBackend(albumObject) {
     body: JSON.stringify(albumObject)
   });
   // Revalidate requests to see recent submissions
-  revalidateTag('album_submissions')
+  revalidateTag('album_submissions', "max")
   // Return Status
   return {"status": submitAlbumResponse.status, "crid": submitAlbumResponse.headers.get("X-CRID")}
 }
@@ -254,8 +254,8 @@ export async function deleteAlbumFromBackend(mbid, reason = null) {
   });
   const status = deleteAlbumResponse.status
   // Revalidate requests to ensure no data is lost
-  revalidateTag('album_submissions')
-  revalidateTag(`album_${mbid}`)
+  revalidateTag('album_submissions', "max")
+  revalidateTag(`album_${mbid}`, "max")
   return {
     status: status, 
     crid: deleteAlbumResponse.headers.get("X-CRID")
@@ -284,10 +284,10 @@ export async function replaceAlbumInBackend(albumPk, new_mbid, isCurrentlyAOTD) 
   });
   const responseJson = await deleteAlbumResponse.json()
   // Revalidate requests to ensure no data is lost
-  revalidateTag('album_submissions')
-  revalidateTag(`album_${responseJson['mbid']}`)
+  revalidateTag('album_submissions', "max")
+  revalidateTag(`album_${responseJson['mbid']}`, "max")
   if(isCurrentlyAOTD) {
-    revalidateTag('AOTD')
+    revalidateTag('AOTD', "max")
   }
   return {
     status: deleteAlbumResponse.status,
@@ -506,12 +506,12 @@ export async function submitReviewToBackend(reviewObject) {
     body: JSON.stringify(reviewObject)
   });
   // Revalidate review related calls
-  revalidateTag('review_submissions')
-  revalidateTag(`review_submissions_${reviewObject['userId']}`)
-  revalidateTag(`album_review_${reviewObject['album_id']}`)
+  updateTag('review_submissions')
+  updateTag(`review_submissions_${reviewObject['userId']}`)
+  updateTag(`album_review_${reviewObject['album_id']}`)
   // Revalidate AOTD calls for calendar views
   const now = new Date()
-  revalidateTag(`calendar-${now.getFullYear()}-${padNumber(now.getMonth() + 1)}`)
+  revalidateTag(`calendar-${now.getFullYear()}-${padNumber(now.getMonth() + 1)}`, "max")
   // Return callback code
   return {
     status: submitReviewResponse.status,
@@ -958,7 +958,7 @@ export async function createOutage(outageObj: object) {
     body: JSON.stringify(outageObj)
   });
   // Revalidate outage tag
-  revalidateTag("calendar-outages")
+  revalidateTag("calendar-outages", "max")
   const createOutageMessage = await createOutageResponse.text()
   const createOutageStatus = await createOutageResponse.status
   return {"status": createOutageStatus, "message": createOutageMessage};
@@ -985,8 +985,8 @@ export async function addReviewReaction(reactObj) {
   const reviewReactStatus = reviewReactResponse.status
   // If status was a success, revalidate review tag 
   if(reviewReactStatus == 200) {
-    revalidateTag(`review_${reactObj['id']}`)
-    revalidateTag(`album_review_${reactObj['mbid']}`) // Revalidate review tag for the specific album
+    revalidateTag(`review_${reactObj['id']}`, "max")
+    revalidateTag(`album_review_${reactObj['mbid']}`, "max") // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactStatus;
@@ -1013,8 +1013,8 @@ export async function deleteReviewReaction(reactObj) {
   const reviewReactDeleteStatus = reviewReactDeleteResponse.status
   // If status was a success, revalidate review tag 
   if(reviewReactDeleteStatus == 200) {
-    revalidateTag(`review_${reactObj['id']}`)
-    revalidateTag(`album_review_${reactObj['mbid']}`) // Revalidate review tag for the specific album
+    revalidateTag(`review_${reactObj['id']}`, "max")
+    revalidateTag(`album_review_${reactObj['mbid']}`, "max") // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactDeleteStatus;

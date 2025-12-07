@@ -1,9 +1,10 @@
+import { Button } from "@heroui/button";
+import { Tooltip } from "@heroui/tooltip";
+
 import { Conditional } from "../conditional"
-import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';
 import { getAlbumAvgRating } from '@/app/lib/aotd_utils';
-import { Badge, Button, Tooltip } from "@heroui/react";
 import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import Image from "next/image";
@@ -113,82 +114,24 @@ export default async function MinimalAlbumDisplay(props) {
         className={`max-h-fit`}
         isDisabled={tooltipDisabled}
       >
-        <Button
-          as={Link}
-          prefetch={false}
+        <Link
           href={(historical) ? `/dashboard/aotd/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
-          radius="none"
-          className={`${albumCoverOverride} px-0 py-0 min-w-0`}
-          isDisabled={!props.album_mbid}
+          prefetch={false}
+          className="flex"
         >
-          <img 
-            src={album_cover_url}
-            className={`${sizingOverride}`}
-            alt={`Album Cover for ${title} by ${artist_name}`}
-          />
-        </Button>
-      </Tooltip>
-      {/* Below was the old implementation, however this fails to conform to the spotify developer rules. */}
-      {/* <Button
-        as={Link}
-        href={(historical) ? `/dashboard/aotd/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}
-        radius="lg"
-        className={`absolute flex flex-col transition opacity-0 group-hover:opacity-100 ease-in-out ${sizingOverride} lg:gap-2 bg-transparent p-0`}
-        isDisabled={!props.album_mbid}
-      >
-        <p className={titleTextOverride}>
-          {title}
-        </p>
-        <p className={artistTextOverride}>
-          {artist_name}
-        </p>
-        <Conditional showWhen={(submitter && showSubmitInfo)}>
-          <Tooltip 
-            content={submitter_comment} 
-            className={`w-fit`}
-            isDisabled={submitter_comment == "No Comment Provided"}
+          <Button
+            radius="none"
+            className={`${albumCoverOverride} px-0 py-0 min-w-0`}
+            isDisabled={!props.album_mbid}
           >
-            <div className="-mb-4">
-              <Badge 
-                content=" " 
-                size="sm" 
-                placement="top-left"
-                isInvisible={submitter_comment == "No Comment Provided"}
-                shape="circle"
-                className="bg-blue-300 -ml-2"
-              >
-                <div>
-                  <UserCard 
-                    userDiscordID={submitter} 
-                    fallbackName={"User Not Found"}
-                    customDescription={(
-                      <p>
-                        Submitter
-                      </p>
-                    )}
-                  />
-                </div>
-              </Badge>
-            </div>
-          </Tooltip>
-        </Conditional>
-        <Conditional showWhen={((avg_rating != null) && showAlbumRating != 0)}>
-          <div className="w-full">
-            <Conditional showWhen={showAlbumRating == 2} >
-                <p className={`w-fit mx-auto px-2 rounded-xl text-black ${ratingToTailwindBgColor((rating_override) ? rating_override : avg_rating)}`}>
-                  <b>{avg_rating.toFixed(2)}</b>
-                </p>
-            </Conditional>
-            <div className="w-fit mx-auto mt-2">
-              <StarRating 
-                className="text-yellow-400"
-                rating={(rating_override) ? rating_override : avg_rating} 
-                textSize={starTextOverride}
-              />
-            </div>
-          </div>
-        </Conditional>
-      </Button> */}
+            <img 
+              src={album_cover_url}
+              className={`${sizingOverride}`}
+              alt={`Album Cover for ${title} by ${artist_name}`}
+            />
+          </Button>
+        </Link>
+      </Tooltip>
     </div>
   )
 }

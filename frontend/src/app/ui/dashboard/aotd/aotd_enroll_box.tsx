@@ -1,8 +1,9 @@
 'use client'
 
+import { Button } from "@heroui/button";
+
 import { enrollAotdUser } from "@/app/lib/aotd_utils";
 import { Divider } from "@heroui/divider";
-import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 

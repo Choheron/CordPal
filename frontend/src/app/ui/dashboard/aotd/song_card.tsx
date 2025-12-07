@@ -1,12 +1,11 @@
 'use client'
 
-import {Badge} from "@heroui/badge";
-import {Card, CardHeader } from "@heroui/card";
-import {Avatar, Button} from "@heroui/react";
-import { Image } from "@heroui/react";
+import { Badge } from "@heroui/badge";
+import { Card, CardHeader } from "@heroui/card";
+import { Avatar } from "@heroui/avatar";
+import { Image } from "@heroui/image";
 
 import { useRef, useEffect, useState } from "react";
-import { Conditional } from "../conditional";
 
 // Display a songcard from spotify
 // Expected Props:

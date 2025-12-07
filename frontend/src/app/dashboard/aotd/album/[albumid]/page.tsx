@@ -1,5 +1,8 @@
 'use server'
 
+import { Button } from "@heroui/button"
+import { Divider } from "@heroui/divider"
+
 import { deleteAlbumFromBackend, getAlbum, getAlbumAvgRating, getAlbumOfTheDayData, getAotdData, getAotdDates } from "@/app/lib/aotd_utils"
 import { isUserAdmin, isUserAlbumUploader } from "@/app/lib/user_utils"
 import { milliToString, monthToName, ratingToTailwindBgColor } from "@/app/lib/utils"
@@ -7,7 +10,6 @@ import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/aotd/album_display"
 import ReviewDisplay from "@/app/ui/dashboard/aotd/review_display"
-import { Button, Divider } from "@heroui/react"
 import Link from "next/link"
 import AlbumDeleteButton from "@/app/ui/dashboard/aotd/album_delete_button"
 import ReplaceAlbumModal from "@/app/ui/dashboard/aotd/modals/replace_album_modal"
@@ -60,14 +62,17 @@ export default async function Page({
               historical={true}
             />
             <Divider className="mb-2" />
-            <Button
-              as={Link}
+            <Link
               href={`/dashboard/aotd/calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`}
-              className={`bg-gradient-to-br from-green-700/80 to-green-800/80 text-black w-1/2 mx-auto`}
-              variant="solid"
+              className="flex"
             >
-              <b>View Day Page</b>
-            </Button>
+              <Button
+                className={`bg-gradient-to-br from-green-700/80 to-green-800/80 text-black w-1/2 mx-auto`}
+                variant="solid"
+              >
+                <b>View Day Page</b>
+              </Button>
+            </Link>
           </div>
       )
     })
@@ -151,15 +156,18 @@ export default async function Page({
   return (
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text={`${albumData("title")}`} />
-      <Button 
-        as={Link}
+      <Link
         href={"/dashboard/aotd"}
-        radius="lg"
-        className="w-fit mx-auto hover:underline" 
-        variant="bordered"
+        className="flex"
       >
-        Return to Main Page
-      </Button> 
+        <Button 
+          radius="lg"
+          className="w-fit mx-auto hover:underline" 
+          variant="bordered"
+        >
+          Return to Main Page
+        </Button> 
+      </Link>
       <div className="flex flex-col sm:flex-row w-full md:w-9/10 justify-center gap-2">
         {/* Album Display and Previous Review Display */}
         <div className="flex flex-col justify-start gap-2">

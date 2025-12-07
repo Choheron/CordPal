@@ -1,10 +1,12 @@
+import { Button } from "@heroui/button";
+import { Tooltip } from "@heroui/tooltip";
+
 import { getAOtDByMonth } from "@/app/lib/aotd_utils";
 import { monthToWeekArray } from "@/app/lib/calendar_utils";
 import { daysInMonth, monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import MinimalAlbumDisplay from "@/app/ui/dashboard/aotd/minimal_album_display";
 import { Conditional } from "@/app/ui/dashboard/conditional";
 import PageTitle from "@/app/ui/dashboard/page_title";
-import { Button, Tooltip } from "@heroui/react";
 import Link from "next/link";
 import { RiThumbDownFill, RiThumbUpFill } from "react-icons/ri";
 
@@ -173,17 +175,19 @@ export default async function Page({
         {yearData.map((month, index) => {
           return (
             <div className="w-full sm:w-1/3 3xl:w-1/4 px-2 py-4" key={index}>
-              <Button 
-                as={Link}
-                prefetch={false}
+              <Link
                 href={`/dashboard/aotd/calendar/${year}/${month.month_number}`}
-                radius="lg"
-                className={`w-full hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
-                variant="solid"
-                isDisabled={month.aotd_data['stats'] == null}
+                prefetch={false}
               >
-                <p>{month.month}</p>
-              </Button>
+                <Button
+                  radius="lg"
+                  className={`w-full hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+                  variant="solid"
+                  isDisabled={month.aotd_data['stats'] == null}
+                >
+                  <p>{month.month}</p>
+                </Button>
+              </Link>
               <div>
                 {genMonth(month)}
               </div>

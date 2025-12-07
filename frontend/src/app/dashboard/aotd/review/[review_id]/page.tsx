@@ -1,5 +1,7 @@
 "use server"
 
+import { Divider } from "@heroui/divider"
+
 import { getAlbum, getReviewHistoricalByID, getTenorGifData } from "@/app/lib/aotd_utils"
 import { getUserData } from "@/app/lib/user_utils"
 import { convertToLocalTZString, generateDateFromUTCString, padNumber, ratingToTailwindBgColor, songRatingToString } from "@/app/lib/utils"
@@ -10,7 +12,6 @@ import ReviewEmojiMartClientWrapper from "@/app/ui/dashboard/aotd/reviewsWrapper
 import ClientTimestamp from "@/app/ui/general/client_timestamp"
 import StarRating from "@/app/ui/general/star_rating"
 import UserCard from "@/app/ui/general/userUiItems/user_card"
-import { Divider } from "@heroui/react"
 
 // Page to display historial data for an specific date
 export default async function Page({

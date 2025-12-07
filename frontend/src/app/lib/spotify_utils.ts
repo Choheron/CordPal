@@ -1,6 +1,6 @@
 "use server"
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { padNumber } from "@/app/lib/utils"
 import { cookies } from "next/headers";
 
@@ -215,7 +215,7 @@ export async function submitAlbumToBackend(albumObject) {
     body: JSON.stringify(albumObject)
   });
   // Revalidate requests to see recent submissions
-  revalidateTag('album_submissions')
+  revalidateTag('album_submissions', "max")
   // Return Status
   return submitAlbumResponse.status
 }
@@ -241,8 +241,8 @@ export async function deleteAlbumFromBackend(album_spotify_id, reason = null) {
   });
   const status = deleteAlbumResponse.status
   // Revalidate requests to ensure no data is lost
-  revalidateTag('album_submissions')
-  revalidateTag(`album_${album_spotify_id}`)
+  revalidateTag('album_submissions', "max")
+  revalidateTag(`album_${album_spotify_id}`, "max")
   return status
 }
 
@@ -451,12 +451,12 @@ export async function submitReviewToBackend(reviewObject) {
     body: JSON.stringify(reviewObject)
   });
   // Revalidate review related calls
-  revalidateTag('review_submissions')
-  revalidateTag(`review_submissions_${reviewObject['userId']}`)
-  revalidateTag(`album_review_${reviewObject['album_id']}`)
+  revalidateTag('review_submissions', "max")
+  revalidateTag(`review_submissions_${reviewObject['userId']}`, "max")
+  revalidateTag(`album_review_${reviewObject['album_id']}`, "max")
   // Revalidate AOTD calls for calendar views
   const now = new Date()
-  revalidateTag(`calendar-${now.getFullYear()}-${padNumber(now.getMonth() + 1)}`)
+  revalidateTag(`calendar-${now.getFullYear()}-${padNumber(now.getMonth() + 1)}`, "max")
   // Return callback code
   return submitReviewResponse.status
 }
@@ -874,7 +874,7 @@ export async function createOutage(outageObj: object) {
     body: JSON.stringify(outageObj)
   });
   // Revalidate outage tag
-  revalidateTag("calendar-outages")
+  revalidateTag("calendar-outages", "max")
   const createOutageMessage = await createOutageResponse.text()
   const createOutageStatus = await createOutageResponse.status
   return {"status": createOutageStatus, "message": createOutageMessage};
@@ -901,8 +901,8 @@ export async function addReviewReaction(reactObj) {
   const reviewReactStatus = reviewReactResponse.status
   // If status was a success, revalidate review tag 
   if(reviewReactStatus == 200) {
-    revalidateTag(`review_${reactObj['id']}`)
-    revalidateTag(`album_review_${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
+    revalidateTag(`review_${reactObj['id']}`, "max")
+    revalidateTag(`album_review_${reactObj['album_spotify_id']}`, "max") // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactStatus;
@@ -929,8 +929,7 @@ export async function deleteReviewReaction(reactObj) {
   const reviewReactDeleteStatus = reviewReactDeleteResponse.status
   // If status was a success, revalidate review tag 
   if(reviewReactDeleteStatus == 200) {
-    revalidateTag(`review_${reactObj['id']}`)
-    revalidateTag(`album_review_${reactObj['album_spotify_id']}`) // Revalidate review tag for the specific album
+    revalidateTag(`review_${reactObj['id']}`, "max")
   }
   // Return Status
   return reviewReactDeleteStatus;
