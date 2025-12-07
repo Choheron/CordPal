@@ -14,9 +14,9 @@ export default async function RecentSubmissions(props) {
   const recentSubs = (props.albumList) ? props.albumList : [];
 
   return (
-    <div className="max-h-[450px] min-w-[320px] w-full lg:w-full lg:mt-2 lg:mb-1 flex flex-col backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800 overflow-y-auto">
+    <div className="h-full min-w-[320px] w-full lg:w-full lg:mt-2 lg:mb-1 flex flex-col backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
       <p className='text-xl mx-auto py-2 font-extralight'>Recent Album Submissions:</p>
-      <div className="flex flex-col justify-around h-full mx-auto">
+      <div className="flex flex-col justify-around h-full mx-auto overflow-y-auto">
         {recentSubs.length === 0 ? (
             <p className='mx-auto my-auto'>No Recent Submissions...</p>
           ) : (

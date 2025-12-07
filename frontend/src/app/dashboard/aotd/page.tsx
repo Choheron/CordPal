@@ -21,6 +21,7 @@ export default async function music() {
   const last_year_string = getLastYearInTimezone("America/Chicago")
   const last_year_arr = last_year_string.split("-")
   const last_year_aotd = await getAlbumOfTheDayData(last_year_string)
+  const last_year_has_aotd = (last_year_aotd['album_id'] != null)
 
   return (
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
@@ -36,7 +37,7 @@ export default async function music() {
             {/* Right side prev year and recent submissions display*/}
             <div className="max-w-full lg:max-w-[350px] flex flex-col">
               {/* Display the album from a year ago today if it exists */}
-              <Conditional showWhen={last_year_aotd['album_id'] != null}>
+              <Conditional showWhen={last_year_has_aotd}>
                 <div className="h-fit p-3 rounded-2xl bg-zinc-800/30 border border-neutral-800 mt-2">
                   <p className='text-xl mx-auto font-extralight w-fit'>Last Year Today:</p>
                   <MinimalAlbumDisplay 
@@ -61,10 +62,12 @@ export default async function music() {
                   />
                 </div>
               </Conditional>
-              <RecentSubmissions 
-                albumList={recentSubmissionsResponse['album_list']} 
-                timestamp={recentSubmissionsResponse['timestamp']}
-              />
+              <div className={`h-full mb-2 ${(last_year_has_aotd) ? "max-h-[450px]" : ""}`}>
+                <RecentSubmissions 
+                  albumList={recentSubmissionsResponse['album_list']} 
+                  timestamp={recentSubmissionsResponse['timestamp']}
+                />
+              </div>
               <Link
                 href={"/dashboard/aotd/album/all"}
                 prefetch={false}
