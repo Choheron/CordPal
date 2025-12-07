@@ -28,7 +28,7 @@ export function generateDateFromUTCString(utcString) {
 }
 
 
-// Get a string representation of yesterdays date using hte passed in timezone
+// Get a string representation of yesterdays date using the passed in timezone
 export function getYesterdayInTimezone(timezoneString) {
   // Helper to get part without weird typescript error
   function getPart(parts: Intl.DateTimeFormatPart[], type: string): string {
@@ -55,6 +55,38 @@ export function getYesterdayInTimezone(timezoneString) {
 
   // Yesterday in CT
   ctMidnight.setUTCDate(ctMidnight.getUTCDate() - 1);
+
+  return ctMidnight.toISOString().slice(0, 10);
+}
+
+
+// Get a string representation of last year's date using the passed in timezone
+export function getLastYearInTimezone(timezoneString) {
+  // Helper to get part without weird typescript error
+  function getPart(parts: Intl.DateTimeFormatPart[], type: string): string {
+    const match = parts.find(p => p.type === type);
+    if (!match) throw new Error(`Missing part: ${type}`);
+    return match.value;
+  }
+  // Main function
+  const now = new Date();
+
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezoneString,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+
+  const y = getPart(parts, "year");
+  const m = getPart(parts, "month");
+  const d = getPart(parts, "day");
+
+  // Build a pure CT midnight date
+  const ctMidnight = new Date(`${y}-${m}-${d}T00:00:00`);
+
+  // Yesterday in CT
+  ctMidnight.setUTCFullYear(ctMidnight.getUTCFullYear() - 1);
 
   return ctMidnight.toISOString().slice(0, 10);
 }

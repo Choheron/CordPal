@@ -112,7 +112,7 @@ export default async function MinimalAlbumDisplay(props) {
         content={tooltipContent()}
         showArrow
         className={`max-h-fit`}
-        isDisabled={tooltipDisabled}
+        isDisabled={tooltipDisabled || title == "No Album Title Found"}
       >
         <Link
           href={(historical) ? `/dashboard/aotd/calendar/${historical_date.replaceAll("-", "/")}` : buttonUrlOverride}

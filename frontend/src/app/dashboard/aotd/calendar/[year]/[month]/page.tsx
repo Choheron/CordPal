@@ -3,7 +3,7 @@
 import { Button } from "@heroui/button";
 import { Tooltip } from "@heroui/tooltip";
 
-import { getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/app/lib/aotd_utils"
+import { getAOtDByMonth } from "@/app/lib/aotd_utils"
 import { daysInMonth, monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
