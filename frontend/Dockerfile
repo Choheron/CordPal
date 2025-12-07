@@ -1,5 +1,5 @@
 # ==== BUILD STAGE ===================================================================
-FROM node:18-alpine AS build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 COPY package*.json ./
@@ -8,7 +8,7 @@ COPY . .
 RUN npm run build
 
 # ==== RUNTIME STAGE ===================================================================
-FROM node:18-alpine AS runtime
+FROM node:20-alpine AS runtime
 
 ENV NODE_ENV=production
 
