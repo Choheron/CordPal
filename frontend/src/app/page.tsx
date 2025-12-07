@@ -1,16 +1,21 @@
 'use server'
 
 import "@/app/globals.css";
+
+import { Alert } from "@heroui/alert";
+import { Button } from "@heroui/button";
+import { Link } from "@heroui/link";
+
 import { verifyAuth } from "./lib/discord_utils";
 import { redirect } from "next/navigation";
 import AboutBlock from "./ui/about/about_block";
-import { Alert, Button, Link } from "@heroui/react";
 import LoginModal from "./ui/login_modal";
 import { Conditional } from "./ui/dashboard/conditional";
 
 export default async function Home({ searchParams }) {
+  const { params } = await searchParams
   // Check if the redirect param exists
-  const redirectReason = searchParams.redirect
+  const redirectReason = params?.redirect
   // If user already has a session code/is already logged in, then redirect them to the dashboard page
   if((await verifyAuth())['valid']) {
     redirect('/dashboard');
@@ -26,20 +31,22 @@ export default async function Home({ searchParams }) {
           <div>
             <p>Login with:</p>
             <div className="flex flex-col gap-1 font-extralight">
-              <Button 
-                as={Link}
+              <Link
                 href={process.env.NEXT_PUBLIC_DISCORD_AUTH_URL}
-                radius="lg"
-                className={`w-fit hover:underline bg-black`}
-                variant="solid"
               >
-                <img 
-                  src={"/images/branding/Discord-Logo-Blurple.svg"}
-                  width={100}
-                  height="auto"
-                  className="p-2"
-                />
-              </Button>
+                <Button
+                  radius="lg"
+                  className={`w-fit hover:underline bg-black`}
+                  variant="solid"
+                >
+                  <img 
+                    src={"/images/branding/Discord-Logo-Blurple.svg"}
+                    width={100}
+                    height="auto"
+                    className="p-2"
+                  />
+                </Button>
+              </Link>
               <LoginModal 
                 isDisabled={(redirectReason == "DIS") ? true : false}
               />

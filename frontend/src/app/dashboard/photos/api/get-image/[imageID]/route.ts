@@ -16,6 +16,7 @@ export async function GET(
 
   if (cached) {
     console.log(`Photoshop cache hit for ID: ${imageID}`)
+    // @ts-expect-error
     return new NextResponse(cached, {
       status: 200,
       headers: {

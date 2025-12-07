@@ -1,9 +1,11 @@
 "use client"
 
+import { Button, Popover, PopoverContent, PopoverTrigger, Tooltip } from "@heroui/react"
+
 // Make use of Emoji Mart from: https://github.com/missive/emoji-mart 
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
-import { Button, Popover, PopoverContent, PopoverTrigger, Tooltip } from "@heroui/react"
+
 import { useState } from 'react'
 import { RiAddCircleFill, RiAddCircleLine, RiAddFill, RiAddLine, RiUserSmileFill, RiUserSmileLine } from 'react-icons/ri'
 

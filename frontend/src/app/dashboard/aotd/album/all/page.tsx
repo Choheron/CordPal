@@ -8,7 +8,12 @@ import {
   TableRow,
   TableCell
 } from "@heroui/table";
-import { Avatar, Button, Spinner, Input, Checkbox } from "@heroui/react";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
+import { Spinner } from "@heroui/spinner";
+import { Input } from "@heroui/input";
+import { Checkbox } from "@heroui/checkbox";
+
 import React from "react";
 import { useRouter } from 'next/navigation';
 import { getAllAlbums, getAllAlbumsNoCache } from "@/app/lib/aotd_utils";
@@ -18,7 +23,6 @@ import { Conditional } from "@/app/ui/dashboard/conditional";
 import ClientTimestamp from "@/app/ui/general/client_timestamp";
 import UserDropdown from "@/app/ui/general/userUiItems/user_dropdown";
 import PageTitle from "@/app/ui/dashboard/page_title";
-import { list } from "postcss";
 
 
 // Page to display a table containing all albums
@@ -180,23 +184,25 @@ export default function Page() {
       case "title":
         return (
           <div className="w-[400px]">
-            <Button 
-              as={Link}
-              prefetch={false}
+            <Link
               href={"/dashboard/aotd/album/" + album['album_id']}
-              radius="lg"
-              className={`relative w-full max-w-full justify-start h-fit px-0 hover:underline text-white py-1`}
-              variant="light"
+              prefetch={false}
             >
-              <Avatar
-                src={`/dashboard/aotd/api/album-cover/${album['album_id']}`}
-                className='my-auto shrink-0'
-                radius="sm"
-              />
-              <p className="w-fit text-lg hover:underline max-w-lg text-ellipsis">
-                {album['title']}
-              </p>
-            </Button>
+              <Button
+                radius="lg"
+                className={`relative w-full max-w-full justify-start h-fit px-0 hover:underline text-white py-1`}
+                variant="light"
+              >
+                <Avatar
+                  src={`/dashboard/aotd/api/album-cover/${album['album_id']}`}
+                  className='my-auto shrink-0'
+                  radius="sm"
+                />
+                <p className="w-fit text-lg hover:underline max-w-lg text-ellipsis">
+                  {album['title']}
+                </p>
+              </Button>
+            </Link>
           </div>
         );
       case "artist":
@@ -241,15 +247,18 @@ export default function Page() {
         const dateArr = ((album['last_aotd'] != null) ? album['last_aotd'].split("-") : null)
         return (
           (album['last_aotd'] != null) ? (
-            <Button 
-              as={Link}
+            <Link
               href={`/dashboard/aotd/calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`}
-              radius="lg"
-              className={`w-full mx-auto hover:underline text-white`}
-              variant="solid"
+              prefetch={false}
             >
-              <b>{(album['last_aotd'] != null) ? album['last_aotd'] : "N/A"}</b>
-            </Button> 
+              <Button
+                radius="lg"
+                className={`w-full mx-auto hover:underline text-white`}
+                variant="solid"
+              >
+                <b>{(album['last_aotd'] != null) ? album['last_aotd'] : "N/A"}</b>
+              </Button> 
+            </Link>
           ):(
             <></>
           )

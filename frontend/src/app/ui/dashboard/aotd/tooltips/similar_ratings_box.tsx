@@ -1,7 +1,8 @@
 'use client'
 
-import ClientTimestamp from "@/app/ui/general/client_timestamp";
 import { Avatar, Button, Divider, Tooltip } from "@heroui/react";
+
+import ClientTimestamp from "@/app/ui/general/client_timestamp";
 import Link from "next/link";
 
 // GUI Display for albums that the user has rated similarly
@@ -28,20 +29,22 @@ export default function SimilarRatingsBox(props) {
         
         <div key={index} className={`py-2`}>
           <Tooltip content={album['title']} >
-            <Button 
-              as={Link}
+            <Link
               href={"/dashboard/aotd/album/" + album['mbid']}
-              radius="sm"
-              className={`h-fit w-fit text-white px-0 hover:scale-110 pointer-events-auto`}
-              variant="light"
             >
-              <Avatar 
-                src={album['cover_url']} 
-                name={album['title']}
-                className="w-20 h-20 text-large -mx-1"
+              <Button 
                 radius="sm"
-              />
-            </Button>
+                className={`h-fit w-fit text-white px-0 hover:scale-110 pointer-events-auto`}
+                variant="light"
+              >
+                <Avatar 
+                  src={album['cover_url']} 
+                  name={album['title']}
+                  className="w-20 h-20 text-large -mx-1"
+                  radius="sm"
+                />
+              </Button>
+            </Link>
           </Tooltip>
         </div>
       )

@@ -8,8 +8,11 @@ import {
   ModalFooter,
   useDisclosure
 } from "@heroui/modal";
-import { Alert, Button, Spinner } from "@heroui/react";
-import {Input} from "@heroui/react";
+import { Alert } from "@heroui/alert";
+import { Button } from "@heroui/button";
+import { Spinner } from "@heroui/spinner";
+import { Input } from "@heroui/input";
+
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { Conditional } from "./dashboard/conditional";

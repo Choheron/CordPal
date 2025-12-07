@@ -1,9 +1,12 @@
 "use server"
 
+import { Avatar } from "@heroui/avatar";
+import { Divider } from "@heroui/divider";
+import { Tooltip } from "@heroui/tooltip";
+
 import { CSSProperties } from "react";
 import { scaleTime, scaleLinear, max, line as d3_line, curveMonotoneX, timeHour } from "d3";
 import { DateTime } from "luxon";
-import { Avatar, Divider, Tooltip } from "@heroui/react";
 import { getUserAvatarURL } from "@/app/lib/user_utils";
 import { Conditional } from "../../../conditional";
 import { ratingToTailwindBgColor, ratingToTailwindTextColor } from "@/app/lib/utils";

@@ -22,6 +22,7 @@ export async function GET(
 
   if (cached) {
     console.log(`Cover art cache hit for mbid: ${mbid}`)
+    // @ts-expect-error
     return new NextResponse(cached, {
       status: 200,
       headers: {

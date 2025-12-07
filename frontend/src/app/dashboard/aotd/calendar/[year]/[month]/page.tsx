@@ -1,12 +1,14 @@
 "use server"
 
-import { getAOtDByMonth, getReviewStatsByMonth, getSubmissionsByMonth } from "@/app/lib/aotd_utils"
+import { Button } from "@heroui/button";
+import { Tooltip } from "@heroui/tooltip";
+
+import { getAOtDByMonth } from "@/app/lib/aotd_utils"
 import { daysInMonth, monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import MinimalAlbumDisplay from "@/app/ui/dashboard/aotd/minimal_album_display"
 import MonthlyStatsBox from "@/app/ui/dashboard/aotd/statistics_displays/monthly_stats_box"
-import { Button, Tooltip } from "@heroui/react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { RiArrowLeftCircleLine, RiArrowRightCircleLine, RiThumbDownFill, RiThumbUpFill, RiVipCrownFill } from "react-icons/ri"
@@ -177,35 +179,41 @@ export default async function Page({
     <div className="flex flex-col w-full max-w-full 2xl:w-3/4 mx-auto items-center p-3 pb-36 pt-10 ">
       <PageTitle text={`Historical Daily Albums for ${monthName} ${year}`} />
       <div className="flex w-full justify-between">
-        <Button 
-          as={Link}
+        <Link
           href={`/dashboard/aotd/calendar/${lastMonth.getFullYear()}/${padNumber(Number(lastMonth.getMonth()) + 1)}`}
-          radius="lg"
-          // An empty AOTD data month will not have a 'stats' key
-          className={`${(Object.keys(lastMonthAotdData).indexOf('stats') == -1) ? "invisible" : ""} w-fit hover:underline text-white`}
-          variant="solid"
         >
-          <RiArrowLeftCircleLine className="text-2xl" />
-        </Button>
-        <Button 
-          as={Link}
-          prefetch={false}
+          <Button
+            radius="lg"
+            // An empty AOTD data month will not have a 'stats' key
+            className={`${(Object.keys(lastMonthAotdData).indexOf('stats') == -1) ? "invisible" : ""} w-fit hover:underline text-white`}
+            variant="solid"
+          >
+            <RiArrowLeftCircleLine className="text-2xl" />
+          </Button>
+        </Link>
+        <Link
           href={`/dashboard/aotd/calendar/${year}`}
-          radius="lg"
-          className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
-          variant="solid"
+          prefetch={false}
         >
-          <b>View all of {year}</b>
-        </Button>
-        <Button 
-          as={Link}
+          <Button
+            radius="lg"
+            className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+            variant="solid"
+          >
+            <b>View all of {year}</b>
+          </Button>
+        </Link>
+        <Link
           href={`/dashboard/aotd/calendar/${nextMonth.getFullYear()}/${padNumber(nextMonth.getMonth() + 1)}`}
-          radius="lg"
-          className={`${(currMonth) ? "invisible" : ""} w-fit hover:underline text-white `}
-          variant="solid"
         >
-          <RiArrowRightCircleLine className="text-2xl" />
-        </Button>
+          <Button
+            radius="lg"
+            className={`${(currMonth) ? "invisible" : ""} w-fit hover:underline text-white `}
+            variant="solid"
+          >
+            <RiArrowRightCircleLine className="text-2xl" />
+          </Button>
+        </Link>
       </div>
       <table className="w-full h-full table-fixed mx-auto sm:border-separate">
         <thead>

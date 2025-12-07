@@ -1,15 +1,18 @@
 "use server"
 
-import { getAlbumAvgRating, getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData } from "@/app/lib/aotd_utils"
+import { Alert } from "@heroui/alert"
+import { Button } from "@heroui/button"
+import { Divider } from "@heroui/divider"
+
+import { getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData } from "@/app/lib/aotd_utils"
 import { getNextDay, getPrevDay, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/aotd/album_display"
 import ReviewDisplay from "@/app/ui/dashboard/aotd/review_display"
 import { AOtDScoreTimelineLineChart } from "@/app/ui/dashboard/aotd/statistics_displays/charts/aotd_score_timeline_linechart"
-import { Alert, Badge, Button, Divider } from "@heroui/react"
 import Link from "next/link"
-import { RiArrowLeftCircleFill, RiArrowLeftCircleLine, RiArrowRightCircleLine, RiCalendar2Fill } from "react-icons/ri"
+import { RiArrowLeftCircleLine, RiArrowRightCircleLine, RiCalendar2Fill } from "react-icons/ri"
 
 // Page to display historial data for an specific date
 export default async function Page({
@@ -62,35 +65,41 @@ export default async function Page({
           <div className="backdrop-blur-2xl px-3 py-3 my-2 mx-auto rounded-2xl bg-zinc-800/30 border border-neutral-800">
             <div className="mx-1 mt-1 mb-4 flex justify-between w-full">
               {/* Previous Day Button */}
-              <Button 
-                as={Link}
+              <Link
                 href={`/dashboard/aotd/calendar/${prevDay.getFullYear()}/${padNumber(prevDay.getMonth() + 1)}/${padNumber(prevDay.getDate())}`}
-                radius="full"
-                className={`w-fit hover:underline text-white`}
-                variant="solid"
               >
-                <RiArrowLeftCircleLine className="text-2xl" />
-              </Button>
+                <Button
+                  radius="full"
+                  className={`w-fit hover:underline text-white`}
+                  variant="solid"
+                >
+                  <RiArrowLeftCircleLine className="text-2xl" />
+                </Button>
+              </Link>
               {/* Month View Button */}
-              <Button 
-                as={Link}
+              <Link
                 href={`/dashboard/aotd/calendar/${year}/${month}`}
-                radius="full"
-                className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
-                variant="solid"
               >
-                <RiCalendar2Fill className="text-2xl"/>
-              </Button>
+                <Button
+                  radius="full"
+                  className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+                  variant="solid"
+                >
+                  <RiCalendar2Fill className="text-2xl"/>
+                </Button>
+              </Link>
               {/* Next Day Button */}
-              <Button
-                as={Link}
+              <Link
                 href={`/dashboard/aotd/calendar/${nextDay.getFullYear()}/${padNumber(nextDay.getMonth() + 1)}/${padNumber(nextDay.getDate())}`}
-                radius="full"
-                className={`${(isToday) ? 'invisible' : ''} w-fit hover:underline text-white`}
-                variant="solid"
               >
-                <RiArrowRightCircleLine className="text-2xl" />
-              </Button> 
+                <Button
+                  radius="full"
+                  className={`${(isToday) ? 'invisible' : ''} w-fit hover:underline text-white`}
+                  variant="solid"
+                >
+                  <RiArrowRightCircleLine className="text-2xl" />
+                </Button> 
+              </Link>
             </div>
             <Conditional showWhen={albumOfTheDayObj['manually_selected'] && albumOfTheDayObj['admin_message']}>
               <Alert
@@ -134,16 +143,18 @@ export default async function Page({
               </div>
             </div>
             <div className="flex justify-around mt-4">
-              <Button 
-                as={Link}
+              <Link
                 href={"/dashboard/aotd/album/" + albumData("album_id")}
-                radius="lg"
-                className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
-                variant="solid"
-                isDisabled={albumData("album_id") == null}
               >
-                <b>Album Page</b>
-              </Button> 
+                <Button 
+                  radius="lg"
+                  className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+                  variant="solid"
+                  isDisabled={albumData("album_id") == null}
+                >
+                  <b>Album Page</b>
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="backdrop-blur-2xl px-2 py-2 my-2 mx-auto rounded-2xl bg-zinc-800/30 border border-neutral-800">
@@ -165,15 +176,17 @@ export default async function Page({
             />
           </div>
         </Conditional>
-        <Button 
-          as={Link}
+        <Link
           href={"/dashboard/aotd"}
-          radius="lg"
-          className="w-fit mx-auto hover:underline" 
-          variant="bordered"
         >
-          Return to Main Page
-        </Button> 
+          <Button 
+            radius="lg"
+            className="w-fit mx-auto hover:underline" 
+            variant="bordered"
+          >
+            Return to Main Page
+          </Button>
+        </Link>
       </div>
     </div>    
   )

@@ -1,9 +1,9 @@
 'use server'
 
-import {User} from "@heroui/user";
+import { User } from "@heroui/user";
+import { Badge } from "@heroui/badge";
 
 import { getUserData, getUserAvatarURL, isUserOnline } from "@/app/lib/user_utils";
-import { Badge } from "@heroui/react";
 import { onlineStatusToTailwindBgColor } from "@/app/lib/utils";
 
 // GUI Representation for a single user

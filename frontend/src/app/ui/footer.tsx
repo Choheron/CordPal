@@ -1,4 +1,6 @@
-import { Divider, Image } from "@heroui/react"
+import { Divider } from "@heroui/divider"
+
+import Image from "next/image"
 
 export default function Footer(props) {
   const currYear = new Date().getFullYear()
@@ -36,8 +38,8 @@ export default function Footer(props) {
             <Image 
               src="/images/branding/MusicBrainz_logo_square.svg" 
               alt="MusicBrainz Logo" 
-              height="auto"
-              width="30px"
+              height={30}
+              width={30}
               className="text-center"
             />
           </a>

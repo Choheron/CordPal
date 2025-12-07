@@ -1,7 +1,7 @@
 import { getReviewsForAlbum, getAotdUserCount, getAotdData } from "@/app/lib/aotd_utils";
 import ReviewAvatarCard from "./review_avatar_card";
 import { Conditional } from "../conditional";
-import { Alert } from "@heroui/react";
+import { Alert } from "@heroui/alert";
 
 // GUI Display for reviews of an album
 // Expected Props:

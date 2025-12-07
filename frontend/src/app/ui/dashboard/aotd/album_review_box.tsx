@@ -1,12 +1,13 @@
 'use client'
 
+import { Accordion, AccordionItem, addToast, Button, Divider, Switch, Tooltip } from "@heroui/react";
+import { Slider, Checkbox } from "@heroui/react";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Router from "next/router"
 
-import { Accordion, AccordionItem, addToast, Button, Divider, Switch, Tooltip } from "@heroui/react";
 import ReviewTipTap from "../../general/input/Tiptap";
-import { Slider, SliderValue, Select, SelectItem, Checkbox } from "@heroui/react";
 import { setReviewCookie, submitReviewToBackend } from "@/app/lib/aotd_utils";
 import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 import { Conditional } from "../conditional";

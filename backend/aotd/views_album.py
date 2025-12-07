@@ -494,7 +494,7 @@ def getUserAlbumsStats(request: HttpRequest, user_discord_id: str | None = None)
   userData['submission_count'] = Album.objects.filter(submitted_by=spotUser.user).count()
   userData['aotd_count'] = DailyAlbum.objects.filter(album__submitted_by=spotUser.user).count()
   try:
-    last_selected_date = DailyAlbum.objects.filter(album__submitted_by=spotUser.user).order_by("-date").first().date
+    last_selected_date = DailyAlbum.objects.filter(album__submitted_by=spotUser.user).filter(date__lte=datetime.datetime.now(tz=pytz.timezone('America/Chicago'))).order_by("-date").first().date
     time_since_last_selection: timedelta = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date() - last_selected_date
     userData['last_selected_date'] = last_selected_date.strftime("%Y-%m-%d")
     userData['days_since_selected'] = time_since_last_selection.days

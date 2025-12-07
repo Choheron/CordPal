@@ -1,6 +1,6 @@
 "use server"
 
-import { revalidateTag } from "next/cache";
+import { revalidateTag, updateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 // Below Code allows for serverside computing of cookie stuff!
@@ -104,7 +104,7 @@ export async function uploadImageToBackend(formData) {
     body: formData,
   });
   // Revalidate photoshops tag
-  revalidateTag('all_photoshops')
+  updateTag('all_photoshops')
   return {
     status: uploadResponse.status,
     crid: uploadResponse.headers.get("X-CRID")

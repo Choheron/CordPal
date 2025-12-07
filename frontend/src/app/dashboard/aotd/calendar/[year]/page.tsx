@@ -1,12 +1,14 @@
+import { Button } from "@heroui/button";
+import { Tooltip } from "@heroui/tooltip";
+
 import { getAOtDByMonth } from "@/app/lib/aotd_utils";
 import { monthToWeekArray } from "@/app/lib/calendar_utils";
 import { daysInMonth, monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import MinimalAlbumDisplay from "@/app/ui/dashboard/aotd/minimal_album_display";
 import { Conditional } from "@/app/ui/dashboard/conditional";
 import PageTitle from "@/app/ui/dashboard/page_title";
-import { Button, Tooltip } from "@heroui/react";
 import Link from "next/link";
-import { RiThumbDownFill, RiThumbUpFill } from "react-icons/ri";
+import { RiThumbDownFill, RiThumbUpFill, RiArrowLeftCircleLine, RiArrowRightCircleLine } from "react-icons/ri";
 
 
 export default async function Page({
@@ -23,6 +25,9 @@ export default async function Page({
   }
   // Parse year from URL
   const { year } = (await params)
+  // Get last and next year
+  const lastYear = (parseInt(year) - 1)
+  const nextYear = (parseInt(year) + 1)
   // Create new Date object
   const yearDate = new Date(year)
   // Get Today's Date
@@ -71,6 +76,7 @@ export default async function Page({
                 showAlbumRating={false}
                 title={"Future Album"}
                 album_img_src={`https://www.placemonkeys.com/500?greyscale&random=${dateArr[2]}`}
+                buttonUrlOverride={ {} }
                 artist={{'name': "Monke"}}
                 sizingOverride="w-full h-full aspect-square"
                 albumCoverOverride="rounded-b-2xl"
@@ -116,7 +122,7 @@ export default async function Page({
                 historical_date={albumGet('date')}
                 sizingOverride="w-full h-full aspect-square"
                 albumCoverOverride="rounded-b-2xl"
-                buttonUrlOverride={`/dashboard/aotd/calendar/${year}/${month.month_number}/${padNumber(dateArr[2])}`}
+                buttonUrlOverride={(albumGet("submitter") != null) ? `/dashboard/aotd/calendar/${year}/${month.month_number}/${padNumber(dateArr[2])}` : {}}
                 titleTextOverride="text-center text-xl 2xl:text-2xl text-wrap line-clamp-2"
                 artistTextOverride="text-center text-sm 2xl:text-xl italic text-wrap"
                 starTextOverride="text-base 2xl:text-2xl"
@@ -169,21 +175,59 @@ export default async function Page({
   return(
     <div className="w-full">
       <PageTitle text={`Historical Daily Albums for ${year}`} />
+      {/* Year Nagivation Links */}
+      <div className="flex justify-between px-3 -mt-10">
+        {/* Previous Year */}
+        <Link
+          href={`/dashboard/aotd/calendar/${lastYear}/`}
+          prefetch={false}
+        >
+          <Button
+            radius="lg"
+            className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+            variant="solid"
+            isDisabled={false}
+          >
+            <RiArrowLeftCircleLine className="text-2xl" />
+            <p>{lastYear}</p>
+          </Button>
+        </Link>
+        {/* Next Year */}
+        <Conditional showWhen={nextYear <= today.getFullYear()}>
+          <Link
+            href={`/dashboard/aotd/calendar/${nextYear}/`}
+            prefetch={false}
+          >
+            <Button
+              radius="lg"
+              className={`w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+              variant="solid"
+              isDisabled={nextYear > today.getFullYear()}
+            >
+              <p>{nextYear}</p>
+              <RiArrowRightCircleLine className="text-2xl" />
+            </Button>
+          </Link>
+        </Conditional>
+      </div>
+      {/* Month by month display */}
       <div className="flex flex-col sm:flex-row flex-wrap">
         {yearData.map((month, index) => {
           return (
             <div className="w-full sm:w-1/3 3xl:w-1/4 px-2 py-4" key={index}>
-              <Button 
-                as={Link}
-                prefetch={false}
+              <Link
                 href={`/dashboard/aotd/calendar/${year}/${month.month_number}`}
-                radius="lg"
-                className={`w-full hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
-                variant="solid"
-                isDisabled={month.aotd_data['stats'] == null}
+                prefetch={false}
               >
-                <p>{month.month}</p>
-              </Button>
+                <Button
+                  radius="lg"
+                  className={`w-full hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
+                  variant="solid"
+                  isDisabled={month.aotd_data['stats'] == null}
+                >
+                  <p>{month.month}</p>
+                </Button>
+              </Link>
               <div>
                 {genMonth(month)}
               </div>

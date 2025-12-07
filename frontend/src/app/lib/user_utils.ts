@@ -203,7 +203,7 @@ export async function updateUserData(updatedJSON) {
     }
   });
   // Revalidate User Data
-  revalidateTag('user-data')
+  revalidateTag('user-data', "max")
   // Return json
   return await userDataResponse.json();
 }
@@ -382,7 +382,7 @@ export async function updateUserPassword(updateBody) {
   const status = updateUserPasswordResponse.status
   const data = await updateUserPasswordResponse.json()
   // Revalidate user data
-  revalidateTag('user-data')
+  revalidateTag('user-data', "max")
   // Return
   return ({"code": status, "data": data})
 }
