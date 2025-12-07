@@ -31,7 +31,7 @@ export default function TopBar(props) {
     { name: 'Photoshops', href: '/dashboard/photos', conditional: props['isMember'], disabled: false, icon: <RiImageLine /> },
     { name: 'Quotes', href: '/dashboard/quotes', conditional: props['isMember'], disabled: false, icon: <RiQuillPenLine /> },
     { name: 'Album Of the Day', href: '/dashboard/aotd', conditional: props['isMember'], disabled: false, icon: <RiAlbumLine /> },
-    { name: 'Functionality Requests', href: '/dashboard/fr', conditional: props['isMember'], disabled: true, icon: <RiSettings3Line /> },
+    // { name: 'Functionality Requests', href: '/dashboard/fr', conditional: props['isMember'], disabled: true, icon: <RiSettings3Line /> },
     { name: 'About', href: '/dashboard/about', conditional: true, disabled: false, icon: <RiInformationLine /> },
   ];
 
