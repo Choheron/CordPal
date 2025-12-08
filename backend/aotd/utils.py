@@ -356,6 +356,12 @@ def get_album_from_mb(mbid: str) -> Album:
   }
   response = requests.get(url, params=params, headers=headers)
   data = response.json()
+  # Parse full track list
+  track_list = []
+  # Iterate each side/disk of the release
+  for grouping in data['media']:
+    for track in grouping['tracks']:
+      track_list.append(track)
   # Create Album Object
   newAlbum = Album(
     mbid=data['id'],
@@ -368,7 +374,7 @@ def get_album_from_mb(mbid: str) -> Album:
     release_date=parseReleaseDate(data['date']),
     release_date_str=data['date'],
     raw_data=data,
-    track_list={ 'tracks': data['media'][0]['tracks'] },
+    track_list=track_list,
   )
   # Return 
   return newAlbum
