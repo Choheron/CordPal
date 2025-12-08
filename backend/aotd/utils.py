@@ -360,6 +360,8 @@ def get_album_from_mb(mbid: str) -> Album:
   track_list = []
   # Iterate each side/disk of the release
   for grouping in data['media']:
+    if 'tracks' not in grouping.keys():
+      continue
     for track in grouping['tracks']:
       track_list.append(track)
   # Create Album Object

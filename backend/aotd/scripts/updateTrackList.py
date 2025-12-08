@@ -27,7 +27,7 @@ def run():
       failed_albums.append((album, e))
       continue
   
-  print(f"Album updates completed! Printing failed list of length {len(fail_data)} now:")
+  print(f"Album updates completed! Printing failed list of length {len(failed_albums)} now:")
   fail_data: tuple[Album, Exception]
   for fail_data in failed_albums:
     fail = fail_data[0]
