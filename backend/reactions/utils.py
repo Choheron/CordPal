@@ -9,10 +9,11 @@ from .models import Reaction
 logger = logging.getLogger()
 
 
-def createReaction(target_obj, user: User, emoji):
+def createReaction(target_obj, user: User, emoji, custom: bool):
   """Create a reaction attached to the passed in object"""
   logger.debug("Attempting to create a reaction...")
   reaction: Reaction = target_obj.reactions.create(
     user=user,
     emoji=emoji,
+    custom_emoji=custom,
   )

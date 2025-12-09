@@ -12,7 +12,6 @@ import { setReviewCookie, submitReviewToBackend } from "@/app/lib/aotd_utils";
 import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 import { Conditional } from "../conditional";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
-import InfoPopover from "../../general/info_popover";
 
 
 // GUI Display for an Album Review Box

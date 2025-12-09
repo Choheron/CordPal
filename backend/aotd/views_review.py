@@ -498,7 +498,7 @@ def submitReviewReaction(request: HttpRequest):
         raise Exception(f"Reaction with emoji {reqBody['emoji']} by {user.nickname} already exists for review {review.pk}")
     except Reaction.DoesNotExist as e:
       # Create a new reaction
-      createReaction(review, user, reqBody['emoji'])
+      createReaction(review, user, reqBody['emoji'], reqBody['custom'])
     # Return success object 
     return HttpResponse(status=200)
   except Exception as e:

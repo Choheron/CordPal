@@ -4,6 +4,7 @@ import { Color } from '@tiptap/extension-color'
 import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
 import Youtube from '@tiptap/extension-youtube'
+import Image from '@tiptap/extension-image'
 import { EditorProvider, useCurrentEditor, Extension } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { useEffect, useState } from 'react'
@@ -233,7 +234,10 @@ export default function TipTap(props) {
       nocookie: false,
       width: 300,
       height: 168.75
-    })
+    }),
+    Image.configure({
+      inline: true,
+    }),
   ]
 
   // =============================================================================================================================
@@ -246,8 +250,13 @@ export default function TipTap(props) {
     const addEmoji = (emojiObj) => {
       if (!editor) return
       // Set editor to content + new emoji
-      // setContent(content + `${emojiObj.native}`)
-      editor.commands.insertContent(`${emojiObj.native}`)
+      // If there is a native object, it is not a custom emoji
+      if(emojiObj.native != undefined) {
+        editor.commands.insertContent(`${emojiObj.native}`)
+      }
+      else {
+        editor.commands.insertContent(`<img src="${emojiObj.src}" />`)
+      }
     }
 
     return (

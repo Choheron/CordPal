@@ -17,6 +17,22 @@ export default function EmojiMartButton(props) {
   // Control hover and open
   const [isHover, setIsHover] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  // Custom Emojis
+  const custom = [
+    {
+      id: 'discord',
+      name: 'Discord',
+      emojis: [
+        {
+          id: 'tfw',
+          name: 'TFW',
+          keywords: ['tfw', 'knee surgery'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/1310014250789371976.webp?size=40' }],
+        },
+      ],
+    }
+  ]
+
 
   
   return (
@@ -45,6 +61,7 @@ export default function EmojiMartButton(props) {
         <Picker 
           data={data} 
           onEmojiSelect={props.selectionCallback}
+          custom={custom}
         />
       </PopoverContent>
     </Popover>

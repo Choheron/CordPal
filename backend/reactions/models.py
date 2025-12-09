@@ -14,7 +14,7 @@ class Reaction(models.Model):
   object_id = models.PositiveIntegerField()
   content_object = GenericForeignKey("content_type", "object_id")
   # Model Specific Fields
-  emoji = models.CharField(max_length=100)
+  emoji = models.CharField(max_length=255)
   creation_timestamp = models.DateTimeField(auto_now_add=True)
   custom_emoji = models.BooleanField(default=False)
 

@@ -26,8 +26,9 @@ export default function ReviewEmojiMartClientWrapper(props) {
   const handleSelection = async (emojiObj) => {
     const reviewReactionObj = {
       "id": reviewID,
-      "emoji": emojiObj.native,
-      "album_mbid": albumMbid 
+      "emoji": (emojiObj.native) ? emojiObj.native : emojiObj.src,
+      "album_mbid": albumMbid,
+      "custom": (emojiObj.native) ? false : true,
     }
     const status = await addReviewReaction(reviewReactionObj)
     // If successful, retrieve review data again
@@ -74,6 +75,16 @@ export default function ReviewEmojiMartClientWrapper(props) {
     return false
   }
 
+  const displayEmoji = (emojiObj, imgWidth = "20px") => {
+    if(emojiObj['custom_emoji'] == true) {
+      return (
+        <img src={emojiObj['emoji']} width={imgWidth}/>
+      )
+    } else {
+      return (emojiObj['emoji'])
+    }
+  }
+
   return (
     <>
       {/* Reaction UI */}
@@ -94,7 +105,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
                 content={
                   <div className="flex flex-col">
                     <p className="mx-auto text-2xl" >
-                      {emojiGroup['emoji']}
+                      {displayEmoji(emojiGroup['objects'][0], "40px")}
                     </p>
                     {emojiGroup['objects'].map((obj, index) => {
                       return (
@@ -109,7 +120,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
                   className={`rounded-xl flex gap-1 px-2 py-1 border ${(didThisReact) ? "bg-blue-700/50 border-blue-500" : "bg-slate-700/50 border-slate-500"} hover:cursor-pointer hover:scale-105`}
                   onClick={() => handleClick(emojiGroup, didThisReact)}
                 >
-                  <p className="text-base">{emojiGroup['emoji']}</p>
+                  <p className="text-base h-fit my-auto">{displayEmoji(emojiGroup['objects'][0])}</p>
                   <p className="text-xs my-auto">{emojiGroup['count']}</p>
                 </div>
               </Tooltip>
