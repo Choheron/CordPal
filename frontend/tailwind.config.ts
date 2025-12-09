@@ -53,6 +53,11 @@ const config: Config = {
                 marginBottom: ".1rem",
               },
             },
+            '.customEmoji': {
+              height: '20px',
+              display: "inline",
+              margin: "0px"
+            },
           }
         },
         DEFAULT: { // This is for default prose class

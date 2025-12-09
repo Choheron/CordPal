@@ -4,7 +4,7 @@ import { Color } from '@tiptap/extension-color'
 import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
 import Youtube from '@tiptap/extension-youtube'
-import Image from '@tiptap/extension-image'
+import { CustomImage } from './replacers/customImage'
 import { EditorProvider, useCurrentEditor, Extension } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { useEffect, useState } from 'react'
@@ -235,7 +235,7 @@ export default function TipTap(props) {
       width: 300,
       height: 168.75
     }),
-    Image.configure({
+    CustomImage.configure({
       inline: true,
     }),
   ]
@@ -255,7 +255,15 @@ export default function TipTap(props) {
         editor.commands.insertContent(`${emojiObj.native}`)
       }
       else {
-        editor.commands.insertContent(`<img src="${emojiObj.src}" />`)
+        // insert image node with attrs; this uses the schema and preserves attributes
+        editor.chain().focus().insertContent({
+          type: 'image',
+          attrs: {
+            src: emojiObj.src,
+            class: 'customEmoji',
+            alt: emojiObj.name || 'emoji'
+          }
+        }).run()
       }
     }
 
