@@ -18,14 +18,14 @@ export default function PhotoGallery(props) {
   const loadImages = () => {
     const fileList = fileListString.split(',')
     // Cut list into 3 different columns (into a terribly named var)
-    var fileListList: any[] = [[],[],[]]
+    var fileListList: any[] = [[],[],[],[]]
     for (let i = 0; i < fileList.length; i++) {
       // Show images in reverse order (newest uploads first)
       const photoindex = (fileList.length - (i + 1))
       var listIndex = 0
       if(windowWidth >= 1024) {
         // Show images newest from top left to bottom right (Otherwise put them all in the same list)
-        listIndex = (i - 1) % 3
+        listIndex = (i - 1) % 4
       }
       if(fileList[photoindex] == "") {
         continue
@@ -34,8 +34,10 @@ export default function PhotoGallery(props) {
         fileListList[0].push(fileList[photoindex])
       }else if(listIndex == 1) {
         fileListList[1].push(fileList[photoindex])
-      } else {
+      } else if(listIndex == 2) {
         fileListList[2].push(fileList[photoindex])
+      } else {
+        fileListList[3].push(fileList[photoindex])
       }
     }
 
