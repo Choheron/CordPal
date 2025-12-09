@@ -53,6 +53,12 @@ export default function EmojiMartButton(props) {
           keywords: ['rat', 'propellar', 'propellarRat'],
           skins: [{ src: 'https://cdn.discordapp.com/emojis/1410019637579485344.webp?size=40' }],
         },
+        {
+          id: 'gigachad',
+          name: 'gigachad',
+          keywords: ['gigachad', 'giga', 'chad'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/926282130890293298.webp?size=40' }],
+        },
       ],
     }
   ]
