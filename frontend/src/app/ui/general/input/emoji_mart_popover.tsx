@@ -20,8 +20,8 @@ export default function EmojiMartButton(props) {
   // Custom Emojis
   const custom = [
     {
-      id: 'discord',
-      name: 'Discord',
+      id: 'custom',
+      name: 'Custom',
       emojis: [
         {
           id: 'tfw',
@@ -62,6 +62,20 @@ export default function EmojiMartButton(props) {
       ],
     }
   ]
+  // Emoji Categories
+  const categories = [
+    "frequent", 
+    "custom",
+    "people", 
+    "nature", 
+    "foods", 
+    "activity", 
+    "places", 
+    "objects", 
+    "symbols", 
+    "flags"
+  ]
+
 
 
   
@@ -92,6 +106,7 @@ export default function EmojiMartButton(props) {
           data={data} 
           onEmojiSelect={props.selectionCallback}
           custom={custom}
+          categories={categories}
         />
       </PopoverContent>
     </Popover>
