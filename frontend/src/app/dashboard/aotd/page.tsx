@@ -62,7 +62,7 @@ export default async function music() {
                   />
                 </div>
               </Conditional>
-              <div className={`h-full mb-2 ${(last_year_has_aotd) ? "max-h-[450px]" : ""}`}>
+              <div className={`h-full mb-2 ${(last_year_has_aotd) ? "md:max-h-[450px]" : ""}`}>
                 <RecentSubmissions 
                   albumList={recentSubmissionsResponse['album_list']} 
                   timestamp={recentSubmissionsResponse['timestamp']}

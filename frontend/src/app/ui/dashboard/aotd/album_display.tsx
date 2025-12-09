@@ -98,6 +98,7 @@ export default async function AlbumDisplay(props) {
             alt={`Album Cover for ${title} by ${artist_name}`}
             className='rounded-2xl mx-auto object-cover'
             fill={true}
+            unoptimized={true}
           />
         </Link>
         <div className="w-full max-w-full flex flex-col lg:gap-2 pl-2 lg:pl-4 pt-1 lg:pt-2 my-auto">

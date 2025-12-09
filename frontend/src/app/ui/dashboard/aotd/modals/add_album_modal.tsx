@@ -277,32 +277,36 @@ export default function AddAlbumModal(props) {
                     aria-label="Available Albums"
                     selectionMode="single"
                     onSelectionChange={setSelectedKey}
+                    className="max-h-[25vh] overflow-y-auto"
                   >
                     {(album) => (
+                      // Display each album in alist
                       <ListboxItem
                         key={album['id']}
                         className="my-1 rounded-xl bg-zinc-800/30 border border-neutral-800"
                       >
-                        <div className="flex">
+                        <div className="flex max-w-full">
                           <div className="shrink-0">
                             <Image
                               src={`/dashboard/aotd/api/album-cover/${album['release-group']['id']}`}
                               fallbackSrc="https://placehold.co/100x100?text=Cover+Not+Found"
                               alt={`Album Art for ${album['title']}`}
-                              width={100}
-                              height={100}
+                              width={50}
+                              height={50}
                               className="rounded-xl"
                             />
                           </div>
-                          <div className="flex flex-col ml-2">
+                          <div className="flex flex-col mx-2 w-full">
                             <div className="flex">
-                              <p className="text-2xl line-clamp-1">{album['title']}</p>
+                              <p className="text-lg line-clamp-1">{album['title']}</p>
                               <Conditional showWhen={album['disambiguation']}>
-                                <p className="text-sm my-auto ml-1 italic">&#40;{album['disambiguation']}&#41;</p>
+                                <p className="text-sm my-auto ml-1 italic line-clamp-1">&#40;{album['disambiguation']}&#41;</p>
                               </Conditional>
                             </div>
-                            <p className="text-base italic">{album['artist-credit'][0]['name']}</p>
-                            <p className="text-base italic">{album['date']}</p>
+                            <p className="text-sm italic">{album['artist-credit'][0]['name']}</p>
+                            <p className="text-sm italic">{album['date']}</p>
+                          </div>
+                          <div className="w-1/2">
                             <p className="text-sm">Type: {album['release-group']['primary-type']}</p>
                             <p className="text-sm">{album['track-count']} Tracks</p>
                           </div>
