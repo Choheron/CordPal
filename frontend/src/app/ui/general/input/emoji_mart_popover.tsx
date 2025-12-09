@@ -29,6 +29,30 @@ export default function EmojiMartButton(props) {
           keywords: ['tfw', 'knee surgery'],
           skins: [{ src: 'https://cdn.discordapp.com/emojis/1310014250789371976.webp?size=40' }],
         },
+        {
+          id: 'dogi',
+          name: 'dogi',
+          keywords: ['dogi', 'dog', 'sad'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/1430310636742774904.webp?size=40' }],
+        },
+        {
+          id: 'skynik',
+          name: 'soynik',
+          keywords: ['soy', 'nik', 'jak'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/1375613103089254461.webp?size=40' }],
+        },
+        {
+          id: 'cringe',
+          name: 'cringe',
+          keywords: ['cringe'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/1367864039639744523.webp?size=40' }],
+        },
+        {
+          id: 'propRat',
+          name: 'propellerRat',
+          keywords: ['rat', 'propellar', 'propellarRat'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/1410019637579485344.webp?size=40' }],
+        },
       ],
     }
   ]
