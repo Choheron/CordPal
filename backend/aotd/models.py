@@ -228,7 +228,8 @@ class Review(models.Model):
           rObj[reaction.emoji] = {
             "count": 1,
             "emoji": reaction.emoji,
-            "objects": [reaction.toJSON()]
+            "objects": [reaction.toJSON()],
+            "custom": reaction.custom_emoji
           }
       # Convert to list and attach to out obj
       outObj['reactions'] = list(rObj.values())

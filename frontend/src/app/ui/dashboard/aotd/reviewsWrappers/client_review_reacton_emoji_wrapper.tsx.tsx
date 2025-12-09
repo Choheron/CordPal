@@ -45,6 +45,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
       "emoji": emojiGroup['emoji'],
       "react_id": (removeReact) ? emojiGroup['objects'].find(obj => {return obj["user_id"] == userID})['id'] : "--",
       "album_mbid": albumMbid,
+      "custom": emojiGroup['custom'],
     }
     if(removeReact) {
       status = await deleteReviewReaction(reviewReactionObj)
