@@ -65,6 +65,12 @@ export default function EmojiMartButton(props) {
           keywords: ['gigachad', 'giga', 'chad'],
           skins: [{ src: 'https://cdn.discordapp.com/emojis/926282130890293298.webp?size=40' }],
         },
+        {
+          id: 'duckcock',
+          name: 'Duckcock',
+          keywords: ['duck', 'cock', 'duckcock'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/743581643662688367.webp?size=40' }],
+        },
       ],
     }
   ]

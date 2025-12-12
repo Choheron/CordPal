@@ -35,7 +35,7 @@ export default async function music() {
             {/* Left side Album of The Day Display */}
             <AlbumOfTheDayBox />
             {/* Right side prev year and recent submissions display*/}
-            <div className="max-w-full lg:max-w-[350px] flex flex-col">
+            <div className="max-w-full lg:w-[350px] flex flex-col">
               {/* Display the album from a year ago today if it exists */}
               <Conditional showWhen={last_year_has_aotd}>
                 <div className="h-fit p-3 rounded-2xl bg-zinc-800/30 border border-neutral-800 mt-2">

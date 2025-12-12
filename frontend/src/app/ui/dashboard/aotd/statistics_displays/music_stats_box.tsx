@@ -172,7 +172,7 @@ export default async function MusicStatsBox(props) {
             </p>
           </div>
           <Divider className="my-1" />
-          <div className="flex flex-col justify-between h-full">
+          <div className="flex flex-col justify-between h-full mr-2">
             <table className="table-fixed w-full">
               <thead>
                 <tr>
