@@ -376,7 +376,7 @@ def get_album_from_mb(mbid: str) -> Album:
     release_date=parseReleaseDate(data['date']),
     release_date_str=data['date'],
     raw_data=data,
-    track_list=track_list,
+    track_list={"tracks": track_list},
   )
   # Return 
   return newAlbum
