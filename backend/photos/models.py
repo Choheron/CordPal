@@ -34,7 +34,10 @@ class Image(models.Model):
     related_name="created_images"
   )
   # Tagged Users
-  tagged_users = models.ManyToManyField(User)
+  tagged_users = models.ManyToManyField(
+    User,
+    related_name="images_tagged_in"
+  )
   # Filename of the image
   filename = models.CharField(max_length=300)
   # Filetype of the image

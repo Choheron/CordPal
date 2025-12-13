@@ -29,5 +29,6 @@ urlpatterns = [
     path("aotd/", include('aotd.urls')),
     path("quotes/", include('quotes.urls')),
     path("tenor/", include('tenor.urls')),
+    path("playback/", include('playback.urls')),
     path('admin/', admin.site.urls),
 ]

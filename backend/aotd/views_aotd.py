@@ -8,7 +8,8 @@ from .utils import (
   checkSelectionFlag,
   getAotdUserObj,
   getAlbumRating,
-  generateDayRatingTimeline
+  generateDayRatingTimeline,
+  retrieveAlbumSTD
 )
 from .models import (
   Album,
@@ -138,10 +139,11 @@ def setAlbumOfDay(request: HttpRequest):
   albumOfTheDayObj.save()
   yesterday = day - datetime.timedelta(days=1)
   try:
-    # Attempt to get previous AOtD Object and generate a timeline, as well as store final rating for that album in the AOtD object
+    # Attempt to get previous AOtD Object and generate a timeline, as well as store final rating for that album in the AOtD object, also calculate standard deviation
     yesterday_aotd = DailyAlbum.objects.get(date=yesterday)
     generateDayRatingTimeline(yesterday_aotd)
     yesterday_aotd.rating = getAlbumRating(yesterday_aotd.album.mbid, False, yesterday.strftime("%Y-%m-%d"))
+    yesterday_aotd.standard_deviation = retrieveAlbumSTD(yesterday_aotd.album.mbid, yesterday.strftime("%Y-%m-%d"), True)
     yesterday_aotd.save()
   except:
     logger.error(f"ERROR IN GENERATING TIMELINE DATA FOR DATE: {yesterday.strftime('%Y-%m-%d')} TRACEBACK: {traceback.print_exc()}", extra={'crid': request.crid})

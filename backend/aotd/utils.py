@@ -1,6 +1,6 @@
 from django.http import HttpRequest
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Sum
+from django.db.models import Sum, StdDev
 
 import logging
 from dotenv import load_dotenv
@@ -12,6 +12,7 @@ import requests
 import pytz
 from django.utils.timezone import now
 from datetime import timedelta
+import numpy
 
 from users.models import User
 from .models import (
@@ -253,6 +254,8 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   total_reviews = all_reviews.count()
   # Get the score of all reviews
   review_sum = all_reviews.aggregate(Sum('score'))['score__sum']
+  # Get the standard deviation of all reviews from this user
+  review_stddev = all_reviews.aggregate(StdDev('score'))['score__stddev']
   # Calculate average review score
   average_review_score = review_sum/total_reviews
   # Calculate median review score
@@ -295,6 +298,7 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   aotdUserObj.missed_reviews = user_missed_review_count
   aotdUserObj.review_score_sum = review_sum
   aotdUserObj.average_review_score = average_review_score
+  aotdUserObj.review_score_stddev = review_stddev
   aotdUserObj.median_review_score = median_review_score
   aotdUserObj.first_listen_percentage = first_time_listen_percentage
   aotdUserObj.lowest_score_given = lowest_review_score
@@ -380,3 +384,36 @@ def get_album_from_mb(mbid: str) -> Album:
   )
   # Return 
   return newAlbum
+
+
+def retrieveAlbumSTD(mbid: str, date: str = None, force: bool = False) -> float:
+  '''
+  Retrieve album standard deviation from DB, if it is not yet stored, calculate it. 
+  
+  :param mbid: Album MBID
+  :type mbid: str
+  :param date: String date in the following format "%Y-%m-%d"
+  :type date: str
+  :return: Standard Deviation of the AotD
+  :rtype: float
+  '''
+   # If date is not provided grab the most recent date of AOtD
+  aotd_date = date if (date) else DailyAlbum.objects.filter(album__mbid=mbid).latest('date').date
+  # Get AOTD Object
+  aotdObj = DailyAlbum.objects.filter(album__mbid=mbid).get(date=aotd_date)
+  # Return stdev if its stored, if not we calculate and store it
+  if((not force) and (aotdObj.standard_deviation != None)):
+    return aotdObj.standard_deviation
+  # Get all ratings for an album
+  reviewList = Review.objects.filter(album__mbid=mbid).filter(aotd_date=aotd_date)
+  # If reviewlist is empty return 0.00'
+  standardDev = 0.00
+  if(len(reviewList) != 0):
+    # Iterate review list and get scores
+    reviewScores = [rev.score for rev in reviewList]
+    # Get standard deviation
+    standardDev = numpy.std(reviewScores)
+  # Store in DB and return
+  aotdObj.standard_deviation = standardDev
+  aotdObj.save()
+  return aotdObj.standard_deviation

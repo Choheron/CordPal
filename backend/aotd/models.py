@@ -38,6 +38,7 @@ class AotdUserData(models.Model):
   review_score_sum = models.FloatField(default=0)
   first_listen_percentage = models.FloatField(default=0)
   average_review_score = models.FloatField(default=0)
+  review_score_stddev = models.FloatField(default=0)
   median_review_score = models.FloatField(default=0)
   lowest_score_given = models.FloatField(default=None, null=True)
   lowest_score_mbid = models.CharField(max_length=256, null=True, default=None)
@@ -161,12 +162,25 @@ class DailyAlbum(models.Model):
     admin_message = models.TextField(null=True, blank=True)  # If set by an admin, and the admin provided a message, store that here. [The frontend will not show that an admin set this day unless a description is provided]
     rating_timeline = models.JSONField(default=generateTimelineDict, null=True)
     rating = models.FloatField(default=11.0, null=True) # Score for this day, will only be populated after the day is over (11 means it was not populated yet, Null means no reviews were made)
+    standard_deviation = models.FloatField(default=None, null=True)
 
     def getReviewCount(self):
       return Review.objects.filter(aotd_date=self.date, album=self.album).count()
 
     def dateToCalString(self):
       return self.date.strftime('%Y-%m-%d')
+    
+    def toJSON(self, timeline: bool = False):
+      out = {}
+      out['album_data'] = self.album.toJSON()
+      out['date'] = self.dateToCalString()
+      out['manual'] = self.manual
+      out['admin_message'] = self.admin_message
+      if(timeline):
+        out['rating_timeline'] = self.rating_timeline
+      out['rating'] = self.rating
+      out['standard_deviation'] = self.standard_deviation
+      return out
 
     def __str__(self):
       return f"Album for {self.date}: {self.album}"

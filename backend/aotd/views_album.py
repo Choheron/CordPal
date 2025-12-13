@@ -1,11 +1,11 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-import numpy
 
 from .utils import (
   getAlbumRating,
   calculateUserReviewData,
-  get_album_from_mb
+  get_album_from_mb,
+  retrieveAlbumSTD
 )
 from users.utils import getUserObj
 from .models import (
@@ -383,23 +383,13 @@ def getAlbumAvgRating(request: HttpRequest, mbid: str, rounded: str = "true", da
 # If a date is not provided in the url bar, will return the most recent aotd standard deviation for that album
 ###
 def getAlbumSTD(request: HttpRequest, mbid: str, date: str = None):
-  # If date is not provided grab the most recent date of AOtD
-  aotd_date = date if (date) else DailyAlbum.objects.filter(album__mbid=mbid).latest('date').date
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning(f"getAlbumSTD called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Get all ratings for an album
-  reviewList = Review.objects.filter(album__mbid=mbid).filter(aotd_date=aotd_date)
-  # If reviewlist is empty return 0.00'
-  standardDev = 0.00
-  if(len(reviewList) != 0):
-    # Iterate review list and get scores
-    reviewScores = [rev.score for rev in reviewList]
-    # Get standard deviation
-    standardDev = numpy.std(reviewScores)
+  standardDev = retrieveAlbumSTD(mbid, date)
   return JsonResponse({"standard_deviation": standardDev})
 
 
