@@ -285,9 +285,9 @@ export async function replaceAlbumInBackend(albumPk, new_mbid, isCurrentlyAOTD) 
   const responseJson = await deleteAlbumResponse.json()
   // Revalidate requests to ensure no data is lost
   revalidateTag('album_submissions', "max")
-  revalidateTag(`album_${responseJson['mbid']}`, "max")
+  updateTag(`album_${responseJson['mbid']}`)
   if(isCurrentlyAOTD) {
-    revalidateTag('AOTD', "max")
+    updateTag('AOTD')
   }
   return {
     status: deleteAlbumResponse.status,
