@@ -59,6 +59,8 @@ class AotdUserData(models.Model):
   total_selected = models.IntegerField(default=None, null=True)
   selection_score_sum = models.FloatField(default=0)
   average_selection_score = models.FloatField(default=0)
+  # Active flag, use to initiate the "yard sale" mechanic
+  active = models.BooleanField(default=True)
 
   # toString Method
   def __str__(self):
@@ -92,6 +94,7 @@ class Album(models.Model):
   disambiguation = models.CharField(max_length=256, null=False, default="") # If its a remaster or not, defauly to ""
   raw_data = models.JSONField(null=True) # JSON field to store all data returned from the frontend
   track_list = models.JSONField(null=True) # JSON field to contain a list of tracks from the musicbrainz api, will be fetched after selection.
+  hidden = models.BooleanField(default=False) # If this is true, it will not appear in recent submissions
 
   legacy_album = models.OneToOneField(
     SpotAlbum,

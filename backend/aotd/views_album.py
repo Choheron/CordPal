@@ -154,6 +154,12 @@ def submitAlbum(request: HttpRequest):
     # Populate submitter and user comment
     newAlbum.submitted_by = user
     newAlbum.user_comment = reqBody['user_comment'] if (reqBody['user_comment'] != "") else "No Comment Provided"
+    # Parse hidden field (if submitter wants the submission to be hidden (should only be admins))
+    if("hidden" in reqBody['album']):
+      hidden = reqBody['album']['hidden']
+    else:
+      hidden = False
+    newAlbum.hidden = hidden
     # Save new album data
     newAlbum.save()
     # Update user data
@@ -394,7 +400,7 @@ def getAlbumSTD(request: HttpRequest, mbid: str, date: str = None):
 
 
 ###
-# Get All Reviews for a specific album. Returns a aotd album id and date
+# Return last X submitted albums
 ###
 def getLastXAlbums(request: HttpRequest, count: int):
   # Make sure request is a get request
@@ -404,7 +410,7 @@ def getLastXAlbums(request: HttpRequest, count: int):
     res.status_code = 405
     return res
   # Get last X count of albums
-  last_X = Album.objects.all().order_by('-submission_date')[:count]
+  last_X = Album.objects.all().exclude(hidden=True).order_by('-submission_date')[:count]
   # Build list of custom Album Objects
   album_list = []
   for album in last_X:
