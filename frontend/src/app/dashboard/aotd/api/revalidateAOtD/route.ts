@@ -1,4 +1,4 @@
-import { updateTag } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { padNumber } from "@/app/lib/utils"
  
 export async function POST() {
@@ -12,7 +12,7 @@ export async function POST() {
   // Revalite tags
   tags.forEach((tag, index) => {
     console.log(`revalidateAOtD - Revalidating Tag: ${tag}`)
-    updateTag(tag)
+    revalidateTag(tag, { expire: 0 })
   })
   // Return success code
   return new Response('Success!', {
