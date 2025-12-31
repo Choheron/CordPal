@@ -2,7 +2,7 @@
 export default async function page({
   params,
 }: {
-  params: Promise<{ year: string }> 
+  params: Promise<{ year: number }> 
 }) {
   // Parse year from URL
   const { year } = (await params)

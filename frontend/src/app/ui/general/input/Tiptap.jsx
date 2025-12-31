@@ -293,7 +293,7 @@ export default function TipTap(props) {
           }}
           editorProps={{
             attributes: {
-              class: `prose prose-invert prose-sm max-w-none focus:outline-none overflow-y-scroll ${textAreaClassName}`,
+              class: `prose prose-invert prose-sm max-w-full focus:outline-none overflow-y-scroll overflow-x-auto ${textAreaClassName}`,
             }}
           }
         ></EditorProvider>

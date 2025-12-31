@@ -116,7 +116,7 @@ class Album(models.Model):
     else:
       return "Not Available"
     
-  def toJSON(self):
+  def toJSON(self, include_raw=True):
     """Return an Album as a JSON. (For HTTP JSON Responses)"""
     out = {}
     out['mbid'] = self.mbid
@@ -130,7 +130,8 @@ class Album(models.Model):
     out['submission_date'] = self.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
     out['release_date_str'] = self.release_date_str
     out['user_comment'] = self.user_comment
-    out['raw_album'] = self.raw_data
+    if(include_raw):
+      out['raw_album'] = self.raw_data
     return out
 
   # Custom delete function to log the user action
@@ -173,9 +174,9 @@ class DailyAlbum(models.Model):
     def dateToCalString(self):
       return self.date.strftime('%Y-%m-%d')
     
-    def toJSON(self, timeline: bool = False):
+    def toJSON(self, timeline: bool = False, include_raw_album: bool = True):
       out = {}
-      out['album_data'] = self.album.toJSON()
+      out['album_data'] = self.album.toJSON(include_raw=include_raw_album)
       out['date'] = self.dateToCalString()
       out['manual'] = self.manual
       out['admin_message'] = self.admin_message
@@ -229,7 +230,7 @@ class Review(models.Model):
       outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")
       outObj['last_updated'] = self.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
       outObj['first_listen'] = self.first_listen
-      outObj['aotd_date'] = self.aotd_date
+      outObj['aotd_date'] = self.aotd_date.strftime("%Y-%m-%d")
       outObj['version'] = self.version
       outObj['advanced'] = self.advanced
       outObj['trackData'] = self.advancedReviewDict
@@ -314,7 +315,7 @@ class ReviewHistory(models.Model):
       outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")
       outObj['last_updated'] = self.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
       outObj['first_listen'] = self.first_listen
-      outObj['aotd_date'] = self.aotd_date
+      outObj['aotd_date'] = self.aotd_date.strftime("%Y-%m-%d")
       outObj['version'] = self.version
       outObj['advanced'] = self.advanced
       outObj['trackData'] = self.advancedReviewDict
