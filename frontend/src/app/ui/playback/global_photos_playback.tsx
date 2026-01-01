@@ -4,9 +4,11 @@ import BasicTable from "./tables/basic_table"
 import UserCard from "../general/userUiItems/user_card"
 import BasicPieChart from "./graphs/basic_pie_chart"
 import PlaybackAward from "./graphics/playback_award"
+import { getUserData } from "@/app/lib/user_utils"
 
 export default async function GlobalPhotoPlaybackData(props) {
   const photoStats = props['photoPlaybackData']
+  const mostTaggedNickname = (await getUserData(photoStats['most_tagged_user']['discord_id']))['nickname']
 
   const backgroundGradientTQ = "bg-gradient-to-bl from-slate-900 to-slate-950"
 
@@ -49,7 +51,7 @@ export default async function GlobalPhotoPlaybackData(props) {
           <PlaybackAward 
             title="The Artist"
             userId={photoStats['most_artist_user']['discord_id']} 
-            flavor_text="Blair photosops dont make themselves"
+            flavor_text={`${mostTaggedNickname} photoshops dont make themselves`}
             emoji="🎨"
             showNickname
             stat_text={

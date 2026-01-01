@@ -98,7 +98,7 @@ export default async function GlobalReviewReactionPlayback(props) {
           <PlaybackAward 
             title="Emoji Enthusiast"
             userId={reactionStats['most_reactions_given']['user__discord_id']} 
-            flavor_text="I just think they're neat"
+            flavor_text="Reaction Andy"
             emoji="📣"
             showNickname
             stat_text={

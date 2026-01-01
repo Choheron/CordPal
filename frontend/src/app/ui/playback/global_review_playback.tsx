@@ -73,7 +73,7 @@ export default async function GlobalReviewPlayback(props) {
           <PlaybackAward 
             title="Set In Stone"
             userId={reviewStats['least_review_edits']['review__user__discord_id']} 
-            flavor_text="I'm not saying it again"
+            flavor_text="Type Once, Cry Once"
             emoji="🗿"
             showNickname
             stat_text={

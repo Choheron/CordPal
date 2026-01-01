@@ -28,6 +28,8 @@ export default async function page({
   }
   // Get site-wide playback data
   const playbackData = await getGlobalPlaybackData(year)
+  // Animated background tailwind
+  const animatedGradientTW = "animate-gradient-move bg-size-200 bg-gradient-to-tr from-violet-700 from-30% via-violet-800 via-50% to-violet-700 to-80%"
 
   // Home button
   const homeButton = () => {
@@ -46,7 +48,7 @@ export default async function page({
   return (
     <>
       {/* If user is on mobile, tell them off */}
-      <div className="sm:hidden bg-gradient-to-bl from-violet-600 to-purple-900">
+      <div className={`sm:hidden ${animatedGradientTW}`}>
         <div className={`w-full z-10 h-[100vh] relative flex align-middle items-center snap-start ${bartle.className}`}>
           <div className="mx-auto">
             <p className="mx-auto text-xl">CordPal Playback</p>
@@ -66,7 +68,7 @@ export default async function page({
         </div>
       </div>
       {/* Cordpal Playback! */}
-      <div className={`hidden sm:block w-full relative overflow-y-scroll h-screen snap-y snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-gradient-to-bl from-violet-600 to-purple-900`}>
+      <div className={`hidden sm:block w-full relative overflow-y-scroll h-screen snap-y snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${animatedGradientTW}`}>
         {/* Home Button */}
         <div id="home" className="absolute top-2 left-2 z-50">
           <Link
