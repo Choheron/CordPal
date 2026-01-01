@@ -24,6 +24,7 @@ export async function isPlaybackAvailable(year, user_discord_id = null) {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
+    next: { tags: [`playbackAvailable`, `playback_${year}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
@@ -46,6 +47,7 @@ export async function getGlobalPlaybackData(year) {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
+    next: { tags: [`playback_${year}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
