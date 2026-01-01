@@ -7,5 +7,5 @@ export default async function page({
   // Parse year from URL
   const { year } = (await params)
 
-  return <p>{`dashboard/playback/${year}/me`}</p>
+  return <p>{`/playback/${year}/me`}</p>
 }

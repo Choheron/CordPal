@@ -73,12 +73,21 @@ def generateGlobalPlayback(year: int):
   ###
   reviewStats = {}
   reviews = Review.objects.filter(aotd_date__range=(start_datetime.date(), end_datetime.date()))
+  review_edits = ReviewHistory.objects.filter(aotd_date__range=(start_datetime.date(), end_datetime.date()))
   reviewStats['total_reviews'] = len(reviews)
-  reviewStats['total_reviews_leaderboard'] = list(reviews.values('user', 'user__discord_id').annotate(total_reviews=Count('pk')).order_by("-total_reviews")) # Submission Leaderboard
-  # Fastest Reviewer - Chronic Skipper
-  # Slowest Reviewer - The Thinker
-  reviewStats['most_reviews'] = reviewStats['total_reviews_leaderboard'][0] # Most Reviews Written - Dedicated 
-  reviewStats['least_reviews'] = reviewStats['total_reviews_leaderboard'][-1] # Least Reviews Written - Missing in Action
+  sub_leaderboard = list(
+    reviews.values('user', 'user__discord_id') \
+    .annotate(total_reviews=Count('pk')) \
+    .order_by("-total_reviews")
+  ) 
+  # Update submission leaderboard with longest streak data
+  for row in sub_leaderboard:
+    user_id = row['user']
+    user_reviews = reviews.filter(user=user_id)
+    row['longest_review_streak'] = calculateLongestUserReviewStreak(user_reviews)[1]
+  reviewStats['total_reviews_leaderboard'] = sub_leaderboard # Submission Leaderboard
+  reviewStats['most_review_edits'] = review_edits.values("review__user__discord_id").annotate(total_edits=Count("pk")).order_by("-total_edits").first() # Most Reviews Edited - The Thinker 
+  reviewStats['least_review_edits'] = review_edits.values("review__user__discord_id").annotate(total_edits=Count("pk")).order_by("-total_edits").last() # Least Reviews Edited - Set In Stone
   reviewStats['average_rating_leaderboard'] = list(reviews.values('user', 'user__discord_id').annotate(average_score_given=Avg('score')).order_by("-average_score_given"))
   reviewStats['highest_average'] = reviewStats['average_rating_leaderboard'][0] # Most Generous Reviewer - Biggest Lover
   reviewStats['lowest_average'] = reviewStats['average_rating_leaderboard'][-1] # Harshest Reviewer - Biggest Hater
@@ -93,17 +102,18 @@ def generateGlobalPlayback(year: int):
   reactionStats = {}
   reactions: QuerySet[Reaction] = Reaction.objects.filter(content_type__model="review").filter(creation_timestamp__range=(start_datetime, end_datetime)) 
   reactionStats['total_reactions'] = reactions.count()
-  reactionStats['total_reactions_leaderboard'] = list(reactions.values("user", "user__discord_id").annotate(total_reactions=Count("pk")).order_by("-total_reactions")) # User Reaction Leaderboard
-  reactionStats['react_leaderboard'] = list(reactions.values("emoji", "custom_emoji").annotate(total_reactions=Count("pk")).order_by("-total_reactions"))[:5] #  5 Most Common Reaction Site-Wide
-  reactionStats['most_reactions_given'] = reactionStats['total_reactions_leaderboard'][0] # Most Reactions Given - Emoji Enthusiast
-  reactionStats['most_reactions_received'] = reviews.values("user", "user__discord_id").annotate(total_reactions=Count("reactions")).order_by("-total_reactions").first() # Most Reactions Received - Crowd Pleaser
-  reactionStats['most_reacted_review'] = reviews \
-    .annotate(distinct_reactors=Count("reactions__user__pk", distinct=True)) \
-    .annotate(total_reactions=Count("reactions")) \
-    .order_by("-distinct_reactors", "-total_reactions") \
-    .first().toJSON() # Most Popular Review (Review with the most reactions from different users) - Reaction Farmer Review
-  # Store Reaction Data
-  playbackData['review_reactions'] = reactionStats
+  if(reactions.count() != 0):
+    reactionStats['total_reactions_leaderboard'] = list(reactions.values("user", "user__discord_id").annotate(total_reactions=Count("pk")).order_by("-total_reactions")) # User Reaction Leaderboard
+    reactionStats['react_leaderboard'] = list(reactions.values("emoji", "custom_emoji").annotate(total_reactions=Count("pk")).order_by("-total_reactions"))[:10] # 10 Most Common Reaction Site-Wide
+    reactionStats['most_reactions_given'] = reactionStats['total_reactions_leaderboard'][0] # Most Reactions Given - Emoji Enthusiast
+    reactionStats['most_reactions_received'] = reviews.values("user", "user__discord_id").annotate(total_reactions=Count("reactions")).order_by("-total_reactions").first() # Most Reactions Received - Crowd Pleaser
+    reactionStats['most_reacted_review'] = reviews \
+      .annotate(distinct_reactors=Count("reactions__user__pk", distinct=True)) \
+      .annotate(total_reactions=Count("reactions")) \
+      .order_by("-distinct_reactors", "-total_reactions") \
+      .first().toJSON() # Most Popular Review (Review with the most reactions from different users) - Reaction Farmer Review
+    # Store Reaction Data
+    playbackData['review_reactions'] = reactionStats
   ###
   # AOTD Stats
   ###
@@ -111,10 +121,11 @@ def generateGlobalPlayback(year: int):
   submissions: QuerySet[Album] = Album.objects.filter(submission_date__range=(start_datetime, end_datetime))
   selections: QuerySet[DailyAlbum] = DailyAlbum.objects.filter(date__range=(start_datetime, end_datetime)).exclude(rating=11).exclude(rating=None) # All Selected Albums (Excluding ones with no reviews)
   albumStats['total_submissions'] = len(submissions)
-  albumStats['total_submissions_leaderboard'] = list(submissions.values("submitted_by").annotate(submission_count=Count("pk")).order_by("-submission_count")) # Submission Leaderboard
-  albumStats['total_selections_leaderboard'] = list(selections.values("album__submitted_by").annotate(selection_count=Count("pk")).order_by("-selection_count")) # Selection Leaderboard
+  albumStats['total_selections'] = len(selections)
+  albumStats['total_submissions_leaderboard'] = list(submissions.values("submitted_by__discord_id").annotate(submission_count=Count("pk")).order_by("-submission_count")) # Submission Leaderboard
+  albumStats['total_selections_leaderboard'] = list(selections.values("album__submitted_by__discord_id").annotate(selection_count=Count("pk")).order_by("-selection_count")) # Selection Leaderboard
   # Subquery for ordering album scoring by review count and score
-  album_rating_qs = selections.values("pk", "album", "album__submitted_by", "rating") \
+  album_rating_qs = selections.values("pk", "album__mbid", "rating") \
     .annotate(
       review_count=Count(
         "album__reviews",
@@ -123,10 +134,10 @@ def generateGlobalPlayback(year: int):
       )
     ) \
     .order_by("-rating", "-review_count")
-  albumStats['highest_rated_album'] = album_rating_qs.first() # Highest Rated Album of the Year - Most Loved (Tie broken by review count)
-  albumStats['lowest_rated_album'] = album_rating_qs.last() # Lowest Rated Album of the Year - Host Hated (Tie broken by review count)
+  albumStats['highest_rated_album'] = album_rating_qs.first() | {"date": DailyAlbum.objects.get(pk=album_rating_qs.first()['pk']).dateToCalString()}  # Highest Rated Album of the Year - Most Loved (Tie broken by review count)
+  albumStats['lowest_rated_album'] = album_rating_qs.last() | {"date": DailyAlbum.objects.get(pk=album_rating_qs.last()['pk']).dateToCalString()} # Lowest Rated Album of the Year - Host Hated (Tie broken by review count)
   # Subquery for ordering album standard deviation by review count and score
-  album_stddev_qs = selections.values("pk", "album", "album__submitted_by", "standard_deviation") \
+  album_stddev_qs = selections.values("pk", "album__mbid", "standard_deviation", "rating") \
     .annotate(
       review_count=Count(
         "album__reviews",
@@ -145,7 +156,7 @@ def generateGlobalPlayback(year: int):
   photoStats = {}
   photos: QuerySet[Image] = Image.objects.filter(upload_timestamp__range=(start_datetime, end_datetime))
   photoStats['total_submissions'] = len(photos)
-  photoStats['total_submissions_leaderboards'] = list(photos.values("uploader").annotate(upload_count=Count("pk")).order_by("-upload_count")) # Uploader Leaderboard
+  photoStats['total_submissions_leaderboards'] = list(photos.values("uploader", "uploader__discord_id").annotate(upload_count=Count("pk")).order_by("-upload_count")) # Uploader Leaderboard
   photoStats['most_tagged_user'] = User.objects.values("pk", "discord_id").annotate(tagged_count=Count("images_tagged_in")).order_by("-tagged_count").first() # Most Tagged User - The Muse
   photoStats['most_artist_user'] = User.objects.values("pk", "discord_id").annotate(artist_count=Count("created_images")).order_by("-artist_count").first() # User Who was Artist the Most - The Artist
   # Store Photo Stats
@@ -157,8 +168,11 @@ def generateGlobalPlayback(year: int):
   quotes: QuerySet[Quote] = Quote.objects.filter(timestamp__range=(start_datetime, end_datetime))
   quoteStats = {}
   quoteStats['total_submitted'] = len(quotes)
-  quoteStats['most_quoted_user'] = list(quotes.values("speaker").annotate(total_quotes=Count("pk")).order_by("-total_quotes")) # Most Quoted User - Public Speaker
-  quoteStats['most_quote_submissions'] = list(quotes.values("submitter").annotate(total_submissions=Count("pk")).order_by("-total_submissions")) # User who submitted the most quotes - Court Stenographer
+  if(len(quotes) > 0):
+    quoteStats['quoted_leaderboards'] = list(quotes.values("speaker", "speaker__discord_id").annotate(total_quotes=Count("pk")).order_by("-total_quotes"))
+    quoteStats['most_quoted_user'] = quoteStats['quoted_leaderboards'][0] # Most Quoted User - Public Speaker
+    quoteStats['quote_submission_leaderboards'] = list(quotes.values("submitter", "submitter__discord_id").annotate(total_submissions=Count("pk")).order_by("-total_submissions"))
+    quoteStats['most_quote_submissions'] = quoteStats['quote_submission_leaderboards'][0] # User who submitted the most quotes - Court Stenographer
   # Store Quote Stats
   playbackData['quotes'] = quoteStats
   # Store playback data in database
@@ -224,7 +238,7 @@ def generateUserPlayback(year: int, userId: str):
       .annotate(avg_score=Avg('score')) \
       .order_by('-avg_score') # Get this user's personal celeb list
   )[:4]
-  if(len(selectedAlbums) != 0):
+  if(len(selectedAlbums) > 0):
     albumStats['highest_rated_aotd'] = selectedAlbums.exclude(rating=11).exclude(rating=None).order_by("-rating", "-date")[0].toJSON(include_raw_album=False) # Highest Rated AOTD Selection
     albumStats['lowest_rated_aotd'] = selectedAlbums.exclude(rating=11).exclude(rating=None).order_by("rating")[0].toJSON(include_raw_album=False) # Lowest Rated AOTD Selection
     albumStats['highest_std'] = selectedAlbums.exclude(rating=11).exclude(standard_deviation=None).order_by("-standard_deviation")[0].toJSON(include_raw_album=False) # Most Controvertial AOTD Selection

@@ -24,11 +24,9 @@ class UserPlayback(models.Model):
   Model representing the CordPal Playback data for a single user.
   '''
   # Foriegn key of a user AOTD object
-  aotd_user = models.OneToOneField(
+  aotd_user = models.ForeignKey(
     AotdUserData,
-    on_delete=models.CASCADE,
-    primary_key=True,
-    unique=True
+    on_delete=models.CASCADE
   )
   year = models.IntegerField(null=False)
   payload = models.JSONField(null=False)
@@ -48,4 +46,4 @@ class UserPlayback(models.Model):
     return out
 
   class Meta:
-    unique_together = (("aotd_user", "year"))
+    unique_together = ("aotd_user", "year", )

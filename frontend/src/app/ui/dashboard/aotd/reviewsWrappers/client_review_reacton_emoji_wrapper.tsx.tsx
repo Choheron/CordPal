@@ -87,7 +87,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
   }
 
   return (
-    <>
+    <div className="w-full">
       {/* Reaction UI */}
       <div className={emojiButtonOverride}>
         <EmojiMartButton 
@@ -97,7 +97,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
       </div>
       {/* Reaction Emoji Display */}
       <Conditional showWhen={reactionsList.length != 0}>
-        <div className="flex flex-wrap w-full max-w-full pt-1 gap-1">
+        <div className="flex flex-wrap w-full max-w-full pt-1">
           {reactionsList.map((emojiGroup, index) => {
             const didThisReact = isUserInReactList(emojiGroup['objects'])
             return (
@@ -118,7 +118,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
               >
                 <div 
                   key={index}
-                  className={`rounded-xl flex gap-1 px-2 py-1 border ${(didThisReact) ? "bg-blue-700/50 border-blue-500" : "bg-slate-700/50 border-slate-500"} hover:cursor-pointer hover:scale-105`}
+                  className={`rounded-xl flex gap-1 px-2 py-1 mx-1 border ${(didThisReact) ? "bg-blue-700/50 border-blue-500" : "bg-slate-700/50 border-slate-500"} hover:cursor-pointer hover:scale-105`}
                   onClick={() => handleClick(emojiGroup, didThisReact)}
                 >
                   <p className="text-base h-fit my-auto">{displayEmoji(emojiGroup['objects'][0])}</p>
@@ -132,6 +132,6 @@ export default function ReviewEmojiMartClientWrapper(props) {
           <p className="text-xs text-gray-500 w-full pl-1 pt-1 italic">Max number of distinct reactions reached.</p>
         </Conditional>
       </Conditional>
-    </>
+    </div>
   )
 }

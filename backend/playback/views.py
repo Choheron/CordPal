@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import datetime
 import pytz
+import json
 
 # Model imports from other apps
 from aotd.models import (
@@ -39,9 +40,16 @@ def generateCordpalPlayback(request: HttpRequest):
   :param request: Django request object
   :type request: HttpRequest
   '''
-  # Get current year (should be Jan 1st of new year)
+  # Get current date (should be Jan 1st of new year)
   date = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
-  year = date.year
+  # Is a body provided?
+  try:
+    body = json.loads(request.body)
+    year = body['year']
+  except:
+    body = None
+    # Subtract one from year to get last year's data
+    year = ((date.year - 1) if APP_ENV == "PROD" else (date.year))
   # Start with site-wide cordpal playback data
   logger.info("Beginning CordPal Playback generation...")
   # If we are in the dev ENV delete existing data and rerun
@@ -56,6 +64,7 @@ def generateCordpalPlayback(request: HttpRequest):
     logger.info(f"Generating Cordpal Playback data for {year}", extra={'crid': request.crid, 'playback_year': year})
     generateGlobalPlayback(year)
   except Exception as e:
+    print(e)
     logger.critical(f"Failure Generating Sitewide playback data for {year}", extra={'crid': request.crid, 'playback_year': year, 'error': e})
     return HttpResponse(status=500)
   # Get all users who have reviewed in the past year
@@ -68,11 +77,12 @@ def generateCordpalPlayback(request: HttpRequest):
         logger.info(f"Requiring deletion of Playback {year} data for {userPlaybackObj.aotd_user.pk}, deleting current playback data and generating...")
         userPlaybackObj.delete()
       except:
-        logger.debug(f"User {userPlaybackObj.aotd_user.pk} dev data for {year} not found, continuing...")
+        logger.debug(f"User {user.pk} dev playback data for {year} not found, continuing...")
     try:
       logger.info(f"Generating Cordpal Playback {year} data for user {user.pk}", extra={'crid': request.crid, 'playback_year': year, "user": user.pk})
       generateUserPlayback(year, user.pk)
     except Exception as e:
+      print(e)
       logger.critical(f"Failure Generating Cordpal Playback {year} data for {user.pk}", extra={'crid': request.crid, 'playback_year': year, "user": user.pk, 'error': e})
       return HttpResponse(status=500)
   return HttpResponse(status=200)

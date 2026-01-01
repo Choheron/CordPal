@@ -193,6 +193,18 @@ export const isDecember = () => {
   return month == 11;
 };
 
+
+// Return true if it is currently in January
+export const isJanuary = () => {
+  // Get Current Date
+  const today = new Date();
+  // Get month (0 indexed return)
+  let month = today.getMonth(); 
+
+  // Return equality operation
+  return month == 0;
+};
+
 // Get day before passed in date
 export function getPrevDay(day: Date) {
   let dateObj = new Date(day);

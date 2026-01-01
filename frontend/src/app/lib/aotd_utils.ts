@@ -621,7 +621,7 @@ export async function getAlbum(mbid: string) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   
-  const allAlbumsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAlbum/${mbid}`, {
+  const getAlbumResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAlbum/${mbid}`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
@@ -631,8 +631,8 @@ export async function getAlbum(mbid: string) {
     },
   });
   console.log(`getAlbum: Attempted request to backend '/aotd/getAlbum/${mbid}'`)
-  const allAlbumsJson = await allAlbumsResponse.json()
-  return allAlbumsJson;
+  const getAlbumJson = await getAlbumResponse.json()
+  return getAlbumJson;
 }
 
 //

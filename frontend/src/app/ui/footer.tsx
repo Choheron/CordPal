@@ -1,10 +1,17 @@
+"use client"
+
 import { Divider } from "@heroui/divider"
 
 import Image from "next/image"
+import { usePathname } from "next/navigation"
 
 export default function Footer(props) {
   const currYear = new Date().getFullYear()
+  const pathname = usePathname()
 
+  if(pathname.indexOf("playback") != -1) {
+    return (<></>)
+  }
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-0 justify-center w-full mt-2 mx-auto py-3 bg-gradient-to-r from-black/50 via-black/100 to-black/50">
       <div className="flex flex-col w-fit text-slate-500 text-center mx-auto sm:mx-0">
