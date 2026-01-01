@@ -52,10 +52,10 @@ export default async function GlobalReviewReactionPlayback(props) {
     ];
 
     return (
-      <div>
+      <>
         <p className="mx-auto text-lg">Top 10 Reactions Used:</p>
         <BasicTable columns={columns} rows={rows} table_label="Emoji Leaderboard Table" />
-      </div>
+      </>
     )
   }
 
@@ -92,7 +92,7 @@ export default async function GlobalReviewReactionPlayback(props) {
     ];
 
     return (
-      <div>
+      <>
         <div className="max-w-[100vw] flex gap-1 pt-1">
           {/* Most Reactions Given */}
           <PlaybackAward 
@@ -129,7 +129,7 @@ export default async function GlobalReviewReactionPlayback(props) {
         </div>
         <p className="mx-auto text-lg">Reactions Leaderboard:</p>
         <BasicTable columns={columns} rows={rows} table_label="User Reaction Leaderboard Table" />
-      </div>
+      </>
     )
   }
 

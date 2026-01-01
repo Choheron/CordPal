@@ -43,11 +43,11 @@ export default async function GlobalQuotesPlayback(props) {
     ];
 
     return (
-      <div>
+      <>
         <p className="mx-auto text-lg">Quote Speaker Leaderboard:</p>
         <BasicTable columns={columns} rows={rows} table_label="Photoshop Submissions Leaderboard Table" />
         <BasicPieChart chartData={rows} title_text={`Total Quotes: ${quoteStats['total_submitted']}`} tooltip_text="Breakdown of submitted Quotes, by user."/>
-      </div>
+      </>
     )
   }
 
@@ -84,7 +84,7 @@ export default async function GlobalQuotesPlayback(props) {
     ];
 
     return (
-      <div>
+      <>
         <div className="max-w-[100vw] flex gap-1 pt-1">
           {/* Most Quoted User */}
           <PlaybackAward 
@@ -123,7 +123,7 @@ export default async function GlobalQuotesPlayback(props) {
         </div>
         <p className="mx-auto text-lg">Quote Submission Leaderboard:</p>
         <BasicTable columns={columns} rows={rows} table_label="Photoshop Submissions Leaderboard Table" />
-      </div>
+      </>
     )
   }
 

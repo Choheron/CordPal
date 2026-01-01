@@ -43,7 +43,7 @@ export default async function GlobalPhotoPlaybackData(props) {
     ];
 
     return (
-      <div>
+      <>
         <div className="max-w-[100vw] flex gap-1 pt-1">
           {/* Artist of the Most Photos */}
           <PlaybackAward 
@@ -83,7 +83,7 @@ export default async function GlobalPhotoPlaybackData(props) {
         <p className="mx-auto text-lg">Photoshop Submissions Leaderboard:</p>
         <BasicTable columns={columns} rows={rows} table_label="Photoshop Submissions Leaderboard Table" />
         <BasicPieChart chartData={rows} title_text={`Total Submissions: ${photoStats['total_submissions']}`} tooltip_text="Breakdown of submitted Photoshops, by user."/>
-      </div>
+      </>
     )
   }
 
@@ -93,7 +93,7 @@ export default async function GlobalPhotoPlaybackData(props) {
       {/* Leaderboards */}
       <div className="flex flex-col sm:flex-row max-h-[100vh] rounded-2xl p-2 gap-3 items-center">
         {/* Reaction Leaderboard */}
-        <div className="flex flex-col max-h-[93%]">
+        <div className="flex flex-col max-h-[95%]">
           {awardColumn()}
         </div>
       </div>

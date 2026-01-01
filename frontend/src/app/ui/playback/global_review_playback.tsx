@@ -118,7 +118,7 @@ export default async function GlobalReviewPlayback(props) {
     ];
 
     return (
-      <div>
+      <>
         <div className="max-w-[100vw] flex gap-1 pt-1">
           {/* Biggest Lover */}
           <PlaybackAward 
@@ -155,7 +155,7 @@ export default async function GlobalReviewPlayback(props) {
         </div>
         <p className="mx-auto text-lg">Average Review Score Leaderboard:</p>
         <BasicTable columns={columns} rows={rows} table_label="Average Review Score Given Leaderboard Table" />
-      </div>
+      </>
     )
   }
 
@@ -187,7 +187,7 @@ export default async function GlobalReviewPlayback(props) {
     ];
 
     return (
-      <div>
+      <>
         <p className="mx-auto text-lg">Standard Deviation Leaderboard:</p>
         <BasicTable columns={columns} rows={rows} table_label="Standard Deviation Leaderboard Table" />
         <div className="max-w-[100vw] flex gap-1 pt-1">
@@ -224,7 +224,7 @@ export default async function GlobalReviewPlayback(props) {
             }
           />
         </div>
-      </div>
+      </>
     )
   }
 

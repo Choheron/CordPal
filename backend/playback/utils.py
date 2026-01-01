@@ -86,7 +86,7 @@ def generateGlobalPlayback(year: int):
     user_reviews = reviews.filter(user=user_id)
     row['longest_review_streak'] = calculateLongestUserReviewStreak(user_reviews)[1]
   reviewStats['total_reviews_leaderboard'] = sub_leaderboard # Submission Leaderboard
-  reviewStats['most_review_edits'] = review_edits.values("review__user__discord_id").annotate(total_edits=Count("pk")).order_by("-total_edits").first() # Most Reviews Edited - The Thinker 
+  reviewStats['most_review_edits'] = reviews.values("review__user__discord_id").annotate(average_length=Count("pk")).order_by("-total_edits").first() # Most Reviews Edited - The Thinker
   reviewStats['least_review_edits'] = review_edits.values("review__user__discord_id").annotate(total_edits=Count("pk")).order_by("-total_edits").last() # Least Reviews Edited - Set In Stone
   reviewStats['average_rating_leaderboard'] = list(reviews.values('user', 'user__discord_id').annotate(average_score_given=Avg('score')).order_by("-average_score_given"))
   reviewStats['highest_average'] = reviewStats['average_rating_leaderboard'][0] # Most Generous Reviewer - Biggest Lover
