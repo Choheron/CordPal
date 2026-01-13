@@ -253,11 +253,11 @@ class Review(models.Model):
       outObj['reactions'] = list(rObj.values())
       return outObj
 
-    def save(self, *args, **kwargs):
+    def save(self, silent_update: bool = False, *args, **kwargs):
       """Save override, will create a history object and user action."""
       from users.models import UserAction
       # Create a history record before updating the review
-      if self.pk:  # Only if this is an update, not a new review
+      if self.pk and not silent_update:  # Only if this is an update, not a new review and is not a silent update by an admin
         # Fetch the original (pre-save) instance from the DB
         old_review = Review.objects.get(pk=self.pk)
         # Create review history object
@@ -295,7 +295,7 @@ class ReviewHistory(models.Model):
     review_text = models.TextField(null=True, blank=True)
     review_date = models.DateTimeField()  # Original date of the review
     first_listen = models.BooleanField(default=None, null=True) # Is this review a result of a first listen?
-    last_updated = models.DateTimeField(default=None, null=True) # When was this verion of the review (the one being overwritten) recorded 
+    last_updated = models.DateTimeField(default=None, null=True) # When was this version of the review (the one being overwritten) recorded 
     aotd_date = models.DateField(null=False) # Attach each review to the aotd date in which it was provided
     # Add review versioning for display
     version = models.IntegerField(default=1)
