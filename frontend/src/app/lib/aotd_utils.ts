@@ -770,17 +770,19 @@ export async function getTenorGifData(tenor_url: string = "", tenor_gif_id: stri
   } else {
     throw new Error("A gif ID or URL must be provided...");
   }
-  // Build backend URL
-  const callUrl = `${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/tenor/getGifUrl/${gif_id}`
-  // Make call to backend
-  console.log(`getTenorGifData: Sending request to backend '${callUrl}'`)
-  const tenorGifResponse = await fetch(callUrl, {
-    method: "GET",
-    next: { revalidate: 86400 }
-  });
-  const retJson = await tenorGifResponse.json();
+  // TENOR API SUPPORT ENDED AS GOOGLE ENDED TENOR API - INSTEAD JUST RETURN BAD URL SO I KNOW IF GIFS ARE APPEARING WRONG
+  // // Build backend URL
+  // const callUrl = `${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/tenor/getGifUrl/${gif_id}`
+  // // Make call to backend
+  // console.log(`getTenorGifData: Sending request to backend '${callUrl}'`)
+  // const tenorGifResponse = await fetch(callUrl, {
+  //   method: "GET",
+  //   next: { revalidate: 86400 }
+  // });
+  // const retJson = await tenorGifResponse.json();
   // Return URL
-  return retJson['url']
+  // return retJson['url']
+  return "https://placehold.co/400x200?text=GIF+NO+LONGER+AVAILABLE+ON+TENOR+CONTACT+CORDPAL+SUPPORT"
 }
 
 //

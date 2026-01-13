@@ -322,7 +322,7 @@ export default function AlbumReviewBox(props) {
             updateCallback={setComment}
           />
           <p className="text-xs mx-2 text-gray-400 mb-1">
-            Enter an optional comment to go with your review of this album. Tenor links will be updated on the display end.
+            Enter an optional comment to go with your review of this album.
           </p>
           <div className="w-full flex flex-col lg:flex-row gap-2 justify-between">
             <Checkbox

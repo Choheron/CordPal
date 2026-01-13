@@ -44,7 +44,7 @@ export async function doReviewEmbedReplacements(reviewObj) {
 
       // Replace Tenor URLs with their corresponding <img> tags
       gifResults.forEach(({ match, gifUrl }) => {
-        temp = temp.replace(match, `<img src="${gifUrl}" frameborder="0" width="300" height="auto" class="max-w-300 h-full" />`);
+        temp = temp.replace(match, `<img src="https://placehold.co/400x200?text=GIF+NO+LONGER+AVAILABLE+ON+TENOR+CONTACT+CORDPAL+SUPPORT"/>`);
       });
     }
     return temp

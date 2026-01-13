@@ -120,9 +120,9 @@ export default async function ReviewPopoverContent(props) {
         </div>
       </Conditional>
       {/* Tenor Disclaimer Display */}
-      <div className="w-fit backdrop-blur-2xl px-2 py-1 rounded-2xl border border-neutral-800">
-        <p className="text-sm italic my-auto">
-          Gifs Provided via Tenor 
+      <div className="w-fit backdrop-blur-2xl px-2 py-1 rounded-2xl border border-neutral-800 bg-black/20 mt-2 m-3">
+        <p className="text-xs italic my-auto text-center">
+          Gifs and Images belong to their respective copyright holders
         </p>
       </div>
       {/* Timestamp Display */}
