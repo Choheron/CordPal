@@ -16,7 +16,7 @@ export default function Footer(props) {
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-0 justify-center w-full mt-2 mx-auto py-3 bg-gradient-to-r from-black/50 via-black/100 to-black/50">
       <div className="flex flex-col w-fit text-slate-500 text-center mx-auto sm:mx-0">
         <p className="text-sm sm:text-base mx-auto">
-          &copy; Copyright 2024-{currYear} -  Cord-Pal - All Rights Reserved
+          &copy; Copyright 2024-{currYear} - Cord-Pal - All Rights Reserved
         </p>
         <div className="flex w-fit mx-auto text-xs sm:text-sm gap-1 justify-center">
           <p>
@@ -52,7 +52,7 @@ export default function Footer(props) {
           </a>
         </div>
         <p className="text-xs gap-1 ">
-          This application utilizes the MusicBranz API but is not officially endorsed by MusicBrainz.
+          CordPal utilizes the MusicBrainz API. CordPal is not officially endorsed by MusicBrainz.
         </p>
       </div>
     </div>
