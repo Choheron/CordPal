@@ -102,8 +102,8 @@ def setAlbumOfDay(request: HttpRequest):
     return HttpResponse(f"WARN: Album of the day already selected: {currDayAlbum}", status=425)
   except DailyAlbum.DoesNotExist:
     logger.info(f"{request.crid} - Today does not yet have an album, selecting one...", extra={'crid': request.crid})
-  # Get Date a year ago to filter by
-  one_year_ago = day - datetime.timedelta(days=730)
+  # Get Date a two years ago to filter by
+  two_year_ago = day - datetime.timedelta(days=730)
   # Define a boolean for selecting the right album
   selected = False
   # Define Album Object
@@ -124,7 +124,7 @@ def setAlbumOfDay(request: HttpRequest):
     # Filter out blocked users albums
     tempAlbum = random.choice(albumPool)
     logger.info(f"Temp album selected: {tempAlbum.title}", extra={'crid': request.crid})
-    albumCheck = DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album=tempAlbum).count()
+    albumCheck = DailyAlbum.objects.filter(date__gte=two_year_ago).filter(album=tempAlbum).count()
     if(albumCheck != 0):
       albumPool = albumPool.exclude(mbid=tempAlbum.mbid)
     else:
@@ -222,8 +222,8 @@ def calculateAOTDChances(request: HttpRequest):
   # Get current date
   day = datetime.date.today()
   tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-  # Get Date a year ago to filter by
-  one_year_ago = day - datetime.timedelta(days=365)
+  # Get Date a two years ago to filter by
+  two_year_ago = day - datetime.timedelta(days=730)
   # Get user list
   user_list = AotdUserData.objects.all().annotate(
     total_album_submissions=Count('user__album', distinct=True),
@@ -251,7 +251,7 @@ def calculateAOTDChances(request: HttpRequest):
     total_album_submissions=Count('user__album', distinct=True),
     recent_picks=Count(
       'user__album__dailyalbum',
-      filter=Q(user__album__dailyalbum__date__gte=one_year_ago),
+      filter=Q(user__album__dailyalbum__date__gte=two_year_ago),
       distinct=True
     )
   )
@@ -293,7 +293,7 @@ def calculateAOTDChances(request: HttpRequest):
     else:
       # Get counts needed to determine percentage
       user_submissions_count = Album.objects.filter(submitted_by=user).count()
-      user_eligible_count = user_submissions_count - (DailyAlbum.objects.filter(date__gte=one_year_ago).filter(album__submitted_by=user).count())
+      user_eligible_count = user_submissions_count - (DailyAlbum.objects.filter(date__gte=two_year_ago).filter(album__submitted_by=user).count())
       total_eligible_count = sum(
         user.total_album_submissions - user.recent_picks for user in eligible_users
       )
