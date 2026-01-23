@@ -229,7 +229,7 @@ def calculateAOTDChances(request: HttpRequest):
     total_album_submissions=Count('user__album', distinct=True),
     recent_picks=Count(
       'user__album__dailyalbum',
-      filter=Q(user__album__dailyalbum__date__gte=one_year_ago),
+      filter=Q(user__album__dailyalbum__date__gte=two_year_ago),
       distinct=True
     )
   )
