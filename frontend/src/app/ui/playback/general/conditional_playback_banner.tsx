@@ -32,7 +32,7 @@ export default function CordpalPlaybackBanner(props) {
   const animatedGradientTW = "animate-gradient-move bg-size-200 bg-gradient-to-tr from-violet-600 from-30% via-purple-800 via-50% to-violet-600 to-80%"
 
   return (
-    <div className={`transition-all duration-500 ease-in-out ${(isJan && globalPlaybackAvailable && !closed) ? 'opacity-100 visible' : 'opacity-0 invisible'} md:block fixed bottom-2 right-2 z-20`}>
+    <div className={`transition-all duration-500 ease-in-out ${(isJan && globalPlaybackAvailable && !closed) ? 'opacity-0 invisible md:opacity-100 md:visible' : 'opacity-0 invisible'} md:block fixed bottom-2 right-2 z-20`}>
       {/* Banner showing if global cordpal playback is available for last year*/}
       <div className="relative">
         {/* Close Icon */}
