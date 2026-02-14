@@ -205,6 +205,18 @@ export const isJanuary = () => {
   return month == 0;
 };
 
+// Return true if it is currently Valentines Day
+export const isValentinesDay = () => {
+  // Get Current Date
+  const today = new Date();
+  // Get month (0 indexed return)
+  let month = today.getMonth(); 
+  let day = today.getDate();
+
+  // Return equality operation
+  return (month == 1 && day == 14);
+};
+
 // Get day before passed in date
 export function getPrevDay(day: Date) {
   let dateObj = new Date(day);

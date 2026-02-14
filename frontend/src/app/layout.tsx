@@ -6,6 +6,7 @@ import {Providers} from "./providers";
 import Heartbeat from "./ui/heartbeat";
 import Footer from "./ui/footer";
 import ClientHolidayDisplay from "./ui/general/holiday/client_holiday_display";
+import { isValentinesDay } from "./lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,6 +17,15 @@ export const metadata: Metadata = {
     icon: '/svgs/logos/CordPal_Logo_V1.svg',
   }
 };
+
+// Get todays date (in central time)
+
+// Make Gradient Pink if Valentines day, purple if not
+const gradientCSS = (
+  (isValentinesDay()) ?
+  ("radial-gradient(125% 125% at 53% 100%, #000000 72%, #db005f 100%)") :
+  ("radial-gradient(125% 125% at 53% 100%, #000000 72%, #350136 100%)")
+)
 
 export default function RootLayout({
   children,
@@ -30,7 +40,7 @@ export default function RootLayout({
         <div
           className="absolute inset-0 z-0"
           style={{
-            background: "radial-gradient(125% 125% at 53% 100%, #000000 72%, #350136 100%)",
+            background: gradientCSS,
           }}
         />
         {/* Placeholder Component to implement heartbeat */}
