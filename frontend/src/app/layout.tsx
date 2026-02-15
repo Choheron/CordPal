@@ -38,7 +38,7 @@ export default function RootLayout({
       <body className={`${inter.className} dark min-h-screen flex flex-col relative`}>
         {/* From https://patterncraft.fun/ */}
         <div
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 z-0 max-h-[100vh]"
           style={{
             background: gradientCSS,
           }}

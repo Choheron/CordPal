@@ -5,7 +5,6 @@ import { getAllBotQuotes } from "@/app/lib/discord_bot_utils";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import QuoteCounts from "@/app/ui/dashboard/quotes/quote_counts";
 import QuoteSortBlock from "@/app/ui/dashboard/quotes/quote_sort_block";
-import { capitalizeFirstLetter } from "@/app/lib/utils";
 
 // TODO: Implement toggle for cursive text in quotes
 export default async function quotes({searchParams}) {

@@ -1,6 +1,5 @@
 import { Albert_Sans, Great_Vibes } from "next/font/google"
 import { dancing } from "../../fonts";
-import { capitalizeFirstLetter } from "@/app/lib/utils";
 
 import UserCard from "../../general/userUiItems/user_card";
 
