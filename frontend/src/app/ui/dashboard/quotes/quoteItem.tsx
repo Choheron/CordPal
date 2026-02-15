@@ -17,6 +17,8 @@ const vibes = Great_Vibes ({
 
 export default async function QuoteItem(props) {
   const textStyle = (props['cursive'] == 'true') ? `${dancing.className}` : `${albertSans.className}`;
+  const userID = (props.quoteObject.speaker) ? props.quoteObject.speaker.discord_id : props.quoteObject.speaker_discord_id
+  const nickname = (props.quoteObject.speaker) ? props.quoteObject.speaker.nickname : props.quoteObject.speaker_discord_id
 
   // Apply Regex on markdown style quotes
   function applyQuoteRegex(str) {
@@ -29,12 +31,12 @@ export default async function QuoteItem(props) {
   }
 
   return (
-    <div className="w-full flex justify-around max-w-5xl rounded-x bg-gradient-to-r from-neutral-900/0 via-neutral-900/75 to-neutral-900/0 px-2 py-2 my-2 rounded-2xl border border-neutral-900 mt-2 mb-2">
+    <div className="w-full flex justify-around max-w-5xl rounded-x bg-gradient-to-r from-neutral-900/0 via-neutral-900/75 to-neutral-900/0 px-2 py-2 my-2 rounded-2xl border border-neutral-900 mb-2">
       <div className="flex flex-col z-10 justify-around w-fit">
         <div className="flex w-fit mr-auto">
           <UserCard 
-            userDiscordID={props.speaker} 
-            fallbackName={props.speaker_nickname}
+            userDiscordID={userID} 
+            fallbackName={nickname}
           />
         </div>
         <div className={`${textStyle} antialiased text-3xl p-1 pb-0 text-center`} >

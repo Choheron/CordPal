@@ -38,6 +38,10 @@ class Quote(models.Model):
     out['text'] = self.text
     out['timestamp'] = self.timestamp.strftime("%m/%d/%Y, %H:%M:%S")
     return out
+  
+  # Get speaker discord ID
+  def get_speaker_id(self):
+    return self.speaker.discord_id if self.speaker else self.speaker_discord_id
 
   # Custom delete function to log the user action
   def delete(self, deleter=None, reason=None, *args, **kwargs):

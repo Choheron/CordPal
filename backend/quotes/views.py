@@ -106,8 +106,21 @@ def getAllQuotesList(request: HttpRequest):
   out = []
   for quote in quotes:
     out.append(quote.toJSON())
+  # Build out summaries of users with quotes
+  speakers = set(list(quotes.values_list('speaker_discord_id', flat=True)) + list(quotes.values_list('speaker__discord_id', flat=True)))
+  summaryObj = []
+  for speakID in speakers:
+    if(speakID != None):
+      # Retrieve user object from ID if possible
+      userObj = userUtils.getUserObj(speakID)
+      # Build Summary Object
+      summaryObj.append({
+        "count": (quotes.filter(speaker__discord_id=speakID).count() + quotes.filter(speaker_discord_id=speakID).count()),
+        "nickname": userObj.nickname if (userObj) else speakID,
+        "discord_id": speakID
+      })
   # Return
-  return JsonResponse({'quotes': out})
+  return JsonResponse({'quotes': out, "summary": summaryObj})
 
 
 def getAllQuotesLegacy(request: HttpRequest):
