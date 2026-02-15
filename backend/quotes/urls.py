@@ -5,7 +5,7 @@ from . import views
 
 urlpatterns = [
   path('submitQuote', views.submitQuote),
-  path('getAllQuotesList', views.getAllQuotesList),
+  path('getAllQuotesList/<str:sortMethod>', views.getAllQuotesList),
   path('getUserSpokenQuotes/<str:user_discord_id>', views.getUserSpokenQuotes),
   path('getAllQuotesLegacy', views.getAllQuotesLegacy),
 ]

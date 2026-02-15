@@ -11,10 +11,10 @@ const getCookie = async (name: string) => {
 // Retrieve bot quotes for all users in the server
 // - RETURN: Json containing the backend quote data for all users
 //
-export async function getAllBotQuotes() {
+export async function getAllBotQuotes(sortMethod: string = "timestamp_descending") {
   const sessionCookie = await getCookie('sessionid');
   // Query quotes endpoint for bot interaction
-  const quoteListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/quotes/getAllQuotesList`, {
+  const quoteListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/quotes/getAllQuotesList/${sortMethod}`, {
     method: "GET",
     credentials: "include",
     cache: 'no-cache',

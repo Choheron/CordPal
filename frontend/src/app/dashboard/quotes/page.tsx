@@ -9,13 +9,10 @@ import QuoteSortBlock from "@/app/ui/dashboard/quotes/quote_sort_block";
 // TODO: Implement toggle for cursive text in quotes
 export default async function quotes({searchParams}) {
   // Get url params
-  const {sortMethod, cursive} = searchParams;
-  // Redirect if any of the search params are undefined
-  if(sortMethod == 'undefined' || cursive == 'undefined') {
-    redirect("/dashboard/quotes?sortMethod=count&cursive=false");
-  }
+  let sortMethod = (await searchParams).sortMethod;
+  let cursive = (await searchParams).cursive;
   // Retrieve quote data
-  const quoteResponse = await getAllBotQuotes()
+  const quoteResponse = await getAllBotQuotes(sortMethod)
   const quotesList = quoteResponse["quotes"];
   const quotesSummary = quoteResponse["summary"];
   const quotesMetadata = quoteResponse["meta"];
@@ -33,6 +30,11 @@ export default async function quotes({searchParams}) {
       <div className="flex flex-col 2xl:flex-row justify-center 2xl:w-3/4">
         <div className="flex flex-col">
           <QuoteCounts className="w-1/2 2xl:mr-5" summaryData={quotesSummary} updateTimestamp={quotesUpdateTimestamp}/>
+          <QuoteSortBlock 
+            className="2xl:mr-5" 
+            sortMethod={(sortMethod == "undefined") ? "timestamp_descending" : sortMethod} 
+            cursive={cursive} 
+          />
         </div>
         <div className="flex flex-col justify-around mb-10">
           {quoteListRender}

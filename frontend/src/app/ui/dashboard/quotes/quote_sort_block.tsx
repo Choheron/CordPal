@@ -18,7 +18,7 @@ export default function QuoteSortBlock(props) {
   const [cursive, setCursive] = useState((props['cursive'] == 'true'));
   // Default Sorting Options
   const sortOptions = [
-    {key: "count", label: "Count", description: "Sort by number of quotes (High to Low)"},
+    // {key: "count", label: "Count", description: "Sort by number of quotes (High to Low)"},
     {key: "name", label: "Name", description: "Sort by speaker's name (Alphabetical)"},
     {key: "timestamp_ascending", label: "Timestamp (Ascending)", description: "Sort by Time (Oldest First)"}, 
     {key: "timestamp_descending", label: "Timestamp (Descending)", description: "Sort by Time (Newest First)"}
