@@ -38,7 +38,7 @@ export default function ReviewScoreCountBarChart(props) {
           <XAxis 
             dataKey={"count"} 
             type="number"
-            domain={["dataMin", "dataMax + 1"]}
+            domain={["dataMin", "dataMax + 5"]}
             hide
           />
           <Bar 
