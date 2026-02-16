@@ -10,7 +10,7 @@ import QuoteItem from "../dashboard/quotes/quoteItem"
 // - userId: String [REQUIRED] - User's discord ID
 export default async function UserQuotesDisplay(props) {
   const userId = props.userId
-  const quotesList = await getUserQuotes(userId)
+  const quotesList: Array<Object> = await getUserQuotes(userId)
 
   // Map quote objects through top level info
   const quoteListRender = quotesList.map((quote) => {
@@ -18,7 +18,7 @@ export default async function UserQuotesDisplay(props) {
   });
 
   return(
-    <div className="w-full h-fit max-h-full flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
+    <div className="w-full h-fit max-h-[100vh] flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
       <div className="flex gap-1 w-fit mr-auto text-xl border border-neutral-800 -m-[9px] p-2 rounded-tl-2xl rounded-br-2xl mb-1">
         <p className="underline">
           Quotes:
