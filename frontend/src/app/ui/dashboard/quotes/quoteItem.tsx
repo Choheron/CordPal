@@ -44,6 +44,7 @@ export default async function QuoteItem(props) {
         </div>
         <div className={`${textStyle} text-right px-10 text-xs xl:text-base`}>
           <p>On: <i>{props.quoteObject['timestamp'].split(',')[0]}</i></p>
+          <p>Submitter: {props.quoteObject['submitter_nickname']}</p>
         </div>
       </div>
     </div>

@@ -187,6 +187,7 @@ export default async function Page({
             // An empty AOTD data month will not have a 'stats' key
             className={`${(Object.keys(lastMonthAotdData).indexOf('stats') == -1) ? "invisible" : ""} w-fit hover:underline text-white`}
             variant="solid"
+            isDisabled={(Object.keys(lastMonthAotdData).indexOf('stats') == -1) ? true : false}
           >
             <RiArrowLeftCircleLine className="text-2xl" />
           </Button>
