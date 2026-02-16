@@ -9,7 +9,15 @@ import { Conditional } from "@/app/ui/dashboard/conditional";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import Link from "next/link";
 import { RiThumbDownFill, RiThumbUpFill, RiArrowLeftCircleLine, RiArrowRightCircleLine } from "react-icons/ri";
+import { isPlaybackAvailable } from "@/app/lib/playback_utils";
 
+import { BBH_Sans_Bartle } from 'next/font/google'
+import CordpalPlaybackBanner from "@/app/ui/playback/general/conditional_playback_banner";
+// Setup Playback Font
+const bartle = BBH_Sans_Bartle({
+  weight: "400",
+  adjustFontFallback: false,
+})
 
 export default async function Page({
   params,
@@ -43,6 +51,10 @@ export default async function Page({
       week_data: monthToWeekArray(year, i+1, daysInMonth(year, i+1))
     }
   }
+  // Playback Button Animated Gradient
+  const animatedGradientTW = "animate-gradient-move bg-size-200 bg-gradient-to-tr from-violet-600 from-30% via-purple-800 via-50% to-violet-600 to-80%"
+  // Check if global playback is available for this year
+  const globalPlaybackAvailable = await isPlaybackAvailable(year)
 
 
   // Helper function to generate a single month's data
@@ -210,6 +222,10 @@ export default async function Page({
           </Link>
         </Conditional>
       </div>
+      {/* Conditional Cordpal Playback Display */}
+      <CordpalPlaybackBanner 
+        year={year}
+      />
       {/* Month by month display */}
       <div className="flex flex-col sm:flex-row flex-wrap">
         {yearData.map((month, index) => {

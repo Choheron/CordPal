@@ -8,11 +8,14 @@ import { BBH_Sans_Bartle } from 'next/font/google'
 import { useEffect, useState } from "react";
 import { RiCloseCircleFill } from "react-icons/ri";
 // Setup Font
-const bartle = BBH_Sans_Bartle({weight: "400"})
+const bartle = BBH_Sans_Bartle({
+  weight: "400",
+  adjustFontFallback: false,
+})
 
 export default function CordpalPlaybackBanner(props) {
   const today = new Date();
-  const isJan = isJanuary()
+  const isJan = (props.year) ? true : isJanuary()
   const [closed, setClosed] = useState(false)
   const [globalPlaybackAvailable, setGlobalPlaybackAvailable] = useState(false)
 
@@ -23,7 +26,7 @@ export default function CordpalPlaybackBanner(props) {
   // UseEffect to check if 
   useEffect(() => {
     const checkAvailable = async () => {
-      setGlobalPlaybackAvailable(await isPlaybackAvailable(today.getFullYear() - 1))
+      setGlobalPlaybackAvailable(await isPlaybackAvailable((props.year) ? props.year : today.getFullYear() - 1))
     }
     checkAvailable()
   },[])

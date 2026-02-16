@@ -130,36 +130,12 @@ export default async function AlbumDisplay(props) {
             <div className="">
               <p className="text-xs sm:text-base">Submitter: </p>
               <div className="ml-2 -mb-1">
-                <Badge 
-                  content=" " 
-                  size="sm" 
-                  placement="top-left"
-                  isInvisible={submitter_comment == "No Comment Provided"}
-                  shape="circle"
-                  className="bg-blue-300 -ml-2"
-                >
-                    <Tooltip 
-                      content={
-                        <p className="w-[300px]">
-                          {submitter_comment}
-                        </p>
-                      }
-                      showArrow
-                      isDisabled={submitter_comment == "No Comment Provided"}
-                      classNames={{
-                        content: ["w-fit"],
-                      }}
-                    >
-                      <div>
-                        <UserCard 
-                          userDiscordID={submitter} 
-                          avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[40px]"}
-                          fallbackName={"User Not Found"}
-                          isProfileLink
-                        />
-                      </div>
-                    </Tooltip>
-                </Badge>
+                <UserCard 
+                  userDiscordID={submitter} 
+                  avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[40px]"}
+                  fallbackName={"User Not Found"}
+                  isProfileLink
+                />
               </div>
             </div>
             <div className="flex text-xs lg:text-sm sm:-mt-2">
@@ -198,6 +174,14 @@ export default async function AlbumDisplay(props) {
           </Conditional>
         </div>
       </div>
+      <Conditional showWhen={submitter_comment != "No Comment Provided"}>
+        <div className="w-full max-w-full pt-2">
+          <p className="text-sm italic text-gray-300 pl-2">Submitter included the following comment:</p>
+          <div className="rounded-2xl p-2 text-sm bg-black/20 border border-neutral-800 max-h-32 sm:max-h-20 overflow-y-auto">
+            {submitter_comment}
+          </div>
+        </div>
+      </Conditional>
     </div>
   )
 }

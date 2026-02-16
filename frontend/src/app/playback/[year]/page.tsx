@@ -12,7 +12,10 @@ import GlobalReviewReactionPlayback from '@/app/ui/playback/global_review_reacti
 import GlobalPhotoPlaybackData from '@/app/ui/playback/global_photos_playback';
 import GlobalQuotesPlayback from '@/app/ui/playback/global_quotes_playback';
 // Setup Font
-const bartle = BBH_Sans_Bartle({weight: "400"})
+const bartle = BBH_Sans_Bartle({
+  weight: "400",
+  adjustFontFallback: false,
+})
 
 export default async function page({
   params,
