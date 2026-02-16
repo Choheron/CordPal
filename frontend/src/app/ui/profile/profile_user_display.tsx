@@ -13,8 +13,8 @@ export default function ProfileUserDisplay(props) {
   const online_status = props.onlineData['status']
 
   return(
-    <div className="w-fit mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-      <div className="group">
+    <div className="w-full mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+      <div className="group flex-shrink-0">
         <img 
           src={userData['avatar_url']}
           className='h-[125px] w-[125px] lg:h-[200px] lg:w-[200px] rounded-2xl mx-auto'
@@ -25,8 +25,8 @@ export default function ProfileUserDisplay(props) {
           <div className={`w-[10px] h-[10px] mx-2 my-auto rounded-full border-2 border-black ${onlineStatusToTailwindBgColor(online_status)}`}></div>
         </div>
       </div>
-      <div className="flex flex-col justify-between font-extralight">
-        <div className="flex flex-col min-w-[350px] max-w-[400px] lg:w-[560px] w-fit">
+      <div className="flex flex-col justify-between font-extralight w-full">
+        <div className="flex flex-col w-full">
           <div className="w-full flex justify-between">
             <p>Nickname:</p>
             <p>{userData['nickname']}</p>

@@ -85,6 +85,8 @@ def getUserSpokenQuotes(request: HttpRequest, user_discord_id: str):
     quotes = Quote.objects.filter(speaker=userObj)
   else:
     quotes = Quote.objects.filter(speaker_id=int(user_discord_id))
+  # Order quotes by timestamp showing most recent
+  quotes = quotes.order_by("-timestamp")
   # Iterate all quotes and create out list
   out = []
   for quote in quotes:

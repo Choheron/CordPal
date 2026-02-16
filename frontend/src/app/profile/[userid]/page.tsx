@@ -1,3 +1,5 @@
+"use server"
+
 import { Button } from "@heroui/button";
 
 import { getUserData, isUserOnline } from "@/app/lib/user_utils";
@@ -5,6 +7,7 @@ import PageTitle from "@/app/ui/dashboard/page_title";
 import ProfileUserDisplay from "@/app/ui/profile/profile_user_display";
 import UserAotdDataDisplay from "@/app/ui/profile/user_aotd_data_display";
 import Link from "next/link";
+import UserQuotesDisplay from "@/app/ui/profile/user_quotes_display";
 
 // Profile Page
 // Route URL: Use userID to get data from backend
@@ -33,15 +36,24 @@ export default async function Page({
           <b>Return to Homepage</b>
         </Button>
       </Link>
-      <div className="w-fit">
-        <ProfileUserDisplay 
-          userData={userData}
-          onlineData={onlineData}
-        />
-        <UserAotdDataDisplay 
-          userId={userid}
-          aotdParticipant={userData['aotd_enrolled']}
-        />
+      <div className="flex flex-col xl:flex-row gap-2">
+        <div className="w-full xl:w-1/2">
+          <ProfileUserDisplay 
+            userData={userData}
+            onlineData={onlineData}
+          />
+          <UserAotdDataDisplay 
+            userId={userid}
+            aotdParticipant={userData['aotd_enrolled']}
+          />
+        </div>
+        <div className="w-full xl:w-1/2">
+          {/* User's Quotes */}
+          <UserQuotesDisplay 
+            userId={userid}
+            userData={userData}
+          />
+        </div>
       </div>
     </main>
   );

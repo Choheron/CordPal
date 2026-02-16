@@ -19,6 +19,7 @@ export default async function QuoteCounts(props) {
             <UserCard 
               userDiscordID={userSum['discord_id']} 
               fallbackName={userSum['nickname']} 
+              isProfileLink={true}
             />
           </div>
           <p className="my-auto">{userSum['count']}</p>
@@ -30,7 +31,7 @@ export default async function QuoteCounts(props) {
   return (
       <div className={`w-auto h-fit p-5 pt-2 flex flex-col justify-center rounded-xl border-b bg-gradient-to-b backdrop-blur-2xl border-neutral-800 bg-zinc-800/30 from-inherit border bg-gray-200 lg:bg-zinc-800/30 ${props["className"]}`}>
       <p className="w-full text-center">Quote Counts:</p>
-      {quoteCountRender}
+        {quoteCountRender}
       <hr/>
       <div className="flex justify-between w-full min-w-72">
         <p>Last Updated:</p>

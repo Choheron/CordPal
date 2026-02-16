@@ -26,3 +26,22 @@ export async function getAllBotQuotes(sortMethod: string = "timestamp_descending
   return jsonRes
 }
   
+
+//
+// Retrieve all quotes for a specific user
+// - RETURN: Json containing the backend quote data for all users
+//
+export async function getUserQuotes(user_discord_id) {
+  const sessionCookie = await getCookie('sessionid');
+  // Query quotes endpoint for bot interaction
+  const quoteListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/quotes/getUserSpokenQuotes/${user_discord_id}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  let jsonRes = JSON.parse(await quoteListResponse.text());
+  return jsonRes['quotes']
+}
