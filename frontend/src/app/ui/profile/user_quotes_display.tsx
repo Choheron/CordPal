@@ -18,7 +18,7 @@ export default async function UserQuotesDisplay(props) {
   });
 
   return(
-    <div className="w-full h-fit max-h-full overflow-y-auto flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
+    <div className="w-full h-fit max-h-full flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
       <div className="flex gap-1 w-fit mr-auto text-xl border border-neutral-800 -m-[9px] p-2 rounded-tl-2xl rounded-br-2xl mb-1">
         <p className="underline">
           Quotes:
@@ -27,7 +27,9 @@ export default async function UserQuotesDisplay(props) {
           {quotesList.length}
         </p>
       </div>
+      <div className="overflow-y-auto">
       {quoteListRender}
+      </div>
     </div>
   )
 }
