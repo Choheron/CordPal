@@ -46,32 +46,18 @@ export default async function Page({
       return (
           <div 
             key={index} 
-            className="flex flex-col h-fit backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800"
+            className="flex flex-col h-fit backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 transition-all hover:scale-105"
           >
-            <div className="flex w-full">
-              <p className={`w-fit h-fit my-auto ${ratingToTailwindBgColor(ratingsObj[date])} px-2 py-1 rounded-full text-black`}>
-                <b>{(ratingsObj[date] == 11.00) ? "--" : ratingsObj[date]}</b>
-              </p>
-              <p className="w-fit ml-auto text-xl rounded-tr-2xl rounded-bl-2xl bg-zinc-800/30 border border-neutral-800 px-2 -mr-2 py-2 -mt-2">
-                {monthToName(dateArr[1])} {dateArr[2]}, {dateArr[0]}
-              </p>
-            </div>
-            <ReviewDisplay
-              album_id={albumData("album_id")}
-              date={date}
-              historical={true}
-            />
-            <Divider className="mb-2" />
             <Link
               href={`/dashboard/aotd/calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`}
-              className="flex"
+              className="flex w-full justify-between gap-2"
             >
-              <Button
-                className={`bg-gradient-to-br from-green-700/80 to-green-800/80 text-black w-1/2 mx-auto`}
-                variant="solid"
-              >
-                <b>View Day Page</b>
-              </Button>
+              <p className="w-fit text-xl">
+                {monthToName(dateArr[1])} {dateArr[2]}, {dateArr[0]}
+              </p>
+              <p className={`w-fit h-fit my-auto ${ratingToTailwindBgColor(ratingsObj[date])} px-2 py-1 ms-2 rounded-full text-black`}>
+                <b>{(ratingsObj[date] == 11.00) ? "--" : ratingsObj[date]}</b>
+              </p>
             </Link>
           </div>
       )
@@ -121,22 +107,23 @@ export default async function Page({
               <p className="text-xl mx-auto w-fit">{`${trackData['position']}. `}</p>
             </div>
             <div className="w-full">
-              <p className="text-xl line-clamp-1">{trackData['title']}</p>
+              <div className="flex gap-1 h-fit">
+                <p className="text-xl line-clamp-1">{trackData['title']}</p>
+                <p className="text-sm my-auto italic">&#x28;{lengthString}&#x29;</p>
+              </div>
               <p className="italic text-base">
                 {artistCredit.map((artistObj) => {
                   return artistObj['name']
                 }).join(", ")}
               </p>
-              <p className="text-sm">{lengthString}</p>
             </div>
           </div>
         </div>
       )
     }
     
-
     return (
-      <div className="relative w-fit lg:max-w-[1080px] flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+      <div className="relative lg:max-w-[1080px] gap-2 backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
         <p className="text-xl lg:text-2xl mx-auto">Tracklist:</p>
         {
           (trackList.length != 0) ? 
@@ -170,9 +157,9 @@ export default async function Page({
       </Link>
       <div className="flex flex-col sm:flex-row w-full md:w-9/10 justify-center gap-2">
         {/* Album Display and Previous Review Display */}
-        <div className="flex flex-col justify-start gap-2">
-          <div className="flex mx-auto gap-2 h-fit">
-            <div className="relative w-fit h-fit lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+        <div className="flex flex-row justify-start gap-2">
+          <div className="gap-2 h-fit w-fit">
+            <div className="relative h-fit lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
               <AlbumDisplay 
                 title={albumData("title")}
                 disambiguation={albumData("disambiguation")}
@@ -201,20 +188,21 @@ export default async function Page({
                 </div>
               </Conditional>
             </div>
+            {/* Tracklist Display */}
+            {trackListBox()}
           </div>
+          {/* Show Previous AOTD Selection Dates */}
           <Conditional showWhen={aotd_dates.length > 0}>
             <div className='w-full'>
               <p className='text-2xl w-fit mx-auto font-extralight'>
-                Previous Album of the Day Appearances
+                AOTD Dates
               </p>
-              <div className="flex justify-around">
+              <div className="">
                 {pastReviewsBox()}
               </div>
             </div>
           </Conditional>
         </div>
-        {/* Tracklist Display */}
-        {trackListBox()}
       </div>
     </div>    
   )
