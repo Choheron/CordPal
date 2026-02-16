@@ -27,11 +27,10 @@ export default async function quotes({searchParams}) {
   return (
     <main className="flex flex-col items-center p-24 pt-10">
       <PageTitle text="Quotes" />
-      <div className="flex flex-col 2xl:flex-row justify-center 2xl:w-3/4">
-        <div className="2xl:sticky 2xl:top-2">
-          <QuoteCounts className="w-1/2 2xl:mr-5" summaryData={quotesSummary} updateTimestamp={quotesUpdateTimestamp}/>
-          <QuoteSortBlock 
-            className="2xl:mr-5" 
+      <div className="flex flex-col 2xl:flex-row 2xl:w-3/4 justify-center">
+        <div className="sticky top-2 self-start 2xl:mr-5 h-fit">
+          <QuoteCounts summaryData={quotesSummary} updateTimestamp={quotesUpdateTimestamp}/>
+          <QuoteSortBlock
             sortMethod={(sortMethod == "undefined") ? "timestamp_descending" : sortMethod} 
             cursive={cursive} 
           />
