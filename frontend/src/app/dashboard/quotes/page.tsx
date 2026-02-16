@@ -1,6 +1,5 @@
 import QuoteItem from "@/app/ui/dashboard/quotes/quoteItem";
 import { ReactNode } from "react";
-import { redirect } from 'next/navigation'
 import { getAllBotQuotes } from "@/app/lib/discord_bot_utils";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import QuoteCounts from "@/app/ui/dashboard/quotes/quote_counts";
@@ -28,7 +27,7 @@ export default async function quotes({searchParams}) {
     <main className="flex flex-col items-center p-24 pt-10">
       <PageTitle text="Quotes" />
       <div className="flex flex-col 2xl:flex-row 2xl:w-3/4 justify-center">
-        <div className="sticky top-2 self-start 2xl:mr-5 h-fit">
+        <div className="2xl:sticky 2xl:top-2 self-start 2xl:mr-5 h-fit">
           <QuoteCounts summaryData={quotesSummary} updateTimestamp={quotesUpdateTimestamp}/>
           <QuoteSortBlock
             sortMethod={(sortMethod == "undefined") ? "timestamp_descending" : sortMethod} 
