@@ -62,19 +62,13 @@ export default async function music() {
                   />
                 </div>
               </Conditional>
-              <div className={`h-full mb-2 ${(last_year_has_aotd) ? "md:max-h-[450px]" : ""}`}>
-                <RecentSubmissions 
-                  albumList={recentSubmissionsResponse['album_list']} 
-                  timestamp={recentSubmissionsResponse['timestamp']}
-                />
-              </div>
               <Link
                 href={"/dashboard/aotd/album/all"}
                 prefetch={false}
                 className="flex"
               >
                 <Button
-                  className="p-2 mx-auto my-2 w-[90%] text-sm text-inheret h-fit bg-gradient-to-br from-green-700/80 to-green-800/80 hover:underline"
+                  className="p-2 mx-auto mt-2 w-[90%] text-sm text-inheret h-fit bg-gradient-to-br from-green-700/80 to-green-800/80 hover:underline"
                   size="sm"
                   radius="lg"
                   variant="solid"
@@ -82,6 +76,12 @@ export default async function music() {
                   <b>View All Albums</b>
                 </Button>
               </Link>
+              <div className={`h-full mb-4 ${(last_year_has_aotd) ? "md:max-h-[450px]" : ""}`}>
+                <RecentSubmissions 
+                  albumList={recentSubmissionsResponse['album_list']} 
+                  timestamp={recentSubmissionsResponse['timestamp']}
+                />
+              </div>
             </div>
           </div>
           <MusicStatsBox />
