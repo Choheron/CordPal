@@ -353,9 +353,13 @@ def getAllAlbums(request: HttpRequest):
       albumObj['last_aotd'] = DailyAlbum.objects.filter(album=album).filter(date__lte=datetime.datetime.now(tz=pytz.timezone('America/Chicago'))).latest('date').date # Return most recent instance of album
       # Get most recent review rating from AOtD
       albumObj['rating'] = getAlbumRating(mbid=album.mbid, rounded=False, date=albumObj['last_aotd'])
+      # Get most recent standard deviation
+      album_stddev = DailyAlbum.objects.filter(album=album).filter(date__lte=datetime.datetime.now(tz=pytz.timezone('America/Chicago'))).latest('date').standard_deviation
+      albumObj['standard_deviation'] = album_stddev if album_stddev != 0.00 else None
     except:
       albumObj['last_aotd'] = None
       albumObj['rating'] = None 
+      albumObj['standard_deviation'] = None
     # Append to List
     albumList.append(albumObj)
   # Return final object
