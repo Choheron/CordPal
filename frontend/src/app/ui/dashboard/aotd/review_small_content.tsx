@@ -28,7 +28,7 @@ export default async function ReviewPopoverContent(props) {
   const userData = await getUserData()
 
   return (
-    <div className="flex flex-col items-center pt-1">
+    <div className="flex flex-col items-center pt-1 z-50">
       <UserCard 
         userDiscordID={review['user_id']} 
         customDescription="View profile"
