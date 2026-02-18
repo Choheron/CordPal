@@ -49,7 +49,7 @@ export default function AllTimezonesBlock(props) {
     return <p>No Timezone Data Provided</p>
   }
   return (
-    <div className="flex flex-col w-fit max-w-[400px] gap-2">
+    <div className="flex flex-col w-full lg:max-w-[400px] gap-2">
       <div  
         className="relative"
       >

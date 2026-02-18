@@ -30,12 +30,12 @@ export default async function music() {
         <SpotifyLoginBox />
       </Conditional>
       <Conditional showWhen={aotd_participant}>
-        <div className="w-full 2xl:w-3/5 ">
-          <div className="flex flex-col w-full justify-center xl:flex-row gap-2">
+        <div className="w-full 2xl:w-4/5 ">
+          <div className="flex flex-col w-full justify-center 2xl:flex-row gap-2">
             {/* Left side Album of The Day Display */}
             <AlbumOfTheDayBox />
             {/* Right side prev year and recent submissions display*/}
-            <div className="max-w-full lg:w-[350px] flex flex-col">
+            <div className="max-w-full xl:w-[350px] flex flex-col">
               {/* Display the album from a year ago today if it exists */}
               <Conditional showWhen={last_year_has_aotd}>
                 <div className="h-fit p-3 rounded-2xl bg-zinc-800/30 border border-neutral-800 mt-2">
