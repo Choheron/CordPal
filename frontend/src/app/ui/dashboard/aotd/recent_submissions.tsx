@@ -41,7 +41,7 @@ export default async function RecentSubmissions(props) {
                         )}
                         description={
                           <div>
-                            <p>{submission['artist']}</p>
+                            <p className="line-clamp-1 max-w-56">{submission['artist']}</p>
                             <p className="text-xs">{"Submitted by: " + submission['submitter']}</p>
                           </div>
                         }
