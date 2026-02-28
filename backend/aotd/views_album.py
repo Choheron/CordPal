@@ -24,6 +24,7 @@ import datetime
 import pytz
 import requests
 from datetime import timedelta
+from django.db.models import Count, Q, F
 
 # Declare logging
 logger = logging.getLogger()
@@ -72,18 +73,23 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
   # Convert String to date
   date_format = '%Y-%m-%d'
   albumDay = datetime.datetime.strptime(date, date_format).date()
-  # Filter submissions by date
-  dateSubmissions = Album.objects.filter(submitted_by=userObj)
-  for submission in dateSubmissions:
-    if(submission.submission_date.astimezone(tz=pytz.timezone('America/Chicago')).date().strftime('%Y-%m-%d') == date):
-      validityStatus['canSubmit'] = False
-      validityStatus['reason'] = f"You have already submitted an album for today! ({albumDay}) (CST)"
-      return JsonResponse(validityStatus)
-  ## Check if a user has submitted a review for the current album, if not, they cannot submit an album
-  # Check for review submitted for the current date
-  try:
-    review = Review.objects.filter(review_date__date=albumDay).get(user=userObj)
-  except ObjectDoesNotExist as e:
+  # Calculate start and end of day
+  start_of_day = datetime.datetime.combine(albumDay, datetime.time.min)
+  end_of_day = start_of_day + datetime.timedelta(days=1)
+  # Check if the user has submitted an album today
+  already_submitted = Album.objects.filter(
+      submitted_by=userObj,
+      submission_date__gte=start_of_day,
+      submission_date__lt=end_of_day
+  ).exists()
+  # If user has already submitted, they cannot submit again today
+  if already_submitted:
+    validityStatus['canSubmit'] = False
+    validityStatus['reason'] = f"You have already submitted an album for today! ({albumDay}) (CST)"
+    return JsonResponse(validityStatus)
+  # If the user has reviewed today, they can submit
+  reviewed_today = Review.objects.filter(review_date__date=albumDay, user=userObj).exists()
+  if (not reviewed_today):
     validityStatus['canSubmit'] = False
     validityStatus['reason'] = f"You have not submitted a review for the current album!"
   ## Check if the user has 100 or more unpicked submissions, users are limited to 100 unpicked albums
@@ -529,30 +535,34 @@ def getLowestHighestAlbumStats(request: HttpRequest):
   # Declare out object
   out = {}
   # Declare placeholders 
-  lowest_album = None
-  lowest_album_rating = 11
   lowest_album_date = None
-  highest_album = None
-  highest_album_rating = -1
   highest_album_date = None
+  # Determine how many reviews to count
+  review_count_limit = 4 if (os.getenv("APP_ENV") == "PROD") else 1
   # Query albums that have been aotd and sort by rating
-  daily_albums = DailyAlbum.objects.all().exclude(rating=11.0).exclude(rating=None).order_by('-rating', '-date')
-  if((os.getenv("APP_ENV") == "PROD")):
-    daily_albums = [album for album in daily_albums if (album.getReviewCount() >= 4)]
+  daily_albums = DailyAlbum.objects \
+    .exclude(rating=11.0) \
+    .exclude(rating=None) \
+    .annotate(review_count=Count('album__reviews', filter=Q(album__reviews__aotd_date=F('date')))) \
+    .filter(review_count__gte=review_count_limit) \
+    .order_by('-rating', '-date')
   # Get the last album
-  lowest_daily_album = list(daily_albums)[-1]
+  lowest_daily_album = daily_albums.last()
   lowest_album = lowest_daily_album.album
   lowest_album_date = lowest_daily_album.date
   # Get the first album
-  highest_daily_album = list(daily_albums)[0]
+  highest_daily_album = daily_albums.first()
   highest_album = highest_daily_album.album
   highest_album_date = highest_daily_album.date
+  # Guard against empty queryset
+  if highest_daily_album is None or lowest_daily_album is None:
+    return JsonResponse({'highest_album': {}, 'lowest_album': {}})
   # Populate out objects
   out['lowest_album'] = lowest_album.toJSON() if lowest_album else {}
-  out['lowest_album']['rating'] = getAlbumRating(lowest_album.mbid, rounded=False) if lowest_album else 0.0
+  out['lowest_album']['rating'] = lowest_daily_album.rating
   out['lowest_album']['date'] = lowest_album_date if lowest_album_date else datetime.datetime.now().strftime("%Y-%m-%d")
   out['highest_album'] = highest_album.toJSON() if highest_album else {}
-  out['highest_album']['rating'] = getAlbumRating(highest_album.mbid, rounded=False) if highest_album else 0.0
+  out['highest_album']['rating'] = highest_daily_album.rating
   out['highest_album']['date'] = highest_album_date if highest_album_date else datetime.datetime.now().strftime("%Y-%m-%d")
   # Return Object
   return JsonResponse(out)

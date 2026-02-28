@@ -9,10 +9,12 @@ import CordpalPlaybackBanner from "../ui/playback/general/conditional_playback_b
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   // Retrieve user data
-  const userData = await getUserData();
-  const userLoginMethods = await getUserLoginMethods();
-  const memberStatus = (await isMember());
-  const avatarURL = await getUserAvatarURL();
+  const [userData, userLoginMethods, memberStatus, avatarURL] = await Promise.all([
+    getUserData(),
+    getUserLoginMethods(),
+    isMember(),
+    getUserAvatarURL(),
+  ]);
 
   // Create linked accounts object and add path to branding avatar
   let linkedAccounts: any[] = []

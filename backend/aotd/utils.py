@@ -1,6 +1,6 @@
 from django.http import HttpRequest
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Sum, StdDev
+from django.db.models import Avg, Sum, StdDev
 
 import logging
 from dotenv import load_dotenv
@@ -71,22 +71,15 @@ def getAlbumRating(mbid, rounded=True, date: str = None):
   # Retrieve album from database
   albumObj = aotd.album
   # Get average review score of album
-  reviewList = Review.objects.filter(album=albumObj).filter(aotd_date=aotd_date)
+  reviewList = Review.objects.filter(album=albumObj, aotd_date=aotd_date)
   # Return None if the album has not been reviewed
-  if(len(reviewList) == 0):
+  if(reviewList.count() == 0):
     return None
-  review_sum = 0.0
-  for review in reviewList:
-    review_sum += float(review.score)
   # Calculate Average [DO NOT STORE IN DB UNTIL DAY IS OVER (Handled in Aotd selection method)]
-  if(rounded):
-    rating = (round((review_sum/float(len(reviewList)))*2)/2 if len(reviewList) > 0 else 0.0)
-    # Return rating
-    return rating
-  else:
-    rating = review_sum/float(len(reviewList))
-    # Return rating
-    return rating
+  avg = reviewList.aggregate(avg=Avg('score'))['avg']
+  rating = ((round(avg * 2) / 2) if (rounded) else (avg)) if (reviewList.count() > 0) else 0.0
+  # Return rating
+  return rating
 
 
 # Check and set a user's aotd "selection_blocked_flag"

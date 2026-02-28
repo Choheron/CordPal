@@ -15,7 +15,7 @@ export async function proxy(request: NextRequest) {
   // Check if user is authorized, if not, redirect to login
   try {
     const authorized = await verifyAuth()
-    if(!(authorized['valid'])) {
+    if(!(authorized)) {
       return NextResponse.redirect(new URL(`/?redirect=${authorized['reason']}`, request.url));
     }
   } catch {
@@ -42,7 +42,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     {
-      source: '/dashboard',
+      source: '/dashboard/:path*',
     }
   ],
 }

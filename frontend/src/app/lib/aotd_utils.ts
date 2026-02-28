@@ -21,7 +21,7 @@ export async function isAotdParticipant() {
   const aotdResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/isAotdParticipant`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    next: { revalidate: 300 },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
