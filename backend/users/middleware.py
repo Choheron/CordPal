@@ -18,7 +18,7 @@ class LastSeenMiddleware:
     # Declare logging
     self.logger = logging.getLogger()
     self.heartbeat_endpoint_paths = ["/users/heartbeat", "/users/getAllOnlineData", "/discordapi/checkToken"]
-    self.no_user_validation_paths = ["/metrics", "/discordapi/checkToken", "/discordapi/token", "/spotifyapi/setAlbumOfDay", "/users/traditionalLogin"]
+    self.no_user_validation_paths = ["/metrics", "/discordapi/checkToken", "/discordapi/token", "/aotd/setAlbumOfDay", "/users/traditionalLogin"]
     # Determine runtime enviornment
     self.APP_ENV = os.getenv('APP_ENV') or 'DEV'
 

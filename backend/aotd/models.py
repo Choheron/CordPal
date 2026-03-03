@@ -38,6 +38,7 @@ class AotdUserData(models.Model):
   review_score_sum = models.FloatField(default=0)
   first_listen_percentage = models.FloatField(default=0)
   average_review_score = models.FloatField(default=0)
+  review_score_stddev = models.FloatField(default=0)
   median_review_score = models.FloatField(default=0)
   lowest_score_given = models.FloatField(default=None, null=True)
   lowest_score_mbid = models.CharField(max_length=256, null=True, default=None)
@@ -58,6 +59,8 @@ class AotdUserData(models.Model):
   total_selected = models.IntegerField(default=None, null=True)
   selection_score_sum = models.FloatField(default=0)
   average_selection_score = models.FloatField(default=0)
+  # Active flag, use to initiate the "yard sale" mechanic
+  active = models.BooleanField(default=True)
 
   # toString Method
   def __str__(self):
@@ -91,6 +94,7 @@ class Album(models.Model):
   disambiguation = models.CharField(max_length=256, null=False, default="") # If its a remaster or not, defauly to ""
   raw_data = models.JSONField(null=True) # JSON field to store all data returned from the frontend
   track_list = models.JSONField(null=True) # JSON field to contain a list of tracks from the musicbrainz api, will be fetched after selection.
+  hidden = models.BooleanField(default=False) # If this is true, it will not appear in recent submissions
 
   legacy_album = models.OneToOneField(
     SpotAlbum,
@@ -112,7 +116,7 @@ class Album(models.Model):
     else:
       return "Not Available"
     
-  def toJSON(self):
+  def toJSON(self, include_raw=True):
     """Return an Album as a JSON. (For HTTP JSON Responses)"""
     out = {}
     out['mbid'] = self.mbid
@@ -126,7 +130,8 @@ class Album(models.Model):
     out['submission_date'] = self.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
     out['release_date_str'] = self.release_date_str
     out['user_comment'] = self.user_comment
-    out['raw_album'] = self.raw_data
+    if(include_raw):
+      out['raw_album'] = self.raw_data
     return out
 
   # Custom delete function to log the user action
@@ -161,12 +166,25 @@ class DailyAlbum(models.Model):
     admin_message = models.TextField(null=True, blank=True)  # If set by an admin, and the admin provided a message, store that here. [The frontend will not show that an admin set this day unless a description is provided]
     rating_timeline = models.JSONField(default=generateTimelineDict, null=True)
     rating = models.FloatField(default=11.0, null=True) # Score for this day, will only be populated after the day is over (11 means it was not populated yet, Null means no reviews were made)
+    standard_deviation = models.FloatField(default=None, null=True)
 
     def getReviewCount(self):
       return Review.objects.filter(aotd_date=self.date, album=self.album).count()
 
     def dateToCalString(self):
       return self.date.strftime('%Y-%m-%d')
+    
+    def toJSON(self, timeline: bool = False, include_raw_album: bool = True):
+      out = {}
+      out['album_data'] = self.album.toJSON(include_raw=include_raw_album)
+      out['date'] = self.dateToCalString()
+      out['manual'] = self.manual
+      out['admin_message'] = self.admin_message
+      if(timeline):
+        out['rating_timeline'] = self.rating_timeline
+      out['rating'] = self.rating
+      out['standard_deviation'] = self.standard_deviation
+      return out
 
     def __str__(self):
       return f"Album for {self.date}: {self.album}"
@@ -212,7 +230,7 @@ class Review(models.Model):
       outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")
       outObj['last_updated'] = self.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
       outObj['first_listen'] = self.first_listen
-      outObj['aotd_date'] = self.aotd_date
+      outObj['aotd_date'] = self.aotd_date.strftime("%Y-%m-%d")
       outObj['version'] = self.version
       outObj['advanced'] = self.advanced
       outObj['trackData'] = self.advancedReviewDict
@@ -235,11 +253,11 @@ class Review(models.Model):
       outObj['reactions'] = list(rObj.values())
       return outObj
 
-    def save(self, *args, **kwargs):
+    def save(self, silent_update: bool = False, *args, **kwargs):
       """Save override, will create a history object and user action."""
       from users.models import UserAction
       # Create a history record before updating the review
-      if self.pk:  # Only if this is an update, not a new review
+      if self.pk and not silent_update:  # Only if this is an update, not a new review and is not a silent update by an admin
         # Fetch the original (pre-save) instance from the DB
         old_review = Review.objects.get(pk=self.pk)
         # Create review history object
@@ -277,7 +295,7 @@ class ReviewHistory(models.Model):
     review_text = models.TextField(null=True, blank=True)
     review_date = models.DateTimeField()  # Original date of the review
     first_listen = models.BooleanField(default=None, null=True) # Is this review a result of a first listen?
-    last_updated = models.DateTimeField(default=None, null=True) # When was this verion of the review (the one being overwritten) recorded 
+    last_updated = models.DateTimeField(default=None, null=True) # When was this version of the review (the one being overwritten) recorded 
     aotd_date = models.DateField(null=False) # Attach each review to the aotd date in which it was provided
     # Add review versioning for display
     version = models.IntegerField(default=1)
@@ -297,7 +315,7 @@ class ReviewHistory(models.Model):
       outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")
       outObj['last_updated'] = self.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
       outObj['first_listen'] = self.first_listen
-      outObj['aotd_date'] = self.aotd_date
+      outObj['aotd_date'] = self.aotd_date.strftime("%Y-%m-%d")
       outObj['version'] = self.version
       outObj['advanced'] = self.advanced
       outObj['trackData'] = self.advancedReviewDict

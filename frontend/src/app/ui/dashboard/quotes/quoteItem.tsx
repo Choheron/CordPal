@@ -1,6 +1,5 @@
 import { Albert_Sans, Great_Vibes } from "next/font/google"
 import { dancing } from "../../fonts";
-import { capitalizeFirstLetter } from "@/app/lib/utils";
 
 import UserCard from "../../general/userUiItems/user_card";
 
@@ -17,6 +16,8 @@ const vibes = Great_Vibes ({
 
 export default async function QuoteItem(props) {
   const textStyle = (props['cursive'] == 'true') ? `${dancing.className}` : `${albertSans.className}`;
+  const userID = (props.quoteObject.speaker) ? props.quoteObject.speaker.discord_id : props.quoteObject.speaker_discord_id
+  const nickname = (props.quoteObject.speaker) ? props.quoteObject.speaker.nickname : props.quoteObject.speaker_discord_id
 
   // Apply Regex on markdown style quotes
   function applyQuoteRegex(str) {
@@ -29,19 +30,21 @@ export default async function QuoteItem(props) {
   }
 
   return (
-    <div className="w-full flex justify-around max-w-5xl rounded-x bg-gradient-to-r from-neutral-900/0 via-neutral-900/75 to-neutral-900/0 px-2 py-2 my-2 rounded-2xl border border-neutral-900 mt-2 mb-2">
-      <div className="flex flex-col z-10 justify-around w-fit">
-        <div className="flex w-fit mr-auto">
+    <div className="w-full flex justify-around max-w-5xl rounded-x bg-gradient-to-r from-neutral-900/0 via-neutral-900/75 to-neutral-900/0 px-2 py-2 my-2 rounded-2xl border border-neutral-900 mb-2">
+      <div className="flex flex-col z-10 justify-around w-full">
+        <div className="flex w-fit">
           <UserCard 
-            userDiscordID={props.speaker} 
-            fallbackName={props.speaker_nickname}
+            userDiscordID={userID} 
+            fallbackName={nickname}
+            avatarClassNameOverride={"flex-shrink-0 size-[20px] xl:size-[40px]"}
           />
         </div>
-        <div className={`${textStyle} antialiased text-3xl p-1 pb-0 text-center`} >
+        <div className={`${textStyle} antialiased text-lg xl:text-3xl p-1 pb-0 text-center`} >
           <p dangerouslySetInnerHTML={{__html: applyQuoteRegex("&quot;" + props.quoteObject['text'] + "&quot;")}}/>
         </div>
-        <div className={`${textStyle} text-right px-10`}>
+        <div className={`${textStyle} text-right px-10 text-xs xl:text-base`}>
           <p>On: <i>{props.quoteObject['timestamp'].split(',')[0]}</i></p>
+          <p>Submitter: {props.quoteObject['submitter_nickname']}</p>
         </div>
       </div>
     </div>

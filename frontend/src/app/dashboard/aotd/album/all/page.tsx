@@ -43,7 +43,7 @@ export default function Page() {
   const columns = [
     {
       key: "title",
-      label: "ALBUM NAME",
+      label: "ALBUM",
       sortable: true,
     },
     {
@@ -59,6 +59,11 @@ export default function Page() {
     {
       key: "submission_date",
       label: "SUBMITTED ON",
+      sortable: true,
+    },
+    {
+      key: "standard_deviation",
+      label: "STDDEV",
       sortable: true,
     },
     {
@@ -85,6 +90,14 @@ export default function Page() {
         setAlbumList(albumList.sort((a, b) => {
           if (descriptor.direction === "ascending") return a['rating'] - b['rating'];
           if (descriptor.direction === "descending") return b['rating'] - a['rating'];
+          return 0;
+        }))
+        break;
+      // Sort on Standard Deviation
+      case 'standard_deviation':
+        setAlbumList(albumList.sort((a, b) => {
+          if (descriptor.direction === "ascending") return a['standard_deviation'] - b['standard_deviation'];
+          if (descriptor.direction === "descending") return b['standard_deviation'] - a['standard_deviation'];
           return 0;
         }))
         break;
@@ -183,22 +196,22 @@ export default function Page() {
     switch (columnKey) {
       case "title":
         return (
-          <div className="w-[400px]">
+          <div className="w-fit lg:w-[300px]">
             <Link
               href={"/dashboard/aotd/album/" + album['album_id']}
               prefetch={false}
             >
               <Button
-                radius="lg"
-                className={`relative w-full max-w-full justify-start h-fit px-0 hover:underline text-white py-1`}
+                radius="sm"
+                className={`relative min-w-0 w-fit lg:w-full justify-start h-fit px-0 hover:underline text-white lg:py-1`}
                 variant="light"
               >
                 <Avatar
                   src={`/dashboard/aotd/api/album-cover/${album['album_id']}`}
-                  className='my-auto shrink-0'
+                  className='my-auto shrink-0 size-10 md:size-10'
                   radius="sm"
                 />
-                <p className="w-fit text-lg hover:underline max-w-lg text-ellipsis">
+                <p className="w-fit text-lg hover:underline max-w-lg text-ellipsis hidden md:block">
                   {album['title']}
                 </p>
               </Button>
@@ -207,27 +220,27 @@ export default function Page() {
         );
       case "artist":
         return (
-          <div className="w-[100px]">
-            <a href={album['artist']['href']} target="_noreferrer" className="w-fit text-md my-auto hover:underline">
+          <div className="w-fit lg:w-[150px]">
+            <a href={album['artist']['href']} target="_noreferrer" className="w-fit text-md my-auto hover:underline text-xs md:text-sm">
               {album['artist']['name']}
             </a>
           </div>
         );
       case "submitter":
         return (
-          <div className="flex gap-2">
+          <div className="flex w-fit gap-2">
             <Avatar
               src={`${album['submitter_avatar_url']}`}
             />
-            <p className="my-auto">
+            <p className="my-auto hidden md:block">
               {album['submitter_nickname']}
             </p>
           </div>
         );
       case "submission_date":
         return (
-          <div className="my-auto">
-            <ClientTimestamp timestamp={album['submission_date']} full={true} />
+          <div className="my-auto text-center">
+            <ClientTimestamp timestamp={album['submission_date']} />
           </div>
         );
       case "rating":
@@ -236,6 +249,19 @@ export default function Page() {
             <div className={`px-2 py-2`}>
               <p className={`text-center text-black ${ratingToTailwindBgColor(album['rating'])} rounded-full`}>
                 <b>{album['rating'].toFixed(2)}</b>
+              </p>
+            </div> 
+            : 
+            <p className="text-center">
+              --
+            </p>
+        );
+      case "standard_deviation":
+        return (
+          (album['standard_deviation'] != null)? 
+            <div className={`px-auto w-full`}>
+              <p className={`text-center text-white text-lg`}>
+                <b>{album['standard_deviation'].toFixed(2)}</b>
               </p>
             </div> 
             : 
@@ -337,11 +363,11 @@ export default function Page() {
           sortDescriptor={sortDescriptor}
           onSortChange={handleSortChange}
           isStriped
-          className="w-full md:w-3/4 mx-auto"
+          className="max-w-full md:w-3/4 mx-auto"
         >
           <TableHeader columns={columns}>
             {(column) =>
-              <TableColumn key={column.key} allowsSorting={column.sortable} className="w-fit">{column.label}</TableColumn>
+              <TableColumn key={column.key} allowsSorting={column.sortable} className="w-fit text-center">{column.label}</TableColumn>
             }
           </TableHeader>
           <TableBody 
@@ -357,7 +383,7 @@ export default function Page() {
           >
             {(item: any) => (
               <TableRow key={`${item['album_id']} - ${item['title']} - ${item['artist']['name']} - ${item['submitter_nickname']}`}>
-                {(columnKey) => <TableCell className="w-fit">{renderCell(item, columnKey)}</TableCell>}
+                {(columnKey) => <TableCell className="min-w-0 md:w-fit">{renderCell(item, columnKey)}</TableCell>}
               </TableRow>
             )}
           </TableBody>

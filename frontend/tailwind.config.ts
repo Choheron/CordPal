@@ -18,6 +18,22 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      backgroundSize: {
+        'size-200': '200% 200%',
+      },
+      backgroundPosition: {
+        'pos-0': '0% 0%',
+        'pos-100': '100% 100%',
+      },
+      animation: {
+        'gradient-move': 'gradient-animation 10s ease infinite',
+      },
+      keyframes: {
+        'gradient-animation': {
+          '0%, 100%': { 'background-position': '0% 50%' },
+          '50%': { 'background-position': '100% 50%' },
+        },
+      },
       typography: ({ theme }) => ({
         sm: {  // This is for small prose class
           css: {

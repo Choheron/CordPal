@@ -51,9 +51,9 @@ class User(AbstractUser):
     return f"https://cdn.discordapp.com/embed/avatars/{int(self.discord_discriminator) % 5}.png"
 
   def is_online(self):
-    """Return true if the last_heartbeat_timestamp is within 1 min."""
+    """Return true if the last_heartbeat_timestamp is within 3 min."""
     try:
-      return ((timezone.now() - self.last_heartbeat_timestamp) < timedelta(minutes=1))
+      return ((timezone.now() - self.last_heartbeat_timestamp) < timedelta(minutes=3))
     except:
       return False
   
@@ -62,7 +62,7 @@ class User(AbstractUser):
     if(not self.is_online()):
       return "Offline"
     time_since_request = (timezone.now() - self.last_request_timestamp)
-    if(time_since_request > timedelta(minutes=2)):
+    if(time_since_request > timedelta(minutes=5)):
       return "Away"
     # If we reach this point, they have had a heartbeat and a request within the last two mins, meaning they are online
     return "Online"

@@ -85,6 +85,8 @@ def getUserSpokenQuotes(request: HttpRequest, user_discord_id: str):
     quotes = Quote.objects.filter(speaker=userObj)
   else:
     quotes = Quote.objects.filter(speaker_id=int(user_discord_id))
+  # Order quotes by timestamp showing most recent
+  quotes = quotes.order_by("-timestamp")
   # Iterate all quotes and create out list
   out = []
   for quote in quotes:
@@ -93,7 +95,7 @@ def getUserSpokenQuotes(request: HttpRequest, user_discord_id: str):
   return JsonResponse({'quotes': out})
 
 
-def getAllQuotesList(request: HttpRequest):
+def getAllQuotesList(request: HttpRequest, sortMethod: str = "timestamp_descending"):
   '''Return all quotes currently stored in the database, in list format'''
   # Make sure request is a GET request
   if(request.method != "GET"):
@@ -103,11 +105,32 @@ def getAllQuotesList(request: HttpRequest):
     return res
   # Get all quotes, convert to list, and return
   quotes = Quote.objects.all()
+  # Build out summaries of users with quotes
+  speakers = set(list(quotes.values_list('speaker_discord_id', flat=True)) + list(quotes.values_list('speaker__discord_id', flat=True)))
+  summaryObj = []
+  for speakID in speakers:
+    if(speakID != None):
+      # Retrieve user object from ID if possible
+      userObj = userUtils.getUserObj(speakID)
+      # Build Summary Object
+      summaryObj.append({
+        "count": (quotes.filter(speaker__discord_id=speakID).count() + quotes.filter(speaker_discord_id=speakID).count()),
+        "nickname": userObj.nickname if (userObj) else speakID,
+        "discord_id": speakID
+      })
+  # Sort quotes based on passed in sorting method
+  if(sortMethod == "timestamp_descending"):
+    quotes = quotes.order_by("-timestamp")
+  elif(sortMethod == "timestamp_ascending"):
+    quotes = quotes.order_by("timestamp")
+  elif(sortMethod == "name"):
+    quotes = quotes.order_by("speaker__nickname")
+  # Get list of quotes with correct sort method
   out = []
   for quote in quotes:
     out.append(quote.toJSON())
   # Return
-  return JsonResponse({'quotes': out})
+  return JsonResponse({'quotes': out, "summary": summaryObj})
 
 
 def getAllQuotesLegacy(request: HttpRequest):

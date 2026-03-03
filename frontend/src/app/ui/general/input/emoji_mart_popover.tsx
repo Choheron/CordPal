@@ -59,11 +59,23 @@ export default function EmojiMartButton(props) {
           keywords: ['rat', 'laugh', 'joy', 'funny'],
           skins: [{ src: 'https://cdn.discordapp.com/emojis/683873459834454031.webp?size=40' }],
         },
+         {
+          id: 'cowboy_rat',
+          name: 'CowboyRat',
+          keywords: ['cowboy', 'rat', 'yeehaw'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/1384923211384357005.webp?size=40' }],
+        },
         {
           id: 'gigachad',
           name: 'Gigachad',
           keywords: ['gigachad', 'giga', 'chad'],
           skins: [{ src: 'https://cdn.discordapp.com/emojis/926282130890293298.webp?size=40' }],
+        },
+        {
+          id: 'duckcock',
+          name: 'Duckcock',
+          keywords: ['duck', 'cock', 'duckcock'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/743581643662688367.webp?size=40' }],
         },
       ],
     }

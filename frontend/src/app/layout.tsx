@@ -2,12 +2,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import {Providers} from "./providers";
-import Image from "next/image";
 
-import ClientSnowfall from "./ui/general/holiday/snowfall";
-import { isDecember } from "./lib/utils";
 import Heartbeat from "./ui/heartbeat";
 import Footer from "./ui/footer";
+import ClientHolidayDisplay from "./ui/general/holiday/client_holiday_display";
+import { isValentinesDay } from "./lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,6 +17,15 @@ export const metadata: Metadata = {
     icon: '/svgs/logos/CordPal_Logo_V1.svg',
   }
 };
+
+// Get todays date (in central time)
+
+// Make Gradient Pink if Valentines day, purple if not
+const gradientCSS = (
+  (isValentinesDay()) ?
+  ("radial-gradient(125% 125% at 53% 100%, #000000 72%, #db005f 100%)") :
+  ("radial-gradient(125% 125% at 53% 100%, #000000 72%, #350136 100%)")
+)
 
 export default function RootLayout({
   children,
@@ -30,55 +38,21 @@ export default function RootLayout({
       <body className={`${inter.className} dark min-h-screen flex flex-col relative`}>
         {/* From https://patterncraft.fun/ */}
         <div
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 z-0 max-h-[100vh]"
           style={{
-            background: "radial-gradient(125% 125% at 53% 100%, #000000 72%, #350136 100%)",
+            background: gradientCSS,
           }}
         />
         {/* Placeholder Component to implement heartbeat */}
         <Heartbeat />
-        {/* Only display if it is December (Holiday Display) */}
-        {(isDecember()) ? 
-          (
-            <>
-              <Image 
-                src={`/svgs/holiday_decor/snowbanks.svg`} 
-                alt="Background Snow, Happy Holidays!" 
-                width={960}
-                height={540}
-                style={{ width: '100vw', height: 'auto' }}
-                className="fixed bottom-0 2xl:-bottom-40 opacity-75"
-              />
-              <div className="flex">
-                <Image
-                  src="/images/holiday_decor/string-lights-png-hd-9.png"
-                  width={0}
-                  height={0}
-                  sizes="49vw"
-                  alt="Image of some Christmas Lights, Merry Christmas!"
-                  className="fixed mt-20 z-0 lg:mt-0 lg:static"
-                  style={{ width: '100%', height: 'auto' }}
-                />
-                <Image
-                  src="/images/holiday_decor/string-lights-png-hd-9.png"
-                  width={0}
-                  height={0}
-                  sizes="49vw"
-                  alt="Image of some Christmas Lights, Merry Christmas!"
-                  className="fixed mt-20 z-0 lg:mt-0 lg:static scale-x-[-1]"
-                  style={{ width: '100%', height: 'auto' }}
-                />
-              </div>
-            </>
-          ) : (<></>)}
+        {/* Conditional Holiday Display (Holiday Display shows only in december and not on playback pages) */}
+        <ClientHolidayDisplay />
         <Providers>
           <div className="flex flex-col min-h-screen bg-inherit relative">
             <div className="flex-grow">{children}</div>
             <Footer />
           </div>
         </Providers>
-        {/* Only display if it is December (Holiday Display) */}
-        {(isDecember()) ? (<ClientSnowfall />) : (<></>)}
       </body>
     </html>
   );

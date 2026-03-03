@@ -9,6 +9,7 @@ import {
   useDisclosure
 } from "@heroui/modal";
 import { addToast, Button, Divider, Link } from "@heroui/react";
+import { Checkbox } from "@heroui/checkbox";
 import { Input } from "@heroui/input";
 import { Textarea } from "@heroui/input";
 
@@ -20,6 +21,7 @@ import { Conditional } from "../../conditional";
 import InfoPopover from "@/app/ui/general/info_popover";
 import { musicBrainzAlbumSearch } from "@/app/lib/aotd_utils";
 import {Image} from "@heroui/image";
+import { isUserAdmin } from "@/app/lib/user_utils";
 
 // Modal to allow a user to submit an album for the album of the day pool
 export default function AddAlbumModal(props) {
@@ -28,8 +30,10 @@ export default function AddAlbumModal(props) {
   // Validation Checks
   const [userAllowedToSubmit, setUserAllowedToSubmit] = React.useState(false);
   const [userAllowedToSubmitMessage, setUserAllowedToSubmitMessage] = React.useState("");
+  const [isAdmin, setIsAdmin] = React.useState(false);
   // Dynamic values
   const [commentValue, setCommentValue] = React.useState("");
+  const [isHidden, setIsHidden] = React.useState(false);
   const [selectedAlbum, setSelectedAlbum] = React.useState(null);
   const [albumError, setAlbumError] = React.useState(false)
   const [albumErrorData, setAlbumErrorData] = React.useState({})
@@ -59,9 +63,14 @@ export default function AddAlbumModal(props) {
     setUserAllowedToSubmitMessage(canSubmitObj['reason']);
   }
 
-  // UseEffect to check if a user is allowed to submit albums
+  // UseEffect to check if a user is allowed to submit albums and see if the user is an admin
   React.useEffect(() => {
+    const checkAdmin = async() => {
+      const adminFlag = await isUserAdmin()
+      setIsAdmin(adminFlag)
+    }
     getUserSubmissionValidity()
+    checkAdmin()
   }, [])
 
   // Send a search request and a
@@ -145,6 +154,7 @@ export default function AddAlbumModal(props) {
     let albumData = {}
     albumData['user_comment'] = commentValue
     albumData['album'] = selectedAlbum
+    albumData['album']['hidden'] = isHidden
     // Call backend to submit album
     const responseObj = await submitAlbumToBackend(albumData)
     // Alert user of action status
@@ -167,6 +177,7 @@ export default function AddAlbumModal(props) {
     cancelPress()
   }
 
+
   // Reset values on cancel button press
   const cancelPress = () => {
     // Clear user data and search result data
@@ -178,9 +189,11 @@ export default function AddAlbumModal(props) {
     setIsSearchLoading(false)
     setSearchAlbumsResponse({})
     setAlbumError(false)
+    setIsHidden(false)
     
     onClose()
   }
+  
   
   return (
     <>
@@ -356,20 +369,29 @@ export default function AddAlbumModal(props) {
               </div>
               </ModalBody>
               <ModalFooter>
-                <Conditional showWhen={albumError}>
-                  <div className="text-red-500 my-auto">
-                    <p className="underline mx-auto">Album has already been submitted!</p>
-                    <div className="flex w-full">
-                      <p className="my-auto">Submitted by:</p>
-                      <Link 
-                        isBlock 
-                        href={`/profile/${albumErrorData['submitter_id']}`}
-                      >
-                        {albumErrorData['submitter_nickname']}
-                      </Link>
+                <div className="flex flex-col">
+                  <Conditional showWhen={albumError}>
+                    <div className="text-red-500 my-auto">
+                      <p className="underline mx-auto">Album has already been submitted!</p>
+                      <div className="flex w-full">
+                        <p className="my-auto">Submitted by:</p>
+                        <Link 
+                          isBlock 
+                          href={`/profile/${albumErrorData['submitter_id']}`}
+                        >
+                          {albumErrorData['submitter_nickname']}
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                </Conditional>
+                  </Conditional>
+                  <Conditional showWhen={isAdmin}>
+                    <div className="">
+                      <Checkbox isSelected={isHidden} onValueChange={setIsHidden}>
+                        Hide This Submission?
+                      </Checkbox>
+                    </div>
+                  </Conditional>
+                </div>
                 <Button color="danger" variant="light" onPress={cancelPress}>
                   Cancel
                 </Button>

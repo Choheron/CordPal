@@ -30,12 +30,12 @@ export default async function music() {
         <SpotifyLoginBox />
       </Conditional>
       <Conditional showWhen={aotd_participant}>
-        <div className="w-full 2xl:w-3/5 ">
-          <div className="flex flex-col w-full justify-center xl:flex-row gap-2">
+        <div className="w-full 2xl:w-4/5 h-fit">
+          <div className="flex flex-col w-full justify-center 2xl:flex-row gap-2">
             {/* Left side Album of The Day Display */}
             <AlbumOfTheDayBox />
             {/* Right side prev year and recent submissions display*/}
-            <div className="max-w-full lg:max-w-[350px] flex flex-col">
+            <div className="max-w-full xl:w-[350px] flex flex-col">
               {/* Display the album from a year ago today if it exists */}
               <Conditional showWhen={last_year_has_aotd}>
                 <div className="h-fit p-3 rounded-2xl bg-zinc-800/30 border border-neutral-800 mt-2">
@@ -62,19 +62,13 @@ export default async function music() {
                   />
                 </div>
               </Conditional>
-              <div className={`h-full mb-2 ${(last_year_has_aotd) ? "md:max-h-[450px]" : ""}`}>
-                <RecentSubmissions 
-                  albumList={recentSubmissionsResponse['album_list']} 
-                  timestamp={recentSubmissionsResponse['timestamp']}
-                />
-              </div>
               <Link
                 href={"/dashboard/aotd/album/all"}
                 prefetch={false}
                 className="flex"
               >
                 <Button
-                  className="p-2 mx-auto my-2 w-[90%] text-sm text-inheret h-fit bg-gradient-to-br from-green-700/80 to-green-800/80 hover:underline"
+                  className="p-2 mx-auto my-2 w-full text-sm text-inheret h-fit bg-gradient-to-br from-green-700/80 to-green-800/80 hover:underline"
                   size="sm"
                   radius="lg"
                   variant="solid"
@@ -82,6 +76,12 @@ export default async function music() {
                   <b>View All Albums</b>
                 </Button>
               </Link>
+              <div className={`h-full mb-2 ${(last_year_has_aotd) ? "md:max-h-[450px]" : ""}`}>
+                <RecentSubmissions 
+                  albumList={recentSubmissionsResponse['album_list']} 
+                  timestamp={recentSubmissionsResponse['timestamp']}
+                />
+              </div>
             </div>
           </div>
           <MusicStatsBox />

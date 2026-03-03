@@ -58,16 +58,16 @@ export default function CurrentTime(props) {
     )
   }
   return (
-    <div className="flex flex-col w-fit max-w-full h-fit px-2 py-2 border-neutral-800 bg-zinc-800/30 rounded-xl border font-extralight">
+    <div className="flex flex-col w-full max-w-full h-fit px-2 py-2 border-neutral-800 bg-zinc-800/30 rounded-xl border font-extralight">
       <p>{((titleOverride) ? titleOverride : "Your Current Time: ")}</p>
       <div className="text-6xl min-w-[400px] px-5">
-        <div className="flex w-full py-3">
-          <div className="flex w-full">
-            <p className="w-1/3 text-center">{padNumber(hours)}</p>
+        <div className="flex w-fit py-3 mx-auto">
+          <div className="flex w-fit">
+            <p className="w-fit text-center">{padNumber(hours)}</p>
             <p>:</p>
-            <p className="w-1/3 text-center">{padNumber(mins)}</p>
+            <p className="w-fit text-center">{padNumber(mins)}</p>
             <p>:</p>
-            <p className="w-1/3 text-center" suppressHydrationWarning>{padNumber(seconds)}</p>
+            <p className="w-fit text-center" suppressHydrationWarning>{padNumber(seconds)}</p>
           </div>
           <p>{((props.military) ? "" : postFix)}</p>
         </div>

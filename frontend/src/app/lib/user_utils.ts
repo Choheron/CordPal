@@ -401,8 +401,7 @@ export async function getRecentUserActions() {
   const userActionsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getRecentUserActions`, {
     method: "GET",
     credentials: "include",
-    cache: 'force-cache',
-    next: { tags: ['user-data'] },
+    cache: 'no-cache',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
