@@ -41,8 +41,7 @@ export async function proxy(request: NextRequest) {
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: [
-    {
-      source: '/dashboard/:path*',
-    }
+    '/dashboard/((?!.*\\/api\\/).*)',  // /dashboard/* but NOT /dashboard/*/api/*
+    '/dashboard',                       // exact /dashboard
   ],
 }
