@@ -166,6 +166,7 @@ export default function UploadPhotoModal(props) {
                 </Button>
                 <Button 
                   color="primary" 
+                  isLoading={uploading}
                   isDisabled={!((titleValue !== "") && fileChosen && (creator !== "")) && !uploading}
                   onPress={uploadPress}
                 >
