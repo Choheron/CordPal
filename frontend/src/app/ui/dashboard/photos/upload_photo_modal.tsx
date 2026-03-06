@@ -28,6 +28,7 @@ export default function UploadPhotoModal(props) {
   const [fileChosen, setFileChosen] = React.useState(false);
   const [fileName, setFileName] = React.useState("")
   const [fileType, setFileType] = React.useState("")
+  const [uploading, setUploading] = React.useState(false)
 
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
@@ -55,6 +56,8 @@ export default function UploadPhotoModal(props) {
     }
     // Check if upload is to happen
     if(upload) {
+      // Mark button uploading
+      await setUploading(true)
       // Send form data to backend
       const responseObj = await uploadImageToBackend(uploadFormData)
       // Alert user of success or failure to upload image
@@ -86,6 +89,7 @@ export default function UploadPhotoModal(props) {
     setFileChosen(false)
     setFileName("")
     setFileType("")
+    setUploading(false)
 
     onClose()
     // Reload page
@@ -162,7 +166,7 @@ export default function UploadPhotoModal(props) {
                 </Button>
                 <Button 
                   color="primary" 
-                  isDisabled={!((titleValue !== "") && fileChosen && (creator !== ""))}
+                  isDisabled={!((titleValue !== "") && fileChosen && (creator !== "")) && !uploading}
                   onPress={uploadPress}
                 >
                   Upload
