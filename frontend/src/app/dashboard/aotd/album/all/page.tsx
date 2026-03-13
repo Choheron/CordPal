@@ -87,7 +87,7 @@ export default function Page() {
     switch(descriptor.column) {
       // Sort on rating
       case 'rating':
-        setAlbumList(albumList.sort((a, b) => {
+        setAlbumList([...albumList].sort((a, b) => {
           if (descriptor.direction === "ascending") return a['rating'] - b['rating'];
           if (descriptor.direction === "descending") return b['rating'] - a['rating'];
           return 0;
@@ -95,7 +95,7 @@ export default function Page() {
         break;
       // Sort on Standard Deviation
       case 'standard_deviation':
-        setAlbumList(albumList.sort((a, b) => {
+        setAlbumList([...albumList].sort((a, b) => {
           if (descriptor.direction === "ascending") return a['standard_deviation'] - b['standard_deviation'];
           if (descriptor.direction === "descending") return b['standard_deviation'] - a['standard_deviation'];
           return 0;
@@ -103,10 +103,10 @@ export default function Page() {
         break;
       // Sort on Submission Date
       case 'submission_date':
-        setAlbumList(albumList.sort((a, b) => {
+        setAlbumList([...albumList].sort((a, b) => {
           const dateA: any = new Date(a['submission_date']);
           const dateB: any = new Date(b['submission_date']);
-          
+
           if (descriptor.direction === "ascending") return (dateA - dateB);
           if (descriptor.direction === "descending") return (dateB - dateA);
           return 0;
@@ -114,7 +114,7 @@ export default function Page() {
         break;
       // Sort on Submitter Nickname
       case 'submitter':
-        setAlbumList(albumList.sort((a, b) => {
+        setAlbumList([...albumList].sort((a, b) => {
           if (descriptor.direction === "ascending") return ((a['submitter_nickname'] < b['submitter_nickname']) ? 1 : -1);
           if (descriptor.direction === "descending") return ((a['submitter_nickname'] > b['submitter_nickname']) ? 1 : -1);
           return 0;
@@ -122,7 +122,7 @@ export default function Page() {
         break;
       // Sort on Artist Name
       case 'artist':
-        setAlbumList(albumList.sort((a, b) => {
+        setAlbumList([...albumList].sort((a, b) => {
           if (descriptor.direction === "ascending") return ((a['artist']['name'] < b['artist']['name']) ? 1 : -1);
           if (descriptor.direction === "descending") return ((a['artist']['name'] > b['artist']['name']) ? 1 : -1);
           return 0;
@@ -130,7 +130,7 @@ export default function Page() {
         break;
       // Sort on Album Title
       case 'title':
-        setAlbumList(albumList.sort((a, b) => {
+        setAlbumList([...albumList].sort((a, b) => {
           if (descriptor.direction === "ascending") return ((a['title'] < b['title']) ? 1 : -1);
           if (descriptor.direction === "descending") return ((a['title'] > b['title']) ? 1 : -1);
           return 0;
@@ -138,7 +138,7 @@ export default function Page() {
         break;
       // Sort on Last Album of Day Date
       case 'last_aotd':
-        setAlbumList(albumList.sort((a, b) => {
+        setAlbumList([...albumList].sort((a, b) => {
           if (descriptor.direction === "ascending") return ((a['last_aotd'] < b['last_aotd']) ? 1 : -1);
           if (descriptor.direction === "descending") return ((a['last_aotd'] > b['last_aotd']) ? 1 : -1);
           return 0;
@@ -312,7 +312,7 @@ export default function Page() {
       <PageTitle text={`Album Data for ${(titleFilter == "") ? "all" : ""} ${(albumList) ? albumList.length : "LOADING"} Albums`} />
       <div>
         {/* Filter Inputs */}
-        <div className="flex gap-1 w-full md:w-3/4 mx-auto">
+        <div className="flex flex-col sm:flex-row gap-1 w-full md:w-3/4 mx-auto">
           <Input 
             label="Title" 
             placeholder="Filter by Title" 
@@ -357,37 +357,86 @@ export default function Page() {
             </div>
           </div>
         </div>
-        {/* Table displaying Albums */}
-        <Table 
-          aria-label="Album Submissions"
-          sortDescriptor={sortDescriptor}
-          onSortChange={handleSortChange}
-          isStriped
-          className="max-w-full md:w-3/4 mx-auto"
-        >
-          <TableHeader columns={columns}>
-            {(column) =>
-              <TableColumn key={column.key} allowsSorting={column.sortable} className="w-fit text-center">{column.label}</TableColumn>
-            }
-          </TableHeader>
-          <TableBody 
-            items={(albumList) ? albumList : []}
-            emptyContent={(listLoading) ? 
-              <div>
-                <Spinner />
-                <p>Loading...</p>
-              </div>
-              : 
-              <p>No Data Available...</p> 
-            }
+        {/* Mobile: Card list */}
+        <div className="md:hidden flex flex-col gap-2 w-full mt-2">
+          {listLoading ? (
+            <div className="flex flex-col items-center py-8 gap-2">
+              <Spinner />
+              <p>Loading...</p>
+            </div>
+          ) : (albumList ?? []).length === 0 ? (
+            <p className="text-center py-8">No Data Available...</p>
+          ) : (
+            (albumList as any[]).map((album: any) => (
+              <Link
+                key={album['album_id']}
+                href={`/dashboard/aotd/album/${album['album_id']}`}
+                prefetch={false}
+              >
+                <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-800/30 border border-neutral-800 active:bg-zinc-700/30">
+                  <Avatar
+                    src={`/dashboard/aotd/api/album-cover/${album['album_id']}`}
+                    radius="sm"
+                    className="shrink-0 size-14"
+                  />
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate">{album['title']}</p>
+                    <p className="text-xs text-gray-400 truncate">{album['artist']['name']}</p>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Avatar src={album['submitter_avatar_url']} className="size-5 shrink-0" />
+                      <p className="text-xs text-gray-400 truncate">{album['submitter_nickname']}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    {album['rating'] != null ? (
+                      <span className={`px-2 py-0.5 text-xs rounded-full text-black font-bold ${ratingToTailwindBgColor(album['rating'])}`}>
+                        {album['rating'].toFixed(2)}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-500">--</span>
+                    )}
+                    {album['last_aotd'] && (
+                      <span className="text-xs text-gray-500">{album['last_aotd']}</span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            ))
+          )}
+        </div>
+        {/* Desktop: Table */}
+        <div className="hidden md:block">
+          <Table
+            aria-label="Album Submissions"
+            sortDescriptor={sortDescriptor}
+            onSortChange={handleSortChange}
+            isStriped
+            className="max-w-full md:w-3/4 mx-auto"
           >
-            {(item: any) => (
-              <TableRow key={`${item['album_id']} - ${item['title']} - ${item['artist']['name']} - ${item['submitter_nickname']}`}>
-                {(columnKey) => <TableCell className="min-w-0 md:w-fit">{renderCell(item, columnKey)}</TableCell>}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            <TableHeader columns={columns}>
+              {(column) =>
+                <TableColumn key={column.key} allowsSorting={column.sortable} className="w-fit text-center">{column.label}</TableColumn>
+              }
+            </TableHeader>
+            <TableBody
+              items={(albumList) ? albumList : []}
+              emptyContent={(listLoading) ?
+                <div>
+                  <Spinner />
+                  <p>Loading...</p>
+                </div>
+                :
+                <p>No Data Available...</p>
+              }
+            >
+              {(item: any) => (
+                <TableRow key={`${item['album_id']} - ${item['title']} - ${item['artist']['name']} - ${item['submitter_nickname']}`}>
+                  {(columnKey) => <TableCell className="min-w-0 md:w-fit">{renderCell(item, columnKey)}</TableCell>}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </>
   )

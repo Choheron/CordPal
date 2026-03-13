@@ -24,7 +24,7 @@ import datetime
 import pytz
 import requests
 from datetime import timedelta
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q, F, Subquery, OuterRef, FloatField
 
 # Declare logging
 logger = logging.getLogger()
@@ -331,44 +331,72 @@ def getAllAlbums(request: HttpRequest):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Retrieve all albums from database
-  albumObj = Album.objects.all()
-  # Declare list of albums
+
+  now = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
+
+  # Correlated subqueries — collapse 3N DailyAlbum queries into the main SELECT
+  latest_date_sq = (
+    DailyAlbum.objects
+    .filter(album=OuterRef('pk'), date__lte=now)
+    .order_by('-date')
+    .values('date')[:1]
+  )
+  latest_rating_sq = (
+    DailyAlbum.objects
+    .filter(album=OuterRef('pk'), date__lte=now)
+    .order_by('-date')
+    .values('rating')[:1]
+  )
+  latest_stddev_sq = (
+    DailyAlbum.objects
+    .filter(album=OuterRef('pk'), date__lte=now)
+    .order_by('-date')
+    .values('standard_deviation')[:1]
+  )
+
+  albums = list(
+    Album.objects
+    .select_related('submitted_by')
+    .defer('raw_data', 'track_list')
+    .annotate(
+      latest_aotd_date=Subquery(latest_date_sq),
+      latest_aotd_rating=Subquery(latest_rating_sq, output_field=FloatField()),
+      latest_aotd_stddev=Subquery(latest_stddev_sq, output_field=FloatField()),
+    )
+  )
+
   albumList = []
-  # Iterate through albums
-  for album in albumObj:
-    # Build album object
-    albumObj = {}
-    albumObj['title'] = album.title
-    albumObj['album_id'] = album.mbid
-    albumObj['album_img_src'] = album.cover_url
-    albumObj['album_src'] = album.album_url
-    albumObj['artist'] = {}
-    albumObj['artist']['name'] = album.artist
-    albumObj['artist']['href'] = (album.artist_url if album.artist_url != "" else album.raw_data['album']['artists'][0]['external_urls']['aotd'])
-    albumObj['submitter'] = album.submitted_by.discord_id
-    albumObj['submitter_avatar_url'] = album.submitted_by.get_avatar_url()
-    albumObj['submitter_nickname'] = album.submitted_by.nickname
-    albumObj['submitter_comment'] = album.user_comment
-    albumObj['submission_date'] = album.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
-    albumObj['release_date_str'] = album.release_date_str
-    albumObj['release_date'] = album.release_date.strftime("%m/%d/%Y, %H:%M:%S") if album.release_date else None
-    # Check if album has been aotd
-    try:
-      # Get most recent AOtD date
-      albumObj['last_aotd'] = DailyAlbum.objects.filter(album=album).filter(date__lte=datetime.datetime.now(tz=pytz.timezone('America/Chicago'))).latest('date').date # Return most recent instance of album
-      # Get most recent review rating from AOtD
-      albumObj['rating'] = getAlbumRating(mbid=album.mbid, rounded=False, date=albumObj['last_aotd'])
-      # Get most recent standard deviation
-      album_stddev = DailyAlbum.objects.filter(album=album).filter(date__lte=datetime.datetime.now(tz=pytz.timezone('America/Chicago'))).latest('date').standard_deviation
-      albumObj['standard_deviation'] = album_stddev if album_stddev != 0.00 else None
-    except:
-      albumObj['last_aotd'] = None
-      albumObj['rating'] = None 
-      albumObj['standard_deviation'] = None
-    # Append to List
-    albumList.append(albumObj)
-  # Return final object
+  for album in albums:
+    user = album.submitted_by
+
+    raw_rating = album.latest_aotd_rating
+    # 11.0 is the sentinel value meaning "day in progress, no stored rating yet"
+    effective_rating = None if (raw_rating is None or raw_rating == 11.0) else raw_rating
+
+    stddev = album.latest_aotd_stddev
+    effective_stddev = stddev if (stddev is not None and stddev != 0.00) else None
+
+    albumList.append({
+      'title': album.title,
+      'album_id': album.mbid,
+      'album_img_src': album.cover_url,
+      'album_src': album.album_url,
+      'artist': {
+        'name': album.artist,
+        'href': album.artist_url if album.artist_url != "" else album.raw_data['album']['artists'][0]['external_urls']['aotd'],
+      },
+      'submitter': user.discord_id if user else None,
+      'submitter_avatar_url': user.get_avatar_url() if user else None,
+      'submitter_nickname': user.nickname if user else None,
+      'submitter_comment': album.user_comment,
+      'submission_date': album.submission_date.strftime("%m/%d/%Y, %H:%M:%S"),
+      'release_date_str': album.release_date_str,
+      'release_date': album.release_date.strftime("%m/%d/%Y, %H:%M:%S") if album.release_date else None,
+      'last_aotd': album.latest_aotd_date,
+      'rating': effective_rating,
+      'standard_deviation': effective_stddev,
+    })
+
   return JsonResponse({"timestamp": datetime.datetime.now(), "albums_list": albumList})
 
 

@@ -6,6 +6,9 @@
 .pnp.js
 .yarn/install-state.gz
 
+# Claude file
+.claude
+
 # Ignore python mess
 __pycache__
 **/__pycache__

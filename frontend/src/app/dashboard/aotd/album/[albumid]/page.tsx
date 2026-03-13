@@ -104,14 +104,14 @@ export default async function Page({
         <div key={index}>
           <div className="flex gap-1">
             <div className="w-[25px]">
-              <p className="text-xl mx-auto w-fit">{`${trackData['position']}. `}</p>
+              <p className="text-base md:text-xl mx-auto w-fit">{`${trackData['position']}. `}</p>
             </div>
             <div className="w-full">
               <div className="flex gap-1 h-fit">
-                <p className="text-xl line-clamp-1">{trackData['title']}</p>
-                <p className="text-sm my-auto italic">&#x28;{lengthString}&#x29;</p>
+                <p className="text-base md:text-xl line-clamp-1">{trackData['title']}</p>
+                <p className="text-xs my-auto italic">&#x28;{lengthString}&#x29;</p>
               </div>
-              <p className="italic text-base">
+              <p className="italic text-xs md:text-base">
                 {artistCredit.map((artistObj) => {
                   return artistObj['name']
                 }).join(", ")}
@@ -157,7 +157,7 @@ export default async function Page({
       </Link>
       <div className="flex flex-col sm:flex-row w-full md:w-9/10 justify-center gap-2">
         {/* Album Display and Previous Review Display */}
-        <div className="flex flex-row justify-start gap-2">
+        <div className="flex flex-col sm:flex-row justify-start gap-2">
           <div className="gap-2 h-fit w-fit">
             <div className="relative h-fit lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
               <AlbumDisplay 
