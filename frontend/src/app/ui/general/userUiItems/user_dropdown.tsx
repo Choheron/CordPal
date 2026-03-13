@@ -32,7 +32,15 @@ export default function UserDropdown(props) {
     // Fetch users when the component mounts
     async function fetchUsers() {
       const fetchedUsers: any = (props.idListOverride) ? props.idListOverride : await getUserList();
-      setUsers(fetchedUsers);
+      // Deduplicate by the field used as the SelectItem key to prevent React key collision warnings
+      const keyField = props.useNicknameKeys ? 'nickname' : 'discord_id';
+      const seen = new Set();
+      const uniqueUsers = fetchedUsers.filter((u: IUser) => {
+        if (seen.has(u[keyField])) return false;
+        seen.add(u[keyField]);
+        return true;
+      });
+      setUsers(uniqueUsers);
       setLoading(false); // Set loading to false after fetching users
     }
     fetchUsers();

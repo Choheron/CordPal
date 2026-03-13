@@ -604,7 +604,7 @@ export async function getAllAlbums() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['album_submissions', 'ATOD'] },
+    next: { tags: ['album_submissions', 'AOTD'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },

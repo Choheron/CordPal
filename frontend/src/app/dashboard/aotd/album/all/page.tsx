@@ -25,11 +25,48 @@ import UserDropdown from "@/app/ui/general/userUiItems/user_dropdown";
 import PageTitle from "@/app/ui/dashboard/page_title";
 
 
+// Helper: pure sort — no mutation
+const sortAlbumList = (list: any[], descriptor: any) => {
+  if (!descriptor?.column) return list
+  return [...list].sort((a, b) => {
+    switch (descriptor.column) {
+      case 'rating':
+        return descriptor.direction === "ascending" ? a['rating'] - b['rating'] : b['rating'] - a['rating']
+      case 'standard_deviation':
+        return descriptor.direction === "ascending"
+          ? a['standard_deviation'] - b['standard_deviation']
+          : b['standard_deviation'] - a['standard_deviation']
+      case 'submission_date': {
+        const dA: any = new Date(a['submission_date'])
+        const dB: any = new Date(b['submission_date'])
+        return descriptor.direction === "ascending" ? dA - dB : dB - dA
+      }
+      case 'submitter':
+        return descriptor.direction === "ascending"
+          ? (a['submitter_nickname'] < b['submitter_nickname'] ? 1 : -1)
+          : (a['submitter_nickname'] > b['submitter_nickname'] ? 1 : -1)
+      case 'artist':
+        return descriptor.direction === "ascending"
+          ? (a['artist']['name'] < b['artist']['name'] ? 1 : -1)
+          : (a['artist']['name'] > b['artist']['name'] ? 1 : -1)
+      case 'title':
+        return descriptor.direction === "ascending"
+          ? (a['title'] < b['title'] ? 1 : -1)
+          : (a['title'] > b['title'] ? 1 : -1)
+      case 'last_aotd':
+        return descriptor.direction === "ascending"
+          ? (a['last_aotd'] < b['last_aotd'] ? 1 : -1)
+          : (a['last_aotd'] > b['last_aotd'] ? 1 : -1)
+      default: return 0
+    }
+  })
+}
+
+
 // Page to display a table containing all albums
 export default function Page() {
   const [updateTimestamp, setUpdateTimestamp] = React.useState<any>("")
-  const [albumListOriginal, setAlbumListOriginal] = React.useState([])
-  const [albumList, setAlbumList] = React.useState<Object[] | null>(null)
+  const [albumListOriginal, setAlbumListOriginal] = React.useState<any[]>([])
   // Album List Loading vars
   const [listLoading, setListLoading] = React.useState(true)
   // Sorting variables
@@ -78,120 +115,35 @@ export default function Page() {
     },
   ];
 
-  // Custom sorting method
-  const handleSortChange = (descriptor) => {
-    if(albumList == null) {
-      return
-    }
-    setSortDescriptor(descriptor)
-    switch(descriptor.column) {
-      // Sort on rating
-      case 'rating':
-        setAlbumList([...albumList].sort((a, b) => {
-          if (descriptor.direction === "ascending") return a['rating'] - b['rating'];
-          if (descriptor.direction === "descending") return b['rating'] - a['rating'];
-          return 0;
-        }))
-        break;
-      // Sort on Standard Deviation
-      case 'standard_deviation':
-        setAlbumList([...albumList].sort((a, b) => {
-          if (descriptor.direction === "ascending") return a['standard_deviation'] - b['standard_deviation'];
-          if (descriptor.direction === "descending") return b['standard_deviation'] - a['standard_deviation'];
-          return 0;
-        }))
-        break;
-      // Sort on Submission Date
-      case 'submission_date':
-        setAlbumList([...albumList].sort((a, b) => {
-          const dateA: any = new Date(a['submission_date']);
-          const dateB: any = new Date(b['submission_date']);
+  // Derived list: filter then sort — synchronous, no extra render
+  const displayedAlbumList = React.useMemo(() => {
+    let list = albumListOriginal
+    if (titleFilter) list = list.filter(a => (a['title'] as string).toLowerCase().includes(titleFilter.toLowerCase()))
+    if (artistFilter) list = list.filter(a => (a['artist']['name'] as string).toLowerCase().includes(artistFilter.toLowerCase()))
+    if (submitterFilter.size) list = list.filter(a => (a['submitter'] as string) === Object.values(submitterFilter)[0])
+    if (aotdFilter) list = list.filter(a => a['last_aotd'] != null && a['rating'] != null)
+    return sortAlbumList(list, sortDescriptor)
+  }, [albumListOriginal, titleFilter, artistFilter, submitterFilter, aotdFilter, sortDescriptor])
 
-          if (descriptor.direction === "ascending") return (dateA - dateB);
-          if (descriptor.direction === "descending") return (dateB - dateA);
-          return 0;
-        }))
-        break;
-      // Sort on Submitter Nickname
-      case 'submitter':
-        setAlbumList([...albumList].sort((a, b) => {
-          if (descriptor.direction === "ascending") return ((a['submitter_nickname'] < b['submitter_nickname']) ? 1 : -1);
-          if (descriptor.direction === "descending") return ((a['submitter_nickname'] > b['submitter_nickname']) ? 1 : -1);
-          return 0;
-        }))
-        break;
-      // Sort on Artist Name
-      case 'artist':
-        setAlbumList([...albumList].sort((a, b) => {
-          if (descriptor.direction === "ascending") return ((a['artist']['name'] < b['artist']['name']) ? 1 : -1);
-          if (descriptor.direction === "descending") return ((a['artist']['name'] > b['artist']['name']) ? 1 : -1);
-          return 0;
-        }))
-        break;
-      // Sort on Album Title
-      case 'title':
-        setAlbumList([...albumList].sort((a, b) => {
-          if (descriptor.direction === "ascending") return ((a['title'] < b['title']) ? 1 : -1);
-          if (descriptor.direction === "descending") return ((a['title'] > b['title']) ? 1 : -1);
-          return 0;
-        }))
-        break;
-      // Sort on Last Album of Day Date
-      case 'last_aotd':
-        setAlbumList([...albumList].sort((a, b) => {
-          if (descriptor.direction === "ascending") return ((a['last_aotd'] < b['last_aotd']) ? 1 : -1);
-          if (descriptor.direction === "descending") return ((a['last_aotd'] > b['last_aotd']) ? 1 : -1);
-          return 0;
-        }))
-        break;
-    }
+  // Sorting: just update the descriptor — useMemo handles the rest
+  const handleSortChange = (descriptor) => {
+    setSortDescriptor(descriptor)
   };
 
   // UseEffect to pull Album Data on first mount (offloaded to client to make the page load faster)
   React.useEffect(() => {
-    if(albumList == null) {
-      const ingestData = async () => {
-        setListLoading(true)
-        let albumData = await getAllAlbums()
-        setAlbumList(albumData['albums_list'].sort((a,b) => {return b['rating'] - a['rating']}))
-        setAlbumListOriginal(albumData['albums_list'])
-        setUpdateTimestamp(albumData['timestamp'])
-        setListLoading(false)
-      }
-      ingestData()
+    const ingestData = async () => {
+      setListLoading(true)
+      const albumData = await getAllAlbums()
+      setAlbumListOriginal(albumData['albums_list'])
+      setUpdateTimestamp(albumData['timestamp'])
+      setListLoading(false)
     }
+    ingestData()
   }, [])
 
-  // UseEffect for when filters change
-  React.useEffect(() => {
-    let newAlbumList = albumListOriginal;
-    let changes = false;
-    if(titleFilter != "") {
-      changes = true
-      newAlbumList = newAlbumList.filter(album => (album['title'] as string).toLowerCase().includes(titleFilter.toLowerCase()))
-    } 
-    if(artistFilter != "") {
-      changes = true
-      newAlbumList = newAlbumList.filter(album => (album['artist']['name'] as string).toLowerCase().includes(artistFilter.toLowerCase()))
-    }
-    if(submitterFilter.size != 0) {
-      changes = true
-      newAlbumList = newAlbumList.filter(album => (album['submitter'] as string) == (Object.values(submitterFilter)[0]))
-    }
-    if(aotdFilter) {
-      changes = true
-      newAlbumList = newAlbumList.filter(album => ((album['last_aotd'] != null) && (album['rating'] != null)))
-    }
-    // Set new list if there have been changes
-    if(changes) {
-      setAlbumList(newAlbumList)
-    } else {
-      setAlbumList(albumListOriginal)
-    }
-  }, [titleFilter, artistFilter, submitterFilter, aotdFilter])
-
   // Render Cell dynamically
-  const renderCell = React.useCallback((album , columnKey: React.Key) => {
+  const renderCell = React.useCallback((album: any, columnKey: React.Key) => {
     // Change render based on column key
     switch (columnKey) {
       case "title":
@@ -245,26 +197,26 @@ export default function Page() {
         );
       case "rating":
         return (
-          (album['rating'] != null)? 
+          (album['rating'] != null)?
             <div className={`px-2 py-2`}>
               <p className={`text-center text-black ${ratingToTailwindBgColor(album['rating'])} rounded-full`}>
                 <b>{album['rating'].toFixed(2)}</b>
               </p>
-            </div> 
-            : 
+            </div>
+            :
             <p className="text-center">
               --
             </p>
         );
       case "standard_deviation":
         return (
-          (album['standard_deviation'] != null)? 
+          (album['standard_deviation'] != null)?
             <div className={`px-auto w-full`}>
               <p className={`text-center text-white text-lg`}>
                 <b>{album['standard_deviation'].toFixed(2)}</b>
               </p>
-            </div> 
-            : 
+            </div>
+            :
             <p className="text-center">
               --
             </p>
@@ -283,7 +235,7 @@ export default function Page() {
                 variant="solid"
               >
                 <b>{(album['last_aotd'] != null) ? album['last_aotd'] : "N/A"}</b>
-              </Button> 
+              </Button>
             </Link>
           ):(
             <></>
@@ -293,12 +245,12 @@ export default function Page() {
   }, []);
 
 
-  // Reset values on cancel button press
+  // Hard refresh — bypass cache and reload from backend
   const hardRefresh = () => {
     const ingestNewData = async () => {
-      setAlbumList([])
-      let albumData = await getAllAlbumsNoCache()
-      setAlbumList(albumData['albums_list'])
+      setListLoading(true)
+      const albumData = await getAllAlbumsNoCache()
+      setAlbumListOriginal(albumData['albums_list'])
       setUpdateTimestamp(albumData['timestamp'])
       setListLoading(false)
     }
@@ -309,31 +261,31 @@ export default function Page() {
 
   return (
     <>
-      <PageTitle text={`Album Data for ${(titleFilter == "") ? "all" : ""} ${(albumList) ? albumList.length : "LOADING"} Albums`} />
+      <PageTitle text={`Album Data for ${(titleFilter == "") ? "all" : ""} ${(listLoading) ? "LOADING" : displayedAlbumList.length} Albums`} />
       <div>
         {/* Filter Inputs */}
         <div className="flex flex-col sm:flex-row gap-1 w-full md:w-3/4 mx-auto">
-          <Input 
-            label="Title" 
-            placeholder="Filter by Title" 
-            value={titleFilter} 
+          <Input
+            label="Title"
+            placeholder="Filter by Title"
+            value={titleFilter}
             onValueChange={setTitleFilter}
           />
-          <Input 
-            label="Artist" 
-            placeholder="Filter by Artist" 
-            value={artistFilter} 
+          <Input
+            label="Artist"
+            placeholder="Filter by Artist"
+            value={artistFilter}
             onValueChange={setArtistFilter}
           />
-          <UserDropdown 
+          <UserDropdown
             label={"Submitter"}
             setSelectionCallback={setSubmitterFilter}
             selectedKeys={submitterFilter}
           />
         </div>
         <div className="w-full md:w-3/4 mx-auto my-1">
-          <Checkbox 
-            isSelected={aotdFilter} 
+          <Checkbox
+            isSelected={aotdFilter}
             onValueChange={setAotdFilter}
             className="w-full ml-1"
           >
@@ -364,10 +316,10 @@ export default function Page() {
               <Spinner />
               <p>Loading...</p>
             </div>
-          ) : (albumList ?? []).length === 0 ? (
+          ) : displayedAlbumList.length === 0 ? (
             <p className="text-center py-8">No Data Available...</p>
           ) : (
-            (albumList as any[]).map((album: any) => (
+            displayedAlbumList.map((album: any) => (
               <Link
                 key={album['album_id']}
                 href={`/dashboard/aotd/album/${album['album_id']}`}
@@ -419,7 +371,7 @@ export default function Page() {
               }
             </TableHeader>
             <TableBody
-              items={(albumList) ? albumList : []}
+              items={displayedAlbumList}
               emptyContent={(listLoading) ?
                 <div>
                   <Spinner />
