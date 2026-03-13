@@ -33,8 +33,10 @@ export default function TipTap(props) {
 
   const MenuBar = () => {
     const { editor } = useCurrentEditor()
+    const [expanded, setExpanded] = useState(false)
+
     const buttonTailwind = (button_name, level) => {
-      const out = "font-extralight border border-black px-2 hover:brightness-90 rounded-full mx-[2px]"
+      const out = "font-extralight border border-black px-2 py-1 sm:py-0 hover:brightness-90 rounded-full mx-[2px]"
       // Determine if button is active or not and edit css
       const active = (level) ? editor.isActive(button_name, level) : editor.isActive(button_name)
       const bgTailwind = (button_name && active) ? "strong bg-slate-700" : "bg-slate-500"
@@ -49,154 +51,121 @@ export default function TipTap(props) {
     return (
       <div className="rounded-t-2xl -m-2 mb-2">
         <div className="flex flex-wrap px-3 pt-1 justify-center bg-slate-500/50 rounded-t-2xl pb-1">
+          {/* Core buttons — always visible */}
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
-            disabled={
-              !editor.can()
-                .chain()
-                .focus()
-                .toggleBold()
-                .run()
-            }
+            disabled={!editor.can().chain().focus().toggleBold().run()}
             className={buttonTailwind("bold")}
           >
             <RiBold />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            disabled={
-              !editor.can()
-                .chain()
-                .focus()
-                .toggleItalic()
-                .run()
-            }
+            disabled={!editor.can().chain().focus().toggleItalic().run()}
             className={buttonTailwind("italic")}
           >
             <RiItalic />
           </button>
-          <button
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            disabled={
-              !editor.can()
-                .chain()
-                .focus()
-                .toggleStrike()
-                .run()
-            }
-            className={buttonTailwind("strike")}
-          >
-            <RiStrikethrough />
-          </button>
-          <button 
-            onClick={() => editor.chain().focus().unsetAllMarks().run()}
-            className={buttonTailwind()}
-          >
-            <RiFormatClear />
-          </button>
-          {/* <button 
-            onClick={() => editor.chain().focus().clearNodes().run()}
-            className={buttonTailwind()}  
-          >
-            Clear nodes
-          </button> */}
-          <button
-            onClick={() => editor.chain().focus().setParagraph().run()}
-            className={buttonTailwind('paragraph')} 
-          >
-            <RiParagraph />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            className={buttonTailwind('heading', { level: 1 })}
-          >
-            <RiH1 />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={buttonTailwind('heading', { level: 2 })}
-          >
-            <RiH2 />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            className={buttonTailwind('heading', { level: 3 })}
-          >
-            <RiH3 />
-          </button>
-          {/* NOT CURRENTLY SUPPORTED */}
-          {/* <button
-            onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-            className={buttonTailwind('heading', { level: 4 })}
-          >
-            <RiH4 />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
-            className={buttonTailwind('heading', { level: 5 })}
-          >
-            <RiH5 />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
-            className={buttonTailwind('heading', { level: 6 })}
-          >
-            <RiH6 />
-          </button> */}
           <button
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             className={buttonTailwind('bulletList')}
           >
             <RiListUnordered />
           </button>
+
+          {/* Extra buttons — always visible on sm+, hidden on mobile unless expanded */}
+          <button
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            disabled={!editor.can().chain().focus().toggleStrike().run()}
+            className={`${buttonTailwind("strike")} ${expanded ? "" : "hidden sm:inline-flex"}`}
+          >
+            <RiStrikethrough />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().unsetAllMarks().run()}
+            className={`${buttonTailwind()} ${expanded ? "" : "hidden sm:inline-flex"}`}
+          >
+            <RiFormatClear />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().setParagraph().run()}
+            className={`${buttonTailwind('paragraph')} ${expanded ? "" : "hidden sm:inline-flex"}`}
+          >
+            <RiParagraph />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+            className={`${buttonTailwind('heading', { level: 1 })} ${expanded ? "" : "hidden sm:inline-flex"}`}
+          >
+            <RiH1 />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+            className={`${buttonTailwind('heading', { level: 2 })} ${expanded ? "" : "hidden sm:inline-flex"}`}
+          >
+            <RiH2 />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+            className={`${buttonTailwind('heading', { level: 3 })} ${expanded ? "" : "hidden sm:inline-flex"}`}
+          >
+            <RiH3 />
+          </button>
           <button
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={buttonTailwind('orderedList')}
+            className={`${buttonTailwind('orderedList')} ${expanded ? "" : "hidden sm:inline-flex"}`}
           >
             <RiListOrdered2 />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={buttonTailwind('blockquote')}
+            className={`${buttonTailwind('blockquote')} ${expanded ? "" : "hidden sm:inline-flex"}`}
           >
             <RiQuoteText />
           </button>
-          <button 
+          <button
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
-            className={buttonTailwind()}
+            className={`${buttonTailwind()} ${expanded ? "" : "hidden sm:inline-flex"}`}
           >
             <RiSeparator />
           </button>
-          <button 
+          <button
             onClick={() => editor.chain().focus().setHardBreak().run()}
-            className={buttonTailwind()}
+            className={`${buttonTailwind()} ${expanded ? "" : "hidden sm:inline-flex"}`}
           >
             <RiPageSeparator />
           </button>
+
+          {/* More / Collapse toggle — only shown on mobile */}
+          {!expanded ? (
+            <button
+              onClick={() => setExpanded(true)}
+              className={`${buttonTailwind()} sm:hidden`}
+              aria-label="More formatting options"
+            >
+              ···
+            </button>
+          ) : (
+            <button
+              onClick={() => setExpanded(false)}
+              className={`${buttonTailwind()} sm:hidden`}
+              aria-label="Collapse formatting options"
+            >
+              ✕
+            </button>
+          )}
         </div>
         <div className="w-full flex justify-between -mt-[22px] px-3">
           <button
             onClick={() => editor.chain().focus().undo().run()}
-            disabled={
-              !editor.can()
-                .chain()
-                .focus()
-                .undo()
-                .run()
-            }
+            disabled={!editor.can().chain().focus().undo().run()}
             className={`${buttonTailwind()} rounded-full`}
           >
             <RiArrowGoBackFill />
           </button>
           <button
             onClick={() => editor.chain().focus().redo().run()}
-            disabled={
-              !editor.can()
-                .chain()
-                .focus()
-                .redo()
-                .run()
-            }
+            disabled={!editor.can().chain().focus().redo().run()}
             className={`${buttonTailwind()} rounded-full`}
           >
             <RiArrowGoForwardFill />

@@ -2,6 +2,7 @@
 
 import { Accordion, AccordionItem, addToast, Button, Divider, Switch, Tooltip } from "@heroui/react";
 import { Slider, Checkbox } from "@heroui/react";
+import { RiInformationLine } from "react-icons/ri";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -242,7 +243,7 @@ export default function AlbumReviewBox(props) {
                   Advanced reviews allow you to give a song by song breakdown of an album, if you leave a song&apos;s comment unchanged it will not appear in the review but the stars will.
                 </p>
               </div>
-              <p className="text-2xl">Track by Track Breakdown:</p>
+              <p className="text-lg sm:text-2xl">Track by Track Breakdown:</p>
               <Divider />
               {
                 songList.map((song, index) => (
@@ -250,7 +251,7 @@ export default function AlbumReviewBox(props) {
                     key={index}
                     className="py-2"
                   >
-                    <p className="text-lg">{song['number']}. <b>{song['title']}</b></p>
+                    <p className="text-sm sm:text-lg">{song['number']}. <b>{song['title']}</b></p>
                     <div className="flex px-1">
                       <Slider   
                         size="sm"
@@ -280,51 +281,72 @@ export default function AlbumReviewBox(props) {
                   </div> 
                 ))
               }
-              <p className="text-2xl pt-2">Overall Review:</p>
+              <p className="text-lg sm:text-2xl pt-2">Overall Review:</p>
               <Divider />
             </div>
           </Conditional>
-          <div 
+          <div
             className="w-full flex flex-col lg:flex-row gap-2 justify-between"
             onMouseEnter={() => setTooltipOpen(true)}
             onMouseLeave={() => setTooltipOpen(false)}
           >
-            <Tooltip 
+            <Tooltip
               className="bg-transparent/85 border-gray-600"
-              classNames={{ base: "pointer-events-none" }}
+              classNames={{ base: "pointer-events-auto" }}
               offset={-10}
               content={
-                <SimilarRatingsBox 
-                  rating={rating} 
+                <SimilarRatingsBox
+                  rating={rating}
                   albums={albumsByRating[Number.parseFloat(rating).toFixed(1)]}
-                  timestamp={albumsByRating['metadata']['timestamp']} 
+                  timestamp={albumsByRating['metadata']['timestamp']}
                 />
-              } 
-              showArrow={true} 
+              }
+              showArrow={true}
               isOpen={tooltipOpen}
+              onOpenChange={setTooltipOpen}
             >
-              <Slider   
-                size="md"
-                radius="lg"
-                step={0.5}
-                marks={getSteps()}
-                color="warning"
-                label={(advanced) ? "Overall Album Rating" : "Album Rating"}
-                hideValue={true}
-                maxValue={10} 
-                minValue={0} 
-                value={rating}
-                onChange={handleSliderMove}
-                renderThumb={(props) => (
-                  <div
-                    {...props}
-                    className="group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
-                  >
-                    <span className="transition-transform bg-yellow-600 shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80" />
+              <div className="w-full">
+                <div className="flex justify-between items-center w-full mb-1 px-1">
+                  <span className="text-sm text-gray-400">
+                    {advanced ? "Overall Album Rating" : "Album Rating"}
+                  </span>
+                  <div className="flex items-center gap-1 sm:hidden">
+                    <span className={`text-base font-bold px-3 py-0.5 rounded-full text-white ${ratingToTailwindBgColor(rating)}`}>
+                      {Number(rating).toFixed(1)}
+                    </span>
+                    <Button
+                      isIconOnly
+                      variant="light"
+                      size="sm"
+                      onPress={() => setTooltipOpen(!tooltipOpen)}
+                      aria-label="Show similar ratings"
+                    >
+                      <RiInformationLine className="text-lg" />
+                    </Button>
                   </div>
-                )}
-                className="max-w-full px-0 sm:px-10 mx-auto" 
-              />
+                </div>
+                <Slider
+                  size="md"
+                  radius="lg"
+                  step={0.5}
+                  marks={getSteps()}
+                  color="warning"
+                  hideValue={true}
+                  maxValue={10}
+                  minValue={0}
+                  value={rating}
+                  onChange={handleSliderMove}
+                  renderThumb={(props) => (
+                    <div
+                      {...props}
+                      className="group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
+                    >
+                      <span className="transition-transform bg-yellow-600 shadow-small from-secondary-100 to-secondary-500 rounded-full w-6 h-6 sm:w-5 sm:h-5 block group-data-[dragging=true]:scale-80" />
+                    </div>
+                  )}
+                  className="max-w-full px-4 sm:px-10 mx-auto"
+                />
+              </div>
               </Tooltip>
           </div>
           <ReviewTipTap 
@@ -344,13 +366,21 @@ export default function AlbumReviewBox(props) {
               </div>
             </Checkbox>
             <div className="flex flex-col gap-1">
-              <Checkbox
-                isSelected={isReady}
-                onValueChange={setIsReady}
-                isDisabled={!isReviewUpdated}
-              >
-                Ready to {(props.hasUserSubmitted)? "Update" : "Submit"}
-              </Checkbox>
+              <div className="py-1 px-1">
+                <Checkbox
+                  isSelected={isReady}
+                  onValueChange={setIsReady}
+                  isDisabled={!isReviewUpdated}
+                >
+                  Ready to {(props.hasUserSubmitted)? "Update" : "Submit"}
+                </Checkbox>
+                {!isReviewUpdated && (
+                  <p className="text-xs text-gray-400 mt-1 ml-1">Make a change to enable submission</p>
+                )}
+                {isReviewUpdated && !isReady && (
+                  <p className="text-xs text-yellow-400 mt-1 ml-1">Check the box above to submit ↑</p>
+                )}
+              </div>
               <Button
                 isDisabled={!isReady}
                 onPress={submitReview}
