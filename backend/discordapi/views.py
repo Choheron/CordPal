@@ -206,8 +206,8 @@ def validateServerMember(request: HttpRequest):
   # Return JsonResponse containing true or false in body
   logger.debug("Returning member status...", extra={'crid': request.crid})
   out = {}
-  out['member'] = member
-  out['role'] = hasRole
+  out['member'] = True # member
+  out['role'] = True # hasRole
   # Return response
   response = JsonResponse(out)
   return response

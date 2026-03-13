@@ -69,6 +69,8 @@ class AotdUserData(models.Model):
   # Return true if streak is set to expire today (they havent reviewed for today's aotd)
   def isStreakAtRisk(self):
     date_now = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
+    if(self.last_review_date is None):
+      return False
     return True if (self.last_review_date.strftime("%Y-%m-%d") != date_now.strftime("%Y-%m-%d")) else False
   
 

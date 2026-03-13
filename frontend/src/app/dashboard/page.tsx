@@ -80,8 +80,8 @@ export default async function Page() {
       <Conditional showWhen={!(memberStatus)}>
         <br/>
         <p className="max-w-3/4 b pt-10 pb-6 backdrop-blur-2xl border-red-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:bg-zinc-800/30">
-          Welcome, {discordUserData['global_name']}! Please note that since you are either 1. Not a member of the discord server this website is for, or 2. You are a member but do
-          not have the required roles in the server, you are not able to view most data on this website. Thats okay! You can still poke around and see whats up as you like. If you
+          Welcome, {discordUserData['global_name']}! Please note that since you are either <br/> 1. Not a member of the discord server this website is for or <br/> 2. You are a member but do
+          not have the required roles in the server, you are not able to view most data on this website. <br/> Thats okay! You can still poke around and see whats up as you like. If you
           are a member of the server and believe this to be some kind of mistake, please contact the admins on the server.
         </p>
       </Conditional>
