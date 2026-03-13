@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Router from "next/router"
 
 import ReviewTipTap from "../../general/input/Tiptap";
-import { setReviewCookie, submitReviewToBackend } from "@/app/lib/aotd_utils";
+import { submitReviewToBackend } from "@/app/lib/aotd_utils";
 import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 import { Conditional } from "../conditional";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
@@ -114,12 +114,20 @@ export default function AlbumReviewBox(props) {
   }
 
 
-  // UseEffect to ensure review cannot be updated unless something changes and update cookie
+  // UseEffect to ensure review cannot be updated unless something changes and save draft to localStorage
   useEffect(() => {
     if(checkIfReviewUpdated()) {
       setIsReviewUpdated(true)
-      // Update reivew cookie if a change has been made
-      setReviewCookie(comment, rating, props.album_id, isFirstListen)
+      // Save draft to localStorage (no server round trip)
+      if(props.album_id) {
+        localStorage.setItem(`aotd_review_${props.album_id}`, JSON.stringify({
+          album_id: props.album_id,
+          score: rating,
+          comment: comment,
+          first_listen: isFirstListen,
+          last_updated: new Date().toISOString()
+        }))
+      }
     } else {
       setIsReviewUpdated(false)
     }
@@ -127,7 +135,9 @@ export default function AlbumReviewBox(props) {
 
 
   // UseEffect to stop users from navigating away if they have unsaved changes
+  // Also broadcasts editing state so SSE refresh can be guarded
   useEffect(() => {
+    window.dispatchEvent(new CustomEvent('reviewEditingChanged', { detail: { isEditing: isReviewUpdated } }))
     if (isReviewUpdated) {
       const routeChangeStart = () => {
         const ok = () => {

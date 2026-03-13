@@ -14,16 +14,26 @@ export async function GET(request: Request) {
   const namespace = process.env.NEXT_PUBLIC_REDIS_CONNECTION_PUBSUB_NAMESPACE ?? ''
   const channel = `${namespace}-aotd_review:${albumId}`
 
+  let heartbeat: ReturnType<typeof setInterval>
+
   const stream = new ReadableStream({
     start(controller) {
+      heartbeat = setInterval(() => {
+        controller.enqueue(new TextEncoder().encode(': ping\n\n'))
+      }, 30_000)
+
       subscriber.subscribe(channel, (err) => {
-        if (err) controller.close()
+        if (err) {
+          clearInterval(heartbeat)
+          controller.close()
+        }
       })
       subscriber.on('message', (_channel, message) => {
         controller.enqueue(new TextEncoder().encode(`data: ${message}\n\n`))
       })
     },
     cancel() {
+      clearInterval(heartbeat)
       subscriber.unsubscribe()
       subscriber.disconnect()
     },
@@ -34,6 +44,7 @@ export async function GET(request: Request) {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no',
     },
   })
 }
