@@ -85,26 +85,32 @@ def getAlbumRating(mbid, rounded=True, date: str = None):
 # Check and set a user's aotd "selection_blocked_flag"
 # NOTE: This works on the idea that at midnight of the next day the user will be blocked, this is so it can be seen earlier on the website when that happens
 #       so a user is marked as blocked from selection if there will have been three days since their last review at the upcoming midnight.
-def checkSelectionFlag(aotd_user: AotdUserData):
+def checkSelectionFlag(aotd_user: AotdUserData, recent_review_users: list = None, outage_user_ids: set = None):
   '''Check and set a user's aotd "selection_blocked_flag"
     NOTE: This works on the idea that at midnight of the next day the user will be blocked, this is so it can be seen earlier on the website when that happens
           so a user is marked as blocked from selection if there will have been three days since their last review at the upcoming midnight.
+    NOTE: recent_review_users and outage_user_ids can be pre-computed and passed in to avoid repeated DB queries when called in a loop.
   '''
   # Get user
   user = aotd_user.user
   # Get tomorrow date
   tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-  # Check if user is going to be under an outage
-  try:
-    outage = UserAlbumOutage.objects.filter(start_date__lte=tomorrow, end_date__gte=tomorrow).get(user = user)
-    logger.info(f"User {user.nickname} is under an outage until {outage.end_date.strftime('%m/%d/%Y')}")
-    return
-  except UserAlbumOutage.DoesNotExist as e:
-    logger.debug(f"User {user.nickname} is not under an outage")
-  # Get the next midnight, then subtract 2 days to determine validity of user
-  selection_timeout = (datetime.date.today() + timedelta(days=1)) - timedelta(days=2)
-  # Get list of reviews from the past 2 days
-  recent_review_users = list(Review.objects.filter(review_date__gte=selection_timeout).values_list('user__discord_id', flat=True).distinct())
+  # Check if user is going to be under an outage — use pre-computed set if provided, otherwise query
+  if outage_user_ids is not None:
+    if user.pk in outage_user_ids:
+      logger.info(f"User {user.nickname} is under an outage (pre-computed map)")
+      return
+  else:
+    try:
+      outage = UserAlbumOutage.objects.filter(start_date__lte=tomorrow, end_date__gte=tomorrow).get(user = user)
+      logger.info(f"User {user.nickname} is under an outage until {outage.end_date.strftime('%m/%d/%Y')}")
+      return
+    except UserAlbumOutage.DoesNotExist as e:
+      logger.debug(f"User {user.nickname} is not under an outage")
+  # Use pre-computed reviewer list if provided, otherwise query
+  if recent_review_users is None:
+    selection_timeout = (datetime.date.today() + timedelta(days=1)) - timedelta(days=2)
+    recent_review_users = list(Review.objects.filter(review_date__gte=selection_timeout).values_list('user__discord_id', flat=True).distinct())
   logger.debug(f"Checking selection blocked flag for user: {aotd_user.user.nickname} [Flag is currently: {aotd_user.selection_blocked_flag}]...")
   # Check if user is in the list of recent reviewers
   blocked = aotd_user.user.discord_id not in recent_review_users

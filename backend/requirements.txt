@@ -15,3 +15,5 @@ psycopg2-binary
 prometheus_client
 # Math Libaries 
 numpy
+# Redis library for pub/sub stuff
+redis

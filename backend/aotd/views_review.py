@@ -24,9 +24,8 @@ from reactions.utils import (
 
 import logging
 from dotenv import load_dotenv
-import os
-import json
-import datetime
+import redis as redis_module
+import os, json, datetime
 from datetime import timedelta
 import pytz
 
@@ -36,6 +35,15 @@ logger = logging.getLogger()
 # Determine runtime enviornment
 APP_ENV = os.getenv('APP_ENV') or 'DEV'
 load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
+
+# Declare redis module
+redis_connection = redis_module.Redis(
+  host=os.environ.get('REDIS_CONNECTION_HOST', '192.168.1.200'),
+  port=int(os.environ.get('REDIS_CONNECTION_PORT', 6379)),
+  decode_responses=True
+)
+# Get PUBSUB namespace
+REDIS_CONNECTION_PUBSUB_NAMESPACE = os.getenv("REDIS_CONNECTION_PUBSUB_NAMESPACE", "NONPROD")
 
 
 ## =========================================================================================================================================================================================
@@ -92,6 +100,11 @@ def submitReview(request: HttpRequest):
       newReview.save()
       # Update user's streak data
       update_user_streak(userObj)
+    finally:
+      # Publish update to redis channel to propt rerender on frontend
+      redis_stream_name = f"{REDIS_CONNECTION_PUBSUB_NAMESPACE}-aotd_review:{reqBody['album_id']}"
+      logger.info(f"Publishing review event to Redis stream: {redis_stream_name}")
+      redis_connection.publish(redis_stream_name, json.dumps({'album_id': reqBody['album_id']}))
   except:
     logger.error(f"ERROR: Failed to save review for user \"{userObj.nickname}\" ({userObj.discord_id}) targeting album {albumObj.mbid} for date {date}!", extra={'crid': request.crid})
     return HttpResponse(500)

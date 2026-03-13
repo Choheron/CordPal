@@ -224,39 +224,35 @@ def calculateAOTDChances(request: HttpRequest):
   tomorrow = datetime.date.today() + datetime.timedelta(days=1)
   # Get Date a two years ago to filter by
   two_year_ago = day - datetime.timedelta(days=730)
-  # Get user list
-  user_list = AotdUserData.objects.all().annotate(
-    total_album_submissions=Count('user__album', distinct=True),
-    recent_picks=Count(
-      'user__album__dailyalbum',
-      filter=Q(user__album__dailyalbum__date__gte=two_year_ago),
-      distinct=True
-    )
-  )
   # Get a map of all outages
   user_outage_map = set(
     UserAlbumOutage.objects
       .filter(start_date__lte=tomorrow, end_date__gte=tomorrow)
       .values_list('user_id', flat=True)
   )
-  # Iterate all users and update the selection blocked flag
-  for user in user_list:
-    checkSelectionFlag(user)
-  # Get a list of all aotd users
-  aotd_users = AotdUserData.objects.all()
-  # Get a list of users who are eligible for selection
-  eligible_users = aotd_users.filter(
-    selection_blocked_flag=False
-  ).exclude(user_id__in=user_outage_map).select_related('user').annotate(
+  # Pre-compute recent reviewers once — passed to checkSelectionFlag to avoid N repeated queries
+  selection_timeout = (datetime.date.today() + datetime.timedelta(days=1)) - datetime.timedelta(days=2)
+  recent_review_users = list(Review.objects.filter(review_date__gte=selection_timeout).values_list('user__discord_id', flat=True).distinct())
+  # Single fetch of all users with annotations, forced to list so it can be reused in-memory
+  user_list = list(AotdUserData.objects.select_related('user').annotate(
     total_album_submissions=Count('user__album', distinct=True),
     recent_picks=Count(
       'user__album__dailyalbum',
       filter=Q(user__album__dailyalbum__date__gte=two_year_ago),
       distinct=True
     )
-  )
+  ))
+  # Update selection blocked flags — pre-computed data avoids per-user DB queries in checkSelectionFlag
+  for aotdUser in user_list:
+    checkSelectionFlag(aotdUser, recent_review_users, user_outage_map)
+  # Build eligible set in Python from in-memory objects (no additional DB call)
+  eligible_users = [u for u in user_list if not u.selection_blocked_flag and u.user_id not in user_outage_map]
+  # Calculate total eligible albums from in-memory annotations (no additional DB call)
+  total_eligible_count = max(0, sum(
+    max(0, eu.total_album_submissions - eu.recent_picks) for eu in eligible_users
+  ))
   # Iterate all aotd users and calculate aotd chances
-  for aotdUser in aotd_users:
+  for aotdUser in user_list:
     logger.info(f"Calculating chance percentage for user {aotdUser.user.nickname}", extra={'crid': request.crid})
     # Retrieve user from aotd data
     user = aotdUser.user
@@ -288,15 +284,10 @@ def calculateAOTDChances(request: HttpRequest):
       userChanceObj.chance_percentage = 0.00
       userChanceObj.block_type = "INACTIVITY"
       userChanceObj.reason = f"Inactivity, user has not reviewed in over two days. Last review was {days_since.days} days ago."
-      # Check if user's selections are currently blocked, return 0% chance
       logger.info(f"\t{aotdUser.user.nickname} is blocked from selection!", extra={'crid': request.crid})
     else:
-      # Get counts needed to determine percentage
-      user_submissions_count = Album.objects.filter(submitted_by=user).count()
-      user_eligible_count = user_submissions_count - (DailyAlbum.objects.filter(date__gte=two_year_ago).filter(album__submitted_by=user).count())
-      total_eligible_count = sum(
-        user.total_album_submissions - user.recent_picks for user in eligible_users
-      )
+      # Use in-memory annotations instead of per-user DB queries
+      user_eligible_count = max(0, aotdUser.total_album_submissions - aotdUser.recent_picks)
       # Do math for percentage
       try:
         chance = round((float(user_eligible_count)/float(total_eligible_count)) * 100.00, 3)

@@ -21,6 +21,7 @@ import { Conditional } from "../conditional";
 import ReplaceAlbumModal from "./modals/replace_album_modal";
 import { revalidateTag } from "next/cache";
 import { getYesterdayInTimezone } from "@/app/lib/utils";
+import ReviewEventSource from "./review_event_source";
 
 // GUI Display for the Album of the Day
 export default async function AlbumOfTheDayBox(props) {
@@ -161,6 +162,7 @@ export default async function AlbumOfTheDayBox(props) {
         </div>
       </div>
       <div className="static w-full lg:w-fit backdrop-blur-2xl px-2 py-2 mt-0 lg:my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+        <ReviewEventSource albumId={albumData("album_id")} />
         <ReviewDisplay 
           review_list={reviewList}
         />
