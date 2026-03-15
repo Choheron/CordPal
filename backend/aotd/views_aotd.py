@@ -235,10 +235,10 @@ def calculateAOTDChances(request: HttpRequest):
   recent_review_users = list(Review.objects.filter(review_date__gte=selection_timeout).values_list('user__discord_id', flat=True).distinct())
   # Single fetch of all users with annotations, forced to list so it can be reused in-memory
   user_list = list(AotdUserData.objects.select_related('user').annotate(
-    total_album_submissions=Count('user__album', distinct=True),
+    total_album_submissions=Count('user__submitted_albums', distinct=True),
     recent_picks=Count(
-      'user__album__dailyalbum',
-      filter=Q(user__album__dailyalbum__date__gte=two_year_ago),
+      'user__submitted_albums__dailyalbum',
+      filter=Q(user__submitted_albums__dailyalbum__date__gte=two_year_ago),
       distinct=True
     )
   ))

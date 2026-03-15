@@ -487,9 +487,10 @@ def getAlbumsStats(request: HttpRequest):
   userStatsList = []
   for user in spotUsers:
     userData = {}
+    two_year_ago = datetime.date.today() - datetime.timedelta(days=730)
     userData['submission_count'] = Album.objects.filter(submitted_by=user.user).count()
     userData['aotd_count'] = DailyAlbum.objects.filter(album__submitted_by=user.user).count()
-    userData['unpicked_count'] = f"{max(0, (Album.objects.filter(submitted_by=user.user).count() - DailyAlbum.objects.filter(album__submitted_by=user.user).count()))}/100"
+    userData['unpicked_count'] = f"{max(0, (Album.objects.filter(submitted_by=user.user).count() - DailyAlbum.objects.filter(album__submitted_by=user.user, date__gte=two_year_ago).count()))}/100"
     userData['discord_id'] = user.user.discord_id
     userData['nickname'] = user.user.nickname
     chance_view_response = json.loads(getChanceOfAotdSelect(request, user.user.discord_id).content)
@@ -525,6 +526,7 @@ def getUserAlbumsStats(request: HttpRequest, user_discord_id: str | None = None)
   spotUser = AotdUserData.objects.get(user__discord_id=user_discord_id) if user_discord_id else AotdUserData.objects.get(user__discord_id=(request.session.get('discord_id')))
   # Get user Data
   userData = {}
+  two_year_ago = datetime.date.today() - datetime.timedelta(days=730)
   userData['submission_count'] = Album.objects.filter(submitted_by=spotUser.user).count()
   userData['aotd_count'] = DailyAlbum.objects.filter(album__submitted_by=spotUser.user).count()
   try:
@@ -535,7 +537,7 @@ def getUserAlbumsStats(request: HttpRequest, user_discord_id: str | None = None)
   except:
     userData['last_selected_date'] = "--"
     userData['days_since_selected'] = (datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date() - spotUser.creation_timestamp.date()).days
-  userData['unpicked_count'] = f"{(Album.objects.filter(submitted_by=spotUser.user).count() - DailyAlbum.objects.filter(album__submitted_by=spotUser.user).count())}/100"
+  userData['unpicked_count'] = f"{max(0, (Album.objects.filter(submitted_by=spotUser.user).count() - DailyAlbum.objects.filter(album__submitted_by=spotUser.user, date__gte=two_year_ago).count()))}/100"
   userData['discord_id'] = spotUser.user.discord_id
   userData['nickname'] = spotUser.user.nickname
   chance_view_response = json.loads(getChanceOfAotdSelect(request, spotUser.user.discord_id).content)
