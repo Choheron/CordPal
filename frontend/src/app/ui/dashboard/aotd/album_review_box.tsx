@@ -378,7 +378,7 @@ export default function AlbumReviewBox(props) {
                   <p className="text-xs text-gray-400 mt-1 ml-1">Make a change to enable submission</p>
                 )}
                 {isReviewUpdated && !isReady && (
-                  <p className="text-xs text-yellow-400 mt-1 ml-1">Check the box above to submit ↑</p>
+                  <p className="text-xs text-yellow-400 mt-1 ml-1 sm:hidden">Check the box above to submit ↑</p>
                 )}
               </div>
               <Button
