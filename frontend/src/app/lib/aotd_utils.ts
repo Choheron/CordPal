@@ -4,6 +4,8 @@ import { revalidateTag, updateTag } from "next/cache";
 import { padNumber } from "@/app/lib/utils"
 import { cookies } from "next/headers";
 
+import { AlbumTag } from "./types";
+
 // Below Code allows for serverside computing of cookie stuff!
 const getCookie = async (name: string) => {
   return (await cookies()).get(name)?.value ?? '';
@@ -1085,4 +1087,167 @@ export async function getAlbumSTD(mbid, date = "") {
   });
   const getAlbumSTDResponseJson = await getAlbumSTDResponse.json()
   return getAlbumSTDResponseJson['standard_deviation'];
+}
+
+// --- Tag Utilities ---
+
+//
+// Get all tags for a given album
+// - RETURN: List of AlbumTag objects
+//
+export async function getTagsForAlbum(mbid: string) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`getTagsForAlbum: Sending request to backend '/aotd/getTagsForAlbum/${mbid}'`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getTagsForAlbum/${mbid}`, {
+    credentials: 'include',
+    headers: { Cookie: `sessionid=${sessionCookie};` },
+  })
+  const data = await res.json()
+  return data.tags as AlbumTag[]
+}
+
+//
+// Submit a new tag for an album
+// - RETURN: JSON response from backend
+//
+export async function submitTag(mbid: string, tagText: string, globalTagId?: number) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`submitTag: Sending request to backend '/aotd/submitTag'`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/submitTag`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', Cookie: `sessionid=${sessionCookie};` },
+    body: JSON.stringify({ mbid, tag_text: tagText, global_tag_id: globalTagId ?? null }),
+  })
+  return res.json()
+}
+
+//
+// Submit an upvote or downvote on a tag
+// - RETURN: JSON response from backend
+//
+export async function voteOnTag(tagId: number, voteType: 1 | -1) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`voteOnTag: Sending request to backend '/aotd/voteOnTag'`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/voteOnTag`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', Cookie: `sessionid=${sessionCookie};` },
+    body: JSON.stringify({ tag_id: tagId, vote_type: voteType }),
+  })
+  return res.json()
+}
+
+//
+// Remove a user's vote from a tag
+// - RETURN: JSON response from backend
+//
+export async function removeVoteFromTag(tagId: number) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`removeVoteFromTag: Sending request to backend '/aotd/removeVoteFromTag'`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/removeVoteFromTag`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', Cookie: `sessionid=${sessionCookie};` },
+    body: JSON.stringify({ tag_id: tagId }),
+  })
+  return res.json()
+}
+
+//
+// Delete a tag by its ID
+// - RETURN: JSON response from backend
+//
+export async function deleteTag(tagId: number) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`deleteTag: Sending request to backend '/aotd/deleteTag'`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/deleteTag`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', Cookie: `sessionid=${sessionCookie};` },
+    body: JSON.stringify({ tag_id: tagId }),
+  })
+  return res.json()
+}
+
+//
+// Get tag suggestions based on existing global tags
+// - RETURN: List of tag suggestion strings
+//
+export async function getTagSuggestions(): Promise<string[]> {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`getTagSuggestions: Sending request to backend '/aotd/getTagSuggestions'`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getTagSuggestions`, {
+    credentials: 'include',
+    headers: { Cookie: `sessionid=${sessionCookie};` },
+  })
+  const data = await res.json()
+  return data.suggestions
+}
+
+// Admin only
+
+//
+// Create a new global tag (admin only)
+// - RETURN: JSON response from backend
+//
+export async function createGlobalTag(tagText: string) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`createGlobalTag: Sending request to backend '/aotd/createGlobalTag'`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/createGlobalTag`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', Cookie: `sessionid=${sessionCookie};` },
+    body: JSON.stringify({ tag_text: tagText }),
+  })
+  return res.json()
+}
+
+//
+// Delete a global tag by its ID (admin only)
+// - RETURN: JSON response from backend
+//
+export async function deleteGlobalTag(tagId: number) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`deleteGlobalTag: Sending request to backend '/aotd/deleteGlobalTag'`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/deleteGlobalTag`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', Cookie: `sessionid=${sessionCookie};` },
+    body: JSON.stringify({ tag_id: tagId }),
+  })
+  return res.json()
+}
+
+//
+// Get all global tags
+// - RETURN: List of global tag objects
+//
+export async function getGlobalTags() {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Make backend request
+  console.log(`getGlobalTags: Sending request to backend '/aotd/getGlobalTags'`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getGlobalTags`, {
+    credentials: 'include',
+    headers: { Cookie: `sessionid=${sessionCookie};` },
+  })
+  const data = await res.json()
+  return data.global_tags
 }
