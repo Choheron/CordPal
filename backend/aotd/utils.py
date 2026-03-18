@@ -256,22 +256,22 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   # Get the standard deviation of all reviews from this user
   review_stddev = all_reviews.aggregate(StdDev('score'))['score__stddev']
   # Calculate average review score
-  average_review_score = review_sum/total_reviews
+  average_review_score = (review_sum/total_reviews) if (total_reviews > 0) else (0.00)
   # Calculate median review score
-  median_review_score = all_reviews.order_by("score")[int(total_reviews/2)].score
+  median_review_score = ((all_reviews.order_by("score")[int(total_reviews/2)].score) if (all_reviews.count() > 0) else 0.00)
   # Calculate first time review percentage
   ft_reviews = all_reviews.filter(first_listen=True).count()
-  first_time_listen_percentage = ft_reviews/total_reviews
+  first_time_listen_percentage = (ft_reviews/total_reviews) if (total_reviews > 0) else (0.00)
   # Get lowest scored album
   lowest_review = all_reviews.order_by('score').first()
-  lowest_review_score = lowest_review.score
-  lowest_review_mbid = lowest_review.album.mbid
-  lowest_review_date =lowest_review.aotd_date
+  lowest_review_score = lowest_review.score if lowest_review else None
+  lowest_review_mbid = lowest_review.album.mbid if lowest_review else None
+  lowest_review_date = lowest_review.aotd_date if lowest_review else None
   # Get highest scored album
   highest_review = all_reviews.order_by('score').last()
-  highest_review_score = highest_review.score
-  highest_review_mbid = highest_review.album.mbid
-  highest_review_date = highest_review.aotd_date
+  highest_review_score = highest_review.score if highest_review else None
+  highest_review_mbid = highest_review.album.mbid if highest_review else None
+  highest_review_date = highest_review.aotd_date if highest_review else None
   # Calculate user's Review KD
   ## Get date of user's AOTD User Data Creation
   user_start_date = user.creation_timestamp.date()
@@ -295,9 +295,9 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   # Update user data
   aotdUserObj.total_reviews = total_reviews
   aotdUserObj.missed_reviews = user_missed_review_count
-  aotdUserObj.review_score_sum = review_sum
+  aotdUserObj.review_score_sum = review_sum if review_sum is not None else 0
   aotdUserObj.average_review_score = average_review_score
-  aotdUserObj.review_score_stddev = review_stddev
+  aotdUserObj.review_score_stddev = review_stddev if review_stddev is not None else 0
   aotdUserObj.median_review_score = median_review_score
   aotdUserObj.first_listen_percentage = first_time_listen_percentage
   aotdUserObj.lowest_score_given = lowest_review_score
