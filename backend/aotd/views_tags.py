@@ -13,7 +13,7 @@ from .models import Album, AlbumTag, GlobalTag
 logger = logging.getLogger(__name__)
 
 APPROVAL_THRESHOLD = 3
-SUGGESTION_MIN_ALBUMS = 2
+SUGGESTION_MIN_ALBUMS = 3
 
 
 def normalize_tag(text: str) -> str:
@@ -64,6 +64,7 @@ def submitTag(request: HttpRequest):
   mbid = body.get('mbid', '').strip()
   raw_text = body.get('tag_text', '').strip()
   global_tag_id = body.get('global_tag_id', None)
+  emoji = body.get('emoji', None) or None  # normalize empty string to None
   # Error handling around mbid and tag text
   if not mbid or not raw_text:
     logger.error("Malformed request body: mbid and tag_text are required", extra={'crid': request.crid})
@@ -89,7 +90,7 @@ def submitTag(request: HttpRequest):
   if AlbumTag.objects.filter(album=album, tag_text__iexact=tag_text).exists():
     return JsonResponse({'error': 'This tag already exists on this album'}, status=409)
   # Create Tag object
-  tag = AlbumTag.objects.create(album=album, tag_text=tag_text, submitted_by=user, global_tag=global_tag)
+  tag = AlbumTag.objects.create(album=album, tag_text=tag_text, submitted_by=user, global_tag=global_tag, emoji=emoji)
   # Auto-upvote from submitter
   ct = ContentType.objects.get_for_model(AlbumTag)
   Vote.objects.create(user=user, content_type=ct, object_id=tag.pk, vote_type=Vote.UPVOTE)
@@ -220,16 +221,16 @@ def deleteTag(request: HttpRequest):
 
 
 def getTagSuggestions(request: HttpRequest):
-  """Return a sorted list of tag suggestion strings, combining admin-preset GlobalTags and community tags approved on 2+ distinct albums."""
+  """Return a sorted list of tag suggestion objects {text, emoji}, combining admin-preset GlobalTags and community tags approved on 2+ distinct albums."""
   # Make sure request is a GET request
   if(request.method != "GET"):
     logger.warning("Called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Admin-preset global tags
-  global_tags = set(GlobalTag.objects.values_list('text', flat=True))
-  # Tags approved on >= 2 distinct albums
+  # Admin-preset global tags with their emojis
+  global_tag_map = {gt.text: gt.emoji for gt in GlobalTag.objects.all()}
+  # Tags approved on >= 3 distinct albums
   common_tags = set(
     AlbumTag.objects
     .filter(is_approved=True)
@@ -238,8 +239,12 @@ def getTagSuggestions(request: HttpRequest):
     .filter(album_count__gte=SUGGESTION_MIN_ALBUMS)
     .values_list('tag_text', flat=True)
   )
-  # Sort and return
-  suggestions = sorted(global_tags | common_tags)
+  # Merge, preferring global tag emoji when text appears in both
+  all_texts = set(global_tag_map.keys()) | common_tags
+  suggestions = sorted(
+    [{'text': text, 'emoji': global_tag_map.get(text)} for text in all_texts],
+    key=lambda x: x['text']
+  )
   return JsonResponse({'suggestions': suggestions})
 
 
@@ -260,11 +265,12 @@ def createGlobalTag(request: HttpRequest):
   raw_text = body.get('tag_text', '').strip()
   if not raw_text:
     return JsonResponse({'error': 'tag_text is required'}, status=400)
+  emoji = body.get('emoji', None) or None
   # Normalize Tag
   tag_text = normalize_tag(raw_text)
   # Create Tag
-  tag, created = GlobalTag.objects.get_or_create(text=tag_text, defaults={'created_by': user})
-  return JsonResponse({'success': True, 'created': created, 'tag': {'id': tag.pk, 'text': tag.text}})
+  tag, created = GlobalTag.objects.get_or_create(text=tag_text, defaults={'created_by': user, 'emoji': emoji})
+  return JsonResponse({'success': True, 'created': created, 'tag': {'id': tag.pk, 'text': tag.text, 'emoji': tag.emoji}})
 
 
 def deleteGlobalTag(request: HttpRequest):
@@ -275,7 +281,7 @@ def deleteGlobalTag(request: HttpRequest):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Get user creating the global tag
+  # Get user deleting the global tag
   user = getUserObj(request.session.get('discord_id'))
   if not user or not user.is_staff:
     return JsonResponse({'error': 'Admin access required'}, status=403)
@@ -305,6 +311,6 @@ def getGlobalTags(request: HttpRequest):
   if not user or not user.is_staff:
     return JsonResponse({'error': 'Admin access required'}, status=403)
   # Return list of tags
-  tags = list(GlobalTag.objects.order_by('text').values('id', 'text', 'created_at'))
+  tags = list(GlobalTag.objects.order_by('text').values('id', 'text', 'emoji', 'created_at'))
   return JsonResponse({'global_tags': tags})
 

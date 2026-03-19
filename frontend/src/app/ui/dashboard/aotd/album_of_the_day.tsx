@@ -39,6 +39,7 @@ export default async function AlbumOfTheDayBox(props) {
   const similarReviewData = await getSimilarReviewsForRatings(user_data['discord_id'])
   // Retrieve review data on this level instead of at reviewbox level
   let reviewList = await getReviewsForAlbum(albumData("album_id"));
+  const albumTags = await getTagsForAlbum(albumData("album_id"));
 
   // Get Todays Date
   let todayDate = new Date()
@@ -140,10 +141,10 @@ export default async function AlbumOfTheDayBox(props) {
           <div className="w-full max-w-full">
             <AlbumTagsDisplay 
               mbid={albumData("album_id")}
-              initialTags={[]}
+              initialTags={albumTags ?? []}
               isEnrolled={aotd_participant}
               isAdmin={isAdmin}
-              currentUserId={user_data["guid"]}
+              currentUserId={user_data["discord_id"]}
               readOnly={false}
               pollIntervalMs={30000}
             />

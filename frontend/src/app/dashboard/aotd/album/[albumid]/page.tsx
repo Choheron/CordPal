@@ -3,7 +3,7 @@
 import { Button } from "@heroui/button"
 import { Divider } from "@heroui/divider"
 
-import { deleteAlbumFromBackend, getAlbum, getAlbumAvgRating, getAlbumOfTheDayData, getAotdData, getAotdDates } from "@/app/lib/aotd_utils"
+import { deleteAlbumFromBackend, getAlbum, getAlbumAvgRating, getAlbumOfTheDayData, getAotdData, getAotdDates, getTagsForAlbum } from "@/app/lib/aotd_utils"
 import { isUserAdmin, isUserAlbumUploader } from "@/app/lib/user_utils"
 import { milliToString, monthToName, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
@@ -13,6 +13,7 @@ import ReviewDisplay from "@/app/ui/dashboard/aotd/review_display"
 import Link from "next/link"
 import AlbumDeleteButton from "@/app/ui/dashboard/aotd/album_delete_button"
 import ReplaceAlbumModal from "@/app/ui/dashboard/aotd/modals/replace_album_modal"
+import AlbumTagsDisplay from "@/app/ui/dashboard/aotd/album_tags"
 
 // Page to display data for a specific album
 export default async function Page({
@@ -37,6 +38,8 @@ export default async function Page({
   let isAdmin = await isUserAdmin()
   // Determine if user is the uploader of the album
   let isUploader = await isUserAlbumUploader(albumid)
+  // Get tags for album
+  const albumTags = await getTagsForAlbum(albumData("album_id"));
   
 
   // Box of historical review dates - Generate series of review displays based on dates
@@ -160,22 +163,31 @@ export default async function Page({
         <div className="flex flex-col sm:flex-row justify-start gap-2">
           <div className="gap-2 h-fit w-fit">
             <div className="relative h-fit lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-              <AlbumDisplay 
-                title={albumData("title")}
-                disambiguation={albumData("disambiguation")}
-                album_img_src={albumData("album_img_src")}
-                album_mbid={albumData("album_id")}
-                album_src={albumData("album_src")}
-                artist={albumData("artist")}
-                submitter={albumData("submitter")}
-                submitter_comment={albumData("submitter_comment")}
-                submission_date={albumData("submission_date")}
-                release_date={albumData('release_date')}
-                release_date_precision={albumData("release_date_precision")}
-                trackCount={albumData("track_list")['tracks']?.length}
-                trackList={albumData("track_list")['tracks']}
-                showAlbumRating={false}
-              />
+              <div>
+                <AlbumDisplay 
+                  title={albumData("title")}
+                  disambiguation={albumData("disambiguation")}
+                  album_img_src={albumData("album_img_src")}
+                  album_mbid={albumData("album_id")}
+                  album_src={albumData("album_src")}
+                  artist={albumData("artist")}
+                  submitter={albumData("submitter")}
+                  submitter_comment={albumData("submitter_comment")}
+                  submission_date={albumData("submission_date")}
+                  release_date={albumData('release_date')}
+                  release_date_precision={albumData("release_date_precision")}
+                  trackCount={albumData("track_list")['tracks']?.length}
+                  trackList={albumData("track_list")['tracks']}
+                  showAlbumRating={false}
+                />
+                <AlbumTagsDisplay 
+                  mbid={albumData("album_id")}
+                  initialTags={albumTags ?? []}
+                  isEnrolled={true}
+                  isAdmin={isAdmin}
+                  readOnly={true}
+                />
+              </div>
               <Conditional showWhen={isAdmin || isUploader}>
                 <div className="absolute -top-1 right-1 flex gap-1">
                   <Conditional showWhen={isAdmin}>

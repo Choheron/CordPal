@@ -1112,7 +1112,7 @@ export async function getTagsForAlbum(mbid: string) {
 // Submit a new tag for an album
 // - RETURN: JSON response from backend
 //
-export async function submitTag(mbid: string, tagText: string, globalTagId?: number) {
+export async function submitTag(mbid: string, tagText: string, globalTagId?: number, emoji?: string | null) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Make backend request
@@ -1121,7 +1121,7 @@ export async function submitTag(mbid: string, tagText: string, globalTagId?: num
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json', Cookie: `sessionid=${sessionCookie};` },
-    body: JSON.stringify({ mbid, tag_text: tagText, global_tag_id: globalTagId ?? null }),
+    body: JSON.stringify({ mbid, tag_text: tagText, global_tag_id: globalTagId ?? null, emoji: emoji ?? null }),
   })
   return res.json()
 }
@@ -1182,9 +1182,9 @@ export async function deleteTag(tagId: number) {
 
 //
 // Get tag suggestions based on existing global tags
-// - RETURN: List of tag suggestion strings
+// - RETURN: List of tag suggestion objects {text, emoji}
 //
-export async function getTagSuggestions(): Promise<string[]> {
+export async function getTagSuggestions(): Promise<{ text: string; emoji: string | null }[]> {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Make backend request
@@ -1203,7 +1203,7 @@ export async function getTagSuggestions(): Promise<string[]> {
 // Create a new global tag (admin only)
 // - RETURN: JSON response from backend
 //
-export async function createGlobalTag(tagText: string) {
+export async function createGlobalTag(tagText: string, emoji?: string | null) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Make backend request
@@ -1212,7 +1212,7 @@ export async function createGlobalTag(tagText: string) {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json', Cookie: `sessionid=${sessionCookie};` },
-    body: JSON.stringify({ tag_text: tagText }),
+    body: JSON.stringify({ tag_text: tagText, emoji: emoji ?? null }),
   })
   return res.json()
 }

@@ -469,6 +469,7 @@ class GlobalTag(models.Model):
   created them.
   """
   text = models.CharField(max_length=50, unique=True)
+  emoji = models.CharField(max_length=255, null=True, blank=True)
   created_by = models.ForeignKey(
     User,
     on_delete=models.SET_NULL,
@@ -538,6 +539,7 @@ class AlbumTag(models.Model):
     blank=True,
     related_name="usages"
   )
+  emoji = models.CharField(max_length=255, null=True, blank=True)
 
   class Meta:
     unique_together = ('album', 'tag_text')  # case-sensitive at DB level; enforce iexact in view
@@ -562,7 +564,7 @@ class AlbumTag(models.Model):
         action_type="CREATE",
         entity_type="ALBUM_TAG",
         entity_id=self.pk,
-        details={"tag_text": self.tag_text, "album_mbid": self.album.mbid, "album_title": self.album.title, "from_global_tag": self.global_tag_id is not None, "global_tag_id": self.global_tag_id}
+        details={"tag_text": self.tag_text, "emoji": self.emoji, "album_mbid": self.album.mbid, "album_title": self.album.title, "from_global_tag": self.global_tag_id is not None, "global_tag_id": self.global_tag_id}
       )
 
   def delete(self, deleter=None, reason=None, admin_delete=False, *args, **kwargs):
@@ -596,6 +598,7 @@ class AlbumTag(models.Model):
     out = {
       'id': self.pk,
       'tag_text': self.tag_text,
+      'emoji': self.emoji,
       'submitted_by': self.submitted_by.nickname if self.submitted_by else None,
       'submitted_by_id': self.submitted_by.discord_id if self.submitted_by else None,
       'submitted_at': self.submitted_at.strftime("%m/%d/%Y, %H:%M:%S"),
