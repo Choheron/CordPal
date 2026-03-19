@@ -11,6 +11,8 @@ import {
   getReviewsForAlbum, 
   getSimilarReviewsForRatings, 
   getUserReviewForAlbum, 
+  getTagsForAlbum, 
+  isAotdParticipant
 } from "@/app/lib/aotd_utils";
 import AddAlbumModal from "./modals/add_album_modal";
 
@@ -22,6 +24,7 @@ import ReplaceAlbumModal from "./modals/replace_album_modal";
 import { revalidateTag } from "next/cache";
 import { getYesterdayInTimezone } from "@/app/lib/utils";
 import ReviewEventSource from "./review_event_source";
+import AlbumTagsDisplay from "./album_tags";
 
 // GUI Display for the Album of the Day
 export default async function AlbumOfTheDayBox(props) {
@@ -29,6 +32,7 @@ export default async function AlbumOfTheDayBox(props) {
   const isAdmin = await isUserAdmin()
   // Get user Data
   const user_data = await getUserData()
+  const aotd_participant = await isAotdParticipant()
   // Get album data
   const albumOfTheDayObj = await getAlbumOfTheDayData()
   const albumReview = await getUserReviewForAlbum(albumData("album_id"))
@@ -133,6 +137,17 @@ export default async function AlbumOfTheDayBox(props) {
             release_date_precision={albumData("release_date_precision")}
             trackList={albumData("track_list")['tracks']}
           />
+          <div className="w-full max-w-full">
+            <AlbumTagsDisplay 
+              mbid={albumData("album_id")}
+              initialTags={[]}
+              isEnrolled={aotd_participant}
+              isAdmin={isAdmin}
+              currentUserId={user_data["guid"]}
+              readOnly={false}
+              pollIntervalMs={30000}
+            />
+          </div>
           <div className="w-full max-w-full">
             <AlbumReviewBox 
               album_id={albumData("album_id")}
