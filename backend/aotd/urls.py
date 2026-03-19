@@ -7,7 +7,8 @@ from . import (
   views_album,
   views_user,
   views_oauth,
-  views_outage
+  views_outage,
+  views_tags
 )
 
 urlpatterns = [
@@ -109,4 +110,17 @@ urlpatterns = [
   path('getUserOutages', views_outage.getUserOutages),
   path('getCurrentOutages', views_outage.getCurrentOutages),
   path('getOutagesByDate/<str:date>', views_outage.getOutagesByDate),
+  ## ============================================================================================================
+  ## Tag Views
+  ## ============================================================================================================
+  path('getTagsForAlbum/<str:mbid>', views_tags.getTagsForAlbum),
+  path('submitTag', views_tags.submitTag),
+  path('voteOnTag', views_tags.voteOnTag),
+  path('removeVoteFromTag', views_tags.removeVoteFromTag),
+  path('deleteTag', views_tags.deleteTag),
+  path('getTagSuggestions', views_tags.getTagSuggestions),
+  # Admin tag management
+  path('createGlobalTag', views_tags.createGlobalTag),
+  path('deleteGlobalTag', views_tags.deleteGlobalTag),
+  path('getGlobalTags', views_tags.getGlobalTags),
 ]

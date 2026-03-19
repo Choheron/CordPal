@@ -4,7 +4,7 @@ import { Alert } from "@heroui/alert"
 import { Button } from "@heroui/button"
 import { Divider } from "@heroui/divider"
 
-import { getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData } from "@/app/lib/aotd_utils"
+import { getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData, getTagsForAlbum } from "@/app/lib/aotd_utils"
 import { getNextDay, getPrevDay, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
@@ -13,6 +13,8 @@ import ReviewDisplay from "@/app/ui/dashboard/aotd/review_display"
 import { AOtDScoreTimelineLineChart } from "@/app/ui/dashboard/aotd/statistics_displays/charts/aotd_score_timeline_linechart"
 import Link from "next/link"
 import { RiArrowLeftCircleLine, RiArrowRightCircleLine, RiCalendar2Fill } from "react-icons/ri"
+import { getUserData, isUserAdmin } from "@/app/lib/user_utils"
+import AlbumTagsDisplay from "@/app/ui/dashboard/aotd/album_tags"
 
 // Page to display historial data for an specific date
 export default async function Page({
@@ -34,6 +36,10 @@ export default async function Page({
   const isToday = isTodayCheck()
   // Fetch standard deviation for this date
   const standard_deviation = (albumData("album_id")) ? await getAlbumSTD(albumData("album_id"), date) : "N/A"
+  // Get tags for album
+  const albumTags = await getTagsForAlbum(albumData("album_id"));
+  // Check if current user is an Admin User
+  const isAdmin = await isUserAdmin()
   
 
   // This may be my ugliest function in this whole thing.... Timezones are really confusing me
@@ -146,6 +152,15 @@ export default async function Page({
               release_date_precision={albumData("release_date_precision")}
               historical_date={date}
             />
+            <div className="w-full max-w-full">
+              <AlbumTagsDisplay 
+                mbid={albumData("album_id")}
+                initialTags={albumTags ?? []}
+                isEnrolled={true}
+                isAdmin={isAdmin}
+                readOnly={true}
+              />
+            </div>
             <div className="mt-2 w-full md:w-4/5 mx-auto">
               <p className="text-xl lg:text-3xl">Day Stats:</p>
               <Divider />
