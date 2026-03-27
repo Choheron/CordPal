@@ -43,7 +43,8 @@ export default async function AlbumOfTheDayBox(props) {
   const albumTags = await getTagsForAlbum(albumData("album_id"));
   // Determine if tags should be hidden (hide-scores-prereview setting)
   const reviewToday = await getHasReviewedToday();
-  const hideTags = (await getAotdUserSettings())['hide_scores_prereview'] && !reviewToday;
+  const hideScore = (await getAotdUserSettings())['hide_scores_prereview'] && !reviewToday;
+  const hideTags = (await getAotdUserSettings())['hide_tags_prereview'] && !reviewToday;
 
   // Get Todays Date
   let todayDate = new Date()
@@ -141,6 +142,7 @@ export default async function AlbumOfTheDayBox(props) {
             release_date={albumData("release_date")}
             release_date_precision={albumData("release_date_precision")}
             trackList={albumData("track_list")['tracks']}
+            hideScore={hideScore}
           />
           <div className="w-full max-w-full">
             <AlbumTagsDisplay

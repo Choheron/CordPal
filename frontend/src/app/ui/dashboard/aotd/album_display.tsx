@@ -35,6 +35,7 @@ import { Tooltip } from "@heroui/tooltip";
 //  - member_status: Boolean - (Optional) Is the user a member of the desired server?
 //  - vertical: Boolean - (Optional) Is this to be a vertical display instead of side by side?
 //  - trackList: List of Objects - (Optional) The tracks contained in the album
+//  - hideScore: Boolean to hide the score of the album
 export default async function AlbumDisplay(props) {
   // Configuration Props
   const showAlbumRating = (props.showAlbumRating == false) ? props.showAlbumRating : true;
@@ -67,6 +68,8 @@ export default async function AlbumDisplay(props) {
   const vertical = (props.vertical) ? props.vertical : false;
   // Track List
   const track_list = (props.trackList) ? props.trackList : null;
+  // Hide album score
+  const hideScore = (props.hideScore) ? props.hideScore : false;
   
 
   const dateToCalUrl = (dateStr) => {
@@ -143,7 +146,7 @@ export default async function AlbumDisplay(props) {
               <ClientTimestamp className="italic pl-1" timestamp={submission_date} full={false}/>
             </div>
           </Conditional>
-          <Conditional showWhen={(avg_rating != 11) && ((avg_rating != null) && showAlbumRating)}>
+          <Conditional showWhen={(avg_rating != 11) && ((avg_rating != null) && showAlbumRating) && !hideScore}>
             <div className="text-xs lg:text-base">
               <div className="flex mb-1">
                 <p>Average {(userAuth) ? "User":"Member"} Rating: </p>
