@@ -202,8 +202,9 @@ export async function updateUserData(updatedJSON) {
       Cookie: `sessionid=${sessionCookie};`
     }
   });
-  // Revalidate User Data
+  // Revalidate User Data and aotd-settings tag
   revalidateTag('user-data', "max")
+  revalidateTag('aotd_settings', "max")
   // Return json
   return await userDataResponse.json();
 }
@@ -407,4 +408,29 @@ export async function getRecentUserActions() {
     }
   });
   return await userActionsResponse.json();
+}
+
+
+//
+// Return boolean of if user has reviewed today or not 
+//
+export async function getHasReviewedToday(discord_id = "") {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Reurn false if cookie is missing
+  if(sessionCookie === "") {
+    return false;
+  }
+  // Determine URL tail
+  const urlTail = (discord_id != "") ? `/${discord_id}` : ''
+  const userReviewTodayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getHasReviewedToday${urlTail}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const response = await userReviewTodayResponse.json();
+  return response['has_reviewed_today'];
 }

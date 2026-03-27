@@ -25,6 +25,10 @@ urlpatterns = [
   path('getAotdUsersList', views_user.getAotdUsersList),
   path('getAotdUserCount', views_user.getAotdUserCount),
   path('getSelectionBlockedFlag', views_user.getSelectionBlockedFlag),
+  # Below URL has two variations (one for lack of URL Param)
+  path('getHasReviewedToday/<str:user_discord_id>', views_user.getHasReviewedToday),
+  path('getHasReviewedToday', views_user.getHasReviewedToday),
+  path('getAotdUserSettings', views_user.getAotdUserSettings),
   ## ============================================================================================================
   ## Album Views
   ## ============================================================================================================

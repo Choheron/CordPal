@@ -23,6 +23,7 @@ type Props = {
   currentUserId?: string | null   // compare against tag.submitted_by_id for delete button visibility
   readOnly?: boolean              // true → approved badges only, no controls (calendar page)
   pollIntervalMs?: number         // if set, poll getTagsForAlbum on this interval (AOTD page only)
+  hideTags?: boolean              // true → hide tags until user has reviewed (pre-review setting)
 }
 
 export default function AlbumTagsDisplay(props: Props) {
@@ -228,10 +229,13 @@ export default function AlbumTagsDisplay(props: Props) {
     <div className="relative">
       {/* Display approved tags */}
       <div className="flex flex-wrap gap-2 m-2">
-        {tags.sort((a, b) => b.net_score - a.net_score).filter((a) => (!props.readOnly || a.is_approved)).map((tag) => AlbumTagChip(tag))}
+        {props.hideTags
+          ? <p className="text-xs text-gray-500 italic my-auto">Tags hidden until you review. This setting can be changed in the settings.</p>
+          : tags.sort((a, b) => b.net_score - a.net_score).filter((a) => (!props.readOnly || a.is_approved)).map((tag) => AlbumTagChip(tag))
+        }
       </div>
       {/* Tagging Button */}
-      {!props.readOnly && props.isEnrolled && (
+      {!props.readOnly && props.isEnrolled && !props.hideTags && (
         <Tooltip content="Add New Tag" placement="left">
           <Button
             onPress={() => setShowSubmitModal(true)}

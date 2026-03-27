@@ -6,6 +6,7 @@ from users.utils import getUserObj
 from .models import (
   AotdUserData,
 )
+from .utils import hasReviewedToday
 
 import logging
 import requests
@@ -112,6 +113,46 @@ def getAotdData(request: HttpRequest):
     return JsonResponse(dir_response)
   else:
     return JsonResponse({})
+
+
+###
+# Get AOTD user settings for the current user
+###
+def getAotdUserSettings(request: HttpRequest):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning(f"getAotdUserSettings called with a non-GET method, returning 405.", extra={'crid': request.crid})
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get user data from session
+  user = getUserObj(request.session.get('discord_id'))
+  # Retrieve and return the user's AOTD settings
+  aotd_data = AotdUserData.objects.get(user=user)
+  return JsonResponse({
+    "hide_scores_prereview": aotd_data.hide_scores_prereview,
+    "hide_tags_prereview": aotd_data.hide_tags_prereview,
+  })
+
+
+###
+# Return if the current user has reviewed today's AOTD
+###
+def getHasReviewedToday(request: HttpRequest, user_discord_id: str | None = None):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning(f"getHasReviewedToday called with a non-GET method, returning 405.", extra={'crid': request.crid})
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # If a user is not passed in, get from session.
+  # Else use the passed in user id.
+  if(user_discord_id is None):
+    # Get user data from session
+    user = getUserObj(request.session.get('discord_id'))
+  else:
+    user = getUserObj(user_discord_id)
+  return JsonResponse({"has_reviewed_today": hasReviewedToday(user)})
 
 
 ###

@@ -33,6 +33,27 @@ export async function isAotdParticipant() {
 }
 
 
+//
+// Get the AOtD settings for the current user
+// - RETURN: Object containing hide_scores_prereview and hide_tags_prereview
+//
+export async function getAotdUserSettings() {
+  const sessionCookie = await getCookie('sessionid');
+  console.log("getAotdUserSettings: Sending request to backend '/aotd/getAotdUserSettings'")
+  const settingsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAotdUserSettings`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: [`aotd_settings`] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    }
+  });
+  const settingsData = await settingsResponse.json();
+  return settingsData;
+}
+
+
 // 
 // Enroll a user in the AOtD
 // - RETURN: Boolen representing successful
@@ -75,6 +96,7 @@ export async function checkIfUserCanSubmit() {
   const canSubmitData = await canSubmitResponse.json();
   return canSubmitData;
 }
+
 
 //
 // Get a count of users who are participating in the AOtD

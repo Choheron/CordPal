@@ -5,7 +5,8 @@ from .utils import (
   getAlbumRating,
   calculateUserReviewData,
   get_album_from_mb,
-  retrieveAlbumSTD
+  retrieveAlbumSTD,
+  hasReviewedToday
 )
 from users.utils import getUserObj
 from .models import (
@@ -88,8 +89,7 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
     validityStatus['reason'] = f"You have already submitted an album for today! ({albumDay}) (CST)"
     return JsonResponse(validityStatus)
   # If the user has reviewed today, they can submit
-  reviewed_today = Review.objects.filter(review_date__date=albumDay, user=userObj).exists()
-  if (not reviewed_today):
+  if not hasReviewedToday(userObj):
     validityStatus['canSubmit'] = False
     validityStatus['reason'] = f"You have not submitted a review for the current album!"
   ## Check if the user has 100 or more unpicked submissions, users are limited to 100 unpicked albums
@@ -251,7 +251,7 @@ def getAlbum(request: HttpRequest, mbid: str):
 ###
 # Replace an Album via its backend primary key, as is auto-assigned by the database.
 ###
-def replaceAlbum(request: HttpRequest, album_pk: str,  new_mbid: str):
+def replaceAlbum(request: HttpRequest, album_pk: str, new_mbid: str):
   '''Replace an Album via its backend primary key, as is auto-assigned by the database. Expected to recieve an album pk and a replacement mbid.'''
   # Make sure request is a POST request
   if(request.method != "POST"):

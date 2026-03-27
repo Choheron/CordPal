@@ -17,6 +17,7 @@ import Image from 'next/image'
 // Expected props:
 //  - isMember: Boolean indicating if the current session user is a member of the desired server
 //  - userInfo: JSON Containing user information
+//  - aotdConnected: Boolean determining if AOTD is connected
 //  - avatarURL: String URL of Discord User's Avatar
 //  - linkedAccounts: List containing data surrounding linked accounts
 export default function TopBar(props) {
@@ -103,6 +104,8 @@ export default function TopBar(props) {
       <div className="z-10 w-full max-w-full h-fit items-center justify-between font-mono text-sm flex flex-col lg:flex-row">
         <SettingsModal 
           userInfo={props.userInfo}
+          aotdConnected={props.aotdConnected}
+          aotdSettings={props.aotdSettings}
           avatarURL={props.avatarURL}
           linkedAccounts={props.linkedAccounts}
           userLoginMethods={props.userLoginMethods}

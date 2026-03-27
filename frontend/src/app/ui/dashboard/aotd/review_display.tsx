@@ -1,7 +1,8 @@
-import { getReviewsForAlbum, getAotdUserCount, getAotdData } from "@/app/lib/aotd_utils";
+import { getReviewsForAlbum, getAotdUserCount, getAotdData, getAotdUserSettings } from "@/app/lib/aotd_utils";
 import ReviewAvatarCard from "./review_avatar_card";
 import { Conditional } from "../conditional";
 import { Alert } from "@heroui/alert";
+import { getHasReviewedToday } from "@/app/lib/user_utils";
 
 // GUI Display for reviews of an album
 // Expected Props:
@@ -15,6 +16,9 @@ export default async function ReviewDisplay(props) {
   const userCount = await getAotdUserCount();
   // If the user is an AOTD participant, check if they are about to lose a review streak
   const aotdUserData = await getAotdData();
+  // Determine if the user has reviewed today and if they have the hide review settings on
+  const reviewToday = await getHasReviewedToday();
+  const hideReviewSetting = (await getAotdUserSettings())['hide_scores_prereview'];
 
 
   return (
@@ -38,6 +42,21 @@ export default async function ReviewDisplay(props) {
           </div>
         </Alert>
       </Conditional>
+      <Conditional showWhen={(hideReviewSetting) && (!reviewToday)}>
+        <Alert
+          className="w-full gap-2 text-sm"
+          color="default"
+          radius="md"
+          hideIcon={true}
+        >
+          <div className="flex gap-2">
+            <p className="text-2xl">🎵</p>
+            <p className="my-auto">
+              Scores are hidden until you've had a chance to share yours. You can disable this in settings.
+            </p>
+          </div>
+        </Alert>
+      </Conditional>
       {reviews.length === 0 ? (
           <div className="w-full text-center">
             <p className="mx-auto font-extralight pt-10">No Reviews.</p>
@@ -45,7 +64,7 @@ export default async function ReviewDisplay(props) {
         ) : (
           reviews.sort((a, b) => a['score'] < b['score'] ? 1 : -1).map((review, index) => (
             <div className="mx-auto w-full max-w-full" key={index}>
-              <ReviewAvatarCard index={index} review_obj={review} />
+              <ReviewAvatarCard index={index} review_obj={review} hideScores={hideReviewSetting && !reviewToday} />
             </div>
           ))
         )

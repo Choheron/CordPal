@@ -165,6 +165,7 @@ def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
 # Update user data changing the fields provided in the request
 ###
 def updateUserData(request: HttpRequest):
+  from aotd.models import AotdUserData
   # Make sure request is a post request
   if(request.method != "POST"):
     logger.warning("updateUserData called with a non-POST method, returning 405.", extra={'crid': request.crid})
@@ -173,8 +174,13 @@ def updateUserData(request: HttpRequest):
     return res
   # Body data
   reqBody = json.loads(request.body)
-  # Retrieve user data via session storage then update user data
-  User.objects.filter(discord_id=request.session['discord_id']).update(**reqBody)
+  # Update default user fields
+  if reqBody.get('default'):
+    User.objects.filter(discord_id=request.session['discord_id']).update(**reqBody['default'])
+  # Update AOTD user settings
+  if reqBody.get('aotd'):
+    user = User.objects.get(discord_id=request.session['discord_id'])
+    AotdUserData.objects.filter(user=user).update(**reqBody['aotd'])
   # Return success code
   return HttpResponse(200)
 

@@ -6,19 +6,20 @@ import { Button } from "@heroui/button";
 import AlbumDisplay from "./album_display";
 import AlbumReviewBox from "./album_review_box";
 import ReviewDisplay from "./review_display";
-import { 
-  getAlbumOfTheDayData, 
-  getReviewsForAlbum, 
-  getSimilarReviewsForRatings, 
-  getUserReviewForAlbum, 
-  getTagsForAlbum, 
-  isAotdParticipant
+import {
+  getAlbumOfTheDayData,
+  getReviewsForAlbum,
+  getSimilarReviewsForRatings,
+  getUserReviewForAlbum,
+  getTagsForAlbum,
+  isAotdParticipant,
+  getAotdUserSettings
 } from "@/app/lib/aotd_utils";
 import AddAlbumModal from "./modals/add_album_modal";
 
 import Link from "next/link";
 import { RiCalendar2Fill} from "react-icons/ri";
-import { getUserData, isUserAdmin } from "@/app/lib/user_utils";
+import { getUserData, isUserAdmin, getHasReviewedToday } from "@/app/lib/user_utils";
 import { Conditional } from "../conditional";
 import ReplaceAlbumModal from "./modals/replace_album_modal";
 import { revalidateTag } from "next/cache";
@@ -40,6 +41,9 @@ export default async function AlbumOfTheDayBox(props) {
   // Retrieve review data on this level instead of at reviewbox level
   let reviewList = await getReviewsForAlbum(albumData("album_id"));
   const albumTags = await getTagsForAlbum(albumData("album_id"));
+  // Determine if tags should be hidden (hide-scores-prereview setting)
+  const reviewToday = await getHasReviewedToday();
+  const hideTags = (await getAotdUserSettings())['hide_scores_prereview'] && !reviewToday;
 
   // Get Todays Date
   let todayDate = new Date()
@@ -139,7 +143,7 @@ export default async function AlbumOfTheDayBox(props) {
             trackList={albumData("track_list")['tracks']}
           />
           <div className="w-full max-w-full">
-            <AlbumTagsDisplay 
+            <AlbumTagsDisplay
               mbid={albumData("album_id")}
               initialTags={albumTags ?? []}
               isEnrolled={aotd_participant}
@@ -147,6 +151,7 @@ export default async function AlbumOfTheDayBox(props) {
               currentUserId={user_data["discord_id"]}
               readOnly={false}
               pollIntervalMs={30000}
+              hideTags={hideTags}
             />
           </div>
           <div className="w-full max-w-full">

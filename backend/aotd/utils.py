@@ -36,6 +36,14 @@ APP_ENV = os.getenv('APP_ENV') or 'DEV'
 load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 
 
+###
+# Returns True if the given user has submitted a review for today's AOTD date (CST).
+###
+def hasReviewedToday(user: User) -> bool:
+  today = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date()
+  return Review.objects.filter(review_date__date=today, user=user).exists()
+
+
 def getAotdUserObj(discord_id):
   """Return Aotd Specific User Object corresponding to discord id"""
   try:
