@@ -43,7 +43,7 @@ export default function SettingsModal(props) {
   // Update Check
   const [canUpdate, setCanUpdate] = React.useState(false)
   // Modal Values
-  const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
+  const {isOpen, onOpen, onClose} = useDisclosure();
   const router = useRouter();
 
   // useEffect to check if nickname is unique
@@ -248,11 +248,13 @@ export default function SettingsModal(props) {
       </Conditional>
       <Modal
         size="xl"
+        classNames={{
+          base: "sm:max-w-xl sm:rounded-large rounded-none m-0 sm:m-auto h-full sm:h-auto flex flex-col"
+        }}
         isOpen={(props.isOpenOverride != null) ? props.isOpenOverride : isOpen}
-        onOpenChange={onOpenChange}
+        onOpenChange={(open) => { if (!open) cancelPress(); }}
         isDismissable={false}
         isKeyboardDismissDisabled={true}
-        onClose={cancelPress}
       >
         <ModalContent>
           {() => (
@@ -266,7 +268,7 @@ export default function SettingsModal(props) {
                   <span className="text-base">{props.userInfo['nickname']}'s Settings</span>
                 </a>
               </ModalHeader>
-              <ModalBody className="font-extralight gap-4">
+              <ModalBody className="font-extralight gap-4 overflow-y-auto flex-1">
                 <p className="text-xs text-white/40 text-center -mt-2">
                   View and update your profile data. Click your avatar above to visit your profile.
                 </p>
