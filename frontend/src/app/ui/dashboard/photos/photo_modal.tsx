@@ -58,13 +58,20 @@ export default function PhotoModal(props) {
     }
   */
   useEffect(() => {
+    // Guard: imgData starts as {} on mount and is reset to {} on modal close.
+    // Without this check, getUserData(undefined) would be called twice for every
+    // card that enters the viewport — even ones the user never opens. Skip until
+    // imgData is populated with real data from the first useEffect above.
+    if (!imgData['uploader']) return
+
     const setSecondaryDataFunc = async () => {
       setUploaderData(await getUserData(imgData['uploader']))
       setCreatorData(await getUserData(imgData['creator']))
       setUploadTimestamp(new Date(Date.parse(imgData['upload_timestamp'])))
+      // toggle off loading state
+      setLoading(false)
     }
     setSecondaryDataFunc()
-    setLoading(false)
   }, [imgData]);
 
   const handleOnClose = () => {

@@ -1,71 +1,47 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import PhotoModal from "./photo_modal"
+// PhotoGallery - Masonry grid layout for the photoshops page
+//
+//
+// Expected Props:
+//  - photos: String - Comma-separated list of image GUIDs returned by getPhotoshops()
+
+import LazyPhotoCard from "./lazy_photo_card"
 
 export default function PhotoGallery(props) {
   const fileListString: any = props.photos
-  // Track screen width
-  const [windowWidth, setWindowWidth] = useState(0);
 
-  useEffect(() => {
-    // Get Window Width
-    if (typeof window !== "undefined") {
-      setWindowWidth(window.innerWidth)
-    }
-  }, [])
-  
-  const loadImages = () => {
-    const fileList = fileListString.split(',')
-    // Cut list into 3 different columns (into a terribly named var)
-    var fileListList: any[] = [[],[],[],[]]
-    for (let i = 0; i < fileList.length; i++) {
-      // Show images in reverse order (newest uploads first)
-      const photoindex = (fileList.length - (i + 1))
-      var listIndex = 0
-      if(windowWidth >= 1024) {
-        // Show images newest from top left to bottom right (Otherwise put them all in the same list)
-        listIndex = (i - 1) % 4
-      }
-      if(fileList[photoindex] == "") {
-        continue
-      }
-      if(listIndex == 0) {
-        fileListList[0].push(fileList[photoindex])
-      }else if(listIndex == 1) {
-        fileListList[1].push(fileList[photoindex])
-      } else if(listIndex == 2) {
-        fileListList[2].push(fileList[photoindex])
-      } else {
-        fileListList[3].push(fileList[photoindex])
-      }
-    }
-
-    return (
-      <div className="flex flex-col lg:flex-row gap-6 w-full 2xl:w-3/4">
-        { fileListList.map((list: string[], listIndex: number) => (
-          <div key={listIndex} className="w-full flex flex-col gap-6 items-center pt-3">
-            { list.map((id: string, index: number) => (
-              <PhotoModal
-                key={id}
-                imageSrc={`/dashboard/photos/api/get-image/${id}`}
-                imageID={id}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  
-  // Return basic string if no photos found
+  // Empty state — no photos match the current filter
   if(fileListString.length == 0) {
     return (<p>No Photos meet Filter Criteria</p>)
   }
-  return(
-    <>
-      {loadImages()}
-    </>
+
+  // Split CSV string into array, strip any empty entries (e.g. trailing comma),
+  // and reverse so newest uploads appear first (top-left to bottom-right in columns)
+  const fileList: string[] = fileListString
+    .split(',')
+    .filter((id: string) => id !== '')
+    .reverse()
+
+  return (
+    // CSS columns masonry:
+    //   columns-1  → single column on mobile
+    //   sm:columns-2 → two columns at sm (640px+)
+    //   lg:columns-4 → four columns at lg (1024px+)
+    //   gap-6 sets the horizontal gap between columns
+    //   2xl:w-3/4 keeps the gallery centered on very wide screens
+    <div className="columns-1 sm:columns-2 lg:columns-4 gap-6 w-full 2xl:w-3/4">
+      {fileList.map((id: string) => (
+        // break-inside-avoid prevents the column renderer from splitting this wrapper
+        // div across a column break, which would visually chop a card in half.
+        // mb-6 provides vertical spacing between cards in the same column.
+        <div key={id} className="mb-6 break-inside-avoid">
+          <LazyPhotoCard
+            imageSrc={`/dashboard/photos/api/get-image/${id}`}
+            imageID={id}
+          />
+        </div>
+      ))}
+    </div>
   )
 }
