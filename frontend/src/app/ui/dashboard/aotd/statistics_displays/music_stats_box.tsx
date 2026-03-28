@@ -104,9 +104,9 @@ export default async function MusicStatsBox(props) {
                 submitter_comment={albumLowHighStatsJson['highest_album']["user_comment"]}
                 submission_date={albumLowHighStatsJson['highest_album']["submission_date"]}
                 historical_date={albumLowHighStatsJson['highest_album']['date']}
-                sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
-                showAlbumRating={2}
-                starTextOverride="text-3xl"
+                // sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
+                showAlbumRating={true}
+                // starTextOverride="text-3xl"
                 showCalLink={true}
               />
             </div>
@@ -126,9 +126,9 @@ export default async function MusicStatsBox(props) {
                 submitter_comment={albumLowHighStatsJson['lowest_album']["user_comment"]}
                 submission_date={albumLowHighStatsJson['lowest_album']["submission_date"]}
                 historical_date={albumLowHighStatsJson['lowest_album']['date']}
-                sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
-                showAlbumRating={2}
-                starTextOverride="text-3xl"
+                // sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
+                showAlbumRating={true}
+                // starTextOverride="text-3xl"
                 showCalLink={true}
               />
             </div>

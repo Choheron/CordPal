@@ -4,8 +4,9 @@ import { Alert } from "@heroui/alert"
 import { Button } from "@heroui/button"
 import { Divider } from "@heroui/divider"
 
-import { getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData, getTagsForAlbum } from "@/app/lib/aotd_utils"
+import { getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData, getTagsForAlbum, getAotdUserSettings, isAotdParticipant } from "@/app/lib/aotd_utils"
 import { getNextDay, getPrevDay, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
+import { getHasReviewedToday } from "@/app/lib/user_utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/aotd/album_display"
@@ -40,7 +41,20 @@ export default async function Page({
   const albumTags = await getTagsForAlbum(albumData("album_id"));
   // Check if current user is an Admin User
   const isAdmin = await isUserAdmin()
-  
+
+  // Hide scores/tags only when viewing today's AOTD and the user's settings say to hide pre-review.
+  // For any historical date, isToday is false so hideScore/hideTags remain false.
+  let hideScore = false
+  let hideTags = false
+  if (isToday && await isAotdParticipant()) {
+    const [aotdSettings, hasReviewedToday] = await Promise.all([
+      getAotdUserSettings(),
+      getHasReviewedToday(),
+    ])
+    hideScore = aotdSettings['hide_scores_prereview'] && !hasReviewedToday
+    hideTags = aotdSettings['hide_tags_prereview'] && !hasReviewedToday
+  }
+
 
   // This may be my ugliest function in this whole thing.... Timezones are really confusing me
   function isTodayCheck() {
@@ -151,14 +165,16 @@ export default async function Page({
               release_date={albumData("release_date")}
               release_date_precision={albumData("release_date_precision")}
               historical_date={date}
+              hideScore={hideScore}
             />
             <div className="w-full max-w-full">
-              <AlbumTagsDisplay 
+              <AlbumTagsDisplay
                 mbid={albumData("album_id")}
                 initialTags={albumTags ?? []}
                 isEnrolled={true}
                 isAdmin={isAdmin}
                 readOnly={true}
+                hideTags={hideTags}
               />
             </div>
             <div className="mt-2 w-full md:w-4/5 mx-auto">
@@ -189,6 +205,7 @@ export default async function Page({
               album_id={albumData("album_id")}
               date={date}
               historical={true}
+              hideScore={hideScore}
             />
           </div>
         </div>
