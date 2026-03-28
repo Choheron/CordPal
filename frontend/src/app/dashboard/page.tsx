@@ -2,11 +2,11 @@
 
 import { Conditional } from "../ui/dashboard/conditional";
 import { isMember, getDiscordUserData } from "../lib/discord_utils";
-import { getAllOnlineData, getUserData, getUserList, getUsersByTimezone } from "../lib/user_utils";
+import { getAllOnlineData, getHasReviewedToday, getUserData, getUserList, getUsersByTimezone } from "../lib/user_utils";
 import PageTitle from "../ui/dashboard/page_title";
 import LiveOnlineUsersBox from "../ui/dashboard/live_online_users_box";
 import AlbumDisplay from "../ui/dashboard/aotd/album_display";
-import { getAlbumOfTheDayData } from "../lib/aotd_utils";
+import { getAlbumOfTheDayData, getAotdUserSettings } from "../lib/aotd_utils";
 import AllTimezonesBlock from "../ui/dashboard/allTimezonesBlock";
 import UserActionsBlock from "../ui/dashboard/userActionsBlock";
 
@@ -21,6 +21,8 @@ export default async function Page() {
   const timezoneData = await getUsersByTimezone();
   // Get Album of the day data
   let albumOfTheDayObj = await getAlbumOfTheDayData()
+  // Determine if the score should be hidden based on user settings
+  const hideScore = ((await getAotdUserSettings())['hide_scores_prereview']) && !(await getHasReviewedToday());
 
   // Pull data from album object, return empty string if not available
   function albumData(key) {
@@ -57,6 +59,7 @@ export default async function Page() {
               release_date={albumData("release_date")}
               release_date_precision={albumData("release_date_precision")}
               member_status={memberStatus}
+              hideScore={hideScore}
             />
           </div>
           <div className="relative flex flex-col h-fit w-full max-w-full sm:max-w-[800px] px-2 py-2 lg:p-4 items-center border-neutral-800 bg-zinc-800/30 from-inherit rounded-xl border">

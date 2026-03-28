@@ -361,7 +361,7 @@ export async function getAlbumOfTheDayData(date: string = '') {
 // Get album rating
 // - RETURN: object containing album of the day data
 //
-export async function getAlbumAvgRating(mbid, rounded = true, date = null) {
+export async function getAlbumAvgRating(mbid, rounded = true, date: any = null) {
   // If mbid is null, return 0
   if(mbid == null) {
     return 0.0

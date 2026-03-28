@@ -188,6 +188,7 @@ export default async function AlbumOfTheDayBox(props) {
         <ReviewEventSource albumId={albumData("album_id")} />
         <ReviewDisplay 
           review_list={reviewList}
+          hideScore={hideScore}
         />
       </div>
     </div>

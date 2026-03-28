@@ -16,9 +16,10 @@ export default async function ReviewDisplay(props) {
   const userCount = await getAotdUserCount();
   // If the user is an AOTD participant, check if they are about to lose a review streak
   const aotdUserData = await getAotdData();
-  // Determine if the user has reviewed today and if they have the hide review settings on
+  // Props for hidescores
+  const hideScore = (props.hideScore) ? props.hideScore : false
+  // Check if user has reviewed today
   const reviewToday = await getHasReviewedToday();
-  const hideReviewSetting = (await getAotdUserSettings())['hide_scores_prereview'];
 
 
   return (
@@ -42,7 +43,7 @@ export default async function ReviewDisplay(props) {
           </div>
         </Alert>
       </Conditional>
-      <Conditional showWhen={(hideReviewSetting) && (!reviewToday)}>
+      <Conditional showWhen={(hideScore) && (!reviewToday)}>
         <Alert
           className="w-full gap-2 text-sm"
           color="default"
@@ -64,7 +65,7 @@ export default async function ReviewDisplay(props) {
         ) : (
           reviews.sort((a, b) => a['score'] < b['score'] ? 1 : -1).map((review, index) => (
             <div className="mx-auto w-full max-w-full" key={index}>
-              <ReviewAvatarCard index={index} review_obj={review} hideScores={hideReviewSetting && !reviewToday} />
+              <ReviewAvatarCard index={index} review_obj={review} hideScores={hideScore} />
             </div>
           ))
         )

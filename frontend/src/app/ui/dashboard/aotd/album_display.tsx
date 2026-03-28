@@ -13,30 +13,34 @@ import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
 import { Tooltip } from "@heroui/tooltip";
 
+type AlbumDisplayProps = {
+  title: string;                                           // Title of the album
+  disambiguation?: string;                                 // Disambiguation of the album (e.g. "Standard Edition")
+  album_img_src: string;                                   // URL to access the album image [EXTERNAL]
+  album_src: string;                                       // URL for user to access the album [EXTERNAL]
+  artist: {
+    name: string;                                          // Name of the artist
+    href: string;                                          // URL to access the artist on external [EXTERNAL]
+  };
+  submitter?: string;                                      // Discord ID of the user that submitted this album
+  submitter_comment?: string;                              // Optional comment left by the album submitter
+  submission_date?: string;                                // String representation of the submission date
+  release_date?: string;                                   // String representation of the release date
+  release_date_precision?: 'year' | 'month' | 'day';       // Preciseness of release date string, defaults to "day"
+  album_mbid?: string;                                     // Album MusicBrainz ID
+  album_id?: string;                                       // Album MusicBrainz ID
+  historical_date?: string;                                // Date this album was Album of the Day (for historical displays)
+  showAlbumRating?: boolean;                               // Show the average user rating for the album, defaults to true
+  showCalLink?: boolean;                                   // Show a button to navigate to the calendar date displayed, defaults to false
+  trackCount?: number;                                     // Number of songs in the album, shown if provided
+  member_status?: boolean;                                 // Whether the user is a member of the desired server
+  vertical?: boolean;                                      // Display vertically instead of side by side
+  trackList?: { length: number; [key: string]: unknown }[]; // The tracks contained in the album
+  hideScore?: boolean;                                     // Hide the score of the album
+}
+
 // GUI Display for an Album
-// Expected Props:
-//  - title: String - Title of the Album
-//  - disambiguation: String - Disambiguation of the album
-//  - album_img_src: string - Url to access the album image [EXTERNAL]
-//  - album_src: string - Url for user to access the album [EXTERNAL]
-//  - artist: Object - Object of Artist Data (Expected fields in object below)
-//      > name: String - Name of Artist
-//      > href: String - Url to access artist on spotify [EXTERNAL URL]
-//  - submitter: String - (Optional) The discord id of the user that submitted this album, not applicable in all use cases
-//  - submitter_comment: String - (Optional) An optional comment that the album submitter may have left with this album
-//  - submission_date: String - (Optional) A String representation of the submission date of the Album
-//  - release_date: String - (Optional) A String representation of the release date of the Album
-//  - release_date_precision: String - (Optional) Preciseness of release date string. Must be "year", "month" or "day". Defaults to "day"
-//  - album_mbid: String - (Optional) Album Spotify ID for retrieval of average from database
-//  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
-//  - showAlbumRating: Boolean - (Optional) [DEFAULT TRUE] Show the average user rating for the album
-//  - showCalLink: Boolean - (Optional) [DEFAULT FALSE] Show a button for the user to go to the calendar date displayed
-//  - trackCount: Boolean - (Optional) Number of songs in the album, if provided, will show.
-//  - member_status: Boolean - (Optional) Is the user a member of the desired server?
-//  - vertical: Boolean - (Optional) Is this to be a vertical display instead of side by side?
-//  - trackList: List of Objects - (Optional) The tracks contained in the album
-//  - hideScore: Boolean to hide the score of the album
-export default async function AlbumDisplay(props) {
+export default async function AlbumDisplay(props: AlbumDisplayProps) {
   // Configuration Props
   const showAlbumRating = (props.showAlbumRating == false) ? props.showAlbumRating : true;
   const trackCount = (props.trackCount) ? props.trackCount : null;
@@ -123,13 +127,13 @@ export default async function AlbumDisplay(props) {
               />
             </div>
           </Conditional>
-          <Conditional showWhen={trackCount}>
+          <Conditional showWhen={trackCount != null}>
             <p className="text-sm -my-1">{trackCount} songs</p>
           </Conditional>
-          <Conditional showWhen={track_list}>
+          <Conditional showWhen={track_list?.length != 0}>
             <p className="text-sm -my-1">{calcAlbumLength()}</p>
           </Conditional>
-          <Conditional showWhen={userAuth && props.submitter}>
+          <Conditional showWhen={userAuth && (props.submitter != null)}>
             <div className="">
               <p className="text-xs sm:text-base">Submitter: </p>
               <div className="ml-2 -mb-1">
