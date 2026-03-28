@@ -11,7 +11,7 @@ export default function StarRating(props) {
   // Star array for display
   const stars: any = [];
   // Override for character to display (must be in a html element)
-  const symbol = (props.symbolOverride) ? props.symbolOverride : <>&#9733;</>
+  const symbol = (props.symbolOverride) ? props.symbolOverride : <>&#9733;&#65038;</>
   // Tailwind configs (Some can be passed in as props, otherwise defaulted)
   const filledColor = (props.symbolColor) ? props.symbolColor : 'text-yellow-500'
   const emptyColor = 'text-gray-500'
@@ -27,7 +27,7 @@ export default function StarRating(props) {
   // Add partial star (with gradient) if there's a decimal value
   if (partialStar > 0) {
     stars.push(
-      <span key="partial" className={`relative ${textSize}`}>
+      <span key="partial" className={`relative inline-block overflow-hidden ${textSize}`}>
         <span 
           className={`absolute inset-0 ${filledColor}`} 
           style={{
@@ -51,7 +51,7 @@ export default function StarRating(props) {
     );
   }
 
-  return <div className="flex justify-center flex-shrink-0 items-center -mt-1">{stars}</div>;
+  return <div className="flex justify-center flex-shrink-0 items-center leading-none">{stars}</div>;
 
   // MY FIRST ITERATION 
   // const rating = (props.rating) ? Math.min(props.rating, 10) : 0;

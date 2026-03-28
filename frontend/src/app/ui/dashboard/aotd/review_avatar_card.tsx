@@ -18,7 +18,7 @@ export default async function ReviewAvatarCard(props) {
   const reviewMessage = await (await doReviewEmbedReplacements(review)).message
 
   const cardContent = (
-    <div className={`relative border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl transition-all ${hideScores ? 'cursor-default' : 'hover:bg-black/40 hover:scale-105'}`}>
+    <div className={`relative border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl transition-all overflow-hidden ${hideScores ? 'cursor-default' : 'hover:bg-black/40 hover:scale-105'}`}>
       <UserCard
         userDiscordID={review['user_id']}
         customDescription={

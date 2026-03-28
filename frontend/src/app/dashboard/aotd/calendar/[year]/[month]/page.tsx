@@ -3,7 +3,8 @@
 import { Button } from "@heroui/button";
 import { Tooltip } from "@heroui/tooltip";
 
-import { getAOtDByMonth } from "@/app/lib/aotd_utils"
+import { getAOtDByMonth, getAotdUserSettings } from "@/app/lib/aotd_utils"
+import { getHasReviewedToday } from "@/app/lib/user_utils"
 import { daysInMonth, monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
@@ -37,6 +38,11 @@ export default async function Page({
   const nextMonth = new Date(new Date(firstDay).setMonth(firstDay.getMonth() + 1));
   // Boolean to see if the viewed month is the current month
   const currMonth = ((today.getMonth() + 1) == Number(month)) && ((today.getFullYear()) == Number(year))
+
+  // Compute hideScore: only hide today's score if the user hasn't reviewed and the setting is on
+  const reviewToday = await getHasReviewedToday();
+  const hideScore = (await getAotdUserSettings())['hide_scores_prereview'] && !reviewToday;
+  const todayStr = `${today.getFullYear()}-${padNumber(today.getMonth() + 1)}-${padNumber(today.getDate())}`;
 
   // Data retrieval from backend
   // Retrieve album data for this month
@@ -95,6 +101,9 @@ export default async function Page({
       )
     }
 
+    const isToday = (dateStr === todayStr);
+    const hideDayScore = isToday && hideScore;
+
     const getDayHtml = () => {
       // If the album date is greater than today, return a special object for future albums
       if(new Date(Number(dateArr[0]), Number(dateArr[1]) - 1, Number(dateArr[2])) > today) {
@@ -116,7 +125,7 @@ export default async function Page({
           {/* Album Body */}
           <MinimalAlbumDisplay
             showSubmitInfo={albumGet("submitter") != null}
-            showAlbumRating={true}
+            showAlbumRating={hideDayScore ? false : true}
             ratingOverride={albumGet("rating")}
             title={albumGet("title")}
             album_mbid={albumGet("album_id")}
@@ -146,7 +155,7 @@ export default async function Page({
           <div className="p-[2px] sm:p-2 w-fit sm:min-w-10 text-center bg-zinc-900/90 border border-zinc-900 rounded-t-2xl rounded-br-2xl text-xs sm:text-base">
             <p>{dateArr[2]}</p>
           </div>
-          <Conditional showWhen={albumGet("rating") != null}>
+          <Conditional showWhen={albumGet("rating") != null && !hideDayScore}>
             <div className={`absolute p-[2px] sm:p-2 w-fit sm:min-w-10 mx-auto ${(is_highest_or_lowest) ? "left-0 rounded-2xl" : "rounded-t-2xl rounded-bl-2xl"} right-0 text-center ${ratingToTailwindBgColor(albumGet("rating"))} bg-opacity-65 top-0 text-xs md:text-base`}>
               <p>{albumGet("rating")?.toFixed(2)}</p>
             </div>

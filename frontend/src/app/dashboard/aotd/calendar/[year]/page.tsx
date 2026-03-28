@@ -1,7 +1,8 @@
 import { Button } from "@heroui/button";
 import { Tooltip } from "@heroui/tooltip";
 
-import { getAOtDByMonth } from "@/app/lib/aotd_utils";
+import { getAOtDByMonth, getAotdUserSettings } from "@/app/lib/aotd_utils";
+import { getHasReviewedToday } from "@/app/lib/user_utils";
 import { monthToWeekArray } from "@/app/lib/calendar_utils";
 import { daysInMonth, monthToName, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import MinimalAlbumDisplay from "@/app/ui/dashboard/aotd/minimal_album_display";
@@ -40,6 +41,10 @@ export default async function Page({
   const yearDate = new Date(year)
   // Get Today's Date
   const today = new Date()
+  // Compute hideScore for today's album
+  const reviewToday = await getHasReviewedToday();
+  const hideScore = (await getAotdUserSettings())['hide_scores_prereview'] && !reviewToday;
+  const todayStr = `${today.getFullYear()}-${padNumber(today.getMonth() + 1)}-${padNumber(today.getDate())}`;
   // Generate an object to contain year data
   let yearData: Month[] = Array(12)
   for(var i = 0; i < yearData.length; i++) {
@@ -65,6 +70,7 @@ export default async function Page({
       const dateArr = date_str.split("-")
       // Check if this day is the highest or lowest in its month
       const is_highest_or_lowest = (((month.month_number - 1 <= today.getMonth()) && (parseInt(year) <= today.getFullYear())) ? ((month.aotd_data['stats'] != null) && ((date_str == month.aotd_data['stats']['highest_aotd_date']) || (date_str == month.aotd_data['stats']['lowest_aotd_date']))) : false)
+      const hideDayScore = (date_str === todayStr) && hideScore;
       // Helper func to get data about this album
       function albumGet(field) {
         if(day_data) {
@@ -121,7 +127,7 @@ export default async function Page({
               {/* Album Body */}
               <MinimalAlbumDisplay
                 showSubmitInfo={albumGet("submitter") != null}
-                showAlbumRating={true}
+                showAlbumRating={hideDayScore ? false : true}
                 ratingOverride={albumGet("rating")}
                 title={albumGet("title")}
                 album_mbid={albumGet("album_id")}

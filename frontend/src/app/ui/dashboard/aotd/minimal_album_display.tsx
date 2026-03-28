@@ -7,7 +7,6 @@ import StarRating from '../../general/star_rating';
 import { getAlbumAvgRating } from '@/app/lib/aotd_utils';
 import Link from "next/link";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
-import Image from "next/image";
 
 // MINIMAL GUI Display for an Album
 // Expected Props:
@@ -31,7 +30,7 @@ import Image from "next/image";
 //  - artistTextOverride: String - (Optional) Override the tailwind css for the artist text
 //  - starTextOverride: String - (Optional) Override the tailwind css for the star rating text
 //  - albumCoverOverride: String (Optional) Override for album display
-export default async function MinimalAlbumDisplay(props) {
+export default async function MinimalAlbumDisplay(props: any) {
   // Configuration Props
   const showAlbumRating = (props.showAlbumRating) ? props.showAlbumRating : 0;
   const showSubmitInfo = (props.showSubmitInfo) ? props.showSubmitInfo : false;
@@ -73,7 +72,7 @@ export default async function MinimalAlbumDisplay(props) {
           {artist_name}
         </p>
         <Conditional showWhen={(submitter && showSubmitInfo)}>
-          <div className="-mb-4 w-fit mx-auto">
+          <div className="w-fit mx-auto">
             <UserCard 
               userDiscordID={submitter} 
               fallbackName={"User Not Found"}
@@ -92,7 +91,7 @@ export default async function MinimalAlbumDisplay(props) {
                   <b>{avg_rating.toFixed(2)}</b>
                 </p>
             </Conditional>
-            <div className="w-fit mx-auto mt-2">
+            <div className="w-fit mx-auto -mt-2">
               <StarRating 
                 className="text-yellow-400"
                 rating={(rating_override) ? rating_override : avg_rating} 
