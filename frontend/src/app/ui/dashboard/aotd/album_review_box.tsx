@@ -4,7 +4,7 @@ import { Accordion, AccordionItem, addToast, Button, Divider, Switch, Tooltip } 
 import { Slider, Checkbox } from "@heroui/react";
 import { RiInformationLine } from "react-icons/ri";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Router from "next/router"
 
@@ -45,6 +45,14 @@ export default function AlbumReviewBox(props) {
   const [isAdvancedUpdated, setIsAdvancedUpdated] = useState(false);
   // Track Tooltip being open
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const tooltipCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openTooltip = () => {
+    if (tooltipCloseTimer.current) clearTimeout(tooltipCloseTimer.current);
+    setTooltipOpen(true);
+  };
+  const closeTooltip = () => {
+    tooltipCloseTimer.current = setTimeout(() => setTooltipOpen(false), 150);
+  };
   // Prop validation
   const songList = (props.song_data) ? props.song_data : null
   // Album Scoring Prop Validation
@@ -287,23 +295,27 @@ export default function AlbumReviewBox(props) {
           </Conditional>
           <div
             className="w-full flex flex-col lg:flex-row gap-2 justify-between"
-            onMouseEnter={() => setTooltipOpen(true)}
-            onMouseLeave={() => setTooltipOpen(false)}
+            onMouseEnter={openTooltip}
+            onMouseLeave={closeTooltip}
           >
             <Tooltip
               className="bg-transparent/85 border-gray-600"
               classNames={{ base: "pointer-events-auto" }}
               offset={-10}
               content={
-                <SimilarRatingsBox
-                  rating={rating}
-                  albums={albumsByRating[Number.parseFloat(rating).toFixed(1)]}
-                  timestamp={albumsByRating['metadata']['timestamp']}
-                />
+                <div 
+                  onMouseEnter={openTooltip} 
+                  onMouseLeave={closeTooltip}
+                >
+                  <SimilarRatingsBox
+                    rating={rating}
+                    albums={albumsByRating[Number.parseFloat(rating).toFixed(1)]}
+                    timestamp={albumsByRating['metadata']['timestamp']}
+                  />
+                </div>
               }
               showArrow={true}
               isOpen={tooltipOpen}
-              onOpenChange={setTooltipOpen}
             >
               <div className="w-full">
                 <div className="flex justify-between items-center w-full mb-1 px-1">
