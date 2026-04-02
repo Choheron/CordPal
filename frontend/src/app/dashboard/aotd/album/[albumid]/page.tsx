@@ -1,10 +1,9 @@
 'use server'
 
 import { Button } from "@heroui/button"
-import { Divider } from "@heroui/divider"
 
-import { deleteAlbumFromBackend, getAlbum, getAlbumAvgRating, getAlbumOfTheDayData, getAotdData, getAotdDates, getTagsForAlbum } from "@/app/lib/aotd_utils"
-import { isUserAdmin, isUserAlbumUploader } from "@/app/lib/user_utils"
+import { getAlbum, getAlbumAvgRating, getAotdDates, getAotdUserSettings, getTagsForAlbum } from "@/app/lib/aotd_utils"
+import { getHasReviewedToday, isUserAdmin, isUserAlbumUploader } from "@/app/lib/user_utils"
 import { milliToString, monthToName, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
@@ -40,6 +39,18 @@ export default async function Page({
   let isUploader = await isUserAlbumUploader(albumid)
   // Get tags for album
   const albumTags = await getTagsForAlbum(albumData("album_id"));
+  // Determine if scores should be hidden (hide-scores-prereview setting)
+  const reviewToday = await getHasReviewedToday();
+  const hideScore = (await getAotdUserSettings())['hide_scores_prereview'] && !reviewToday;
+
+
+  function isTodayCheck(date: string) {
+    const todayStr = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0])).toISOString().split('T')[0]
+    const splitDate = date.split("-")
+    const dateString = new Date(Date.parse(new Date(parseInt(splitDate[0]), parseInt(splitDate[1])-1, parseInt(splitDate[2])).toISOString().split('T')[0])).toISOString().split('T')[0]
+    // Return string equals
+    return todayStr == dateString;
+  }
   
 
   // Box of historical review dates - Generate series of review displays based on dates
@@ -58,9 +69,15 @@ export default async function Page({
               <p className="w-fit text-xl">
                 {monthToName(dateArr[1])} {dateArr[2]}, {dateArr[0]}
               </p>
-              <p className={`w-fit h-fit my-auto ${ratingToTailwindBgColor(ratingsObj[date])} px-2 py-1 ms-2 rounded-full text-black`}>
-                <b>{(ratingsObj[date] == 11.00) ? "--" : ratingsObj[date]}</b>
-              </p>
+              {(isTodayCheck(date) && hideScore) ? (
+                <p className={`w-fit h-fit my-auto bg-gray-600 px-2 py-1 ms-2 rounded-full text-black`}>
+                  <b>{`--`}</b>
+                </p>
+              ):(
+                <p className={`w-fit h-fit my-auto ${ratingToTailwindBgColor(ratingsObj[date])} px-2 py-1 ms-2 rounded-full text-black`}>
+                  <b>{(ratingsObj[date] == 11.00) ? "--" : ratingsObj[date]}</b>
+                </p>
+              )}
             </Link>
           </div>
       )
