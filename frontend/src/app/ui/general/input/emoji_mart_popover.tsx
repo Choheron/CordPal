@@ -77,6 +77,12 @@ export default function EmojiMartButton(props) {
           keywords: ['duck', 'cock', 'duckcock'],
           skins: [{ src: 'https://cdn.discordapp.com/emojis/743581643662688367.webp?size=40' }],
         },
+        {
+          id: 'mike_rat',
+          name: 'MikeRat',
+          keywords: ['mike', 'rat', 'mikerat'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/1368623628110921798.webp?size=40' }],
+        },
       ],
     }
   ]
