@@ -29,5 +29,6 @@ urlpatterns = [
     path("aotd/", include('aotd.urls')),
     path("quotes/", include('quotes.urls')),
     path("playback/", include('playback.urls')),
+    path("emojis/", include('emojis.urls')), # April 2026 Custom Emojis Overhaul
     path('admin/', admin.site.urls),
 ]
