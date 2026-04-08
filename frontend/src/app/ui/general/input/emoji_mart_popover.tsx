@@ -6,8 +6,9 @@ import { Button, Popover, PopoverContent, PopoverTrigger, Tooltip } from "@herou
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { RiAddCircleFill, RiAddCircleLine, RiAddFill, RiAddLine, RiUserSmileFill, RiUserSmileLine } from 'react-icons/ri'
+import { recordEmojiUse } from "@/app/lib/emoji_utils"
 
 // An emoji mart picker that pops up when the button is clicked
 // Expected Props:
@@ -17,93 +18,23 @@ export default function EmojiMartButton(props) {
   // Control hover and open
   const [isHover, setIsHover] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  // Custom Emojis
-  const custom = [
-    {
-      id: 'custom',
-      name: 'Custom',
-      emojis: [
-        {
-          id: 'tfw',
-          name: 'TFW',
-          keywords: ['tfw', 'knee surgery'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/1310014250789371976.webp?size=40' }],
-        },
-        {
-          id: 'dogi',
-          name: 'Dogi',
-          keywords: ['dogi', 'dog', 'sad'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/1430310636742774904.webp?size=40' }],
-        },
-        {
-          id: 'skynik',
-          name: 'Soynik',
-          keywords: ['soy', 'nik', 'jak'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/1375613103089254461.webp?size=40' }],
-        },
-        {
-          id: 'cringe',
-          name: 'Cringe',
-          keywords: ['cringe'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/1367864039639744523.webp?size=40' }],
-        },
-        {
-          id: 'propRat',
-          name: 'Propeller Rat',
-          keywords: ['rat', 'propellar', 'propellarRat'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/1410019637579485344.webp?size=40' }],
-        },
-        {
-          id: 'laughing_rat',
-          name: 'Laughing Rat',
-          keywords: ['rat', 'laugh', 'joy', 'funny'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/683873459834454031.webp?size=40' }],
-        },
-        {
-          id: 'cowboy_rat',
-          name: 'CowboyRat',
-          keywords: ['cowboy', 'rat', 'yeehaw'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/1384923211384357005.webp?size=40' }],
-        },
-        {
-          id: 'gigachad',
-          name: 'Gigachad',
-          keywords: ['gigachad', 'giga', 'chad'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/926282130890293298.webp?size=40' }],
-        },
-        {
-          id: 'duckcock',
-          name: 'Duckcock',
-          keywords: ['duck', 'cock', 'duckcock'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/743581643662688367.webp?size=40' }],
-        },
-        {
-          id: 'mike_rat',
-          name: 'MikeRat',
-          keywords: ['mike', 'rat', 'mikerat'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/1368623628110921798.webp?size=40' }],
-        },
-        {
-          id: 'rat_grab',
-          name: 'RatGrab',
-          keywords: ['grab', 'rat', 'grabrat', 'ratgrab'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/676632269611597834.webp?size=40' }],
-        },
-        {
-          id: 'pointin_rat',
-          name: 'PointinRat',
-          keywords: ['point', 'rat', 'pointrat'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/1027788393171669002.webp?size=40' }],
-        },
-        {
-          id: 'blair_rat',
-          name: 'BlairRat',
-          keywords: ['blair', 'rat', 'blairrat'],
-          skins: [{ src: 'https://cdn.discordapp.com/emojis/1368628543042355230.webp?size=40' }],
-        },
-      ],
-    }
-  ]
+  // Custom Emojis — typed explicitly so emojis: any[] rather than never[]
+  const [customEmojis, setCustomEmojis] = useState<{ id: string; name: string; emojis: any[] }[]>([
+    { id: 'custom', name: 'Custom', emojis: [] }
+  ])
+
+  useEffect(() => {
+    // Fetch client-side — session cookie sent automatically with credentials: 'include'
+    fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/emojis/list/`, {
+      credentials: 'include'
+    })
+      .then(r => r.json())
+      .then(emojiData => {
+        setCustomEmojis([{ id: 'custom', name: 'Custom', emojis: emojiData.emojis }])
+      })
+      .catch(() => {}) // Degrade gracefully — picker still works without custom emojis
+  }, [])
+
   // Emoji Categories
   const categories = [
     "frequent", 
@@ -118,7 +49,18 @@ export default function EmojiMartButton(props) {
     "flags"
   ]
 
-
+  // Selection Callback Wrapper for Custom Emojis
+  const handleEmojiSelect = (emojiObj) => {
+    // If it's a custom emoji, find the emoji_id and record use
+    if (emojiObj.src) {
+      const match = customEmojis[0]?.emojis?.find(e => e.skins?.[0]?.src === emojiObj.src)
+      if (match?.emoji_id) {
+        recordEmojiUse(match.emoji_id).catch(() => {})  // Server action, fire-and-forget
+      }
+    }
+    props.selectionCallback(emojiObj)  // Original callback unchanged
+    setIsOpen(false)
+  }
 
   
   return (
@@ -144,10 +86,10 @@ export default function EmojiMartButton(props) {
         </Button>
       </PopoverTrigger>
       <PopoverContent>
-        <Picker 
-          data={data} 
-          onEmojiSelect={props.selectionCallback}
-          custom={custom}
+        <Picker
+          data={data}
+          onEmojiSelect={handleEmojiSelect}
+          custom={customEmojis}
           categories={categories}
         />
       </PopoverContent>
