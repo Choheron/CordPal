@@ -17,8 +17,8 @@ SUGGESTION_MIN_ALBUMS = 3
 
 
 def normalize_tag(text: str) -> str:
-  """Title-case each word and strip surrounding whitespace."""
-  return ' '.join(word.capitalize() for word in text.strip().split())
+  """Strip surrounding whitespace and normalize internal spacing."""
+  return ' '.join(text.strip().split())
 
 ## =========================================================================================================================================================================================
 ## TAGGING METHODS
