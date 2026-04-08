@@ -59,7 +59,7 @@ export default function EmojiMartButton(props) {
           keywords: ['rat', 'laugh', 'joy', 'funny'],
           skins: [{ src: 'https://cdn.discordapp.com/emojis/683873459834454031.webp?size=40' }],
         },
-         {
+        {
           id: 'cowboy_rat',
           name: 'CowboyRat',
           keywords: ['cowboy', 'rat', 'yeehaw'],
@@ -88,6 +88,12 @@ export default function EmojiMartButton(props) {
           name: 'RatGrab',
           keywords: ['grab', 'rat', 'grabrat', 'ratgrab'],
           skins: [{ src: 'https://cdn.discordapp.com/emojis/676632269611597834.webp?size=40' }],
+        },
+        {
+          id: 'pointin_rat',
+          name: 'PointinRat',
+          keywords: ['point', 'rat', 'pointrat'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/1027788393171669002.webp?size=40' }],
         },
       ],
     }
