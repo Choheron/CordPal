@@ -95,6 +95,12 @@ export default function EmojiMartButton(props) {
           keywords: ['point', 'rat', 'pointrat'],
           skins: [{ src: 'https://cdn.discordapp.com/emojis/1027788393171669002.webp?size=40' }],
         },
+        {
+          id: 'blair_rat',
+          name: 'BlairRat',
+          keywords: ['blair', 'rat', 'blairrat'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/1368628543042355230.webp?size=40' }],
+        },
       ],
     }
   ]
