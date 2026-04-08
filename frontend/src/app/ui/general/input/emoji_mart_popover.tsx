@@ -83,6 +83,12 @@ export default function EmojiMartButton(props) {
           keywords: ['mike', 'rat', 'mikerat'],
           skins: [{ src: 'https://cdn.discordapp.com/emojis/1368623628110921798.webp?size=40' }],
         },
+        {
+          id: 'rat_grab',
+          name: 'RatGrab',
+          keywords: ['grab', 'rat', 'grabrat', 'ratgrab'],
+          skins: [{ src: 'https://cdn.discordapp.com/emojis/676632269611597834.webp?size=40' }],
+        },
       ],
     }
   ]
