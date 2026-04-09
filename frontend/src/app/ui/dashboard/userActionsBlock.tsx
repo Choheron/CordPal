@@ -1,63 +1,80 @@
 import { getRecentUserActions } from "@/app/lib/user_utils"
 import UserCard from "../general/userUiItems/user_card"
 import ClientTimestamp from "../general/client_timestamp"
+import { RiAddLine, RiEditLine, RiDeleteBin2Line } from "react-icons/ri"
 
 // Display the last 10 user actions made on the site
 export default async function UserActionsBlock(props) {
-  // Get user actions from backend
   const userActions = await getRecentUserActions()
 
-  // Return a tailwind background color corresponding to the action taken by the user
-  const getBgColorByAction = (action: string) => {
+  const getActionStyles = (action: string) => {
     switch(action) {
       case "CREATE":
-        return "bg-green-300/30";
+        return {
+          border: "border-l-emerald-500",
+          glow: "[box-shadow:inset_5px_0_10px_-3px_rgba(16,185,129,0.2)]",
+          iconBg: "bg-emerald-500/15 text-emerald-400",
+          icon: <RiAddLine />
+        };
       case "UPDATE":
-        return "bg-blue-300/30";
+        return {
+          border: "border-l-sky-500",
+          glow: "[box-shadow:inset_5px_0_10px_-3px_rgba(14,165,233,0.2)]",
+          iconBg: "bg-sky-500/15 text-sky-400",
+          icon: <RiEditLine />
+        };
       case "DELETE":
-        return "bg-red-300/30";
+        return {
+          border: "border-l-rose-500",
+          glow: "[box-shadow:inset_5px_0_10px_-3px_rgba(244,63,94,0.2)]",
+          iconBg: "bg-rose-500/15 text-rose-400",
+          icon: <RiDeleteBin2Line />
+        };
+      default:
+        return {
+          border: "border-l-zinc-500",
+          glow: "",
+          iconBg: "bg-zinc-500/15 text-zinc-400",
+          icon: null
+        };
     }
   }
 
-
-  // Generate an action card for a single user action
   const generateActionCard = (action) => {
+    const styles = getActionStyles(action['action_type'])
     return (
-      <div className={`flex items-center w-full rounded-xl p-1 ${getBgColorByAction(action['action_type'])}`}>
-        <div className="w-1/5 pt-1 -mb-1 ml-1">
-          <UserCard 
+      <div className={`flex items-center w-full border-l-[3px] ${styles.border} ${styles.glow} bg-zinc-800/40 hover:bg-zinc-700/40 transition-colors rounded-r-lg pl-2.5 pr-4 py-2 gap-3 cursor-default`}>
+        <div className={`flex-shrink-0 w-[22px] h-[22px] rounded-full flex items-center justify-center text-sm ${styles.iconBg}`}>
+          {styles.icon}
+        </div>
+        <div className="w-[30%] min-w-0">
+          <UserCard
             userDiscordID={action['user']['discord_id']}
-            avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[40px]"}
+            avatarClassNameOverride={"flex-shrink-0 size-[28px] sm:size-[34px]"}
             fallbackName={"User Not Found"}
           />
         </div>
-        <div className="w-1/5">
-          <p>{action['action_type']}</p>
+        <div className="flex-1 min-w-0">
+          <p className="font-mono text-xs text-zinc-400 truncate">{action['entity_type']}</p>
         </div>
-        <div className="w-1/5">
-          <p>{action['entity_type']}</p>
-        </div>
-        <div className="w-fit">
+        <div className="flex-shrink-0">
           <ClientTimestamp
             timestamp={action['timestamp']}
             full={true}
+            className="font-mono text-xs text-zinc-500 tabular-nums"
           />
         </div>
       </div>
     )
   }
 
-
-  // FINAL Return Statement
   return (
-    <div className="flex flex-col w-full gap-1 overflow-y-auto max-h-[400px] rounded-xl">
-      { userActions['actions'].map((action, index) => {
-        return (
-          <div key={index}>
-            { generateActionCard(action) }
-          </div>
-        )
-      })}
+    <div className="flex flex-col w-full gap-1.5 overflow-y-auto max-h-[350px]">
+      {userActions['actions'].map((action, index) => (
+        <div key={index}>
+          {generateActionCard(action)}
+        </div>
+      ))}
     </div>
   )
 }
