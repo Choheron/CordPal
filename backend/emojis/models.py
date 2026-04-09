@@ -36,18 +36,19 @@ class CustomEmoji(models.Model):
     """
     backend_base = os.getenv('BACKEND_BASE_URL', '').rstrip('/')
     out = {}
-    out['emoji_id']      = self.emoji_id
-    out['name']          = self.name
-    out['display_name']  = self.display_name or self.name
-    out['keywords']      = self.keywords
-    out['serve_url']     = f'{backend_base}/emojis/serve/{self.emoji_id}/'
-    out['use_count']     = self.use_count
-    out['is_active']     = self.is_active
-    out['upload_timestamp'] = self.upload_timestamp.strftime('%m/%d/%Y, %H:%M:%S')
-    out['submitted_by']  = self.submitted_by.nickname if self.submitted_by else None
+    out['emoji_id']            = self.emoji_id
+    out['name']                = self.name
+    out['display_name']        = self.display_name or self.name
+    out['keywords']            = self.keywords
+    out['serve_url']           = f'{backend_base}/emojis/serve/{self.emoji_id}/'
+    out['use_count']           = self.use_count
+    out['is_active']           = self.is_active
+    out['upload_timestamp']    = self.upload_timestamp.strftime('%m/%d/%Y, %H:%M:%S')
+    out['submitted_by']        = self.submitted_by.nickname if self.submitted_by else None
+    out['submitted_by_id']     = self.submitted_by.discord_id
+    out['submitted_at']        = self.submitted_at.strftime('%m/%d/%Y, %H:%M:%S') if self.submitted_at else None
     # Respect hide_submitted_at for non-admin callers
     if admin:
-      out['submitted_at']      = self.submitted_at.strftime('%m/%d/%Y, %H:%M:%S') if self.submitted_at else None
       out['hide_submitted_at'] = self.hide_submitted_at
       out['filename']          = self.filename
       out['filetype']          = self.filetype

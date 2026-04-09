@@ -8,6 +8,8 @@ import logging
 import os
 import re
 import uuid
+import datetime
+import pytz
 from dotenv import load_dotenv
 
 from .models import CustomEmoji
@@ -52,6 +54,8 @@ def listEmojis(request: HttpRequest):
       'name': emoji.display_name or emoji.name,
       'keywords': emoji.keywords,
       'skins': [{'src': f'{backend_base}/emojis/serve/{emoji.emoji_id}/'}],
+      'submitted_by': emoji.submitted_by.nickname if emoji.submitted_by else "UNKNOWN",
+      'submitted_at': emoji.submitted_at.strftime('%m/%d/%Y, %H:%M:%S') if emoji.submitted_at else "ERR DATE"
     })
   return JsonResponse({'emojis': out})
 
@@ -150,6 +154,8 @@ def uploadEmoji(request: HttpRequest):
     res = HttpResponse("Failed to write emoji file to backend filesystem.")
     res.status_code = 500
     return res
+  # Get the current time
+  date = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
   # Create the database record
   try:
     emoji = CustomEmoji(
@@ -159,6 +165,7 @@ def uploadEmoji(request: HttpRequest):
       filename=stored_filename,
       filetype=img_filetype,
       submitted_by=user,
+      submitted_at=date
     )
     emoji.save()
   except Exception:
