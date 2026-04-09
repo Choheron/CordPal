@@ -43,7 +43,7 @@ export default async function Page() {
         <div className="flex flex-col gap-3">
           {/* AOTD, User Actions, Live Users Box */}
           <div className="flex flex-col gap-3 lg:flex-row">
-            <div className="flex flex-col gap-2 max-h-[800px]">
+            <div className="flex flex-col gap-2">
               <div className="relative flex flex-col h-fit w-full max-w-full sm:max-w-[800px] px-2 py-2 lg:p-4 items-center border-neutral-800 bg-zinc-800/30 from-inherit rounded-xl border">
                 <p className="absolute top-0 left-0 p-1 text-2xl font-extralight bg-gray-900 rounded-tl-xl rounded-br-xl">
                   Today&apos;s Album of the Day

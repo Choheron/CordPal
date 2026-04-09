@@ -69,7 +69,7 @@ export default async function UserActionsBlock(props) {
   }
 
   return (
-    <div className="flex flex-col w-full gap-1.5 overflow-y-auto max-h-[400px]">
+    <div className="flex flex-col w-full gap-1.5 overflow-y-auto max-h-[350px]">
       {userActions['actions'].map((action, index) => (
         <div key={index}>
           {generateActionCard(action)}

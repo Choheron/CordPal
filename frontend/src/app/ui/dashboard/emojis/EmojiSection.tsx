@@ -9,7 +9,7 @@ import EmojiSubmitModal from "./EmojiSubmitModal";
 // Admins see full metadata and management controls on each card;
 // members see a clean public grid.
 export default async function EmojiSection() {
-  const isAdmin = !await isUserAdmin();
+  const isAdmin = await isUserAdmin();
   // Admins get full metadata including inactive emojis; members get the active public list
   const emojis = isAdmin
     ? await getAdminEmojiList()
