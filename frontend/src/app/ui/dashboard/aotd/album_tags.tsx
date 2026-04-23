@@ -55,6 +55,32 @@ export default function AlbumTagsDisplay(props: Props) {
     return <span className={size === "lg" ? "text-xl leading-none" : "text-base leading-none"}>{emoji}</span>
   }
 
+  function GhostTagChip(tag: AlbumTag) {
+    function scramble(text: string): string {
+      let s = (tag.id * 2654435761) >>> 0
+      const rng = () => { s ^= s << 13; s ^= s >> 17; s ^= s << 5; return (s >>> 0) / 0xffffffff }
+      const chars = text.split('')
+      for (let i = chars.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [chars[i], chars[j]] = [chars[j], chars[i]]
+      }
+      for (let i = 0; i < chars.length; i++) {
+        if (chars[i] !== ' ' && rng() < 0.3)
+          chars[i] = String.fromCharCode(97 + Math.floor(rng() * 26))
+      }
+      return chars.join('')
+    }
+
+    return (
+      <div
+        key={tag.id}
+        className="flex items-center px-2.5 py-1 rounded-full text-sm border bg-white/5 border-white/10 select-none pointer-events-none"
+      >
+        <span className="blur-[3px] text-white/40">{scramble(tag.tag_text)}</span>
+      </div>
+    )
+  }
+
   // Child function for a single tag display
   function AlbumTagChip(tag: AlbumTag) {
     const canDelete = !props.readOnly && (
@@ -229,10 +255,14 @@ export default function AlbumTagsDisplay(props: Props) {
     <div className="relative">
       {/* Display approved tags */}
       <div className="flex flex-wrap gap-2 m-2">
-        {props.hideTags
-          ? <p className="text-xs text-gray-500 italic my-auto">Tags hidden until you review. This setting can be changed in the settings.</p>
-          : tags.sort((a, b) => b.net_score - a.net_score).filter((a) => (!props.readOnly || a.is_approved)).map((tag) => AlbumTagChip(tag))
-        }
+        {props.hideTags ? (
+          <>
+            {tags.filter(t => !props.readOnly || t.is_approved).map((tag) => GhostTagChip(tag))}
+            <p className="w-full text-xs text-gray-500 italic">Tags are hidden until you review. Change this in settings.</p>
+          </>
+        ) : (
+          tags.sort((a, b) => b.net_score - a.net_score).filter((a) => (!props.readOnly || a.is_approved)).map((tag) => AlbumTagChip(tag))
+        )}
       </div>
       {/* Tagging Button */}
       {!props.readOnly && props.isEnrolled && !props.hideTags && (
@@ -267,7 +297,7 @@ export default function AlbumTagsDisplay(props: Props) {
                 {/* Quick-add suggestions */}
                 {suggestions.length > 0 && (
                   <div>
-                    <p className="text-sm text-gray-400 mb-2">Quick add a suggestion</p>
+                    <p className="text-sm text-gray-400 mb-2">Quick add a tag</p>
                     <div className="flex flex-wrap gap-2">
                       {suggestions.map((s) => {
                         const alreadyAdded = tags.some(t => t.tag_text.toLowerCase() === s.text.toLowerCase())
@@ -291,7 +321,7 @@ export default function AlbumTagsDisplay(props: Props) {
                   <p className="text-sm text-gray-400">Or write a custom tag</p>
                   <Input
                     label="Tag"
-                    placeholder="e.g. Shoegaze, Energetic, Must Listen..."
+                    placeholder="e.g. RiffCity, Shoegaze..."
                     value={tagText}
                     onValueChange={setTagText}
                     maxLength={50}
