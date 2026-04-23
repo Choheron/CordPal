@@ -147,11 +147,7 @@ export default async function AlbumOfTheDayBox(props) {
           <div className="w-full max-w-full">
             <AlbumTagsDisplay
               mbid={albumData("album_id")}
-              initialTags={[
-                { id: 1, tag_text: "Shoegaze", emoji: "🎸", submitted_by: "testuser", submitted_by_id: "123", submitted_at: "", is_approved: true, net_score: 3, upvotes: 3, downvotes: 0, user_vote: null },
-                { id: 2, tag_text: "Melancholic", emoji: "😔", submitted_by: "testuser", submitted_by_id: "123", submitted_at: "", is_approved: true, net_score: 1, upvotes: 1, downvotes: 0, user_vote: null },
-                { id: 3, tag_text: "Must Listen", emoji: null, submitted_by: "testuser", submitted_by_id: "123", submitted_at: "", is_approved: false, net_score: 0, upvotes: 0, downvotes: 0, user_vote: null },
-              ]}
+              initialTags={albumTags ?? []}
               isEnrolled={aotd_participant}
               isAdmin={isAdmin}
               currentUserId={user_data["discord_id"]}
