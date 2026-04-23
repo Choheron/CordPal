@@ -239,10 +239,27 @@ def getTagSuggestions(request: HttpRequest):
     .filter(album_count__gte=SUGGESTION_MIN_ALBUMS)
     .values_list('tag_text', flat=True)
   )
+  # For community tags not covered by a GlobalTag, find the most common non-null emoji
+  # across all approved usages of that tag text
+  community_only = common_tags - set(global_tag_map.keys())
+  community_emoji_map = {}
+  if community_only:
+    rows = (
+      AlbumTag.objects
+      .filter(tag_text__in=community_only, is_approved=True)
+      .exclude(emoji__isnull=True).exclude(emoji='')
+      .values('tag_text', 'emoji')
+      .annotate(count=Count('id'))
+      .order_by('tag_text', '-count')
+    )
+    for row in rows:
+      if row['tag_text'] not in community_emoji_map:
+        community_emoji_map[row['tag_text']] = row['emoji']
   # Merge, preferring global tag emoji when text appears in both
+  emoji_map = {**community_emoji_map, **global_tag_map}
   all_texts = set(global_tag_map.keys()) | common_tags
   suggestions = sorted(
-    [{'text': text, 'emoji': global_tag_map.get(text)} for text in all_texts],
+    [{'text': text, 'emoji': emoji_map.get(text)} for text in all_texts],
     key=lambda x: x['text']
   )
   return JsonResponse({'suggestions': suggestions})
