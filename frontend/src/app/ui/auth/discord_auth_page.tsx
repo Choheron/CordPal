@@ -15,7 +15,6 @@ export default function DiscordAuthPage() {
         code: code,
         redirect_uri: process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI,
       };
-      console.log(reqData);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL_CLIENT}/discordapi/token`, {
         method: 'POST',
@@ -24,7 +23,11 @@ export default function DiscordAuthPage() {
         cache: 'no-store',
       });
 
-      console.log("Auth completed, redirecting...");
+      if(!res.ok) {
+        router.push("/?redirect=AUTH_FAILED");
+        return;
+      }
+
       router.push("/");
     };
 

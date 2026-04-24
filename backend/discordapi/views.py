@@ -167,10 +167,10 @@ def validateServerMember(request: HttpRequest):
     logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}", extra={'crid': request.crid})
     # Clear session cookie on fail
     response = HttpResponse("/", status=302)
-    response.delete_cookie("session_id")
+    response.delete_cookie("sessionid")
     return response
   # Check if member status already exists in session store
-  if(("server_member" in request.session) and (datetime.strptime(request.session.get("server_member_expiry"), cookie_time_fmt) < datetime.now())):
+  if(("server_member" in request.session) and (datetime.strptime(request.session.get("server_member_expiry"), cookie_time_fmt) > datetime.now())):
     status = request.session.get("server_member")
     logger.debug(f"Session has cached membership value of: {status}", extra={'crid': request.crid})
     member = status
@@ -206,8 +206,8 @@ def validateServerMember(request: HttpRequest):
   # Return JsonResponse containing true or false in body
   logger.debug("Returning member status...", extra={'crid': request.crid})
   out = {}
-  out['member'] = True # member
-  out['role'] = True # hasRole
+  out['member'] = member
+  out['role'] = hasRole
   # Return response
   response = JsonResponse(out)
   return response
@@ -224,7 +224,12 @@ def checkIfPrevAuth(request: HttpRequest):
     res.status_code = 405
     return res
   # Check if session is still valid
-  validSession = (request.session.get('discord_id') != None) and (DiscordTokens.objects.get(user__discord_id = request.session.get('discord_id')).access_token != None)
+  discord_id = request.session.get('discord_id')
+  try:
+    token = DiscordTokens.objects.get(user__discord_id=discord_id) if discord_id else None
+    validSession = token is not None and token.access_token is not None
+  except DiscordTokens.DoesNotExist:
+    validSession = False
   logger.debug(f"Valid Session After Expiry Check: {validSession}", extra={'crid': request.crid})
   # If session is invalid, return false
   if(not validSession):
@@ -306,8 +311,8 @@ def logout(request: HttpRequest):
   # Log user out
   auth_logout(request)
   # Generate Response
-  response = JsonResponse(out) 
-  response.delete_cookie("session_id")
+  response = JsonResponse(out)
+  response.delete_cookie("sessionid")
   return response
 
 
