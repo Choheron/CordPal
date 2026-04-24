@@ -190,6 +190,7 @@ export default async function Page({
       <div className="flex w-full justify-between">
         <Link
           href={`/dashboard/aotd/calendar/${lastMonth.getFullYear()}/${padNumber(Number(lastMonth.getMonth()) + 1)}`}
+          prefetch={false}
         >
           <Button
             radius="lg"
@@ -215,6 +216,7 @@ export default async function Page({
         </Link>
         <Link
           href={`/dashboard/aotd/calendar/${nextMonth.getFullYear()}/${padNumber(nextMonth.getMonth() + 1)}`}
+          prefetch={false}
         >
           <Button
             radius="lg"

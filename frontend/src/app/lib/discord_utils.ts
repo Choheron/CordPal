@@ -52,7 +52,7 @@ export async function verifyAuth() {
   const prevAuthResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/checkToken`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    next: { revalidate: 60 },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }

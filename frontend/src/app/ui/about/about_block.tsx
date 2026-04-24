@@ -96,10 +96,7 @@ export default async function AboutBlock(props) {
           <li><a href="https://remixicon.com/" className="text-blue-500 hover:underline">RemixIcons</a> - Open source icons.</li>
           <li><a href="https://tiptap.dev/" className="text-blue-500 hover:underline">TipTap</a> - Rich text editor, made it much easier to implement rich text editing for users.</li>
           <li><a href="https://rosencharts.com/" className="text-blue-500 hover:underline">Rosen Charts</a> - SSR Chart Library that is extremely easily extensible.</li>
-          <li>
-            <a href="https://developer.spotify.com/documentation/web-api" className="text-blue-500 hover:underline">Spotify API</a> - All songs and artist related 
-            media is property of spotify and/or the respective artist.
-          </li>
+          <li><a href="https://musicbrainz.org/doc/MusicBrainz_API" className="text-blue-500 hover:underline">MusicBrainz API</a> - Album and artist metadata for Album of the Day.</li>
           <li><a href="https://discord.com/developers/docs/intro" className="text-blue-500 hover:underline">Discord API</a> - The start of the whole project.</li>
           
         </ul>

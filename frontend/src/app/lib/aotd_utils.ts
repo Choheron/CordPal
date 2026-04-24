@@ -533,6 +533,7 @@ export async function submitReviewToBackend(reviewObject) {
   updateTag('review_submissions')
   updateTag(`review_submissions_${reviewObject['userId']}`)
   updateTag(`album_review_${reviewObject['album_id']}`)
+  updateTag('user_review_today')
   // Revalidate AOTD calls for calendar views
   const now = new Date()
   revalidateTag(`calendar-${now.getFullYear()}-${padNumber(now.getMonth() + 1)}`, "max")
@@ -622,11 +623,9 @@ export async function getLowestHighestAlbumStats() {
 export async function getAllAlbums() {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
-  
   console.log(`getAllAlbums: Sending request to backend '/aotd/getAllAlbums'`)
   const allAlbumsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAllAlbums`, {
     method: "GET",
-    credentials: "include",
     cache: 'force-cache',
     next: { tags: ['album_submissions', 'AOTD'] },
     headers: {
@@ -693,7 +692,7 @@ export async function getAllUserReviewStats() {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['review_submissions', 'ATOD'] },
+    next: { tags: ['review_submissions', 'AOTD'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },

@@ -24,7 +24,7 @@ import { Conditional } from "./conditional";
 //  - update: Boolean for if this user is updating an existing password or not
 export default function EditPasswordModal(props) {
   // Static values
-  const userInfo = props.userInfo // UserInfo Object Keys: {guid, username, last_updated_timestamp, creation_timestamp, email, nickname, discord_id, discord_discriminator, discord_is_verified, discord_avatar, spotify_connected, is_active, is_staff, avatar_url}
+  const userInfo = props.userInfo // UserInfo Object Keys: {guid, username, last_updated_timestamp, creation_timestamp, email, nickname, discord_id, discord_discriminator, discord_is_verified, discord_avatar, is_active, is_staff, avatar_url}
   const nickname = userInfo['nickname']
   const update = props.update
   // Password States

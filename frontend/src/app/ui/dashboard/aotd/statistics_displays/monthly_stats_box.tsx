@@ -14,7 +14,7 @@ import { getAllAotdUsersList, getAOtDByMonth, getReviewStatsByMonth, getSubmissi
 //  - atodData: Object - AOTD data for the month
 //  - subData: Object - Submission data for the month
 //  - reviewData: Object - Review data for the month
-//  - spotifyUserData: Object - Data for all users who have authenticated with spotify
+//  - aotdUserData: Object - Data for all users who have authenticated with AOTD
 export default async function MonthlyStatsBox(props) {
   // Prop validation/fetching data from backend
   const year = (props.year) ? props.year : null;
@@ -22,7 +22,7 @@ export default async function MonthlyStatsBox(props) {
   const aotdData = (props.aotdData) ? props.aotdData : (await getAOtDByMonth(year, padNumber(Number(month))));
   const subData = (props.subData) ? props.subData : (await getSubmissionsByMonth(year, padNumber(Number(month))));
   const reviewData = (props.reviewData) ? props.reviewData : (await getReviewStatsByMonth(year, padNumber(Number(month))));
-  const spotifyUserData = (props.spotifyUserData) ? props.spotifyUserData : (await getAllAotdUsersList())
+  const aotdUserData = (props.aotdUserData) ? props.aotdUserData : (await getAllAotdUsersList())
   const aotdStats = (aotdData) ? aotdData['stats'] : null;
   // Data Parsing from props
   const highest_album = (aotdStats) ? aotdData[aotdStats['highest_aotd_date']] : "Not Found";
@@ -64,8 +64,8 @@ export default async function MonthlyStatsBox(props) {
         />
       </div>
       {/* User specific Stats */}
-      <MonthlyUserStats 
-        spotifyUserData={spotifyUserData}
+      <MonthlyUserStats
+        aotdUserData={aotdUserData}
         monthName={month_name}
         month={month}
         year={year}

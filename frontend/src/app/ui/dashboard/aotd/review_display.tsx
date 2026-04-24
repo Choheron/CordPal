@@ -6,7 +6,7 @@ import { getHasReviewedToday } from "@/app/lib/user_utils";
 
 // GUI Display for reviews of an album
 // Expected Props:
-//  - album_id: String - Spotify Album ID to retrieve review
+//  - album_id: String - Album ID (mbid) to retrieve review
 //  - date: String - Date in which the album provided was AOTD (Historical Support)
 //  - historical: Boolean - Is this review display in a historical context 
 export default async function ReviewDisplay(props) {

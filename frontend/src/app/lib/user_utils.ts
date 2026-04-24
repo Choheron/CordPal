@@ -426,7 +426,7 @@ export async function getHasReviewedToday(discord_id = "") {
   const userReviewTodayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getHasReviewedToday${urlTail}`, {
     method: "GET",
     credentials: "include",
-    cache: 'no-cache',
+    next: { revalidate: 300, tags: ['user_review_today'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }

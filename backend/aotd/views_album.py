@@ -25,7 +25,7 @@ import datetime
 import pytz
 import requests
 from datetime import timedelta
-from django.db.models import Count, Q, F, Subquery, OuterRef, FloatField
+from django.db.models import Count, Q, F
 
 # Declare logging
 logger = logging.getLogger()
@@ -334,46 +334,32 @@ def getAllAlbums(request: HttpRequest):
 
   now = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
 
-  # Correlated subqueries — collapse 3N DailyAlbum queries into the main SELECT
-  latest_date_sq = (
-    DailyAlbum.objects
-    .filter(album=OuterRef('pk'), date__lte=now)
-    .order_by('-date')
-    .values('date')[:1]
-  )
-  latest_rating_sq = (
-    DailyAlbum.objects
-    .filter(album=OuterRef('pk'), date__lte=now)
-    .order_by('-date')
-    .values('rating')[:1]
-  )
-  latest_stddev_sq = (
-    DailyAlbum.objects
-    .filter(album=OuterRef('pk'), date__lte=now)
-    .order_by('-date')
-    .values('standard_deviation')[:1]
-  )
+  # Single DISTINCT ON query: latest DailyAlbum per album — replaces 3 correlated subqueries
+  latest_daily = {
+    d['album_id']: d
+    for d in DailyAlbum.objects
+      .filter(date__lte=now)
+      .order_by('album_id', '-date')
+      .distinct('album_id')
+      .values('album_id', 'date', 'rating', 'standard_deviation')
+  }
 
   albums = list(
     Album.objects
     .select_related('submitted_by')
     .defer('raw_data', 'track_list')
-    .annotate(
-      latest_aotd_date=Subquery(latest_date_sq),
-      latest_aotd_rating=Subquery(latest_rating_sq, output_field=FloatField()),
-      latest_aotd_stddev=Subquery(latest_stddev_sq, output_field=FloatField()),
-    )
   )
 
   albumList = []
   for album in albums:
     user = album.submitted_by
+    daily = latest_daily.get(album.pk, {})
 
-    raw_rating = album.latest_aotd_rating
+    raw_rating = daily.get('rating')
     # 11.0 is the sentinel value meaning "day in progress, no stored rating yet"
     effective_rating = None if (raw_rating is None or raw_rating == 11.0) else raw_rating
 
-    stddev = album.latest_aotd_stddev
+    stddev = daily.get('standard_deviation')
     effective_stddev = stddev if (stddev is not None and stddev != 0.00) else None
 
     albumList.append({
@@ -383,7 +369,7 @@ def getAllAlbums(request: HttpRequest):
       'album_src': album.album_url,
       'artist': {
         'name': album.artist,
-        'href': album.artist_url if album.artist_url != "" else album.raw_data['album']['artists'][0]['external_urls']['aotd'],
+        'href': album.artist_url,
       },
       'submitter': user.discord_id if user else None,
       'submitter_avatar_url': user.get_avatar_url() if user else None,
@@ -392,7 +378,7 @@ def getAllAlbums(request: HttpRequest):
       'submission_date': album.submission_date.strftime("%m/%d/%Y, %H:%M:%S"),
       'release_date_str': album.release_date_str,
       'release_date': album.release_date.strftime("%m/%d/%Y, %H:%M:%S") if album.release_date else None,
-      'last_aotd': album.latest_aotd_date,
+      'last_aotd': daily.get('date'),
       'rating': effective_rating,
       'standard_deviation': effective_stddev,
     })

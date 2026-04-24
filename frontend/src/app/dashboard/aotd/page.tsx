@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { Conditional } from "@/app/ui/dashboard/conditional";
-import SpotifyLoginBox from "@/app/ui/dashboard/aotd/aotd_enroll_box";
+import AotdEnrollBox from "@/app/ui/dashboard/aotd/aotd_enroll_box";
 import { getAlbumOfTheDayData, getLastXSubmissions, isAotdParticipant } from "@/app/lib/aotd_utils";
 import AlbumOfTheDayBox from "@/app/ui/dashboard/aotd/album_of_the_day";
 import RecentSubmissions from "@/app/ui/dashboard/aotd/recent_submissions";
@@ -27,7 +27,7 @@ export default async function music() {
     <div className="flex flex-col items-center p-3 pb-36 pt-10">
       <PageTitle text="Album Of The Day" />
       <Conditional showWhen={!aotd_participant}>
-        <SpotifyLoginBox />
+        <AotdEnrollBox />
       </Conditional>
       <Conditional showWhen={aotd_participant}>
         <div className="w-full 2xl:w-4/5 h-fit">

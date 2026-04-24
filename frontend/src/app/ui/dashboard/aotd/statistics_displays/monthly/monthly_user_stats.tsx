@@ -11,7 +11,7 @@ import StarRating from "@/app/ui/general/star_rating";
 // Expected Props:
 //  - aotdStats: Obj - Object containing Album Of the Day stats for the month
 //  - subData: Obj - Object containing submission data for the month
-//  - spotifyUserData: Object - Data for all users who have authenticated with spotify
+//  - aotdUserData: Object - Data for all AOTD users
 //  - reviewData: Obj - Object containing review data for that month
 //  - year: String - Year of month
 //  - month: String - Zero padded month number string
@@ -29,8 +29,7 @@ export default function MonthlyUserStats(props) {
   const user_review_stats = reviewData['user_stats']
   const user_sub_stats = subData['user_stats']
   const user_sel_stats = aotdStats['user_stats']
-  // Get list of spotify users from passed in props and map it to the correct format
-  const users = props.spotifyUserData.map((user, index) => {
+  const users = props.aotdUserData.map((user, index) => {
     const userObj = {
       key: index,
       discord_id: user['discord_id'],

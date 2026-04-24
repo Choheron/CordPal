@@ -98,7 +98,7 @@ export default async function UserAotdDataDisplay(props) {
                 title={reviewStats['highest_album']["title"]}
                 album_mbid={reviewStats['highest_album']["mbid"]}
                 album_img_src={reviewStats['highest_album']["album_img_src"]}
-                album_src={reviewStats['highest_album']["spotify_url"]}
+                album_src={reviewStats['highest_album']["album_src"]}
                 artist={{"name": reviewStats['highest_album']["artist"], "href": reviewStats['highest_album']["artist_url"]}}
                 submitter={reviewStats['highest_album']["submitter_id"]}
                 submitter_comment={reviewStats['highest_album']["submitter_comment"]}
@@ -214,7 +214,7 @@ export default async function UserAotdDataDisplay(props) {
         <div
           className="flex flex-col justify-around h-[125px] w-[250px] lg:h-[300px] lg:w-[600px]"
         >
-          <p className="mx-auto w-fit text-xl -mt-5">User has not connected spotify!</p>
+          <p className="mx-auto w-fit text-xl -mt-5">User has not enrolled in Album of the Day.</p>
         </div>
       )}
     </div>

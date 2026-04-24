@@ -17,7 +17,7 @@ import { ratingToTailwindBgColor } from "@/app/lib/utils";
 
 // GUI Display for an Album Review Box
 // Expected Props:
-//  - album_id: String - Album ID (spotify ID)
+//  - album_id: String - Album ID (mbid)
 //  - song_data: List of Objects - List of songs included in the album
 //      > name: String - Name of Song
 //  - rating: Float - (optional) User rating if they left a previous review

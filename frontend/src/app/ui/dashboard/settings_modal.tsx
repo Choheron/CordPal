@@ -30,7 +30,7 @@ import { Conditional } from "./conditional";
 //  - setIsOpenOverride: function - Override the open function. REQUIRED IF isOpenOverride is provided
 export default function SettingsModal(props) {
   // Static values
-  const userInfo = props.userInfo // UserInfo Object Keys: {guid, username, last_updated_timestamp, creation_timestamp, email, nickname, discord_id, discord_discriminator, discord_is_verified, discord_avatar, spotify_connected, is_active, is_staff, avatar_url}
+  const userInfo = props.userInfo // UserInfo Object Keys: {guid, username, last_updated_timestamp, creation_timestamp, email, nickname, discord_id, discord_discriminator, discord_is_verified, discord_avatar, is_active, is_staff, avatar_url}
   const loginMethods = props.userLoginMethods
   const aotdConnected = (props.aotdConnected) ? props.aotdConnected : false
   // Login Settings Values

@@ -15,11 +15,11 @@ import { ratingToTailwindBgColor } from "@/app/lib/utils";
 //  - album_src: string - Url for user to access the album [EXTERNAL]
 //  - artist: Object - Object of Artist Data (Expected fields in object below)
 //      > name: String - Name of Artist
-//      > href: String - Url to access artist on spotify [EXTERNAL URL]
+//      > href: String - Url to access artist on MusicBrainz [EXTERNAL URL]
 //  - submitter: String - (Optional) The discord id of the user that submitted this album, not applicable in all use cases
 //  - submitter_comment: String - (Optional) An optional comment that the album submitter may have left with this album
 //  - submission_date: String - (Optional) A String representation of the submission date of the Album
-//  - album_mbid: String - (Optional) Album Spotify ID for retrieval of average from database
+//  - album_mbid: String - (Optional) Album MusicBrainz ID for retrieval of average from database
 //  - historical_date: String - (Optional) Date in which this album was Album Of the Day (THIS IS FOR HISTORICAL DISPLAYS)
 //  - showAlbumRating: Boolean - (Optional) [DEFAULT 0] 0: Show no ratings, 1: Show stars, 2: Show stars and number
 //  - showSubmitInfo: Boolean - (Optional) [DEFAULT FALSE] Show the submission info for the album
