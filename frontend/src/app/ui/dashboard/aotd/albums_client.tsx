@@ -203,7 +203,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
         <div>
           <div className="flex w-full md:w-3/4 mx-auto justify-between my-1">
             <p className="mt-auto">
-              Data Last Updated: {convertToLocalTZString(timestamp, true)}
+              Data Last Updated: {convertToLocalTZString(new Date(timestamp), true)}
             </p>
             <div className="flex">
               <Button color="primary" variant="solid" className="mr-2 mt-auto" isDisabled={isPending} onPress={hardRefresh}>
