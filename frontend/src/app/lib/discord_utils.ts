@@ -14,7 +14,7 @@ const getCookie = async (name: string) => {
 export async function isMember() {
   const sessionCookie = await getCookie('sessionid');
   console.log("isMember: Sending request to backend '/discordapi/validateMember'")
-  const memberResponse = await fetch(`${process.env.BASE_BACKEND_URL}/discordapi/validateMember`, {
+  const memberResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/validateMember`, {
     method: "GET",
     credentials: "include",
     next: { revalidate: 300 },
@@ -35,13 +35,13 @@ export async function isMember() {
 // Verify session cookie is in storage, to skip login page
 // - RETURN: true if valid, or { valid: false, reason: string } if not
 //
-export async function verifyAuth(): Promise<true | { valid: false; reason?: string }> {
+export async function verifyAuth(): Promise<true | { valid: false | true; reason?: string }> {
   const sessionCookie = await getCookie('sessionid');
   if(sessionCookie === "") {
     return { valid: false, reason: 'NO_SESSION' };
   }
   console.log("verifyAuth: Sending request to backend '/discordapi/checkToken'")
-  const prevAuthResponse = await fetch(`${process.env.BASE_BACKEND_URL}/discordapi/checkToken`, {
+  const prevAuthResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/checkToken`, {
     method: "GET",
     credentials: "include",
     next: { revalidate: 60 },
@@ -51,7 +51,7 @@ export async function verifyAuth(): Promise<true | { valid: false; reason?: stri
   });
   const responseJson = await prevAuthResponse.json();
   if(responseJson['valid']) {
-    return true;
+    return { valid: true, reason: 'NA' };
   }
   return { valid: false, reason: responseJson['reason'] };
 }
@@ -65,7 +65,7 @@ export async function getDiscordUserData() {
   if(sessionCookie === "") {
     return false;
   }
-  const userDataResponse = await fetch(`${process.env.BASE_BACKEND_URL}/discordapi/userData`, {
+  const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/userData`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',

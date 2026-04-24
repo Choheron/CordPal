@@ -16,14 +16,14 @@ export async function proxy(request: NextRequest) {
   }
 
   // Verify the session cookie is present and the Discord token is still valid
-  let authorized: Awaited<ReturnType<typeof verifyAuth>>;
+  let authorized: any;
   try {
     authorized = await verifyAuth();
   } catch {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  if(authorized !== true) {
+  if(authorized.valid !== true) {
     const reason = authorized.reason ?? '';
     return NextResponse.redirect(new URL(`/?redirect=${reason}`, request.url));
   }
