@@ -126,11 +126,20 @@ export async function getAotdUserCount() {
 // Submit a search query to musicbrainz.
 // - RETURN: JSON Objects 
 //
-export async function musicBrainzAlbumSearch(albumTitle, artist = null) {
+export async function musicBrainzAlbumSearch(albumTitle, artist = null, mbid = "") {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
-  // Build query params
-  const params = `?query=release:"${albumTitle}"${(artist) ? ` AND artist:"${artist}"` : ""}&limit=15&fmt=json`
+  // Two main search paths, MBID or Album name and artist
+  let params: string = ""
+  // Path one: MBID
+  if(mbid != "") {
+    // Build query params
+    params = `${mbid}?inc=artists+release-groups+genres&fmt=json`
+  } else {
+    // Path two: Album Name and Artist
+    // Build query params
+    params = `?query=release:"${albumTitle}"${(artist) ? ` AND artist:"${artist}"` : ""}&limit=15&fmt=json`
+  }
   // Send search query to musicbrainz to search for album
   console.log(`musicBrainzAlbumSearch: Sending request to musicbrainz for an album search: https://musicbrainz.org/ws/2/release/${params}`)
   const albumSearchItemsResponse = await fetch(`https://musicbrainz.org/ws/2/release/${params}`, {
@@ -143,7 +152,7 @@ export async function musicBrainzAlbumSearch(albumTitle, artist = null) {
     }
   });
   const response = await albumSearchItemsResponse.json();
-  return response;
+  return (mbid != "") ? ({ releases: [response]}) : (response);
 }
 
 

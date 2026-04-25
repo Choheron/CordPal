@@ -16,10 +16,9 @@ import { Textarea } from "@heroui/input";
 import React from "react";
 import { useRouter } from 'next/navigation';
 import { Listbox,  ListboxItem} from "@heroui/listbox";
-import { checkIfAlbumAlreadyExists, checkIfUserCanSubmit, submitAlbumToBackend } from "@/app/lib/aotd_utils";
+import { checkIfAlbumAlreadyExists, checkIfUserCanSubmit, musicBrainzAlbumSearch, submitAlbumToBackend } from "@/app/lib/aotd_utils";
 import { Conditional } from "../../conditional";
 import InfoPopover from "@/app/ui/general/info_popover";
-import { musicBrainzAlbumSearch } from "@/app/lib/aotd_utils";
 import {Image} from "@heroui/image";
 import { isUserAdmin } from "@/app/lib/user_utils";
 
@@ -40,7 +39,7 @@ export default function AddAlbumModal(props) {
   // Search Dynamic Values
   const [searchTitle, setSearchTitle] = React.useState("");
   const [searchArtist, setSearchArtist] = React.useState<any>("");
-  const [searchObj, setSearchObj] = React.useState({ album: "", artist: null});
+  const [searchMBID, setSearchMBID] = React.useState("");
   const [isSearchLoading, setIsSearchLoading] = React.useState(false);
   const [searchAlbumsResponse, setSearchAlbumsResponse] = React.useState({});
   // Mapped data to album cards
@@ -74,43 +73,39 @@ export default function AddAlbumModal(props) {
   }, [])
 
   // Send a search request and a
-  const searchPress = () => {
+  const searchPress = async () => {
+    // Search method to be awaited
+    const getSearchResults = async (searchObj) => {
+      if(searchObj.album == "" && searchObj.mbid == "") {
+        return;
+      }
+      setSearchAlbumsResponse((await musicBrainzAlbumSearch(searchObj.album, searchObj.artist, searchObj.mbid)))
+    }
     // Set search loading to true
     setIsSearchLoading(true)
     // Clear existing album list elements
     setAlbumList([])
     // Create payload to send data to backend
-    let albumSearchData = { album: "", artist: null}
-    if(searchTitle != "") {
-      albumSearchData.album = searchTitle
-    }
-    if((searchArtist != "") && (searchArtist != null)) {
-      albumSearchData.artist = searchArtist
+    let albumSearchData = { album: "", artist: null, mbid: ""}
+    if(searchMBID != "") {
+      albumSearchData.mbid = searchMBID
     } else {
-      setSearchArtist("")
-    }
-    setSearchObj(albumSearchData)
-  }
-
-  // UseEffect to search for an album once query data is updated
-  React.useEffect(() => {
-    const getSearchResults = async () => {
-      if(searchObj.album == "") {
-        return;
+      if(searchTitle != "") {
+        albumSearchData.album = searchTitle
       }
-      setSearchAlbumsResponse((await musicBrainzAlbumSearch(searchObj.album, searchObj.artist)))
+      if((searchArtist != "") && (searchArtist != null)) {
+        albumSearchData.artist = searchArtist
+      } else {
+        setSearchArtist("")
+      }
     }
-    getSearchResults()
-  }, [searchObj])
+    await getSearchResults(albumSearchData)
+  }
 
   // UseEffect to map album data from spotify to a selectable listItem
   React.useEffect(() => {
     if(searchAlbumsResponse['releases']) {
-      setAlbumList(
-        searchAlbumsResponse['releases'].map((album_obj, index) => {
-          return album_obj
-        })
-      )
+      setAlbumList(searchAlbumsResponse['releases'])
     }
     setIsSearchLoading(false)
   }, [searchAlbumsResponse])
@@ -184,8 +179,10 @@ export default function AddAlbumModal(props) {
     setCommentValue("")
     setSearchArtist("")
     setSearchTitle("")
+    setSearchMBID("")
     setAlbumList([])
     setSelectedAlbum(null)
+    setSelectedKey(new Set([]))
     setIsSearchLoading(false)
     setSearchAlbumsResponse({})
     setAlbumError(false)
@@ -247,11 +244,12 @@ export default function AddAlbumModal(props) {
                 <div className="max-w-[320px] lg:max-w-[650px] px-2 py-2 mt-2 text-small italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
                   <p>
                     NOTE: Please refrain from submitting &quot;best of&quot; albums to the AOtD pool. The purpose of the AOtD is to add albums created by the artist in their originial form &#40;extended editions,
-                    deluxes, and the like are allowed&#41;. If any album is in question, ask in the discord. Additionally, please check if an album&apos;s deluxe, extended, etc edition has already been submitted before
-                    submitting an album. 
+                    deluxes, and the like are allowed&#41;. If any album is in question, ask in the discord.
                   </p>
                 </div>
-                <p className="text-xl">Album Search: </p>
+                <p className="text-xl">Search for an Album: </p>
+                <Divider />
+                <p className="text-sm">Search via Album name and Artist Name:</p>
                 <Input 
                   className="w-full"
                   size="md"
@@ -259,6 +257,7 @@ export default function AddAlbumModal(props) {
                   placeholder="Enter an Album title" 
                   value={searchTitle}
                   onValueChange={setSearchTitle}
+                  isDisabled={searchMBID != ""}
                   isRequired
                 />
                 <Input 
@@ -268,14 +267,25 @@ export default function AddAlbumModal(props) {
                   placeholder="Enter an Artist's name" 
                   value={searchArtist}
                   onValueChange={setSearchArtist}
+                  isDisabled={searchMBID != ""}
+                />
+                <p className="text-sm">Or directly retrieve it via MBID:</p>
+                <Input 
+                  className="w-full"
+                  size="md"
+                  label="Album MBID:" 
+                  placeholder="Enter the Album's MBID" 
+                  value={searchMBID}
+                  onValueChange={setSearchMBID}
+                  isDisabled={searchTitle != "" || searchArtist != ""}
                 />
                 <Button 
                   isLoading={isSearchLoading}
                   color="primary" 
-                  isDisabled={!((searchTitle !== "") || (searchArtist !== ""))}
+                  isDisabled={!((searchTitle !== "") || (searchArtist !== "") || (searchMBID !== ""))}
                   onPress={searchPress}
                 >
-                  Search for Album
+                  Search {(searchMBID != "") ? ("via MBID") : ("via Name and Artist")}
                 </Button>
                 <Divider />
                 <p>Search Results:</p>
@@ -321,7 +331,7 @@ export default function AddAlbumModal(props) {
                           </div>
                           <div className="w-1/2">
                             <p className="text-sm">Type: {album['release-group']['primary-type']}</p>
-                            <p className="text-sm">{album['track-count']} Tracks</p>
+                            <p className="text-sm">{album['track-count'] ?? album['media']?.[0]?.['track-count'] ?? '?'} Tracks</p>
                           </div>
                         </div>
                       </ListboxItem>
@@ -350,7 +360,7 @@ export default function AddAlbumModal(props) {
                         </div>
                         <p className="text-base italic">{selectedAlbum['artist-credit'][0]['name']}</p>
                         <p className="text-base italic">{selectedAlbum['date']}</p>
-                        <p className="text-sm">{selectedAlbum['track-count']} Tracks</p>
+                        <p className="text-sm">{selectedAlbum['track-count'] ?? selectedAlbum['media']?.[0]?.['track-count'] ?? '?'} Tracks</p>
                         <a href={`https://musicbrainz.org/release/${selectedAlbum['id']}`} target="_noreferrer" className="text-lg text-blue-600 hover:underline">
                           MusicBrainz Link for Verification
                         </a>
