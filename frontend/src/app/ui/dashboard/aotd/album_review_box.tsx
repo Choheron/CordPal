@@ -13,6 +13,7 @@ import { submitReviewToBackend } from "@/app/lib/aotd_utils";
 import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 import { Conditional } from "../conditional";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
+import InfoPopover from "../../general/info_popover";
 
 
 // GUI Display for an Album Review Box
@@ -369,14 +370,25 @@ export default function AlbumReviewBox(props) {
             Enter an optional comment to go with your review of this album.
           </p>
           <div className="w-full flex flex-col lg:flex-row gap-2 justify-between">
-            <Checkbox
-              isSelected={isFirstListen}
-              onValueChange={setIsFirstListen}
-            >
-              <div className="flex gap-1">
-                First Time Listen
-              </div>
-            </Checkbox>
+            <div className="flex gap-2 h-fit">
+              <Checkbox
+                isSelected={isFirstListen}
+                onValueChange={setIsFirstListen}
+              >
+                <div className="flex gap-1">
+                  First Time Listen
+                </div>
+              </Checkbox>
+              <InfoPopover 
+                triggerText="?" 
+                triggerClassName=""
+                triggerTextColor="blue-500"
+                popoverTitle="First Time Listen Checkbox"
+                popoverText={"Click this if this is your first time listening to the album"}
+                popoverPlacement="top"
+                showArrow={true}
+              />
+            </div>
             <div className="flex flex-col gap-1">
               <div className="py-1 px-1">
                 <Checkbox
