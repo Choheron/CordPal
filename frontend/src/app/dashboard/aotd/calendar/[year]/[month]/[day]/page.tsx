@@ -4,7 +4,7 @@ import { Alert } from "@heroui/alert"
 import { Button } from "@heroui/button"
 import { Divider } from "@heroui/divider"
 
-import { getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData, getTagsForAlbum, getAotdUserSettings, isAotdParticipant } from "@/app/lib/aotd_utils"
+import { getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData, getTagsForAlbum, getAotdUserSettings, isAotdParticipant, getAlbumCommentAtDate } from "@/app/lib/aotd_utils"
 import { getNextDay, getPrevDay, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { getHasReviewedToday } from "@/app/lib/user_utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
@@ -41,6 +41,10 @@ export default async function Page({
   const albumTags = await getTagsForAlbum(albumData("album_id"));
   // Check if current user is an Admin User
   const isAdmin = await isUserAdmin()
+  // Fetch the comment that was in effect on this AOTD date (may differ from current if edited later)
+  const commentData = albumData("album_id")
+    ? await getAlbumCommentAtDate(albumData("album_id"), date)
+    : { comment: albumData("submitter_comment"), was_updated_since_aotd: false }
 
   // Hide scores/tags only when viewing today's AOTD and the user's settings say to hide pre-review.
   // For any historical date, isToday is false so hideScore/hideTags remain false.
@@ -160,13 +164,21 @@ export default async function Page({
               album_mbid={albumData("album_id")}
               artist={albumData("artist")}
               submitter={albumData("submitter")}
-              submitter_comment={albumData("submitter_comment")}
+              submitter_comment={commentData.comment ?? albumData("submitter_comment")}
               submission_date={albumData("submission_date")}
               release_date={albumData("release_date")}
               release_date_precision={albumData("release_date_precision")}
               historical_date={date}
               hideScore={hideScore}
             />
+            <Conditional showWhen={commentData.was_updated_since_aotd}>
+              <div className="text-xs italic text-gray-400 px-2 pb-2">
+                This submission message has been updated since this AOTD date.{" "}
+                <Link href={`/dashboard/aotd/album/${albumData("album_id")}`} className="underline">
+                  View current message.
+                </Link>
+              </div>
+            </Conditional>
             <div className="w-full max-w-full">
               <AlbumTagsDisplay
                 mbid={albumData("album_id")}

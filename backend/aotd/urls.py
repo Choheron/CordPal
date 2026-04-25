@@ -59,6 +59,9 @@ urlpatterns = [
   # Below URL has two variations (one for lack of URL Param)
   path('isUserAlbumUploader/<str:mbid>/<str:user_discord_id>', views_album.isUserAlbumUploader),
   path('isUserAlbumUploader/<str:mbid>', views_album.isUserAlbumUploader),
+  path('updateAlbumSubmission', views_album.updateAlbumSubmission),
+  path('getAlbumCommentHistory/<str:mbid>', views_album.getAlbumCommentHistory),
+  path('getAlbumCommentAtDate/<str:mbid>/<str:aotd_date>', views_album.getAlbumCommentAtDate),
   ## ============================================================================================================
   ## Review Views
   ## ============================================================================================================

@@ -2,7 +2,7 @@
 
 import { Button } from "@heroui/button"
 
-import { getAlbum, getAlbumAvgRating, getAotdDates, getAotdUserSettings, getTagsForAlbum } from "@/app/lib/aotd_utils"
+import { getAlbum, getAlbumAvgRating, getAotdDates, getAotdUserSettings, getTagsForAlbum, getAlbumCommentHistory } from "@/app/lib/aotd_utils"
 import { getHasReviewedToday, isUserAdmin, isUserAlbumUploader } from "@/app/lib/user_utils"
 import { milliToString, monthToName, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
@@ -12,7 +12,9 @@ import ReviewDisplay from "@/app/ui/dashboard/aotd/review_display"
 import Link from "next/link"
 import AlbumDeleteButton from "@/app/ui/dashboard/aotd/album_delete_button"
 import ReplaceAlbumModal from "@/app/ui/dashboard/aotd/modals/replace_album_modal"
+import EditSubmissionModal from "@/app/ui/dashboard/aotd/modals/edit_submission_modal"
 import AlbumTagsDisplay from "@/app/ui/dashboard/aotd/album_tags"
+import SubmissionHistoryAccordion from "@/app/ui/dashboard/aotd/submission_history_accordion"
 
 // Page to display data for a specific album
 export default async function Page({
@@ -39,6 +41,8 @@ export default async function Page({
   let isUploader = await isUserAlbumUploader(albumid)
   // Get tags for album
   const albumTags = await getTagsForAlbum(albumData("album_id"));
+  // Fetch submission comment history — shown to all users (edit button is gated separately)
+  const commentHistory = await getAlbumCommentHistory(albumid)
   // Determine if scores should be hidden (hide-scores-prereview setting)
   const reviewToday = await getHasReviewedToday();
   const hideScore = (await getAotdUserSettings())['hide_scores_prereview'] && !reviewToday;
@@ -208,17 +212,27 @@ export default async function Page({
               <Conditional showWhen={isAdmin || isUploader}>
                 <div className="absolute -top-1 right-1 flex gap-1">
                   <Conditional showWhen={isAdmin}>
-                    <ReplaceAlbumModal 
+                    <ReplaceAlbumModal
                       albumObj={albumObj}
                       isButtonDisabled={!isAdmin}
                     />
                   </Conditional>
+                  <EditSubmissionModal
+                    albumMbid={albumData("album_id")}
+                    currentComment={albumData("submitter_comment")}
+                    albumTitle={albumData("title")}
+                    isButtonDisabled={false}
+                  />
                   <AlbumDeleteButton albumid={albumid} albumTitle={albumData("title")} aotd_dates={aotd_dates}/>
                 </div>
               </Conditional>
             </div>
             {/* Tracklist Display */}
             {trackListBox()}
+            {/* Album comment history — visible to all, only rendered after at least one edit */}
+            <Conditional showWhen={commentHistory.length > 1}>
+              <SubmissionHistoryAccordion historyList={commentHistory} />
+            </Conditional>
           </div>
           {/* Show Previous AOTD Selection Dates */}
           <Conditional showWhen={aotd_dates.length > 0}>
