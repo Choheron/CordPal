@@ -167,7 +167,7 @@ class Album(models.Model):
         UserAction.objects.create(
           user=edited_by,
           action_type="UPDATE",
-          entity_type="ALBUM",
+          entity_type="ALBUM_COMMENT",
           entity_id=self.pk,
           details={
             "old_comment": old.user_comment,
