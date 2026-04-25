@@ -71,7 +71,7 @@ export async function AOtDScoreTimelineLineChart(props) {
       <Conditional showWhen={new Date(aotdDate) <= new Date("04/08/2025")}>
         <div className="w-full text-center font-extralight mx-auto px-2 py-2 my-2 text-small italic border border-neutral-800 rounded-2xl bg-zinc-800/30 -mt-3 mb-5">
           <p>
-            <span className="text-yellow-600"><b>WARNING:</b></span> Score data for albums on or before January 6th 2025 may have incorrect graphs or data.
+            <span className="text-yellow-600"><b>WARNING:</b></span> Score data for albums on or before April 8th, 2025 may have incorrect graphs or data.
           </p>
         </div>
       </Conditional>

@@ -153,6 +153,30 @@ class Album(models.Model):
       out['raw_album'] = self.raw_data
     return out
 
+  def save(self, edited_by=None, *args, **kwargs):
+    from users.models import UserAction
+    if self.pk and edited_by is not None:
+      old = Album.objects.get(pk=self.pk)
+      if old.user_comment != self.user_comment:
+        history = AlbumCommentHistory.objects.create(
+          album=self,
+          user_comment=old.user_comment,
+          edited_by=edited_by,
+          admin_edit=(edited_by != self.submitted_by)
+        )
+        UserAction.objects.create(
+          user=edited_by,
+          action_type="UPDATE",
+          entity_type="ALBUM",
+          entity_id=self.pk,
+          details={
+            "old_comment": old.user_comment,
+            "new_comment": self.user_comment,
+            "comment_history_pk": history.pk
+          }
+        )
+    super().save(*args, **kwargs)
+
   # Custom delete function to log the user action
   def delete(self, deleter=None, reason=None, *args, **kwargs):
     # Log the action before actually deleting
@@ -193,6 +217,7 @@ class AlbumCommentHistory(models.Model):
     blank=True,
     related_name="album_comment_edits"
   )
+  admin_edit = models.BooleanField(default=False)  # True when the editor is not the original uploader
 
   def toJSON(self):
     """Return a comment history entry as JSON. (For HTTP JSON Responses)"""
@@ -202,6 +227,7 @@ class AlbumCommentHistory(models.Model):
       "recorded_at": self.recorded_at.strftime("%m/%d/%Y, %H:%M:%S"),
       "edited_by": self.edited_by.discord_id if self.edited_by else None,
       "edited_by_nickname": self.edited_by.nickname if self.edited_by else None,
+      "admin_edit": self.admin_edit,
     }
 
   def __str__(self):

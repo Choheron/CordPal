@@ -658,10 +658,10 @@ def isUserAlbumUploader(request: HttpRequest, mbid: str, user_discord_id: str = 
 # Creates an AlbumCommentHistory snapshot before overwriting and logs a UserAction for the audit trail.
 ###
 def updateAlbumSubmission(request: HttpRequest):
-  from users.models import UserAction
   if request.method != "POST":
     logger.warning(f"updateAlbumSubmission called with a non-POST method, returning 405.", extra={'crid': request.crid})
     return HttpResponse("Method not allowed", status=405)
+  # Parse request body
   reqBody = json.loads(request.body)
   mbid = reqBody.get('mbid', '')
   new_comment = reqBody.get('new_comment', '')
@@ -677,28 +677,8 @@ def updateAlbumSubmission(request: HttpRequest):
   if album.submitted_by != user and not user.is_staff:
     logger.warning(f"updateAlbumSubmission: User {user.discord_id}/{user.nickname} attempted to edit comment on album {mbid} without permission.", extra={'crid': request.crid})
     return HttpResponse("Forbidden", status=403)
-  old_comment = album.user_comment
-  # Snapshot the old comment before overwriting
-  history = AlbumCommentHistory.objects.create(
-    album=album,
-    user_comment=old_comment,
-    edited_by=user
-  )
-  # Apply the new comment
   album.user_comment = new_comment
-  album.save()
-  # Audit trail
-  UserAction.objects.create(
-    user=user,
-    action_type="UPDATE",
-    entity_type="ALBUM",
-    entity_id=album.pk,
-    details={
-      "old_comment": old_comment,
-      "new_comment": new_comment,
-      "comment_history_pk": history.pk
-    }
-  )
+  album.save(edited_by=user)
   logger.info(f"updateAlbumSubmission: User {user.discord_id}/{user.nickname} updated comment on album {mbid}.", extra={'crid': request.crid})
   return HttpResponse(status=200)
 
@@ -721,23 +701,29 @@ def getAlbumCommentHistory(request: HttpRequest, mbid: str):
     album = Album.objects.get(mbid=mbid)
   except ObjectDoesNotExist:
     return HttpResponse("Album not found", status=404)
-  # Oldest-first so index arithmetic below is straightforward
-  history_qs = list(AlbumCommentHistory.objects.filter(album=album).order_by('recorded_at'))
+  # Newest-first so the last entry in the final list is the original comment
+  history_qs = list(AlbumCommentHistory.objects.filter(album=album).order_by('-recorded_at'))
   entries = []
+  last_i = len(history_qs) - 1
   for i, entry in enumerate(history_qs):
-    # This version was live from the previous edit (or album submission) until recorded_at
-    created_at = history_qs[i - 1].recorded_at if i > 0 else album.submission_date
+    # created_at: when this version *started*. For non-original entries it's when the
+    # preceding (older) edit was recorded; for the original it's the album submission date.
+    created_at = history_qs[i + 1].recorded_at if i < last_i else album.submission_date
     row = entry.toJSON()
     row['created_at'] = created_at.strftime("%m/%d/%Y, %H:%M:%S") if created_at else None
+    # admin_edit: was *this* version created by an admin edit? That's the edit captured in
+    # the next (older) history entry. The original was never created by an edit.
+    row['admin_edit'] = history_qs[i + 1].admin_edit if i < last_i else False
     entries.append(row)
   # Current version started when the most recent history entry was recorded
-  current_created_at = history_qs[-1].recorded_at.strftime("%m/%d/%Y, %H:%M:%S") if history_qs else None
+  current_created_at = history_qs[0].recorded_at.strftime("%m/%d/%Y, %H:%M:%S") if history_qs else None
   current_entry = {
     "id": None,
     "user_comment": album.user_comment,
     "created_at": current_created_at,
-    "edited_by": None,
-    "edited_by_nickname": None,
+    "edited_by": history_qs[0].edited_by.discord_id,
+    "edited_by_nickname": history_qs[0].edited_by.nickname,
+    "admin_edit": history_qs[0].admin_edit if history_qs else False
   }
   entries.insert(0, current_entry)
   return JsonResponse({"history": entries})

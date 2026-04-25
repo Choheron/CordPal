@@ -71,6 +71,11 @@ export default function SubmissionHistoryAccordion(props) {
                     edited by {entry['edited_by_nickname']}
                   </p>
                 )}
+                <Conditional showWhen={entry['admin_edit']}>
+                  <p className="text-xs my-auto border border-blue-500 rounded-full px-1 ml-1 bg-blue-600/80 italic text-white font-normal">
+                    <b>ADMIN EDIT</b>
+                  </p>
+                </Conditional>
               </div>
               <Conditional showWhen={entry['created_at'] !== null}>
                 <div className="text-xs italic font-extralight text-gray-500">
