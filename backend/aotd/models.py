@@ -176,6 +176,38 @@ class Album(models.Model):
     return f"{self.title} by {self.artist}"
 
 
+# Immutable snapshot of an Album's user_comment at the point it was edited.
+class AlbumCommentHistory(models.Model):
+  """
+  Created automatically each time Album.user_comment is updated via the
+  updateAlbumSubmission endpoint. Stores the previous comment so the full
+  edit history can be reconstructed. Never modified after creation.
+  """
+  album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name="comment_history")
+  user_comment = models.TextField(null=True, blank=True)  # snapshot of the comment before the edit
+  recorded_at = models.DateTimeField(auto_now_add=True)   # when this history record was created
+  edited_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="album_comment_edits"
+  )
+
+  def toJSON(self):
+    """Return a comment history entry as JSON. (For HTTP JSON Responses)"""
+    return {
+      "id": self.pk,
+      "user_comment": self.user_comment,
+      "recorded_at": self.recorded_at.strftime("%m/%d/%Y, %H:%M:%S"),
+      "edited_by": self.edited_by.discord_id if self.edited_by else None,
+      "edited_by_nickname": self.edited_by.nickname if self.edited_by else None,
+    }
+
+  def __str__(self):
+    return f"Comment history for {self.album.title} at {self.recorded_at}"
+
+
 # Model for an album of the day
 class DailyAlbum(models.Model):
   """

@@ -12,6 +12,7 @@ from users.utils import getUserObj
 from .models import (
   AotdUserData,
   Album,
+  AlbumCommentHistory,
   Review,
   DailyAlbum
 )
@@ -650,3 +651,134 @@ def isUserAlbumUploader(request: HttpRequest, mbid: str, user_discord_id: str = 
   out = (user == album.submitted_by)
   # Return Object
   return JsonResponse({'uploader': out})
+
+
+###
+# Update the user_comment on an album. Only the original submitter or an admin may do this.
+# Creates an AlbumCommentHistory snapshot before overwriting and logs a UserAction for the audit trail.
+###
+def updateAlbumSubmission(request: HttpRequest):
+  from users.models import UserAction
+  if request.method != "POST":
+    logger.warning(f"updateAlbumSubmission called with a non-POST method, returning 405.", extra={'crid': request.crid})
+    return HttpResponse("Method not allowed", status=405)
+  reqBody = json.loads(request.body)
+  mbid = reqBody.get('mbid', '')
+  new_comment = reqBody.get('new_comment', '')
+  # Reject empty comments
+  if not new_comment or not new_comment.strip():
+    return HttpResponse("Comment may not be empty", status=400)
+  try:
+    album = Album.objects.get(mbid=mbid)
+  except ObjectDoesNotExist:
+    return HttpResponse("Album not found", status=404)
+  # Only the original submitter or staff may edit
+  user = getUserObj(request.session.get('discord_id'))
+  if album.submitted_by != user and not user.is_staff:
+    logger.warning(f"updateAlbumSubmission: User {user.discord_id}/{user.nickname} attempted to edit comment on album {mbid} without permission.", extra={'crid': request.crid})
+    return HttpResponse("Forbidden", status=403)
+  old_comment = album.user_comment
+  # Snapshot the old comment before overwriting
+  history = AlbumCommentHistory.objects.create(
+    album=album,
+    user_comment=old_comment,
+    edited_by=user
+  )
+  # Apply the new comment
+  album.user_comment = new_comment
+  album.save()
+  # Audit trail
+  UserAction.objects.create(
+    user=user,
+    action_type="UPDATE",
+    entity_type="ALBUM",
+    entity_id=album.pk,
+    details={
+      "old_comment": old_comment,
+      "new_comment": new_comment,
+      "comment_history_pk": history.pk
+    }
+  )
+  logger.info(f"updateAlbumSubmission: User {user.discord_id}/{user.nickname} updated comment on album {mbid}.", extra={'crid': request.crid})
+  return HttpResponse(status=200)
+
+
+###
+# Return the full comment edit history for an album, newest first, with the current
+# comment prepended as the "current" entry for diff display.
+#
+# Timestamp note: AlbumCommentHistory.recorded_at is when a version was *replaced*,
+# not when it *started*. We compute created_at as the *start* time of each version:
+#   - original comment: Album.submission_date
+#   - each subsequent version: the recorded_at of the entry it replaced
+#   - current version: the recorded_at of the most recent history entry
+###
+def getAlbumCommentHistory(request: HttpRequest, mbid: str):
+  if request.method != "GET":
+    logger.warning(f"getAlbumCommentHistory called with a non-GET method, returning 405.", extra={'crid': request.crid})
+    return HttpResponse("Method not allowed", status=405)
+  try:
+    album = Album.objects.get(mbid=mbid)
+  except ObjectDoesNotExist:
+    return HttpResponse("Album not found", status=404)
+  # Oldest-first so index arithmetic below is straightforward
+  history_qs = list(AlbumCommentHistory.objects.filter(album=album).order_by('recorded_at'))
+  entries = []
+  for i, entry in enumerate(history_qs):
+    # This version was live from the previous edit (or album submission) until recorded_at
+    created_at = history_qs[i - 1].recorded_at if i > 0 else album.submission_date
+    row = entry.toJSON()
+    row['created_at'] = created_at.strftime("%m/%d/%Y, %H:%M:%S") if created_at else None
+    entries.append(row)
+  # Current version started when the most recent history entry was recorded
+  current_created_at = history_qs[-1].recorded_at.strftime("%m/%d/%Y, %H:%M:%S") if history_qs else None
+  current_entry = {
+    "id": None,
+    "user_comment": album.user_comment,
+    "created_at": current_created_at,
+    "edited_by": None,
+    "edited_by_nickname": None,
+  }
+  entries.insert(0, current_entry)
+  return JsonResponse({"history": entries})
+
+
+###
+# Return the comment that was in effect on a given AOTD date, plus a flag indicating
+# whether it has since been updated. Used by the calendar page to show the original message.
+#
+# Logic: AlbumCommentHistory stores the *previous* comment before each edit.
+# The first history entry with recorded_at > aotd_midnight is the earliest edit
+# that happened *after* the AOTD date, meaning its stored comment was the one
+# in effect AT the AOTD time.
+###
+def getAlbumCommentAtDate(request: HttpRequest, mbid: str, aotd_date: str):
+  if request.method != "GET":
+    logger.warning(f"getAlbumCommentAtDate called with a non-GET method, returning 405.", extra={'crid': request.crid})
+    return HttpResponse("Method not allowed", status=405)
+  try:
+    album = Album.objects.get(mbid=mbid)
+    DailyAlbum.objects.get(album=album, date=aotd_date)
+  except ObjectDoesNotExist:
+    return HttpResponse("Album or AOTD date not found", status=404)
+  # Treat AOTD selection as occurring at midnight CST on the given date
+  cst = pytz.timezone('America/Chicago')
+  aotd_midnight = cst.localize(datetime.datetime.strptime(aotd_date, "%Y-%m-%d"))
+  # The earliest edit recorded after that midnight holds the comment that was live at selection time
+  first_edit_after = (
+    AlbumCommentHistory.objects
+    .filter(album=album, recorded_at__gt=aotd_midnight)
+    .order_by('recorded_at')
+    .first()
+  )
+  if first_edit_after:
+    # Comment was changed after AOTD; the history entry holds the pre-edit (original) text
+    return JsonResponse({
+      "comment": first_edit_after.user_comment,
+      "was_updated_since_aotd": True
+    })
+  # No edits after AOTD — current comment is the one that was live at selection time
+  return JsonResponse({
+    "comment": album.user_comment,
+    "was_updated_since_aotd": False
+  })

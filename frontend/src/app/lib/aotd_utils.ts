@@ -1257,6 +1257,68 @@ export async function deleteGlobalTag(tagId: number) {
 }
 
 //
+// Update the user_comment on an album submission.
+// Creates an AlbumCommentHistory snapshot and a UserAction on the backend.
+// - RETURN: { status, crid }
+//
+export async function updateAlbumSubmission(mbid: string, newComment: string) {
+  const sessionCookie = await getCookie('sessionid');
+  console.log(`updateAlbumSubmission: Sending request to backend '/aotd/updateAlbumSubmission' for ${mbid}`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/updateAlbumSubmission`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: { Cookie: `sessionid=${sessionCookie};` },
+    body: JSON.stringify({ mbid, new_comment: newComment })
+  });
+  if (res.ok) {
+    // Bust the album cache so the updated comment is visible immediately
+    revalidateTag(`album_${mbid}`, "max")
+  }
+  return { status: res.status, crid: res.headers.get("X-CRID") }
+}
+
+
+//
+// Fetch the full comment edit history for an album.
+// Returns an array where index 0 is the current state and the last entry is the original.
+// - RETURN: Array of comment history entries
+//
+export async function getAlbumCommentHistory(mbid: string) {
+  const sessionCookie = await getCookie('sessionid');
+  console.log(`getAlbumCommentHistory: Sending request to backend '/aotd/getAlbumCommentHistory/${mbid}'`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAlbumCommentHistory/${mbid}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: { Cookie: `sessionid=${sessionCookie};` },
+  });
+  if (!res.ok) return []
+  const data = await res.json()
+  return data['history'] ?? []
+}
+
+
+//
+// Fetch the comment that was in effect on a specific AOTD date, and whether
+// it has been edited since. Used by the calendar page to show the original message.
+// - RETURN: { comment: string, was_updated_since_aotd: boolean }
+//
+export async function getAlbumCommentAtDate(mbid: string, aotdDate: string) {
+  const sessionCookie = await getCookie('sessionid');
+  console.log(`getAlbumCommentAtDate: Sending request for album ${mbid} at date ${aotdDate}`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAlbumCommentAtDate/${mbid}/${aotdDate}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: { Cookie: `sessionid=${sessionCookie};` },
+  });
+  if (!res.ok) return { comment: null, was_updated_since_aotd: false }
+  return await res.json()
+}
+
+
+//
 // Get all global tags
 // - RETURN: List of global tag objects
 //
