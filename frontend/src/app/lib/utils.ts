@@ -85,7 +85,7 @@ export function getLastYearInTimezone(timezoneString) {
   // Build a pure CT midnight date
   const ctMidnight = new Date(`${y}-${m}-${d}T00:00:00`);
 
-  // Yesterday in CT
+  // Last Year in CT
   ctMidnight.setUTCFullYear(ctMidnight.getUTCFullYear() - 1);
 
   return ctMidnight.toISOString().slice(0, 10);
