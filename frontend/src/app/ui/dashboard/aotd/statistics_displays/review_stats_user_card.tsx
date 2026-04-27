@@ -1,5 +1,3 @@
-'use server'
-
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover"
 import { Divider } from "@heroui/divider"
 import { Button} from "@heroui/button"

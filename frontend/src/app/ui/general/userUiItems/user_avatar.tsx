@@ -1,5 +1,3 @@
-'use server'
-
 import { Avatar } from "@heroui/avatar";
 import { Badge } from "@heroui/badge";
 

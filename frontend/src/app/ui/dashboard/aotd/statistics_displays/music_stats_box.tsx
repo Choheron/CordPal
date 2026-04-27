@@ -1,5 +1,3 @@
-'use server'
-
 import { Divider } from "@heroui/divider";
 import { Tooltip } from "@heroui/tooltip";
 

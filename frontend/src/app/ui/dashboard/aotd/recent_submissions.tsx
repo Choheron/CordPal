@@ -1,5 +1,3 @@
-'use server'
-
 import { User } from "@heroui/user";
 import { Button } from "@heroui/button";
 

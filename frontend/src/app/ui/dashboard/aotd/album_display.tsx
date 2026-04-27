@@ -1,5 +1,3 @@
-'use server'
-
 import { Conditional } from "../conditional"
 import UserCard from '../../general/userUiItems/user_card';
 import StarRating from '../../general/star_rating';

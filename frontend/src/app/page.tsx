@@ -1,5 +1,3 @@
-'use server'
-
 import "@/app/globals.css";
 
 import { Alert } from "@heroui/alert";

@@ -1,5 +1,3 @@
-'use server'
-
 import Link from "next/link";
 
 import PageTitle from "@/app/ui/dashboard/page_title";

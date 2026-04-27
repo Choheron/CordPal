@@ -1,5 +1,3 @@
-'use server'
-
 import { Button } from "@heroui/button"
 
 import { getAlbum, getAlbumAvgRating, getAotdDates, getAotdUserSettings, getTagsForAlbum, getAlbumCommentHistory } from "@/app/lib/aotd_utils"

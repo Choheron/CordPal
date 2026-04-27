@@ -1,5 +1,3 @@
-'use server'
-
 import { getAllUserReviews, getAotdData, getUserAlbumsStats, getUserReviewStats } from "@/app/lib/aotd_utils";
 import MinimalAlbumDisplay from "../dashboard/aotd/minimal_album_display";
 import StarRating from "../general/star_rating";
