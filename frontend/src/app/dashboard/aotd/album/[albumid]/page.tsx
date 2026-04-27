@@ -1,8 +1,8 @@
 import { Button } from "@heroui/button"
 
 import { getAlbum, getAlbumAvgRating, getAotdDates, getAotdUserSettings, getTagsForAlbum, getAlbumCommentHistory } from "@/app/lib/aotd_utils"
-import { getHasReviewedToday, isUserAdmin, isUserAlbumUploader } from "@/app/lib/user_utils"
-import { milliToString, monthToName, ratingToTailwindBgColor } from "@/app/lib/utils"
+import { getHasReviewedToday, getUserData, isUserAdmin, isUserAlbumUploader } from "@/app/lib/user_utils"
+import { getLastYearInTimezone, milliToString, monthToName, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/aotd/album_display"
@@ -34,9 +34,11 @@ export default async function Page({
     ratingsObj[date] = (await getAlbumAvgRating(albumid, false, date)).toFixed(2)
   }
   // Determine if user is admin
-  let isAdmin = await isUserAdmin()
+  const [isAdmin, user_data] = await Promise.all([isUserAdmin(), getUserData()])
   // Determine if user is the uploader of the album
   let isUploader = await isUserAlbumUploader(albumid)
+  // Determine if this album was AOTD exactly one year ago today
+  const isYearAgoAlbum = aotd_dates.includes(getLastYearInTimezone("America/Chicago"))
   // Get tags for album
   const albumTags = await getTagsForAlbum(albumData("album_id"));
   // Fetch submission comment history — shown to all users (edit button is gated separately)
@@ -199,12 +201,16 @@ export default async function Page({
                   trackList={albumData("track_list")['tracks']}
                   showAlbumRating={false}
                 />
-                <AlbumTagsDisplay 
+                <Conditional showWhen={isYearAgoAlbum} >
+                  <p className="w-full text-xs text-gray-500 italic text-center">This album was AOTD a year ago today! You can edit tags on this album.</p>
+                </Conditional>
+                <AlbumTagsDisplay
                   mbid={albumData("album_id")}
                   initialTags={albumTags ?? []}
                   isEnrolled={true}
                   isAdmin={isAdmin}
-                  readOnly={true}
+                  currentUserId={isYearAgoAlbum ? user_data['discord_id'] : undefined}
+                  readOnly={!isYearAgoAlbum}
                 />
               </div>
               <Conditional showWhen={isAdmin || isUploader}>
