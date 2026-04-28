@@ -15,10 +15,13 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Verify the session cookie is present and the Discord token is still valid
+  // Start both in parallel — layout needs isMember on all dashboard routes regardless
+  const authPromise = verifyAuth();
+  const memberPromise = isMember();
+
   let authorized: any;
   try {
-    authorized = await verifyAuth();
+    authorized = await authPromise;
   } catch {
     return NextResponse.redirect(new URL('/', request.url));
   }
@@ -28,21 +31,30 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(`/?redirect=${reason}`, request.url));
   }
 
-  if(checkNonUserAccess(request)) {
-    return NextResponse.next();
+  let memberStatus: boolean;
+  try {
+    memberStatus = await memberPromise;
+  } catch {
+    memberStatus = false;
   }
 
   // Gate pages that require guild membership
-  if(!(await isMember())) {
+  if(!checkNonUserAccess(request) && !memberStatus) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  return NextResponse.next();
+  // Pass membership result downstream so layout/page don't re-fetch
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-is-member', String(memberStatus));
+
+  return NextResponse.next({
+    request: { headers: requestHeaders }
+  });
 }
 
 export const config = {
   matcher: [
-    '/dashboard/((?!.*\\/api\\/).*)',  // /dashboard/* but NOT /dashboard/*/api/*
+    '/dashboard/((?!.*\\/api\\/).*)',   // /dashboard/* but NOT /dashboard/*/api/*
     '/dashboard',                       // exact /dashboard
   ],
 }

@@ -1,7 +1,8 @@
 "use server"
 
 import { Conditional } from "../ui/dashboard/conditional";
-import { isMember, getDiscordUserData } from "../lib/discord_utils";
+import { getDiscordUserData } from "../lib/discord_utils";
+import { headers } from "next/headers";
 import { getAllOnlineData, getHasReviewedToday, getUserData, getUserList, getUsersByTimezone } from "../lib/user_utils";
 import PageTitle from "../ui/dashboard/page_title";
 import LiveOnlineUsersBox from "../ui/dashboard/live_online_users_box";
@@ -14,7 +15,8 @@ import EmojiSection from "../ui/dashboard/emojis/EmojiSection";
 export default async function Page() {
   const discordUserData = await getDiscordUserData();
   const userData = await getUserData();
-  const memberStatus = await isMember();
+  // memberStatus is injected by middleware to avoid a redundant backend call
+  const memberStatus = (await headers()).get('x-is-member') === 'true';
   // Inital props for passing to client list
   const userList = await getUserList();
   const onlineData = await getAllOnlineData();

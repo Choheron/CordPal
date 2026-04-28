@@ -17,7 +17,7 @@ export async function isMember() {
   const memberResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/validateMember`, {
     method: "GET",
     credentials: "include",
-    next: { revalidate: 300 },
+    cache: 'no-store',
     headers: {
       Cookie: `sessionid=${sessionCookie};`,
       'X-Member-Check': `true`
@@ -44,7 +44,7 @@ export async function verifyAuth(): Promise<true | { valid: false | true; reason
   const prevAuthResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/checkToken`, {
     method: "GET",
     credentials: "include",
-    next: { revalidate: 60 },
+    cache: 'no-store',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
@@ -68,7 +68,7 @@ export async function getDiscordUserData() {
   const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/discordapi/userData`, {
     method: "GET",
     credentials: "include",
-    cache: 'force-cache',
+    cache: 'no-store',
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     }
