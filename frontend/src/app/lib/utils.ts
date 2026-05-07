@@ -152,18 +152,28 @@ export function convertToLocalTZString(date: Date, full: boolean = false) {
 // Convert a rating to its hex color value
 export function ratingToHexColor(rating: number): string {
   rating = Math.max(0.0, Math.min(10.0, rating));
-  switch(Math.floor(rating)) {
-    case 10: return "#55ff00";
-    case 9:  return "#83ee00";
-    case 8:  return "#a4db00";
-    case 7:  return "#bac800";
-    case 6:  return "#cdb400";
-    case 5:  return "#dc9e00";
-    case 4:  return "#ea8600";
-    case 3:  return "#f66900";
-    case 2:  return "#fc4700";
-    case 1:  return "#de1111";
-    default: return "#ff0000";
+  switch(Math.floor(rating * 2) / 2) {
+    case 10:  return "#55ff00";
+    case 9.5: return "#6cf700";
+    case 9:   return "#83ee00";
+    case 8.5: return "#94e500";
+    case 8:   return "#a4db00";
+    case 7.5: return "#afd200";
+    case 7:   return "#bac800";
+    case 6.5: return "#c4be00";
+    case 6:   return "#cdb400";
+    case 5.5: return "#d5a900";
+    case 5:   return "#dc9e00";
+    case 4.5: return "#e39200";
+    case 4:   return "#ea8600";
+    case 3.5: return "#f07800";
+    case 3:   return "#f66900";
+    case 2.5: return "#f95800";
+    case 2:   return "#fc4700";
+    case 1.5: return "#ed2c09";
+    case 1:   return "#de1111";
+    case 0.5: return "#ef0909";
+    default:  return "#ff0000";
   }
 }
 
@@ -173,18 +183,28 @@ export function ratingToTailwindBgColor(rating: number) {
   rating = Math.max(0.0, rating);
   rating = Math.min(10.00, rating);
   let tailwind = ""
-  switch(Math.floor(rating)) {
-    case 10: tailwind = "bg-[#55ff00]"; break;
-    case 9:  tailwind = "bg-[#83ee00]"; break;
-    case 8:  tailwind = "bg-[#a4db00]"; break;
-    case 7:  tailwind = "bg-[#bac800]"; break;
-    case 6:  tailwind = "bg-[#cdb400]"; break;
-    case 5:  tailwind = "bg-[#dc9e00]"; break;
-    case 4:  tailwind = "bg-[#ea8600]"; break;
-    case 3:  tailwind = "bg-[#f66900]"; break;
-    case 2:  tailwind = "bg-[#fc4700]"; break;
-    case 1:  tailwind = "bg-[#de1111]"; break;
-    default: tailwind = "bg-[#ff0000]";
+  switch(Math.floor(rating * 2) / 2) {
+    case 10:  tailwind = "bg-[#55ff00]"; break;
+    case 9.5: tailwind = "bg-[#6cf700]"; break;
+    case 9:   tailwind = "bg-[#83ee00]"; break;
+    case 8.5: tailwind = "bg-[#94e500]"; break;
+    case 8:   tailwind = "bg-[#a4db00]"; break;
+    case 7.5: tailwind = "bg-[#afd200]"; break;
+    case 7:   tailwind = "bg-[#bac800]"; break;
+    case 6.5: tailwind = "bg-[#c4be00]"; break;
+    case 6:   tailwind = "bg-[#cdb400]"; break;
+    case 5.5: tailwind = "bg-[#d5a900]"; break;
+    case 5:   tailwind = "bg-[#dc9e00]"; break;
+    case 4.5: tailwind = "bg-[#e39200]"; break;
+    case 4:   tailwind = "bg-[#ea8600]"; break;
+    case 3.5: tailwind = "bg-[#f07800]"; break;
+    case 3:   tailwind = "bg-[#f66900]"; break;
+    case 2.5: tailwind = "bg-[#f95800]"; break;
+    case 2:   tailwind = "bg-[#fc4700]"; break;
+    case 1.5: tailwind = "bg-[#ed2c09]"; break;
+    case 1:   tailwind = "bg-[#de1111]"; break;
+    case 0.5: tailwind = "bg-[#ef0909]"; break;
+    default:  tailwind = "bg-[#ff0000]";
   }
   // Return with opacity override
   return tailwind
@@ -195,28 +215,27 @@ export function ratingToTailwindTextColor(rating: number) {
   // Normalize rating
   rating = Math.max(0.0, rating);
   rating = Math.min(10.00, rating);
-  if(rating >= 9.99)
-    return "text-[#55ff00]"
-  if(rating >= 9.0)
-    return "text-[#83ee00]"
-  if(rating >= 8.0)
-    return "text-[#a4db00]"
-  if(rating >= 7.0)
-    return "text-[#bac800]"
-  if(rating >= 6.0)
-    return "text-[#cdb400]"
-  if(rating >= 5.0)
-    return "text-[#dc9e00]"
-  if(rating >= 4.0)
-    return "text-[#ea8600]"
-  if(rating >= 3.0)
-    return "text-[#f66900]"
-  if(rating >= 2.0)
-    return "text-[#fc4700]"
-  if(rating >= 1.0)
-    return "text-[#de1111]"
-  if(rating >= 0.0)
-    return "text-[#ff0000]"
+  if(rating >= 9.99) return "text-[#55ff00]"
+  if(rating >= 9.5)  return "text-[#6cf700]"
+  if(rating >= 9.0)  return "text-[#83ee00]"
+  if(rating >= 8.5)  return "text-[#94e500]"
+  if(rating >= 8.0)  return "text-[#a4db00]"
+  if(rating >= 7.5)  return "text-[#afd200]"
+  if(rating >= 7.0)  return "text-[#bac800]"
+  if(rating >= 6.5)  return "text-[#c4be00]"
+  if(rating >= 6.0)  return "text-[#cdb400]"
+  if(rating >= 5.5)  return "text-[#d5a900]"
+  if(rating >= 5.0)  return "text-[#dc9e00]"
+  if(rating >= 4.5)  return "text-[#e39200]"
+  if(rating >= 4.0)  return "text-[#ea8600]"
+  if(rating >= 3.5)  return "text-[#f07800]"
+  if(rating >= 3.0)  return "text-[#f66900]"
+  if(rating >= 2.5)  return "text-[#f95800]"
+  if(rating >= 2.0)  return "text-[#fc4700]"
+  if(rating >= 1.5)  return "text-[#ed2c09]"
+  if(rating >= 1.0)  return "text-[#de1111]"
+  if(rating >= 0.5)  return "text-[#ef0909]"
+  return "text-[#ff0000]"
 }
 
 // Return true if it is currently in December
