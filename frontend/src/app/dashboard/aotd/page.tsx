@@ -8,13 +8,15 @@ import AlbumOfTheDayBox from "@/app/ui/dashboard/aotd/album_of_the_day";
 import RecentSubmissions from "@/app/ui/dashboard/aotd/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/aotd/statistics_displays/music_stats_box";
 import { Button } from "@heroui/button";
-import { getLastYearInTimezone, padNumber } from "@/app/lib/utils";
+import { getLastYearInTimezone, getTodayInTimezone, padNumber } from "@/app/lib/utils";
 import MinimalAlbumDisplay from "@/app/ui/dashboard/aotd/minimal_album_display";
 
 export default async function music() {
   const aotd_participant = await isAotdParticipant();
   const recentSubmissionsResponse = await getLastXSubmissions(8);
-
+  // Get today's date
+  const today_string = getTodayInTimezone("America/Chicago")
+  const today_arr = today_string.split("-")
   // Query for last year's AOTD Data
   const last_year_string = getLastYearInTimezone("America/Chicago")
   const last_year_arr = last_year_string.split("-")
@@ -82,7 +84,11 @@ export default async function music() {
               </div>
             </div>
           </div>
-          <MusicStatsBox />
+          <MusicStatsBox
+            year={today_arr[0]}
+            month={today_arr[1]}
+            day={today_arr[2]}
+          />
         </div>
       </Conditional>
     </div>

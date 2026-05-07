@@ -28,6 +28,31 @@ export function generateDateFromUTCString(utcString) {
 }
 
 
+// Get a string representation of today's date using the passed in timezone
+export function getTodayInTimezone(timezoneString) {
+  function getPart(parts: Intl.DateTimeFormatPart[], type: string): string {
+    const match = parts.find(p => p.type === type);
+    if (!match) throw new Error(`Missing part: ${type}`);
+    return match.value;
+  }
+
+  const now = new Date();
+
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezoneString,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+
+  const y = getPart(parts, "year");
+  const m = getPart(parts, "month");
+  const d = getPart(parts, "day");
+
+  return `${y}-${m}-${d}`;
+}
+
+
 // Get a string representation of yesterdays date using the passed in timezone
 export function getYesterdayInTimezone(timezoneString) {
   // Helper to get part without weird typescript error
@@ -268,6 +293,7 @@ export function daysInMonth(year, month) {
 
 // Convert date string in YYYY-MM-DD format to a human readable string
 export function dateToString(dateStr: string) {
+  console.log(dateStr)
   const dateArr = dateStr.split("-")
 
   return `${monthToName(dateArr[1])} ${dateArr[2]}, ${dateArr[0]}`

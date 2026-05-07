@@ -2,20 +2,34 @@ import { Divider } from "@heroui/divider";
 import { Tooltip } from "@heroui/tooltip";
 
 import UserCard from "@/app/ui/general/userUiItems/user_card";
-import { getAlbumsStats, getAllUserReviewStats, getChanceOfAotdSelect, getLowestHighestAlbumStats } from "@/app/lib/aotd_utils";
+import { getAlbumOfTheDayData, getAlbumsStats, getAllUserReviewStats, getAOtDByMonth, getChanceOfAotdSelect, getLowestHighestAlbumStats } from "@/app/lib/aotd_utils";
 
-import { dateToString } from "@/app/lib/utils";
+import { dateToString, monthToName } from "@/app/lib/utils";
 import ReviewStatsUserCard from "./review_stats_user_card";
 import CreateOutageModal from "../modals/create_outage_modal";
 import AlbumDisplay from "../album_display";
 
 // GUI Display for an Album
 // Expected Props:
-//   - NONE YET
+//   - year - String year (2XXX)
+//   - month - String Month (number)
+//   - day - String Day (number)
 export default async function MusicStatsBox(props) {
+  // Get props
+  const year = props.year
+  const month = props.month
+  const day = props.day
+  // Make backend requests
   const albumStatsJson = await getAlbumsStats();
-  const albumLowHighStatsJson = await getLowestHighestAlbumStats();
+  const albumLowHighStatsJson = await getAOtDByMonth(year, month);
   const userReviewStatsJson = await getAllUserReviewStats();
+  // Parse Album Data
+  const empty_month = (Object.keys(albumLowHighStatsJson).length <= 2) // An empty month will return only two fields
+  const highest_date = albumLowHighStatsJson['stats']?.['highest_aotd_date']
+  const lowest_date = albumLowHighStatsJson['stats']?.['lowest_aotd_date']
+  const single_album = !empty_month && (highest_date === lowest_date)
+  const highest_album: Object = (empty_month) ? {"date": "2000-01-01"} : (await getAlbumOfTheDayData(highest_date))
+  const lowest_album: Object = (single_album || empty_month) ? {"date": "2000-01-01"} : (await getAlbumOfTheDayData(lowest_date))
 
 
   const albumUserStatsTable = albumStatsJson['user_objs'].sort((a, b) => a['selection_chance'] < b['selection_chance'] ? 1 : -1).map((user, index) => {
@@ -64,6 +78,7 @@ export default async function MusicStatsBox(props) {
     )
   })
 
+
   const reviewUserStatsList = userReviewStatsJson['review_data'].sort((a, b) => a['total_reviews'] < b['total_reviews'] ? 1 : -1).map((user) => {
     return (
       <div 
@@ -81,56 +96,65 @@ export default async function MusicStatsBox(props) {
     )
   })
 
+
   return (
     <div className="flex flex-col w-full justify-center xl:flex-row gap-2">
       <div className="mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row gap-10 backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
         {/* Lowest and Highest Album Stats */}
         <div className="w-fit flex flex-col">
-          {/* Album Highest Stats */}
-          <div className='w-full lg:w-[800px] mx-auto flex flex-col'>
-            <p className="mx-auto text-xl underline mb-2">
-              Highest Album: {dateToString(albumLowHighStatsJson['highest_album']['date'])}
-            </p>
-            <div className="mx-auto">
-              <AlbumDisplay
-                title={albumLowHighStatsJson['highest_album']["title"]}
-                album_mbid={albumLowHighStatsJson['highest_album']["mbid"]}
-                album_img_src={albumLowHighStatsJson['highest_album']["cover_url"]}
-                album_src={albumLowHighStatsJson['highest_album']["album_url"]}
-                artist={{"name": albumLowHighStatsJson['highest_album']["artist"], "href": albumLowHighStatsJson['highest_album']["artist_url"]}}
-                submitter={albumLowHighStatsJson['highest_album']["submitter_id"]}
-                submitter_comment={albumLowHighStatsJson['highest_album']["user_comment"]}
-                submission_date={albumLowHighStatsJson['highest_album']["submission_date"]}
-                historical_date={albumLowHighStatsJson['highest_album']['date']}
-                // sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
-                showAlbumRating={true}
-                // starTextOverride="text-3xl"
-                showCalLink={true}
-              />
+          {(empty_month) ? (
+            <div className='w-full lg:w-[800px] mx-auto flex flex-col'>
+              <p>Highest and lowest album data unavailable for this month</p>
             </div>
-            <Divider className="my-1" />
-            {/* Album Lowest Stats */}
-            <p className="mx-auto text-xl underline mb-2">
-              Lowest Album: {dateToString(albumLowHighStatsJson['lowest_album']['date'])}
-            </p>
-            <div className="mx-auto">
-              <AlbumDisplay
-                title={albumLowHighStatsJson['lowest_album']["title"]}
-                album_mbid={albumLowHighStatsJson['lowest_album']["mbid"]}
-                album_img_src={albumLowHighStatsJson['lowest_album']["cover_url"]}
-                album_src={albumLowHighStatsJson['lowest_album']["album_url"]}
-                artist={{"name": albumLowHighStatsJson['lowest_album']["artist"], "href": albumLowHighStatsJson['lowest_album']["artist_url"]}}
-                submitter={albumLowHighStatsJson['lowest_album']["submitter_id"]}
-                submitter_comment={albumLowHighStatsJson['lowest_album']["user_comment"]}
-                submission_date={albumLowHighStatsJson['lowest_album']["submission_date"]}
-                historical_date={albumLowHighStatsJson['lowest_album']['date']}
-                // sizingOverride="h-full w-full lg:h-[300px] lg:w-[300px]"
-                showAlbumRating={true}
-                // starTextOverride="text-3xl"
-                showCalLink={true}
-              />
+          ):(
+            <div className='w-full lg:w-[800px] mx-auto flex flex-col'>
+              {/* Album Highest Stats */}
+              <p className="font-extralight w-full text-center text-xl">
+                {single_album ? `Only Album of ${monthToName(month)} ${year}` : `${monthToName(month)} ${year}'s Highest`}: {dateToString(highest_date)}
+              </p>
+              <Divider className="mb-2" />
+              <div className="mx-auto">
+                <AlbumDisplay
+                  title={highest_album["title"]}
+                  album_mbid={highest_album["mbid"]}
+                  album_img_src={highest_album["cover_url"]}
+                  album_src={highest_album["album_url"]}
+                  artist={highest_album["artist"]}
+                  submitter={highest_album["submitter_id"]}
+                  submitter_comment={highest_album["user_comment"]}
+                  submission_date={highest_album["submission_date"]}
+                  historical_date={highest_album['date']}
+                  showAlbumRating={true}
+                  showCalLink={true}
+                />
+              </div>
+              {!single_album && (
+                <>
+                  <Divider className="my-2" />
+                  {/* Album Lowest Stats */}
+                  <p className="font-extralight w-full text-center text-xl">
+                    {monthToName(month)} {year}&apos;s Lowest: {dateToString(lowest_date)}
+                  </p>
+                  <Divider className="mb-2" />
+                  <div className="mx-auto">
+                    <AlbumDisplay
+                      title={lowest_album["title"]}
+                      album_mbid={lowest_album["mbid"]}
+                      album_img_src={lowest_album["cover_url"]}
+                      album_src={lowest_album["album_url"]}
+                      artist={lowest_album["artist"]}
+                      submitter={lowest_album["submitter_id"]}
+                      submitter_comment={lowest_album["user_comment"]}
+                      submission_date={lowest_album["submission_date"]}
+                      historical_date={lowest_album['date']}
+                      showAlbumRating={true}
+                      showCalLink={true}
+                    />
+                  </div>
+                </>
+              )}
             </div>
-          </div>
+          )}
           <div className="lg:w-[650px] mx-auto px-2 py-2 mt-2 text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
             <p>In order to be considered for highest or lowest album, an album must have 4 or more reviews. Any album with 3 or less reviews will not be counted.</p>
           </div>
