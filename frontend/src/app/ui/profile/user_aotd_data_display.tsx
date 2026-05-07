@@ -2,7 +2,6 @@ import { getAllUserReviews, getAotdData, getUserAlbumsStats, getUserReviewStats 
 import MinimalAlbumDisplay from "../dashboard/aotd/minimal_album_display";
 import StarRating from "../general/star_rating";
 import { boolToEmoji, ratingToTailwindBgColor } from "@/app/lib/utils";
-import ReviewScoreCountBarChart from "../general/charts/review_score_bar_chart";
 import ReviewCountChartBox from "./review_count_chart_box";
 
 // Display user favorite and least favorite albums

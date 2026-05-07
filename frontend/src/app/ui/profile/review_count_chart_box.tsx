@@ -1,6 +1,7 @@
 import { Tooltip } from "@heroui/tooltip"
 import ClientTimestamp from "../general/client_timestamp"
 import { ratingToHexColor } from "@/app/lib/utils"
+import ReviewScoreCountBarChart from "../general/charts/review_score_bar_chart"
 
 // Box display review stats and reviews in a dynmic chart list combo
 // Expected Props:
@@ -56,6 +57,11 @@ export default function ReviewCountChartBox(props) {
 
   return (
     <>
+      <div className="h-80 w-3/4 mt-1 ml-5">
+        <ReviewScoreCountBarChart
+          data={reviewStats['score_counts']}
+        />
+      </div>
       <div className="mx-2 sm:mx-10 my-6 flex flex-col gap-2">
         <p className="text-sm font-semibold uppercase tracking-widest text-neutral-400 mb-1">Rating Breakdown</p>
         {reviewStats['score_counts'].map((countObj, index) => {
