@@ -2,12 +2,14 @@ import { Divider } from "@heroui/divider";
 import { Tooltip } from "@heroui/tooltip";
 
 import UserCard from "@/app/ui/general/userUiItems/user_card";
-import { getAlbumOfTheDayData, getAlbumsStats, getAllUserReviewStats, getAOtDByMonth, getChanceOfAotdSelect, getLowestHighestAlbumStats } from "@/app/lib/aotd_utils";
+import { getAlbumOfTheDayData, getAlbumsStats, getAllUserReviewStats, getAOtDByMonth, getChanceOfAotdSelect, getLowestHighestAlbumStats, getTagsForAlbum } from "@/app/lib/aotd_utils";
 
 import { dateToString, monthToName } from "@/app/lib/utils";
 import ReviewStatsUserCard from "./review_stats_user_card";
 import CreateOutageModal from "../modals/create_outage_modal";
 import AlbumDisplay from "../album_display";
+import AlbumTagsDisplay from "../album_tags";
+import { getUserData, isUserAdmin } from "@/app/lib/user_utils";
 
 // GUI Display for an Album
 // Expected Props:
@@ -19,7 +21,10 @@ export default async function MusicStatsBox(props) {
   const year = props.year
   const month = props.month
   const day = props.day
+  const aotd_participant = props.aotd_participant
   // Make backend requests
+  const isAdmin = await isUserAdmin()
+  const user_data = await getUserData()
   const albumStatsJson = await getAlbumsStats();
   const albumLowHighStatsJson = await getAOtDByMonth(year, month);
   const userReviewStatsJson = await getAllUserReviewStats();
@@ -29,7 +34,9 @@ export default async function MusicStatsBox(props) {
   const lowest_date = albumLowHighStatsJson['stats']?.['lowest_aotd_date']
   const single_album = !empty_month && (highest_date === lowest_date)
   const highest_album: Object = (empty_month) ? {"date": "2000-01-01"} : (await getAlbumOfTheDayData(highest_date))
+  const highest_album_tags = (empty_month) ? [] : await getTagsForAlbum(highest_album["mbid"]);
   const lowest_album: Object = (single_album || empty_month) ? {"date": "2000-01-01"} : (await getAlbumOfTheDayData(lowest_date))
+  const lowest_album_tags = (empty_month) ? [] : await getTagsForAlbum(lowest_album["mbid"]);
 
 
   const albumUserStatsTable = albumStatsJson['user_objs'].sort((a, b) => a['selection_chance'] < b['selection_chance'] ? 1 : -1).map((user, index) => {
@@ -113,7 +120,7 @@ export default async function MusicStatsBox(props) {
                 {single_album ? `Only Album of ${monthToName(month)} ${year}` : `${monthToName(month)} ${year}'s Highest`}: {dateToString(highest_date)}
               </p>
               <Divider className="mb-2" />
-              <div className="mx-auto">
+              <div className="mr-auto">
                 <AlbumDisplay
                   title={highest_album["title"]}
                   album_mbid={highest_album["mbid"]}
@@ -123,10 +130,20 @@ export default async function MusicStatsBox(props) {
                   submitter={highest_album["submitter_id"]}
                   submitter_comment={highest_album["user_comment"]}
                   submission_date={highest_album["submission_date"]}
-                  historical_date={highest_album['date']}
+                  historical_date={highest_date}
                   showAlbumRating={true}
                   showCalLink={true}
                 />
+                <div className="w-full max-w-full">
+                  <AlbumTagsDisplay
+                    mbid={highest_album["mbid"]}
+                    initialTags={highest_album_tags}
+                    isEnrolled={aotd_participant}
+                    isAdmin={isAdmin}
+                    currentUserId={user_data["discord_id"]}
+                    readOnly={true}
+                  />
+                </div>
               </div>
               {!single_album && (
                 <>
@@ -136,7 +153,7 @@ export default async function MusicStatsBox(props) {
                     {monthToName(month)} {year}&apos;s Lowest: {dateToString(lowest_date)}
                   </p>
                   <Divider className="mb-2" />
-                  <div className="mx-auto">
+                  <div className="mr-auto">
                     <AlbumDisplay
                       title={lowest_album["title"]}
                       album_mbid={lowest_album["mbid"]}
@@ -146,10 +163,20 @@ export default async function MusicStatsBox(props) {
                       submitter={lowest_album["submitter_id"]}
                       submitter_comment={lowest_album["user_comment"]}
                       submission_date={lowest_album["submission_date"]}
-                      historical_date={lowest_album['date']}
+                      historical_date={lowest_date}
                       showAlbumRating={true}
                       showCalLink={true}
                     />
+                    <div className="w-full max-w-full">
+                      <AlbumTagsDisplay
+                        mbid={lowest_album["mbid"]}
+                        initialTags={lowest_album_tags}
+                        isEnrolled={aotd_participant}
+                        isAdmin={isAdmin}
+                        currentUserId={user_data["discord_id"]}
+                        readOnly={true}
+                      />
+                    </div>
                   </div>
                 </>
               )}

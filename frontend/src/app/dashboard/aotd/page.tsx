@@ -88,6 +88,7 @@ export default async function music() {
             year={today_arr[0]}
             month={today_arr[1]}
             day={today_arr[2]}
+            aotd_participant={aotd_participant}
           />
         </div>
       </Conditional>
