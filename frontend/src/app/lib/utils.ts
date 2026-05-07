@@ -149,33 +149,45 @@ export function convertToLocalTZString(date: Date, full: boolean = false) {
   return `${splitString[0]} ${splitString[1]} ${splitString[2]}` + ((full) ? ` ${hours}:${padNumber(adjustedDate.getMinutes())}:${padNumber(adjustedDate.getSeconds())} ${suffix}` : "")
 }
 
+// Convert a rating to its hex color value
+export function ratingToHexColor(rating: number): string {
+  rating = Math.max(0.0, Math.min(10.0, rating));
+  switch(Math.floor(rating)) {
+    case 10: return "#55ff00";
+    case 9:  return "#83ee00";
+    case 8:  return "#a4db00";
+    case 7:  return "#bac800";
+    case 6:  return "#cdb400";
+    case 5:  return "#dc9e00";
+    case 4:  return "#ea8600";
+    case 3:  return "#f66900";
+    case 2:  return "#fc4700";
+    case 1:  return "#de1111";
+    default: return "#ff0000";
+  }
+}
+
 // Convert a rating to a string representing tailwind color
 export function ratingToTailwindBgColor(rating: number) {
   // Normalize rating
   rating = Math.max(0.0, rating);
   rating = Math.min(10.00, rating);
-  if(rating >= 9.99)
-    return "bg-[#55ff00]"
-  if(rating >= 9.0)
-    return "bg-[#83ee00]"
-  if(rating >= 8.0)
-    return "bg-[#a4db00]"
-  if(rating >= 7.0)
-    return "bg-[#bac800]"
-  if(rating >= 6.0)
-    return "bg-[#cdb400]"
-  if(rating >= 5.0)
-    return "bg-[#dc9e00]"
-  if(rating >= 4.0)
-    return "bg-[#ea8600]"
-  if(rating >= 3.0)
-    return "bg-[#f66900]"
-  if(rating >= 2.0)
-    return "bg-[#fc4700]"
-  if(rating >= 1.0)
-    return "bg-[#de1111]"
-  if(rating >= 0.0)
-    return "bg-[#ff0000]"
+  let tailwind = ""
+  switch(Math.floor(rating)) {
+    case 10: tailwind = "bg-[#55ff00]"; break;
+    case 9:  tailwind = "bg-[#83ee00]"; break;
+    case 8:  tailwind = "bg-[#a4db00]"; break;
+    case 7:  tailwind = "bg-[#bac800]"; break;
+    case 6:  tailwind = "bg-[#cdb400]"; break;
+    case 5:  tailwind = "bg-[#dc9e00]"; break;
+    case 4:  tailwind = "bg-[#ea8600]"; break;
+    case 3:  tailwind = "bg-[#f66900]"; break;
+    case 2:  tailwind = "bg-[#fc4700]"; break;
+    case 1:  tailwind = "bg-[#de1111]"; break;
+    default: tailwind = "bg-[#ff0000]";
+  }
+  // Return with opacity override
+  return tailwind
 }
 
 // Convert a rating to a string representing tailwind color

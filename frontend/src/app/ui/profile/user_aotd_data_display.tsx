@@ -44,7 +44,7 @@ export default async function UserAotdDataDisplay(props) {
             <p className="w-fit mx-auto underline text-large">
               Album Stats
             </p>
-            <div className="flex justify-around">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <div className="flex flex-col text-center">
                 <p>Albums Submitted: </p>
                 <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">
@@ -63,8 +63,6 @@ export default async function UserAotdDataDisplay(props) {
                   {userAlbumStats['unpicked_count']}
                 </p>
               </div>
-            </div>
-            <div className="flex justify-around">
               <div className="flex flex-col text-center">
                 <p>Last AOTD Date: </p>
                 <p className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg">

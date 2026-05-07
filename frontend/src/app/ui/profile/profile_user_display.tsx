@@ -14,7 +14,7 @@ export default function ProfileUserDisplay(props) {
 
   return(
     <div className="w-full mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-      <div className="group flex-shrink-0">
+      <div className="group relative flex-shrink-0">
         <img 
           src={userData['avatar_url']}
           className='h-[125px] w-[125px] lg:h-[200px] lg:w-[200px] rounded-2xl mx-auto'

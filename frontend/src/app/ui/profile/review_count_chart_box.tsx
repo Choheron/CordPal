@@ -1,10 +1,6 @@
-"use client"
-
 import { Tooltip } from "@heroui/tooltip"
-
-import { useState } from "react"
-import ReviewScoreCountBarChart from "../general/charts/review_score_bar_chart"
 import ClientTimestamp from "../general/client_timestamp"
+import { ratingToHexColor } from "@/app/lib/utils"
 
 // Box display review stats and reviews in a dynmic chart list combo
 // Expected Props:
@@ -15,17 +11,15 @@ export default function ReviewCountChartBox(props) {
   const reviewStats = props.reviewStats
   const reviewList = props.reviewsObj['reviews']
   const reviewListTimestamp = props.reviewsObj['metadata']['timestamp']
-  // States for display management
-  const [score, setScore] = useState(5);
 
-  const displayReviews = () => {
-    return reviewList.filter((rev) => (rev.score==score)).sort((a,b) => ((a['review_date'] < b['review_date']) ? 1 : -1)).map((review, index) => {
+   const displayReviews = (man_score) => {
+    return reviewList.filter((rev) => (rev.score==man_score)).sort((a,b) => ((a['review_date'] < b['review_date']) ? 1 : -1)).map((review, index) => {
       const album = review['album']
 
       return (
         <div 
-          className="flex h-[135px] w-[135px] m-1"
-          key={index}  
+          className="flex h-[80px] w-[80px] m-1 flex-shrink-0 my-auto"
+          key={index}
         >
           <Tooltip 
             content={
@@ -44,7 +38,7 @@ export default function ReviewCountChartBox(props) {
           >
           <a 
             href={`/dashboard/aotd/review/${review['id']}`}
-            className="flex flex-col h-full w-full justify-center py-0 mx-1"
+            className="flex flex-col h-full w-full justify-center py-0"
           >
             <img 
               // src={album['cover_url']}
@@ -61,24 +55,27 @@ export default function ReviewCountChartBox(props) {
 
 
   return (
-    <div className="flex w-full h-fit">
-      <div className="h-80 -ml-5 w-1/2">
-        <ReviewScoreCountBarChart
-          data={reviewStats['score_counts']}
-          dataCallback={setScore}
-          defaultIndex={score*2}
-        />
+    <>
+      <div className="mx-2 sm:mx-10 my-6 flex flex-col gap-2">
+        <p className="text-sm font-semibold uppercase tracking-widest text-neutral-400 mb-1">Rating Breakdown</p>
+        {reviewStats['score_counts'].map((countObj, index) => {
+          const thisObj = reviewStats['score_counts'][reviewStats['score_counts'].length - (index+1)]
+          return (
+            <div key={index} className="flex items-center rounded-xl overflow-hidden bg-white/5 border border-white/5">
+              <p className="text-base sm:text-2xl font-bold w-10 sm:w-16 text-center flex-shrink-0" style={{ color: ratingToHexColor(thisObj['score']) }}>
+                {thisObj['score']}
+              </p>
+              <p className="text-xs text-center text-neutral-400 w-10 sm:w-20 flex-shrink-0">{thisObj['count']} album{thisObj['count'] !== 1 ? 's' : ''}</p>
+              <div
+                className="overflow-x-auto flex items-center h-[96px] rounded-xl py-1 w-0 flex-1 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20"
+                style={{ backgroundColor: ratingToHexColor(thisObj['score']) + '1A' }}
+              >
+                {displayReviews(thisObj['score'])}
+              </div>
+            </div>
+          )
+        })}
       </div>
-      <div className="w-2/3 rounded-2xl bg-black/30 border border-neutral-800 -pb-10">
-        <p className="w-full text-center rounded-tl-2xl rounded-tr-2xl bg-black/50">
-          Reviews with a Score of: {score}
-        </p>
-        <div className="relative h-[92%] bg-black/90 rounded-b-2xl">
-          <div className="absolute flex flex-wrap justify-around max-w-full max-h-full overflow-auto scrollbar-hide mx-2">
-            {displayReviews()}
-          </div>
-        </div>
-      </div>
-    </div>
+    </>
   )
 }
