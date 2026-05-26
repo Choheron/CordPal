@@ -29,6 +29,7 @@ export default function UploadPhotoModal(props) {
   const [fileName, setFileName] = React.useState("")
   const [fileType, setFileType] = React.useState("")
   const [uploading, setUploading] = React.useState(false)
+  const [previewURL, setPreviewURL] = React.useState<string | null>(null); // Photo Local URL for preview
 
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const router = useRouter();
@@ -90,6 +91,11 @@ export default function UploadPhotoModal(props) {
     setFileName("")
     setFileType("")
     setUploading(false)
+    // Clear file preview
+    if(previewURL) {
+      URL.revokeObjectURL(previewURL)
+    }
+    setPreviewURL(null)
 
     onClose()
     // Reload page
@@ -103,10 +109,15 @@ export default function UploadPhotoModal(props) {
       setFileChosen(true)
       setFileName(fileRef.current.files![0].name)
       setFileType(fileRef.current.files![0].type)
+      if(previewURL) {
+        URL.revokeObjectURL(previewURL)
+      }
+      setPreviewURL(URL.createObjectURL(fileRef.current.files![0]))
     } else {
       setFileChosen(false)
       setFileName("")
       setFileType("")
+      setPreviewURL(null)
     }
   }
 
@@ -158,6 +169,12 @@ export default function UploadPhotoModal(props) {
                   setSelectionCallback={setCreator} 
                 />
                 <input type="file" id="imagefile" name="file" accept="image/*" onChange={checkFileData} ref={fileRef} required />
+                {previewURL && (
+                  <img 
+                    src={previewURL}
+                    alt="Image Uploaded by User"
+                  />
+                )}
               </div>
               </ModalBody>
               <ModalFooter>
