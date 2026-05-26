@@ -63,7 +63,7 @@ def isDiscordTokenExpired(request: HttpRequest):
   # Get session Expiry time
   tokenExpireTime = tokenData.expiry_date
   # Check if request session's discord token is out of date
-  if(curTime > tokenExpireTime):
+  if((tokenExpireTime is not None) and (curTime > tokenExpireTime)):
     logger.info("Token IS expired...", extra={'crid': request.crid})
     return True
   # Return false if not expired

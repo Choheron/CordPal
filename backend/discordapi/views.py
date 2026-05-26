@@ -169,8 +169,17 @@ def validateServerMember(request: HttpRequest):
     response = HttpResponse("/", status=302)
     response.delete_cookie("sessionid")
     return response
+  ### EMERGENCY OVERRIDE CODE
+  # # TODO: EMERGENCY FIX TO RESTORE ACCESS THIS ALLOWS ANYONE IN
+  # out = {}
+  # out['member'] = True
+  # out['role'] = True
+  # # Return response
+  # response = JsonResponse(out)
+  # return response
+  ### END EMERGENCY OVERRIDE 
   # Check if member status already exists in session store
-  if(("server_member" in request.session) and (datetime.strptime(request.session.get("server_member_expiry"), cookie_time_fmt) > datetime.now())):
+  if(("server_member" in request.session) and (request.session.get("server_member_expiry") != None) and (datetime.strptime(request.session.get("server_member_expiry"), cookie_time_fmt) > datetime.now()) ):
     status = request.session.get("server_member")
     logger.debug(f"Session has cached membership value of: {status}", extra={'crid': request.crid})
     member = status
