@@ -123,9 +123,9 @@ export default async function MusicStatsBox(props) {
               <div className="mr-auto">
                 <AlbumDisplay
                   title={highest_album["title"]}
-                  album_mbid={highest_album["mbid"]}
+                  album_mbid={highest_album["album_id"]}
                   album_img_src={highest_album["cover_url"]}
-                  album_src={highest_album["album_url"]}
+                  album_src={highest_album["album_src"]}
                   artist={highest_album["artist"]}
                   submitter={highest_album["submitter_id"]}
                   submitter_comment={highest_album["user_comment"]}
@@ -136,7 +136,7 @@ export default async function MusicStatsBox(props) {
                 />
                 <div className="w-full max-w-full">
                   <AlbumTagsDisplay
-                    mbid={highest_album["mbid"]}
+                    mbid={highest_album["album_id"]}
                     initialTags={highest_album_tags}
                     isEnrolled={aotd_participant}
                     isAdmin={isAdmin}
@@ -156,9 +156,9 @@ export default async function MusicStatsBox(props) {
                   <div className="mr-auto">
                     <AlbumDisplay
                       title={lowest_album["title"]}
-                      album_mbid={lowest_album["mbid"]}
+                      album_mbid={lowest_album["album_id"]}
                       album_img_src={lowest_album["cover_url"]}
-                      album_src={lowest_album["album_url"]}
+                      album_src={lowest_album["album_src"]}
                       artist={lowest_album["artist"]}
                       submitter={lowest_album["submitter_id"]}
                       submitter_comment={lowest_album["user_comment"]}
@@ -169,7 +169,7 @@ export default async function MusicStatsBox(props) {
                     />
                     <div className="w-full max-w-full">
                       <AlbumTagsDisplay
-                        mbid={lowest_album["mbid"]}
+                        mbid={lowest_album["album_id"]}
                         initialTags={lowest_album_tags}
                         isEnrolled={aotd_participant}
                         isAdmin={isAdmin}
