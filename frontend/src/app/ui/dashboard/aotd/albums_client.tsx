@@ -13,6 +13,7 @@ import { Button } from "@heroui/button";
 import { Spinner } from "@heroui/spinner";
 import { Input } from "@heroui/input";
 import { Checkbox } from "@heroui/checkbox";
+import { Pagination } from "@heroui/pagination";
 
 import React from "react";
 import { useRouter } from 'next/navigation';
@@ -84,6 +85,8 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
   const [submitterFilter, setSubmitterFilter] = React.useState(new Set([]))
   const [aotdFilter, setAotdFilter] = React.useState(false)
   const [isPending, startTransition] = React.useTransition()
+  const [page, setPage] = React.useState(1)
+  const rowsPerPage = 50
   const router = useRouter()
 
   const displayedAlbumList = React.useMemo(() => {
@@ -94,6 +97,14 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     if (aotdFilter) list = list.filter(a => a['last_aotd'] != null && a['rating'] != null)
     return sortAlbumList(list, sortDescriptor)
   }, [albums, titleFilter, artistFilter, submitterFilter, aotdFilter, sortDescriptor])
+
+  React.useEffect(() => { setPage(1) }, [titleFilter, artistFilter, submitterFilter, aotdFilter, sortDescriptor])
+
+  const totalPages = Math.max(1, Math.ceil(displayedAlbumList.length / rowsPerPage))
+  const paginatedAlbumList = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage
+    return displayedAlbumList.slice(start, start + rowsPerPage)
+  }, [displayedAlbumList, page, rowsPerPage])
 
   const handleSortChange = (descriptor) => setSortDescriptor(descriptor)
 
@@ -220,10 +231,10 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
               <Spinner />
               <p>Loading...</p>
             </div>
-          ) : displayedAlbumList.length === 0 ? (
+          ) : paginatedAlbumList.length === 0 ? (
             <p className="text-center py-8">No Data Available...</p>
           ) : (
-            displayedAlbumList.map((album: any) => (
+            paginatedAlbumList.map((album: any) => (
               <Link key={album['album_id']} href={`/dashboard/aotd/album/${album['album_id']}`} prefetch={false}>
                 <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-800/30 border border-neutral-800 active:bg-zinc-700/30">
                   <Avatar src={`/dashboard/aotd/api/album-cover/${album['album_id']}`} radius="sm" className="shrink-0 size-14" />
@@ -267,7 +278,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
               }
             </TableHeader>
             <TableBody
-              items={displayedAlbumList}
+              items={paginatedAlbumList}
               emptyContent={
                 isPending ?
                   <div><Spinner /><p>Loading...</p></div>
@@ -283,6 +294,11 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
             </TableBody>
           </Table>
         </div>
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-4 pb-4">
+            <Pagination total={totalPages} page={page} onChange={setPage} color="primary" />
+          </div>
+        )}
       </div>
     </>
   )
