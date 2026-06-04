@@ -34,7 +34,7 @@ export default function AddAlbumModal(props) {
   const [commentValue, setCommentValue] = React.useState("");
   const [isHidden, setIsHidden] = React.useState(false);
   const [selectedAlbum, setSelectedAlbum] = React.useState(null);
-  const [albumError, setAlbumError] = React.useState(false)
+  const [albumError, setAlbumError] = React.useState<Boolean | null>(null)
   const [albumErrorData, setAlbumErrorData] = React.useState({})
   // Search Dynamic Values
   const [searchTitle, setSearchTitle] = React.useState("");
@@ -115,7 +115,7 @@ export default function AddAlbumModal(props) {
   React.useEffect(() => {
     if(searchAlbumsResponse['releases']) {
       setSelectedAlbum(null)
-      setAlbumError(false)
+      setAlbumError(null)
       for(let i = 0; i < searchAlbumsResponse['releases'].length; i++) {
         if(!(searchAlbumsResponse['releases'][i])) {
           break;
@@ -137,13 +137,12 @@ export default function AddAlbumModal(props) {
       setAlbumErrorData(albumErrData)
       setAlbumError(albumErrData['exists'])
     }
-
     console.log(selectedAlbum)
     checkIfAlbumAlreadySubmitted()
   }, [selectedAlbum])
 
 
-  // Send request to upload the submitted image
+  // Send request to upload the submitted album
   const submitPress = async () => {
     // Create payload to send data to backend
     let albumData = {}
@@ -185,7 +184,7 @@ export default function AddAlbumModal(props) {
     setSelectedKey(new Set([]))
     setIsSearchLoading(false)
     setSearchAlbumsResponse({})
-    setAlbumError(false)
+    setAlbumError(null)
     setIsHidden(false)
     
     onClose()
@@ -381,18 +380,28 @@ export default function AddAlbumModal(props) {
               </DrawerBody>
               <DrawerFooter className="block w-full">
                 <div className="flex flex-col">
-                  <Conditional showWhen={albumError}>
-                    <div className="text-red-500 text-small my-auto">
-                      <p className="underline mx-auto">Album has already been submitted!</p>
+                  <Conditional showWhen={albumError == true}>
+                    <div className="w-fit rounded-t-2xl p-1 bg-zinc-800/30 border border-neutral-600">
+                      <p>{`You are ${(albumErrorData['valid_submission']) ? "ABLE" : "UNABLE"} to submit this album`}</p>
+                    </div>
+                    <div className="text-red-500 text-small my-auto rounded-b-2xl rounded-tr-2xl p-3 mb-2 bg-zinc-800/30 border border-neutral-600">
+                      <p className="mx-auto">Album has already been submitted!</p>
                       <div className="flex w-full">
                         <p className="my-auto">Submitted by:</p>
                         <Link 
                           isBlock 
                           href={`/profile/${albumErrorData['submitter_id']}`}
+                          className="text-sm"
                         >
                           {albumErrorData['submitter_nickname']}
                         </Link>
                       </div>
+                      {/* Tell user if they can rescue this album even though it has been submitted */}
+                      {(albumErrorData['valid_submission']) && (
+                        <div className="text-yellow-700">
+                          <p>However, you can rescue this album from this user as they are not active and it has not been AOTD.</p>
+                        </div>
+                      )}
                     </div>
                   </Conditional>
                 </div>
@@ -409,7 +418,7 @@ export default function AddAlbumModal(props) {
                   </Button>
                   <Button 
                     color="primary" 
-                    isDisabled={!((selectedAlbum) && (albumList) && (!albumError))}
+                    isDisabled={(albumError == null) || !((selectedAlbum != null) && (albumList) && ((!albumError) || (albumError && albumErrorData['valid_submission'])))}
                     onPress={submitPress}
                   >
                     Submit Album

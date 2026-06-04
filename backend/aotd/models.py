@@ -68,9 +68,9 @@ class AotdUserData(models.Model):
   total_selected = models.IntegerField(default=None, null=True)
   selection_score_sum = models.FloatField(default=0)
   average_selection_score = models.FloatField(default=0)
-  # Active flag, use to initiate the "yard sale" mechanic
+  # Active flag, use to initiate the "yard sale"/inactivity mechanic
   active = models.BooleanField(default=True)
-  # User Settings (NOTE: Possibly moved to another model if settings grow)
+  # User Settings (NOTE: Possibly move to another model if settings grow)
   hide_scores_prereview = models.BooleanField(default=False) # Hide reviews for an album if the user has not reviewed yet
   hide_tags_prereview = models.BooleanField(default=False) # Hide tags for an album if the user has not reviewed yet
 

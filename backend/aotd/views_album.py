@@ -129,6 +129,13 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, release_group_id: str):
     out['exists'] = True
     out['submitter_id'] = albumObject.submitted_by.discord_id
     out['submitter_nickname'] = albumObject.submitted_by.nickname
+    out['submitter_active'] = albumObject.submitted_by.aotd_data.active # Determine if the user who submitted this album is active
+    out['has_been_aotd'] = (DailyAlbum.objects.filter(album=albumObject).count() > 0) # Determine if the album attempting to be submitted as been AOTD before
+    if(out['has_been_aotd']):
+      # Get current timestamp 
+      now = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
+      out['last_aotd_date'] = DailyAlbum.objects.filter(album=albumObject, date__lte=now).order_by('-date')[0].date
+    out['valid_submission'] = (not out['submitter_active']) and (not out['has_been_aotd']) # If this is a valid submission despite existing already (This is an inactive user or "yard sale" situation)
   except ObjectDoesNotExist as e:
     out['exists'] = False
   # Return aotd Response
@@ -149,9 +156,12 @@ def submitAlbum(request: HttpRequest):
   reqBody = json.loads(request.body)
   # Ensure that album doesnt already exist in the pool
   try:
-    albumObject = Album.objects.get(mbid = reqBody['album']['id'])
+    kwargs = {'raw_data__release-group__id': reqBody['album']['release-group']['id']}
+    albumObject = Album.objects.get(**kwargs)
     if(albumObject):
-      logger.info(f"Album already exists, name: {albumObject.title}!", extra={'crid': request.crid})
+      logger.info(f"Album with release group already exists, name: {albumObject.title}!", extra={'crid': request.crid})
+      # Check if current owner of this album is active
+      current_submitter_active = albumObject.submitted_by.aotd_data.active
     return HttpResponse(status=400)
   except ObjectDoesNotExist as e:
     # Get user from database
@@ -335,7 +345,7 @@ def getAllAlbums(request: HttpRequest):
 
   now = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
 
-  # Single DISTINCT ON query: latest DailyAlbum per album — replaces 3 correlated subqueries
+  # Single DISTINCT ON query: latest DailyAlbum per album — replaced 3 correlated subqueries
   latest_daily = {
     d['album_id']: d
     for d in DailyAlbum.objects
