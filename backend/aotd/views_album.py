@@ -134,7 +134,7 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, release_group_id: str):
     if(out['has_been_aotd']):
       # Get current timestamp 
       now = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
-      out['last_aotd_date'] = DailyAlbum.objects.filter(album=albumObject, date__lte=now).order_by('-date')[0].date
+      out['last_aotd_date'] = DailyAlbum.objects.filter(album=albumObject, date__lte=now).order_by('-date')[0].date # Get last AOTD date
     out['valid_submission'] = (not out['submitter_active']) and (not out['has_been_aotd']) # If this is a valid submission despite existing already (This is an inactive user or "yard sale" situation)
   except ObjectDoesNotExist as e:
     out['exists'] = False
