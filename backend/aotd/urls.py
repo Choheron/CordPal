@@ -34,6 +34,7 @@ urlpatterns = [
   ## ============================================================================================================
   path('checkIfAlbumAlreadyExists/<str:release_group_id>', views_album.checkIfAlbumAlreadyExists),
   path('submitAlbum', views_album.submitAlbum),
+  path('rescueAlbum', views_album.rescueAlbum),
   path('deleteAlbum', views_album.deleteAlbum),
   path('replaceAlbum/<str:album_pk>/<str:new_mbid>', views_album.replaceAlbum),
   path('getAlbum/<str:mbid>', views_album.getAlbum),

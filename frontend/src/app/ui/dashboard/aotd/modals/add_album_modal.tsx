@@ -16,7 +16,7 @@ import { Textarea } from "@heroui/input";
 import React from "react";
 import { useRouter } from 'next/navigation';
 import { Listbox,  ListboxItem} from "@heroui/listbox";
-import { checkIfAlbumAlreadyExists, checkIfUserCanSubmit, musicBrainzAlbumSearch, submitAlbumToBackend } from "@/app/lib/aotd_utils";
+import { checkIfAlbumAlreadyExists, checkIfUserCanSubmit, musicBrainzAlbumSearch, rescueAlbumFromBackend, submitAlbumToBackend } from "@/app/lib/aotd_utils";
 import { Conditional } from "../../conditional";
 import InfoPopover from "@/app/ui/general/info_popover";
 import {Image} from "@heroui/image";
@@ -42,6 +42,7 @@ export default function AddAlbumModal(props) {
   const [searchMBID, setSearchMBID] = React.useState("");
   const [isSearchLoading, setIsSearchLoading] = React.useState(false);
   const [searchAlbumsResponse, setSearchAlbumsResponse] = React.useState({});
+  const [submitLoading, setSubmitLoading] = React.useState(false);
   // Mapped data to album cards
   const [albumList, setAlbumList] = React.useState([]);
   // Listbox Selection Settings
@@ -144,24 +145,30 @@ export default function AddAlbumModal(props) {
 
   // Send request to upload the submitted album
   const submitPress = async () => {
+    // Set submit loading
+    setSubmitLoading(true)
     // Create payload to send data to backend
     let albumData = {}
     albumData['user_comment'] = commentValue
     albumData['album'] = selectedAlbum
     albumData['album']['hidden'] = isHidden
-    // Call backend to submit album
-    const responseObj = await submitAlbumToBackend(albumData)
+    // Call backend to submit or rescue album
+    const isRescue = albumError && albumErrorData['valid_submission']
+    const action = (isRescue) ? "rescue" : "submission"
+    const responseObj = isRescue
+      ? await rescueAlbumFromBackend(albumData)
+      : await submitAlbumToBackend(albumData)
     // Alert user of action status
     if((responseObj['status'] == 200) && (selectedAlbum != null)) {
       addToast({
-        title: `Successfully submitted "${selectedAlbum['title']}"!`,
-        description: `${selectedAlbum['title']} has been added to the Album of the Day Selecton Pool!`,
+        title: `Successful ${action} of "${selectedAlbum['title']}"!`,
+        description: `${action.charAt(0).toUpperCase() + action.slice(1)} of ${selectedAlbum['title']} was a success!`,
         color: "success",
       })
     } else {
       addToast({
         title: `Failed to submit album!`,
-        description: `Album failiure submitted with the following error code: ${responseObj['status']}. Please contact server administrators with CRID: ${responseObj['crid']}.`,
+        description: `Album ${action} failed with the following error code: ${responseObj['status']}. Associated Error Message: ${responseObj['err_message']}. Please contact server administrators with CRID: ${responseObj['crid']}.`,
         color: "danger",
       })
     }
@@ -186,6 +193,7 @@ export default function AddAlbumModal(props) {
     setSearchAlbumsResponse({})
     setAlbumError(null)
     setIsHidden(false)
+    setSubmitLoading(false)
     
     onClose()
   }
@@ -201,7 +209,7 @@ export default function AddAlbumModal(props) {
             onPress={onOpen}
             radius="none"
             variant="solid"
-            isDisabled={!userAllowedToSubmit}
+            // isDisabled={!userAllowedToSubmit}
           >
             <b>Submit An Album</b>
           </Button>
@@ -378,51 +386,52 @@ export default function AddAlbumModal(props) {
                 />
               </div>
               </DrawerBody>
-              <DrawerFooter className="block w-full">
-                <div className="flex flex-col">
-                  <Conditional showWhen={albumError == true}>
-                    <div className="w-fit rounded-t-2xl p-1 bg-zinc-800/30 border border-neutral-600">
-                      <p>{`You are ${(albumErrorData['valid_submission']) ? "ABLE" : "UNABLE"} to submit this album`}</p>
+              <DrawerFooter className="flex flex-col gap-3 w-full">
+                <Conditional showWhen={albumError == true}>
+                  <div className="rounded-2xl p-3 bg-zinc-800/30 border border-neutral-600 text-sm">
+                    <p className={`font-medium mb-1 ${albumErrorData['valid_submission'] ? 'text-yellow-500' : 'text-red-500'}`}>
+                      {albumErrorData['valid_submission'] ? 'Already submitted. However, you can rescue this album' : 'Album has already been submitted'}
+                    </p>
+                    <div className="flex items-center gap-1 text-red-400">
+                      <span>Submitted by:</span>
+                      <Link href={`/profile/${albumErrorData['submitter_id']}`} className="text-sm">
+                        {albumErrorData['submitter_nickname']}
+                      </Link>
                     </div>
-                    <div className="text-red-500 text-small my-auto rounded-b-2xl rounded-tr-2xl p-3 mb-2 bg-zinc-800/30 border border-neutral-600">
-                      <p className="mx-auto">Album has already been submitted!</p>
-                      <div className="flex w-full">
-                        <p className="my-auto">Submitted by:</p>
-                        <Link 
-                          isBlock 
-                          href={`/profile/${albumErrorData['submitter_id']}`}
-                          className="text-sm"
-                        >
-                          {albumErrorData['submitter_nickname']}
+                    {albumErrorData['has_been_aotd'] && (
+                      <div className="flex items-center gap-1 text-red-400">
+                        <span>Last AOTD:</span>
+                        <Link href={`/dashboard/aotd/calendar/${albumErrorData['last_aotd_date'].replaceAll("-", "/")}`} className="text-sm">
+                          {albumErrorData['last_aotd_date']}
                         </Link>
                       </div>
-                      {/* Tell user if they can rescue this album even though it has been submitted */}
-                      {(albumErrorData['valid_submission']) && (
-                        <div className="text-yellow-700">
-                          <p>However, you can rescue this album from this user as they are not active and it has not been AOTD.</p>
-                        </div>
-                      )}
-                    </div>
-                  </Conditional>
-                </div>
-                <div className="flex flex-row w-full justify-between">
+                    )}
+                    {albumErrorData['valid_submission'] && (
+                      <p className="text-xs text-yellow-600 mt-1">
+                        Submitter is inactive and this album hasn&apos;t been AOTD yet.
+                      </p>
+                    )}
+                  </div>
+                </Conditional>
+                <div className="flex w-full items-center">
                   <Conditional showWhen={isAdmin}>
-                    <div className="">
-                      <Checkbox isSelected={isHidden} onValueChange={setIsHidden}>
-                        Hide This Submission?
-                      </Checkbox>
-                    </div>
+                    <Checkbox isSelected={isHidden} onValueChange={setIsHidden}>
+                      Hide This Submission?
+                    </Checkbox>
                   </Conditional>
-                  <Button color="danger" variant="light" onPress={cancelPress}>
-                    Cancel
-                  </Button>
-                  <Button 
-                    color="primary" 
-                    isDisabled={(albumError == null) || !((selectedAlbum != null) && (albumList) && ((!albumError) || (albumError && albumErrorData['valid_submission'])))}
-                    onPress={submitPress}
-                  >
-                    Submit Album
-                  </Button>
+                  <div className="flex gap-2 ml-auto">
+                    <Button color="danger" variant="light" onPress={cancelPress}>
+                      Cancel
+                    </Button>
+                    <Button
+                      color="primary"
+                      isDisabled={(albumError == null) || !((selectedAlbum != null) && (albumList) && ((!albumError) || (albumError && albumErrorData['valid_submission'])))}
+                      onPress={submitPress}
+                      isLoading={submitLoading}
+                    >
+                      {`${(albumError) ? "Rescue": "Submit"} Album`}
+                    </Button>
+                  </div>
                 </div>
               </DrawerFooter>
             </>

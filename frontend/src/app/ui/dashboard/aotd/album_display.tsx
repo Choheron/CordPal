@@ -12,29 +12,31 @@ import { Button } from "@heroui/button";
 import { Tooltip } from "@heroui/tooltip";
 
 type AlbumDisplayProps = {
-  title: string;                                           // Title of the album
-  disambiguation?: string;                                 // Disambiguation of the album (e.g. "Standard Edition")
-  album_img_src: string;                                   // URL to access the album image [EXTERNAL]
-  album_src: string;                                       // URL for user to access the album [EXTERNAL]
+  title: string;                                            // Title of the album
+  disambiguation?: string;                                  // Disambiguation of the album (e.g. "Standard Edition")
+  album_img_src: string;                                    // URL to access the album image [EXTERNAL]
+  album_src: string;                                        // URL for user to access the album [EXTERNAL]
   artist: {
-    name: string;                                          // Name of the artist
-    href: string;                                          // URL to access the artist on external [EXTERNAL]
+    name: string;                                           // Name of the artist
+    href: string;                                           // URL to access the artist on external [EXTERNAL]
   };
-  submitter?: string;                                      // Discord ID of the user that submitted this album
-  submitter_comment?: string;                              // Optional comment left by the album submitter
-  submission_date?: string;                                // String representation of the submission date
-  release_date?: string;                                   // String representation of the release date
-  release_date_precision?: 'year' | 'month' | 'day';       // Preciseness of release date string, defaults to "day"
-  album_mbid?: string;                                     // Album MusicBrainz ID
-  album_id?: string;                                       // Album MusicBrainz ID
-  historical_date?: string;                                // Date this album was Album of the Day (for historical displays)
-  showAlbumRating?: boolean;                               // Show the average user rating for the album, defaults to true
-  showCalLink?: boolean;                                   // Show a button to navigate to the calendar date displayed, defaults to false
-  trackCount?: number;                                     // Number of songs in the album, shown if provided
-  member_status?: boolean;                                 // Whether the user is a member of the desired server
-  vertical?: boolean;                                      // Display vertically instead of side by side
+  submitter?: string;                                       // Discord ID of the user that submitted this album
+  owner?: string;                                           // Discord ID of current owner of album, OPTIONAL as this will only be passed if the owner is not the submitter
+  submitter_comment?: string;                               // Optional comment left by the album submitter
+  submission_date?: string;                                 // String representation of the submission date
+  transfer_date?: string;                                   // String representation of the transfer date, OPTIONAL as this will only be passed if the owner is not the submitter
+  release_date?: string;                                    // String representation of the release date
+  release_date_precision?: 'year' | 'month' | 'day';        // Preciseness of release date string, defaults to "day"
+  album_mbid?: string;                                      // Album MusicBrainz ID
+  album_id?: string;                                        // Album MusicBrainz ID
+  historical_date?: string;                                 // Date this album was Album of the Day (for historical displays)
+  showAlbumRating?: boolean;                                // Show the average user rating for the album, defaults to true
+  showCalLink?: boolean;                                    // Show a button to navigate to the calendar date displayed, defaults to false
+  trackCount?: number;                                      // Number of songs in the album, shown if provided
+  member_status?: boolean;                                  // Whether the user is a member of the desired server
+  vertical?: boolean;                                       // Display vertically instead of side by side
   trackList?: { length: number; [key: string]: unknown }[]; // The tracks contained in the album
-  hideScore?: boolean;                                     // Hide the score of the album
+  hideScore?: boolean;                                      // Hide the score of the album
 }
 
 // GUI Display for an Album
@@ -52,6 +54,9 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
   // Artist props
   const artist_name = (props.artist && props.artist['name']) ? props.artist['name'] : "Artist Name not Found";
   const artist_url = (props.artist && props.artist['href']) ? props.artist['href'] : "https://www.google.com/search?q=sad+face";
+  // Add UI for display of owner if the owner is not the submitter
+  const owner = (props.owner != '') ? props.owner : null;
+  const transfer_date: string = (props.transfer_date) ? props.transfer_date : "01/01/0001, 01:01:01";
   // User rating props checks
   const submitter = (props.submitter) ? props.submitter : "Not Provided";
   const submitter_comment = (props.submitter_comment) ? props.submitter_comment : "No Comment Provided";
@@ -131,23 +136,34 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
           <Conditional showWhen={track_list?.length != 0}>
             <p className="text-sm -my-1">{calcAlbumLength()}</p>
           </Conditional>
-          <Conditional showWhen={userAuth && (props.submitter != null)}>
-            <div className="">
-              <p className="text-xs sm:text-base">Submitter: </p>
-              <div className="ml-2 -mb-1">
-                <UserCard 
-                  userDiscordID={submitter} 
-                  avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[40px]"}
+          <div className="flex flex-col gap-1 mt-0.5">
+            <Conditional showWhen={userAuth && (owner != null)}>
+              <div className="flex items-center justify-start gap-2">
+                <p className="text-xs text-yellow-400/80 w-14 text-right shrink-0">Owner</p>
+                <UserCard
+                  userDiscordID={owner}
+                  avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[32px]"}
                   fallbackName={"User Not Found"}
                   isProfileLink
                 />
+                <ClientTimestamp className="text-xs italic text-neutral-500" timestamp={transfer_date} full={false}/>
               </div>
-            </div>
-            <div className="flex text-xs lg:text-sm sm:-mt-2">
-              <p>Submitted:</p>
-              <ClientTimestamp className="italic pl-1" timestamp={submission_date} full={false}/>
-            </div>
-          </Conditional>
+            </Conditional>
+            <Conditional showWhen={userAuth && (props.submitter != null)}>
+              <div className="flex items-center gap-2">
+                <p className={`text-xs w-14 text-right shrink-0 ${owner != null ? "text-neutral-500" : "text-neutral-400"}`}>
+                  {owner != null ? "Original" : "Submitted"}
+                </p>
+                <UserCard
+                  userDiscordID={submitter}
+                  avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[32px]"}
+                  fallbackName={"User Not Found"}
+                  isProfileLink
+                />
+                <ClientTimestamp className="text-xs italic text-neutral-500" timestamp={submission_date} full={false}/>
+              </div>
+            </Conditional>
+          </div>
           <Conditional showWhen={(avg_rating != 11) && ((avg_rating != null) && showAlbumRating) && !hideScore}>
             <div className="text-xs lg:text-base">
               <div className="flex mb-1">

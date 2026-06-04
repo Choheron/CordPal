@@ -149,6 +149,13 @@ class Album(models.Model):
     out['submission_date'] = self.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
     out['release_date_str'] = self.release_date_str
     out['user_comment'] = self.user_comment
+    recent_transfer = self.ownership_history.order_by('-transferred_at').first()
+    if recent_transfer and recent_transfer.previous_owner:
+      out['submitter'] = recent_transfer.previous_owner.nickname
+      out['submitter_id'] = recent_transfer.previous_owner.discord_id
+      out['owner'] = self.submitted_by.nickname
+      out['owner_id'] = self.submitted_by.discord_id
+      out['transfer_date'] = recent_transfer.transferred_at.strftime("%m/%d/%Y, %H:%M:%S")
     if(include_raw):
       out['raw_album'] = self.raw_data
     return out
@@ -176,6 +183,32 @@ class Album(models.Model):
           }
         )
     super().save(*args, **kwargs)
+  
+  def rescue(self, rescuer, comment=None):
+    """
+    Change album ownership in the event of an inactive user owning an album another user would like to submit
+    """
+    from users.models import UserAction
+    previous_owner = self.submitted_by
+    AlbumOwnershipHistory.objects.create(
+      album=self,
+      previous_owner=previous_owner,
+      new_owner=rescuer
+    )
+    UserAction.objects.create(
+      user=rescuer,
+      action_type="UPDATE",
+      entity_type="ALBUM_OWNER",
+      entity_id=self.pk,
+      details={
+          "previous_owner_id": previous_owner.discord_id if previous_owner else None,
+          "new_owner_id": rescuer.discord_id
+      }
+    )
+    self.submitted_by = rescuer
+    if comment is not None:
+      self.user_comment = comment
+    super(Album, self).save()
 
   # Custom delete function to log the user action
   def delete(self, deleter=None, reason=None, *args, **kwargs):
@@ -232,6 +265,20 @@ class AlbumCommentHistory(models.Model):
 
   def __str__(self):
     return f"Comment history for {self.album.title} at {self.recorded_at}"
+  
+
+class AlbumOwnershipHistory(models.Model):
+    """
+    Represents ownership history of an album, allowing users to "Rescue" albums from inactive AOTD users. 
+    """
+    album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name="ownership_history")
+    previous_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="relinquished_albums")
+    new_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="rescued_albums")
+    transferred_at = models.DateTimeField(default=now)
+
+    def __str__(self):
+      return f"{self.album.title}: {self.previous_owner} → {self.new_owner} on {self.transferred_at.strftime('%d/%m/%Y, %H:%M:%S')}"
+
 
 
 # Model for an album of the day

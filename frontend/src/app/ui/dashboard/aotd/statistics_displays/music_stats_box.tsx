@@ -128,6 +128,8 @@ export default async function MusicStatsBox(props) {
                   album_src={highest_album["album_src"]}
                   artist={highest_album["artist"]}
                   submitter={highest_album["submitter_id"]}
+                  owner={highest_album["owner_id"]}
+                  transfer_date={highest_album["transfer_date"]}
                   submitter_comment={highest_album["user_comment"]}
                   submission_date={highest_album["submission_date"]}
                   historical_date={highest_date}
@@ -161,6 +163,8 @@ export default async function MusicStatsBox(props) {
                       album_src={lowest_album["album_src"]}
                       artist={lowest_album["artist"]}
                       submitter={lowest_album["submitter_id"]}
+                      owner={lowest_album["owner_id"]}
+                      transfer_date={lowest_album["transfer_date"]}
                       submitter_comment={lowest_album["user_comment"]}
                       submission_date={lowest_album["submission_date"]}
                       historical_date={lowest_date}

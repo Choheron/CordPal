@@ -60,6 +60,8 @@ export default async function Page() {
                   album_mbid={albumData("album_id")}
                   artist={albumData("artist")}
                   submitter={albumData("submitter")}
+                  owner={albumData("owner")}
+                  transfer_date={albumData("transfer_date")}
                   submitter_comment={albumData("submitter_comment")}
                   submission_date={albumData("submission_date")}
                   release_date={albumData("release_date")}

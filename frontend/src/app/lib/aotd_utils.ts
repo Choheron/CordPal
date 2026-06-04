@@ -158,7 +158,7 @@ export async function musicBrainzAlbumSearch(albumTitle, artist = null, mbid = "
 
 //
 // Submit an album for adding to the Album of the day pool in the backend
-// - RETURN: HttpResponse
+// - RETURN: JsonResponse
 //
 export async function submitAlbumToBackend(albumObject) {
   // Check for sessionid in cookies
@@ -174,10 +174,30 @@ export async function submitAlbumToBackend(albumObject) {
     },
     body: JSON.stringify(albumObject)
   });
+  const responseJson = await submitAlbumResponse.json();
   // Revalidate requests to see recent submissions
   revalidateTag('album_submissions', "max")
   // Return Status
-  return {"status": submitAlbumResponse.status, "crid": submitAlbumResponse.headers.get("X-CRID")}
+  return {"status": submitAlbumResponse.status, "err_message": responseJson.err_message, "crid": submitAlbumResponse.headers.get("X-CRID")}
+}
+
+
+//
+// Submit an album for rescuing from an inactive user on the backend
+// - RETURN: JsonResponse 
+//
+export async function rescueAlbumFromBackend(albumObject) {
+  const sessionCookie = await getCookie('sessionid');
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/rescueAlbum`, {
+    method: "POST",
+    credentials: "include",
+    cache: 'no-cache',
+    headers: { Cookie: `sessionid=${sessionCookie};` },
+    body: JSON.stringify(albumObject)
+  });
+  revalidateTag('album_submissions', "max")
+  const responseJson = await response.json();
+  return { status: response.status, err_message: responseJson.err_message, crid: response.headers.get("X-CRID") }
 }
 
 

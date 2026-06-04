@@ -160,9 +160,8 @@ def submitAlbum(request: HttpRequest):
     albumObject = Album.objects.get(**kwargs)
     if(albumObject):
       logger.info(f"Album with release group already exists, name: {albumObject.title}!", extra={'crid': request.crid})
-      # Check if current owner of this album is active
-      current_submitter_active = albumObject.submitted_by.aotd_data.active
-    return HttpResponse(status=400)
+    out = {'succesful': False, 'status': 400, 'err_message': f'Album from release group already exists!'}
+    return JsonResponse(out, status=out['status'])
   except ObjectDoesNotExist as e:
     # Get user from database
     user = getUserObj(request.session.get('discord_id'))
@@ -181,7 +180,46 @@ def submitAlbum(request: HttpRequest):
     newAlbum.save()
     # Update user data
     calculateUserReviewData(AotdUserData.objects.get(user=user))
-    return HttpResponse(status=200)
+    out = {'succesful': True, 'status': 200, 'err_message': 'N/A'}
+    return JsonResponse(out, status=out['status'])
+  
+
+###
+# Method to change ownership of an album, not submit a new one
+###
+def rescueAlbum(request: HttpRequest):
+  """
+  Change ownership of an album, expects the same request body as submitAlbum.
+  This should only see use during a "yard-sale" or "rescue" event.
+  """
+  if request.method != "POST":
+    logger.warning(f"rescueAlbum called with a non-POST method, returning 405.", extra={'crid': request.crid})
+    return HttpResponse(status=405)
+  reqBody = json.loads(request.body)
+  user = getUserObj(request.session.get('discord_id'))
+  release_group_id = reqBody['album']['release-group']['id']
+  logger.info(f"User {user.nickname} attempting to rescue album with release group ID {release_group_id}.", extra={'crid': request.crid})
+  try:
+    kwargs = {'raw_data__release-group__id': release_group_id}
+    albumObject = Album.objects.get(**kwargs)
+  except ObjectDoesNotExist:
+    logger.warning(f"rescueAlbum: Album with release group ID {release_group_id} not found.", extra={'crid': request.crid})
+    out = {'succesful': False, 'status': 404, 'err_message': f'Provided Album ({reqBody["album"]["id"]}) does not exist!'}
+    return JsonResponse(out, status=out['status'])
+  # Re-validate rescue eligibility server-side
+  submitter_active = albumObject.submitted_by.aotd_data.active
+  has_been_aotd = DailyAlbum.objects.filter(album=albumObject).exists()
+  if submitter_active or has_been_aotd:
+    logger.warning(f"rescueAlbum: Album \"{albumObject.title}\" is not rescue-eligible (submitter_active={submitter_active}, has_been_aotd={has_been_aotd}). Returning 403.", extra={'crid': request.crid})
+    out = {'succesful': False, 'status': 403, 'err_message': f'Provided Album ({reqBody["album"]["id"]}) is not eligible for rescue!'}
+    return JsonResponse(out, status=out['status'])
+  comment = reqBody.get('user_comment') or None
+  logger.info(f"Transferring ownership of \"{albumObject.title}\" from {albumObject.submitted_by.nickname} to {user.nickname}.", extra={'crid': request.crid})
+  albumObject.rescue(rescuer=user, comment=comment)
+  calculateUserReviewData(AotdUserData.objects.get(user=user))
+  logger.info(f"Album \"{albumObject.title}\" successfully rescued by {user.nickname}.", extra={'crid': request.crid})
+  out = {'succesful': True, 'status': 200, 'err_message': "N/A"}
+  return JsonResponse(out, status=out['status'])
 
 
 ###
@@ -250,10 +288,17 @@ def getAlbum(request: HttpRequest, mbid: str):
     out['submitter_nickname'] = albumObj.submitted_by.nickname
     out['submitter_comment'] = albumObj.user_comment
     out['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+    # If this album has been rescued, the original submitter is the previous owner in history
+    recent_transfer = albumObj.ownership_history.order_by('-transferred_at').first()
+    if recent_transfer and recent_transfer.previous_owner:
+      out['submitter'] = recent_transfer.previous_owner.discord_id
+      out['submitter_nickname'] = recent_transfer.previous_owner.nickname
+      out['owner'] = albumObj.submitted_by.discord_id
+      out['transfer_date'] = recent_transfer.transferred_at.strftime("%m/%d/%Y, %H:%M:%S")
     out['release_date_str'] = albumObj.raw_data['release-group']['first-release-date'] if ('first-release-date' in albumObj.raw_data['release-group'].keys()) else albumObj.release_date_str
     out['release_date'] = parseReleaseDate(out['release_date_str'])
     out['track_list'] = albumObj.track_list if albumObj.track_list else {"tracks": []}
-  except:
+  except ObjectDoesNotExist as e:
     out = {}
   # Return final object
   return JsonResponse(out)
