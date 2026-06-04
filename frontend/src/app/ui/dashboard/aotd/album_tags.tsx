@@ -5,12 +5,12 @@ import { AlbumTag, GlobalTag, TagSuggestion } from "@/app/lib/types"
 import { useEffect, useState } from "react"
 
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter
-} from "@heroui/modal";
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter
+} from "@heroui/react";
 import { Button, Input, Tooltip } from "@heroui/react";
 import { RiAddLine, RiArrowDownFill, RiArrowDownLine, RiArrowUpFill, RiArrowUpLine, RiCloseLine, RiPriceTagFill } from "react-icons/ri";
 import EmojiMartButton from "@/app/ui/general/input/emoji_mart_popover";
@@ -279,20 +279,18 @@ export default function AlbumTagsDisplay(props: Props) {
           </Button>
         </Tooltip>
       )}
-      {/* Tagging Modal */}
-      <Modal
+      {/* Tagging Drawer */}
+      <Drawer
         isOpen={showSubmitModal}
         onOpenChange={handleModalClose}
-        classNames={{
-          wrapper: "items-end sm:items-center",
-          base: "w-full h-dvh m-0 rounded-none sm:max-w-5xl sm:h-auto sm:max-h-[80vh] sm:rounded-large sm:my-10 sm:mx-6"
-        }}
+        placement="right"
+        size="lg"
       >
-        <ModalContent>
+        <DrawerContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Add a Tag</ModalHeader>
-              <ModalBody className="gap-4">
+              <DrawerHeader className="flex flex-col gap-1">Add a Tag</DrawerHeader>
+              <DrawerBody className="gap-4">
                 <p className="text-sm text-gray-400 mb-2">Commonly used tags {`(set by admins or tagged on 3 or more albums)`}</p>
                 {/* Quick-add suggestions */}
                 {suggestions.length > 0 && (
@@ -431,19 +429,19 @@ export default function AlbumTagsDisplay(props: Props) {
                     </div>
                   </>
                 )}
-              </ModalBody>
-              <ModalFooter>
+              </DrawerBody>
+              <DrawerFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
                   Cancel
                 </Button>
                 <Button color="primary" onPress={handleSubmit} isLoading={isSubmitting} isDisabled={!tagText.trim()}>
                   Submit
                 </Button>
-              </ModalFooter>
+              </DrawerFooter>
             </>
           )}
-        </ModalContent>
-      </Modal>
+        </DrawerContent>
+      </Drawer>
     </div>
   )
 }

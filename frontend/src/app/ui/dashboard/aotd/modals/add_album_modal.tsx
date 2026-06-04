@@ -1,13 +1,13 @@
 'use client'
 
 import {
-  Modal, 
-  ModalContent, 
-  ModalHeader, 
-  ModalBody, 
-  ModalFooter,
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
   useDisclosure
-} from "@heroui/modal";
+} from "@heroui/react";
 import { addToast, Button, Divider, Link } from "@heroui/react";
 import { Checkbox } from "@heroui/checkbox";
 import { Input } from "@heroui/input";
@@ -224,24 +224,25 @@ export default function AddAlbumModal(props) {
           </div>
         </Conditional>
       </div>
-      <Modal 
-        size="xl" 
-        isOpen={isOpen} 
-        isDismissable={false} 
-        onOpenChange={onOpenChange} 
+      <Drawer
+        size="lg"
+        isOpen={isOpen}
+        isDismissable={false}
+        onOpenChange={onOpenChange}
         onClose={cancelPress}
+        placement="right"
         scrollBehavior="inside"
       >
-        <ModalContent>
+        <DrawerContent>
           {() => (
             <>
-              <ModalHeader className="mx-auto -mb-3">
+              <DrawerHeader className="mx-auto -mb-3">
                 Submit an Album for the Album Pool
-              </ModalHeader>
-              <ModalBody>
+              </DrawerHeader>
+              <DrawerBody>
               <div className="flex flex-col gap-2 justify-evenly">
                 <Divider />
-                <div className="max-w-[320px] lg:max-w-[650px] px-2 py-2 mt-2 text-small italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
+                <div className="max-w-[320px] lg:max-w-[650px] px-2 py-2 mt-2 text-xs italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
                   <p>
                     NOTE: Please refrain from submitting &quot;best of&quot; albums to the AOtD pool. The purpose of the AOtD is to add albums created by the artist in their originial form &#40;extended editions,
                     deluxes, and the like are allowed&#41;. If any album is in question, ask in the discord.
@@ -377,11 +378,11 @@ export default function AddAlbumModal(props) {
                   onValueChange={setCommentValue}
                 />
               </div>
-              </ModalBody>
-              <ModalFooter>
+              </DrawerBody>
+              <DrawerFooter className="block w-full">
                 <div className="flex flex-col">
                   <Conditional showWhen={albumError}>
-                    <div className="text-red-500 my-auto">
+                    <div className="text-red-500 text-small my-auto">
                       <p className="underline mx-auto">Album has already been submitted!</p>
                       <div className="flex w-full">
                         <p className="my-auto">Submitted by:</p>
@@ -394,6 +395,8 @@ export default function AddAlbumModal(props) {
                       </div>
                     </div>
                   </Conditional>
+                </div>
+                <div className="flex flex-row w-full justify-between">
                   <Conditional showWhen={isAdmin}>
                     <div className="">
                       <Checkbox isSelected={isHidden} onValueChange={setIsHidden}>
@@ -401,22 +404,22 @@ export default function AddAlbumModal(props) {
                       </Checkbox>
                     </div>
                   </Conditional>
+                  <Button color="danger" variant="light" onPress={cancelPress}>
+                    Cancel
+                  </Button>
+                  <Button 
+                    color="primary" 
+                    isDisabled={!((selectedAlbum) && (albumList) && (!albumError))}
+                    onPress={submitPress}
+                  >
+                    Submit Album
+                  </Button>
                 </div>
-                <Button color="danger" variant="light" onPress={cancelPress}>
-                  Cancel
-                </Button>
-                <Button 
-                  color="primary" 
-                  isDisabled={!((selectedAlbum) && (albumList) && (!albumError))}
-                  onPress={submitPress}
-                >
-                  Submit Album
-                </Button>
-              </ModalFooter>
+              </DrawerFooter>
             </>
           )}
-        </ModalContent>
-      </Modal>
+        </DrawerContent>
+      </Drawer>
     </>
   )
 }
