@@ -296,7 +296,12 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
         </div>
         {totalPages > 1 && (
           <div className="flex justify-center mt-4 pb-4">
-            <Pagination total={totalPages} page={page} onChange={setPage} color="primary" />
+            <Pagination 
+              total={totalPages} 
+              page={page} 
+              onChange={setPage} 
+              color="primary" 
+            />
           </div>
         )}
       </div>
