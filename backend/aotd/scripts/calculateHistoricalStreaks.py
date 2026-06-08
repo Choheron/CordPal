@@ -1,4 +1,6 @@
-# This script is for a one time use to migrate AOTD data from spotify to the new AOTD backend as part of the great "Anti-Spotify" migration of June 2025
+# One-time script to backfill AotdUserData streak fields from historical review data.
+# Replays all DailyAlbum records in order, seeding last_review_date and recalculating
+# current_streak for each reviewer as if they had participated live on each date.
 from datetime import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
