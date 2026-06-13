@@ -18,7 +18,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
     isAotdParticipant()
   ]);
   const memberStatus = reqHeaders.get('x-is-member') === 'true';
-  // Retrieve aotd settings if the user is a participant
+  // Retrieve aotd settings if the user is a participant (Also includes if user is inactive)
   const aotdSettings = (aotdConnected) ? (await getAotdUserSettings()) : (null)
 
   // Create linked accounts object and add path to branding avatar

@@ -132,6 +132,7 @@ def getAotdUserSettings(request: HttpRequest):
   return JsonResponse({
     "hide_scores_prereview": aotd_data.hide_scores_prereview,
     "hide_tags_prereview": aotd_data.hide_tags_prereview,
+    "active_aotd": aotd_data.active,
   })
 
 

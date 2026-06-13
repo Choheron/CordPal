@@ -13,6 +13,7 @@ import SettingsModal from "./settings_modal";
 import { useState } from "react";
 import { RiAlbumLine, RiHome2Line, RiImageLine, RiInformationLine, RiQuillPenLine } from "react-icons/ri";
 import Image from 'next/image'
+import { Alert } from "@heroui/react";
 
 // Expected props:
 //  - isMember: Boolean indicating if the current session user is a member of the desired server
@@ -81,69 +82,79 @@ export default function TopBar(props) {
   }
 
   return (
-    <div className="relative flex flex-col items-center justify-between max-w-full sm:px-0 pt-20 sm:pt-0 pb-0">
-      <div className="hidden lg:flex flex-col w-full max-w-full">
-        <div className="relative w-[222px] h-[41px] 2xl:w-[333px] 2xl:h-[60px] 3xl:w-[444px] 3xl:h-[82px] ml-1 mt-1">
-          <Image
-            fill
-            src="/svgs/logos/CordPal_Logo_Large_V1.svg"
-            alt="CordPal Logo"
+    <div>
+      <div className="relative flex flex-col items-center justify-between max-w-full sm:px-0 pt-20 sm:pt-0 pb-0">
+        <div className="hidden lg:flex flex-col w-full max-w-full">
+          <div className="relative w-[222px] h-[41px] 2xl:w-[333px] 2xl:h-[60px] 3xl:w-[444px] 3xl:h-[82px] ml-1 mt-1">
+            <Image
+              fill
+              src="/svgs/logos/CordPal_Logo_Large_V1.svg"
+              alt="CordPal Logo"
+            />
+          </div>
+          <a
+            className="pointer-events-none w-fit p-8 ml-1 lg:ml-1 font-mono text-sm lg:pointer-events-auto lg:p-0 text-gray-500 italic z-50"
+            href="https://homelab.nanophage.win"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            By{" "}
+            Nanophage
+          </a>
+        </div>
+        <div className="z-10 w-full max-w-full h-fit items-center justify-between font-mono text-sm flex flex-col lg:flex-row">
+          <SettingsModal 
+            userInfo={props.userInfo}
+            aotdConnected={props.aotdConnected}
+            aotdSettings={props.aotdSettings}
+            avatarURL={props.avatarURL}
+            linkedAccounts={props.linkedAccounts}
+            userLoginMethods={props.userLoginMethods}
+            isOpenOverride={settingsOpen}
+            setIsOpenOverride={setSettingsOpen}
           />
-        </div>
-        <a
-          className="pointer-events-none w-fit p-8 ml-1 lg:ml-1 font-mono text-sm lg:pointer-events-auto lg:p-0 text-gray-500 italic z-50"
-          href="https://homelab.nanophage.win"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          By{" "}
-          Nanophage
-        </a>
-      </div>
-      <div className="z-10 w-full max-w-full h-fit items-center justify-between font-mono text-sm flex flex-col lg:flex-row">
-        <SettingsModal 
-          userInfo={props.userInfo}
-          aotdConnected={props.aotdConnected}
-          aotdSettings={props.aotdSettings}
-          avatarURL={props.avatarURL}
-          linkedAccounts={props.linkedAccounts}
-          userLoginMethods={props.userLoginMethods}
-          isOpenOverride={settingsOpen}
-          setIsOpenOverride={setSettingsOpen}
-        />
-        {/* Navigation Pages */}
-        <div className="w-full max-w-full h-full my-auto items-center justify-center font-mono text-sm flex flex-col lg:flex-row lg:pt-0 xl:absolute xl:top-1">
-          {links.map((link, index) => {
-              return(
-                <Conditional 
-                  key={index}
-                  showWhen={link.conditional}
-                >
-                  <div 
-                    className={clsx("flex gap-1 px-4 py-1 my-auto text-center rounded-full text-white",
-                      {'text-decoration-line: underline bg-gradient-to-r from-neutral-900/0 via-neutral-900 to-neutral-900/0': pathname === link.href},
-                      {'line-through': link.disabled})}
+          {/* Navigation Pages */}
+          <div className="w-full max-w-full h-full my-auto items-center justify-center font-mono text-sm flex flex-col lg:flex-row lg:pt-0 xl:absolute xl:top-1">
+            {links.map((link, index) => {
+                return(
+                  <Conditional 
+                    key={index}
+                    showWhen={link.conditional}
                   >
-                    <div className="text-xl">
-                      {link.icon}
-                    </div>
-                    <Link 
-                      key={index}
-                      href={link.href}
-                      isDisabled={link.disabled}
-                      size="sm"
-                      className="text-center rounded-full text-white"
+                    <div 
+                      className={clsx("flex gap-1 px-4 py-1 my-auto text-center rounded-full text-white",
+                        {'text-decoration-line: underline bg-gradient-to-r from-neutral-900/0 via-neutral-900 to-neutral-900/0': pathname === link.href},
+                        {'line-through': link.disabled})}
                     >
-                      {link.name}
-                    </Link>
-                  </div>
-                </Conditional>
-              );
-            })
-          }
+                      <div className="text-xl">
+                        {link.icon}
+                      </div>
+                      <Link 
+                        key={index}
+                        href={link.href}
+                        isDisabled={link.disabled}
+                        size="sm"
+                        className="text-center rounded-full text-white"
+                      >
+                        {link.name}
+                      </Link>
+                    </div>
+                  </Conditional>
+                );
+              })
+            }
+          </div>
         </div>
+        {userActionsDropdown()}
       </div>
-      {userActionsDropdown()}
+      <Conditional showWhen={props.aotdConnected && !props.aotdSettings['active_aotd']}>
+        <Alert 
+          color="danger" 
+          title="AOTD - You are INACTIVE" 
+          description="You have been marked inactive due to you having not reviewed an Album of the Day in 14 or more days. This means that your albums that have not yet been picked can be Rescued/Submitted by other users."
+          className="m-2 sm:w-2/3 mx-auto"
+        />
+      </Conditional>
     </div>
   );
 }
