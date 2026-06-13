@@ -152,7 +152,7 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
             <Conditional showWhen={userAuth && (props.submitter != null)}>
               <div className="flex items-center gap-2">
                 <p className={`text-xs w-14 text-right shrink-0 ${owner != null ? "text-neutral-500" : "text-neutral-400"}`}>
-                  {owner != null ? "Original" : "Submitted"}
+                  {owner != null ? "Original" : "Submitter"}
                 </p>
                 <UserCard
                   userDiscordID={submitter}
