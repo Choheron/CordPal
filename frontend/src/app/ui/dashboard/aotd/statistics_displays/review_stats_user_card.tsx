@@ -24,6 +24,7 @@ import { Conditional } from "../../conditional"
 //          "highest_score_given": -1,
 //          "highest_score_album": None,
 //          "highest_score_date": None,
+//          "active": True,
 //        }
 export default async function ReviewStatsUserCard(props) {
   const reviewData = props.userReviewObj;
@@ -45,6 +46,7 @@ export default async function ReviewStatsUserCard(props) {
         <div>
           <UserCard
             userDiscordID={reviewData['discord_id']}
+            inactive={!reviewData['active']}
             avatarClassNameOverride="size-[40px]"
             customDescription={
               <p>Click for review stats</p>

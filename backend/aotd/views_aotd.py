@@ -224,7 +224,7 @@ def calculateAOTDChances(request: HttpRequest):
   tomorrow = datetime.date.today() + datetime.timedelta(days=1)
   # Get Date a two years ago to filter by
   two_year_ago = day - datetime.timedelta(days=730)
-  # Get a map of all outages
+  # Get a map of all outages currently in effect
   user_outage_map = set(
     UserAlbumOutage.objects
       .filter(start_date__lte=tomorrow, end_date__gte=tomorrow)

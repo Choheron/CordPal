@@ -10,6 +10,8 @@ import CreateOutageModal from "../modals/create_outage_modal";
 import AlbumDisplay from "../album_display";
 import AlbumTagsDisplay from "../album_tags";
 import { getUserData, isUserAdmin } from "@/app/lib/user_utils";
+import { Conditional } from "../../conditional";
+import { Alert } from "@heroui/react";
 
 // GUI Display for an Album
 // Expected Props:
@@ -48,16 +50,24 @@ export default async function MusicStatsBox(props) {
           <UserCard
             userDiscordID={user['discord_id']}
             avatarClassNameOverride="size-[35px] flex-shrink-0"
+            inactive={!user['active']}
             customDescription={(
               <Tooltip 
                 content={
-                  <div className="flex flex-col">
+                  <div className="flex flex-col text-sm">
                     <p>{`${user['nickname']}'s albums are currently ${(user['selection_blocked']) ? "BLOCKED": "ALLOWED"} for selection.`}</p>
                     {(user['block_type']) ? (<p><b>Block Type:</b> {user['block_type']}</p>) : <></>}
                     {(user['selection_blocked']) ? (<p><b>Reason:</b> <i>{user['reason']}</i></p>) : <></>}
                     <p>{`${(user['block_type'] == "OUTAGE") ? (user['admin_outage'] == "true") ? `Outage placed by admins.` : `Outage placed by ${user['nickname']}.` : ""}`}</p>
                     <p>{(user['block_type'] == "OUTAGE") ? `This outage lasts until: ${user['outage_end']}` : ``}</p>
                     <p>{`User has submitted ${user['submission_count']} album(s).`}</p>
+                    <Conditional showWhen={!user['active']}>
+                      <hr/>
+                      <div className="border border-red-800 rounded-xl p-2 mt-2 bg-red-600/10">
+                      <p className="font-bold text-base">This user is fully inactive!</p> 
+                      <p>They have not reviewed in over 14 days, their albums can be rescued if they have not been AOTD.</p>
+                      </div>
+                    </Conditional>
                   </div>
                 }
                 className="max-w-[300px] mb-5"

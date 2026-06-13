@@ -195,6 +195,7 @@ export async function rescueAlbumFromBackend(albumObject) {
     headers: { Cookie: `sessionid=${sessionCookie};` },
     body: JSON.stringify(albumObject)
   });
+  // Revalidate requests to see recent submissions or rescues
   revalidateTag('album_submissions', "max")
   const responseJson = await response.json();
   return { status: response.status, err_message: responseJson.err_message, crid: response.headers.get("X-CRID") }
@@ -598,6 +599,33 @@ export async function getLastXSubmissions(count = 0) {
   });
   const reviewListRes = await subResponse.json()
   return reviewListRes;
+}
+
+
+//
+// Get Last X Album Actions (Submissions or Rescues)
+// - RETURN: list in JSON
+//
+export async function getLastXSubOrRescueAlbums(count = 0) {
+  // If no album ID provided, return empty list
+  if(count == 0) {
+    return []
+  }
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Query Backend for Recent Submissions
+  console.log(`getLastXSubOrRescueAlbums: Sending request to backend '/aotd/getLastXSubOrRescueAlbums/${count}'`)
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getLastXSubOrRescueAlbums/${count}`, {
+    method: "GET",
+    credentials: "include",
+    cache: 'force-cache',
+    next: { tags: ['album_submissions'] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const subOrRescueJson = await response.json()
+  return subOrRescueJson;
 }
 
 

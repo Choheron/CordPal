@@ -108,7 +108,7 @@ def submitReview(request: HttpRequest):
   except:
     logger.error(f"ERROR: Failed to save review for user \"{userObj.nickname}\" ({userObj.discord_id}) targeting album {albumObj.mbid} for date {date}!", extra={'crid': request.crid})
     return HttpResponse(500)
-  # Update user selection_blocked flag status
+  # Update user selection_blocked and activity flag status
   checkSelectionFlag(AotdUserData.objects.get(user=userObj))
   # Update review stats
   calculateUserReviewData(AotdUserData.objects.get(user=userObj))
@@ -242,7 +242,8 @@ def getAllUserReviewStats(request: HttpRequest):
       "current_streak": aotdUser.current_streak,
       "longest_streak": aotdUser.longest_streak,
       "last_review_date": aotdUser.last_review_date,
-      "streak_at_risk": aotdUser.isStreakAtRisk()
+      "streak_at_risk": aotdUser.isStreakAtRisk(),
+      "active": aotdUser.active
     }
   # Convert user reviews object to list
   outList = []

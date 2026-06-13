@@ -3,7 +3,7 @@ import Link from "next/link";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { Conditional } from "@/app/ui/dashboard/conditional";
 import AotdEnrollBox from "@/app/ui/dashboard/aotd/aotd_enroll_box";
-import { getAlbumOfTheDayData, getLastXSubmissions, isAotdParticipant } from "@/app/lib/aotd_utils";
+import { getAlbumOfTheDayData, getLastXSubOrRescueAlbums, isAotdParticipant } from "@/app/lib/aotd_utils";
 import AlbumOfTheDayBox from "@/app/ui/dashboard/aotd/album_of_the_day";
 import RecentSubmissions from "@/app/ui/dashboard/aotd/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/aotd/statistics_displays/music_stats_box";
@@ -13,7 +13,7 @@ import MinimalAlbumDisplay from "@/app/ui/dashboard/aotd/minimal_album_display";
 
 export default async function music() {
   const aotd_participant = await isAotdParticipant();
-  const recentSubmissionsResponse = await getLastXSubmissions(8);
+  const recentSubmissionsResponse = await getLastXSubOrRescueAlbums(8);
   // Get today's date
   const today_string = getTodayInTimezone("America/Chicago")
   const today_arr = today_string.split("-")
@@ -78,7 +78,7 @@ export default async function music() {
               </Link>
               <div className={`h-full mb-2 ${(last_year_has_aotd) ? "md:max-h-[450px]" : ""}`}>
                 <RecentSubmissions 
-                  albumList={recentSubmissionsResponse['album_list']} 
+                  actionList={recentSubmissionsResponse['action_list']} 
                   timestamp={recentSubmissionsResponse['timestamp']}
                 />
               </div>

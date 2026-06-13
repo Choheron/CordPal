@@ -3,6 +3,7 @@ import { Badge } from "@heroui/badge";
 
 import { getUserData, getUserAvatarURL, isUserOnline } from "@/app/lib/user_utils";
 import { onlineStatusToTailwindBgColor } from "@/app/lib/utils";
+import { Conditional } from "../../dashboard/conditional";
 
 // GUI Representation for a single user
 // Expected Props:
@@ -14,11 +15,13 @@ import { onlineStatusToTailwindBgColor } from "@/app/lib/utils";
 // - onlineStatusDesc: Boolean (Optional) [DEFAULT FALSE] - Should the description be a check for a users online status? Will appear before custom desc
 // - onlineBadge: Boolean (Optional) [DEFAULT FALSE] - Show a dot in the top left signifying if the user is online or not
 // - avatarClassNameOverride: String (Optional) - Override the avatar classname
+// - inactive: Boolean (Optional) - If inactive, it will show an inactive banner
 export default async function UserCard(props) {
   let customDesc = (props.customDescription) ? props.customDescription : null;
   const profileLink = (props.isProfileLink) ? props.isProfileLink : false;
   const showOnlineDot = (props.onlineBadge) ? props.onlineBadge : false;
   const avatarClassName = (props.avatarClassNameOverride) ? props.avatarClassNameOverride : "flex-shrink-0 size-[40px]";
+  const inactive = (props.inactive) ? props.inactive : false;
 
   try {
     var userData = await getUserData(props.userDiscordID)
@@ -55,22 +58,29 @@ export default async function UserCard(props) {
       shape="circle"
       isInvisible={!showOnlineDot}
     >
-      <User
-        className="w-fit"
-        name={userData['nickname']}
-        description={(
-          customDesc
-        )}
-        avatarProps={{
-          showFallback: true,
-          name: userData['nickname'],
-          src: userAvatarURL,
-          className: avatarClassName
-        }}
-        classNames={{
-          name: "line-clamp-1 text-xs sm:text-sm"
-        }}
-      />
+      <div className="relative w-fit h-fit overflow-clip">
+        <Conditional showWhen={inactive}>
+          <p className="z-10 absolute top-3 -left-11 text-[8px] bg-red-600 -rotate-45 px-10">
+            INACTIVE
+          </p>
+        </Conditional>
+        <User
+          className="w-fit"
+          name={userData['nickname']}
+          description={(
+            customDesc
+          )}
+          avatarProps={{
+            showFallback: true,
+            name: userData['nickname'],
+            src: userAvatarURL,
+            className: avatarClassName
+          }}
+          classNames={{
+            name: "line-clamp-1 text-xs sm:text-sm"
+          }}
+        />
+      </div>
     </Badge>
   )
 

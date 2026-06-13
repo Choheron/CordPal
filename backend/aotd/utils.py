@@ -1,6 +1,6 @@
 from django.http import HttpRequest
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Avg, Sum, StdDev
+from django.db.models import Avg, Sum, StdDev, Q
 
 import logging
 from dotenv import load_dotenv
@@ -103,6 +103,14 @@ def checkSelectionFlag(aotd_user: AotdUserData, recent_review_users: list = None
   user = aotd_user.user
   # Get tomorrow date
   tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+  # Get 14 days ago
+  fortnight_ago = datetime.date.today() - datetime.timedelta(days=14)
+  # Get a map of all outages in the last 14 days
+  inactivity_outage_map = list(
+    UserAlbumOutage.objects
+      .filter(Q(start_date__gte=fortnight_ago) | Q(end_date__gte=fortnight_ago))
+      .values_list('user_id', flat=True)
+  )
   # Check if user is going to be under an outage — use pre-computed set if provided, otherwise query
   if outage_user_ids is not None:
     if user.pk in outage_user_ids:
@@ -126,6 +134,14 @@ def checkSelectionFlag(aotd_user: AotdUserData, recent_review_users: list = None
   if(aotd_user.selection_blocked_flag != blocked):
     aotd_user.selection_blocked_flag = blocked
     logger.info(f"Changing `selection_blocked_flag` to {blocked} for {aotd_user.user.nickname}...")
+    aotd_user.save()
+  # Check if user should be marked as inactive
+  active_users = list(Review.objects.filter(review_date__gte=fortnight_ago).values_list('user__discord_id', flat=True).distinct()) # A user is active if they have reviewed in the last 14 days
+  # A user is active if they are in the active users pool OR they appear in the outages pool as they had an outage
+  active = (aotd_user.user.discord_id in active_users) or (aotd_user.user.discord_id in inactivity_outage_map)
+  if(aotd_user.active != active):
+    aotd_user.active = active
+    logger.info(f"Changing `active` flag to {active} for {aotd_user.user.nickname}...")
     aotd_user.save()
 
 

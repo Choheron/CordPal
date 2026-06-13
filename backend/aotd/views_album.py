@@ -13,6 +13,7 @@ from .models import (
   AotdUserData,
   Album,
   AlbumCommentHistory,
+  AlbumOwnershipHistory,
   Review,
   DailyAlbum
 )
@@ -88,6 +89,16 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
   if already_submitted:
     validityStatus['canSubmit'] = False
     validityStatus['reason'] = f"You have already submitted an album for today! ({albumDay}) (CST)"
+    return JsonResponse(validityStatus)
+  # A rescue also counts as a submission for the day
+  already_rescued = AlbumOwnershipHistory.objects.filter(
+      new_owner=userObj,
+      transferred_at__gte=start_of_day,
+      transferred_at__lt=end_of_day
+  ).exists()
+  if already_rescued:
+    validityStatus['canSubmit'] = False
+    validityStatus['reason'] = f"You have already rescued an album today! ({albumDay}) (CST)"
     return JsonResponse(validityStatus)
   # If the user has reviewed today, they can submit
   if not hasReviewedToday(userObj):
@@ -480,6 +491,41 @@ def getAlbumSTD(request: HttpRequest, mbid: str, date: str = None):
 
 
 ###
+# Return last X submitted or rescued albums
+###
+def getLastXSubOrRescueAlbums(request: HttpRequest, count: int):
+  '''
+  Return the last X submitted or rescued albums for use with the "Recent Album Submissions" UI
+  '''
+  from users.models import UserAction
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning(f"getLastXSubOrRescueAlbums called with a non-GET method, returning 405.", extra={'crid': request.crid})
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Get last X count of albums
+  last_X_submissions_or_rescues = UserAction.objects.filter(Q(action_type='CREATE', entity_type='ALBUM') | Q(action_type='UPDATE', entity_type='ALBUM_OWNER')).order_by('-timestamp')[:count]
+  # Build list of custom Album Objects
+  action_list = []
+  for album_action in last_X_submissions_or_rescues:
+    print(album_action.entity_id)
+    obj = {}
+    obj['action'] = album_action.action_type
+    obj['entity'] = album_action.entity_type
+    obj['entity_id'] = album_action.entity_id
+    obj['album'] = Album.objects.get(id=album_action.entity_id).toJSON(include_raw=False)
+    obj['action_details'] = album_action.details
+    if(album_action.action_type == "UPDATE"):
+      # Dynamically append user data if it appears in action details (TODO: Make this more dynamic than just hardcoded stuff)
+      obj['action_details']['new_owner_nick'] = AotdUserData.objects.get(user__discord_id=obj['action_details']['new_owner_id']).user.nickname
+      obj['action_details']['previous_owner_nick'] = AotdUserData.objects.get(user__discord_id=obj['action_details']['previous_owner_id']).user.nickname
+    # Append to List
+    action_list.append(obj)
+  return JsonResponse({ "action_list": action_list, "timestamp" : datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")})
+
+
+###
 # Return last X submitted albums
 ###
 def getLastXAlbums(request: HttpRequest, count: int):
@@ -544,6 +590,7 @@ def getAlbumsStats(request: HttpRequest):
     if(userData['block_type'] == "OUTAGE"):
       userData['outage_start'] = chance_view_response['outage']['outage_start']
       userData['outage_end'] = chance_view_response['outage']['outage_end']
+    userData['active'] = user.active
     # Append to List
     userStatsList.append(userData)
   # Add list to out
@@ -593,6 +640,7 @@ def getUserAlbumsStats(request: HttpRequest, user_discord_id: str | None = None)
     userData['outage_end'] = chance_view_response['outage']['outage_end']
   # Return Object
   return JsonResponse(userData)
+
 
 ###
 # Get Lowest and Highest Rated Albums

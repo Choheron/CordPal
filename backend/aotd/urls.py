@@ -40,6 +40,7 @@ urlpatterns = [
   path('getAlbum/<str:mbid>', views_album.getAlbum),
   path('getAllAlbums', views_album.getAllAlbums),
   path('getLastXAlbums/<int:count>', views_album.getLastXAlbums),
+  path('getLastXSubOrRescueAlbums/<int:count>', views_album.getLastXSubOrRescueAlbums),
   # Below URL has three variations (for different URL params)
   path('getAlbumAvgRating/<str:mbid>/<str:rounded>/<str:date>', views_album.getAlbumAvgRating),
   path('getAlbumAvgRating/<str:mbid>/<str:rounded>', views_album.getAlbumAvgRating),
