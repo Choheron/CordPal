@@ -231,7 +231,7 @@ def calculateAOTDChances(request: HttpRequest):
       .values_list('user_id', flat=True)
   )
   # Pre-compute recent reviewers once — passed to checkSelectionFlag to avoid N repeated queries
-  selection_timeout = (datetime.date.today() + datetime.timedelta(days=1)) - datetime.timedelta(days=2)
+  selection_timeout = timezone.now() - datetime.timedelta(days=1)
   recent_review_users = list(Review.objects.filter(review_date__gte=selection_timeout).values_list('user__discord_id', flat=True).distinct())
   # Single fetch of all users with annotations, forced to list so it can be reused in-memory
   user_list = list(AotdUserData.objects.select_related('user').annotate(

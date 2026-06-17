@@ -252,7 +252,8 @@ def checkIfPrevAuth(request: HttpRequest):
   if(validSession):
     validSession = checkPreviousAuthorization(request)
   # Ensure user is logged in
-  if(validSession and isDiscordTokenExpired(request)):
+  # Pass the token fetched above to avoid two more DB queries inside isDiscordTokenExpired
+  if(validSession and isDiscordTokenExpired(request, token=token)):
     try:
       refreshDiscordToken(request)
     except Exception as e:

@@ -125,7 +125,7 @@ def checkSelectionFlag(aotd_user: AotdUserData, recent_review_users: list = None
       logger.debug(f"User {user.nickname} is not under an outage")
   # Use pre-computed reviewer list if provided, otherwise query
   if recent_review_users is None:
-    selection_timeout = (datetime.date.today() + timedelta(days=1)) - timedelta(days=2)
+    selection_timeout = now() - timedelta(days=1)
     recent_review_users = list(Review.objects.filter(review_date__gte=selection_timeout).values_list('user__discord_id', flat=True).distinct())
   logger.debug(f"Checking selection blocked flag for user: {aotd_user.user.nickname} [Flag is currently: {aotd_user.selection_blocked_flag}]...")
   # Check if user is in the list of recent reviewers
@@ -136,7 +136,7 @@ def checkSelectionFlag(aotd_user: AotdUserData, recent_review_users: list = None
     logger.info(f"Changing `selection_blocked_flag` to {blocked} for {aotd_user.user.nickname}...")
     aotd_user.save()
   # Check if user should be marked as inactive
-  active_users = list(Review.objects.filter(review_date__gte=fortnight_ago).values_list('user__discord_id', flat=True).distinct()) # A user is active if they have reviewed in the last 14 days
+  active_users = list(Review.objects.filter(review_date__gte=now() - timedelta(days=14)).values_list('user__discord_id', flat=True).distinct()) # A user is active if they have reviewed in the last 14 days
   # A user is active if they are in the active users pool OR they appear in the outages pool as they had an outage
   active = (aotd_user.user.discord_id in active_users) or (aotd_user.user.discord_id in inactivity_outage_map)
   if(aotd_user.active != active):

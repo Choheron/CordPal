@@ -40,6 +40,9 @@ class User(AbstractUser):
   # Track any and all API calls that come through with this user's session cookie
   last_request_timestamp = models.DateTimeField(null = True)
   last_heartbeat_timestamp = models.DateTimeField(null = True)
+  # Tracks when the avatar URL was last verified against Discord's CDN so we can
+  # skip the round-trip on every auth check (see refreshDiscordProfilePic).
+  last_avatar_check = models.DateTimeField(null=True, blank=True)
   
   # Some Backend overhauls
   USERNAME_FIELD = 'nickname' # Set username field to nickname so users can change their email to change their username, email must be unique now

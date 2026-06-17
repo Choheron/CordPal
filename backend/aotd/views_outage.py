@@ -37,13 +37,13 @@ def createOutage(request: HttpRequest):
   # Retreive expected items from request body (Also grab objects where needed)
   userID = reqBody['user_discord_id'] if ('user_discord_id' in reqBody) else request.session['discord_id']
   user = User.objects.get(discord_id = userID)
-  start_date = datetime.strptime(reqBody['start_date'], '%Y-%m-%d').replace(tzinfo=pytz.timezone('America/Chicago'))
-  end_date = datetime.strptime(reqBody['end_date'], '%Y-%m-%d').replace(tzinfo=pytz.timezone('America/Chicago'))
+  start_date = datetime.strptime(reqBody['start_date'], '%Y-%m-%d').date()
+  end_date = datetime.strptime(reqBody['end_date'], '%Y-%m-%d').date()
   reason = reqBody['reason']
   admin_enacted = (reqBody['admin_enacted'] if ('admin_enacted' in reqBody) else False)
   admin_enactor = (User.objects.get(reqBody['admin_discord_id']) if ('admin_discord_id' in reqBody) else None)
   # Ensure that start_date is over three days away from the current date
-  earlist_start = datetime.now(pytz.timezone('America/Chicago')) + timedelta(days=2)
+  earlist_start = datetime.now(pytz.timezone('America/Chicago')).date() + timedelta(days=2)
   if(start_date < earlist_start):
     logger.warning("Request for creation of an outage had a date within 3 days... Rejecting and returning error message.", extra={'crid': request.crid})
     return HttpResponse("Creation Failed. Start Date cannot be within 3 days of current time.", status=400, content_type="text/plain")
