@@ -131,12 +131,14 @@ export default function AddAlbumModal(props) {
   // UseEffect to set of album is already submitted
   React.useEffect(() => {
     const checkIfAlbumAlreadySubmitted = async () => {
-      if(selectedValue == "") {
+      if(selectedValue == "" || !selectedAlbum) {
         return;
       }
+      setSubmitLoading(true)
       const albumErrData = await checkIfAlbumAlreadyExists((selectedAlbum) ? selectedAlbum['release-group']['id'] : null)
       setAlbumErrorData(albumErrData)
       setAlbumError(albumErrData['exists'])
+      setSubmitLoading(false)
     }
     console.log(selectedAlbum)
     checkIfAlbumAlreadySubmitted()
@@ -209,7 +211,7 @@ export default function AddAlbumModal(props) {
             onPress={onOpen}
             radius="none"
             variant="solid"
-            isDisabled={!userAllowedToSubmit}
+            // isDisabled={!userAllowedToSubmit}
           >
             <b>Submit An Album</b>
           </Button>

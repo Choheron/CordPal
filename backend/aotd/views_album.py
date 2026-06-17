@@ -132,9 +132,7 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, release_group_id: str):
   out = {}
   # Get album from database
   try:
-    kwargs = {'raw_data__release-group__id': release_group_id}
-    albumObject = Album.objects.get(**kwargs)
-    # Check if any other album of the same release-group exists
+    albumObject = Album.objects.get(release_group_id=release_group_id)
     if(albumObject):
       logger.info(f"Album does already exist, name: {albumObject.title}!", extra={'crid': request.crid})
     out['exists'] = True
@@ -167,8 +165,7 @@ def submitAlbum(request: HttpRequest):
   reqBody = json.loads(request.body)
   # Ensure that album doesnt already exist in the pool
   try:
-    kwargs = {'raw_data__release-group__id': reqBody['album']['release-group']['id']}
-    albumObject = Album.objects.get(**kwargs)
+    albumObject = Album.objects.get(release_group_id=reqBody['album']['release-group']['id'])
     if(albumObject):
       logger.info(f"Album with release group already exists, name: {albumObject.title}!", extra={'crid': request.crid})
     out = {'succesful': False, 'status': 400, 'err_message': f'Album from release group already exists!'}
@@ -179,6 +176,7 @@ def submitAlbum(request: HttpRequest):
     # Query musicbrainz to get full album data using mbid (to avoid issues with params)
     newAlbum = get_album_from_mb(reqBody['album']['id'])
     # Populate submitter and user comment
+    newAlbum.release_group_id = reqBody['album']['release-group']['id']
     newAlbum.submitted_by = user
     newAlbum.user_comment = reqBody['user_comment'] if (reqBody['user_comment'] != "") else "No Comment Provided"
     # Parse hidden field (if submitter wants the submission to be hidden (should only be admins))

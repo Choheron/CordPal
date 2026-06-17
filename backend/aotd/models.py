@@ -111,6 +111,7 @@ class Album(models.Model):
   release_date = models.DateField(max_length=50, null=True) # Date Object Release Date (Optional if a release date can be parsed)
   release_date_str = models.CharField(max_length=50, null=True) # Raw Release date, if found or provided
   disambiguation = models.CharField(max_length=256, null=False, default="") # If its a remaster or not, defauly to ""
+  release_group_id = models.CharField(max_length=256, db_index=True, null=True, default=None) # Release group of the album
   raw_data = models.JSONField(null=True) # JSON field to store all data returned from the frontend
   track_list = models.JSONField(null=True) # JSON field to contain a list of tracks from the musicbrainz api, will be fetched after selection.
   hidden = models.BooleanField(default=False) # If this is true, it will not appear in recent submissions

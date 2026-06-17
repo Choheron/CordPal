@@ -2,6 +2,7 @@ import { getRecentUserActions } from "@/app/lib/user_utils"
 import UserCard from "../general/userUiItems/user_card"
 import ClientTimestamp from "../general/client_timestamp"
 import { RiAddLine, RiEditLine, RiDeleteBin2Line } from "react-icons/ri"
+import { Conditional } from "./conditional"
 
 // Display the last 10 user actions made on the site
 export default async function UserActionsBlock(props) {
@@ -40,10 +41,40 @@ export default async function UserActionsBlock(props) {
     }
   }
 
+  const getActionDetail = (action) => {
+    const { entity_type, action_type, details } = action
+    if (entity_type === "CUSTOM_EMOJI" && action_type === "CREATE" && details) {
+      return details.display_name || details.name || null
+    }
+    if (entity_type === "ALBUM" && details) {
+      if (action_type === "DELETE") {
+        const parts = [details.deleted_album, details.reason].filter(Boolean)
+        return parts.length ? parts.join(" - ") : null
+      }
+      if (action_type === "CREATE") {
+        const parts = [details.title, details.artist].filter(Boolean)
+        return parts.length ? parts.join(" - ") : null
+      }
+    }
+    return null
+  }
+
   const generateActionCard = (action) => {
     const styles = getActionStyles(action['action_type'])
+    const detail = getActionDetail(action)
+    const isAdminAlbumDelete = (() => {
+      if (action['entity_type'] !== "ALBUM" || action['action_type'] !== "DELETE" || !action['details']) return false
+      const raw = action['details']['album_raw_data']
+      const deleter = action['user']['discord_id']
+      return deleter !== raw['submitter_id'] && deleter !== raw['owner_id']
+    })()
     return (
-      <div className={`flex items-center w-full border-l-[3px] ${styles.border} ${styles.glow} bg-zinc-800/40 hover:bg-zinc-700/40 transition-colors rounded-r-lg pl-2.5 pr-4 py-2 gap-3 cursor-default`}>
+      <div className={`relative flex items-center w-full border-l-[3px] ${styles.border} ${styles.glow} bg-zinc-800/40 hover:bg-zinc-700/40 transition-colors rounded-r-lg pl-2.5 pr-4 py-2 gap-3 cursor-default overflow-hidden`}>
+        <Conditional showWhen={isAdminAlbumDelete}>
+          <p className="z-10 absolute top-3 -left-10 text-[10px] bg-red-600 font-bold -rotate-45 px-10">
+            ADMIN
+          </p>
+        </Conditional>
         <div className={`flex-shrink-0 w-[22px] h-[22px] rounded-full flex items-center justify-center text-sm ${styles.iconBg}`}>
           {styles.icon}
         </div>
@@ -56,6 +87,7 @@ export default async function UserActionsBlock(props) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-mono text-xs text-zinc-400 truncate">{action['entity_type']}</p>
+          {detail && <p className="font-mono text-xs text-zinc-600 truncate" title={detail}>{detail}</p>}
         </div>
         <div className="flex-shrink-0">
           <ClientTimestamp
