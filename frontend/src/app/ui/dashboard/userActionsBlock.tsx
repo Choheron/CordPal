@@ -1,13 +1,25 @@
-import { getRecentUserActions } from "@/app/lib/user_utils"
+import { getRecentUserActions, getUserData } from "@/app/lib/user_utils"
 import UserCard from "../general/userUiItems/user_card"
 import ClientTimestamp from "../general/client_timestamp"
 import { RiAddLine, RiEditLine, RiDeleteBin2Line } from "react-icons/ri"
 import { Conditional } from "./conditional"
 
-// Display the last 10 user actions made on the site
+// Scrollable feed of the last 20 user actions taken on the site
+// Expected Props: none
 export default async function UserActionsBlock(props) {
   const userActions = await getRecentUserActions()
 
+  // Resolve previous owner nicknames for album rescue actions before rendering
+  await Promise.all(
+    userActions['actions']
+      .filter(a => a.entity_type === 'ALBUM_OWNER' && a.details?.previous_owner_id)
+      .map(async (a) => {
+        const data = await getUserData(a.details.previous_owner_id)
+        a.details.previous_owner_nick = data?.nickname ?? a.details.previous_owner_id
+      })
+  )
+
+  // Return color/icon styles based on action type, with ALBUM_OWNER overriding to amber
   const getActionStyles = (action: string) => {
     switch(action) {
       case "CREATE":
@@ -41,10 +53,14 @@ export default async function UserActionsBlock(props) {
     }
   }
 
+  // Return a human-readable detail string for an action, or null if none applies
   const getActionDetail = (action) => {
     const { entity_type, action_type, details } = action
     if (entity_type === "CUSTOM_EMOJI" && action_type === "CREATE" && details) {
       return details.display_name || details.name || null
+    }
+    if (entity_type === "ALBUM_OWNER" && details?.previous_owner_nick) {
+      return `Rescued from ${details.previous_owner_nick}`
     }
     if (entity_type === "ALBUM" && details) {
       if (action_type === "DELETE") {
@@ -59,6 +75,7 @@ export default async function UserActionsBlock(props) {
     return null
   }
 
+  // Render a single action row with icon, user card, entity label, detail, and timestamp
   const generateActionCard = (action) => {
     const styles = getActionStyles(action['action_type'])
     const detail = getActionDetail(action)
@@ -86,8 +103,11 @@ export default async function UserActionsBlock(props) {
           />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-mono text-xs text-zinc-400 truncate">{action['entity_type']}</p>
-          {detail && <p className="font-mono text-xs text-zinc-600 truncate" title={detail}>{detail}</p>}
+          <p className="font-mono text-xs text-zinc-400 truncate">{action['entity_type'] === "ALBUM_OWNER" ? "ALBUM_RESCUE" : action['entity_type']}</p>
+          {action['entity_type'] === "REVIEW"
+            ? <a href={`/dashboard/aotd/review/${action['entity_id']}`} className="font-mono text-xs text-sky-700 hover:underline truncate block">See Review</a>
+            : detail && <p className="font-mono text-xs text-zinc-600 truncate" title={detail}>{detail}</p>
+          }
         </div>
         <div className="flex-shrink-0">
           <ClientTimestamp
