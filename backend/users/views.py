@@ -487,8 +487,8 @@ def getRecentUserActions(request: HttpRequest):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Retrieve last 10 user actions
-  user_actions = UserAction.objects.all().order_by('-id')[:20]
+  # Retrieve last 30 user actions
+  user_actions = UserAction.objects.all().order_by('-id')[:30]
   # Iterate User Action objects and convert to JSON
   outList = []
   for action in user_actions:
