@@ -15,7 +15,7 @@ export default async function RecentSubmissions(props) {
   return (
     <div className="h-full w-full lg:w-[350px] flex flex-col backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
       <p className='text-xl mx-auto py-2 font-extralight'>Recent Album Subs&#47;Rescues:</p>
-      <div className="flex flex-col justify-around h-full mx-auto overflow-y-auto scrollbar-hide">
+      <div className="flex flex-col justify-around h-full mx-1 overflow-y-auto scrollbar-hide">
         {recentActions.length === 0 ? (
             <p className='mx-auto my-auto'>No Recent Submissions/Rescues...</p>
           ) : (
@@ -28,7 +28,7 @@ export default async function RecentSubmissions(props) {
                 >
                   <Button
                     radius="lg"
-                    className={`relative group h-fit w-full hover:underline text-white pt-1 text-left overflow-clip`}
+                    className={`relative group h-fit w-full hover:underline text-white pt-1 text-left overflow-clip p-1`}
                     variant="light"
                   >
                     <Conditional showWhen={action['action'] == "UPDATE"}>
