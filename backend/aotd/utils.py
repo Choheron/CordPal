@@ -125,8 +125,8 @@ def checkSelectionFlag(aotd_user: AotdUserData, recent_review_users: list = None
       logger.debug(f"User {user.nickname} is not under an outage")
   # Use pre-computed reviewer list if provided, otherwise query
   if recent_review_users is None:
-    selection_timeout = now() - timedelta(days=1)
-    recent_review_users = list(Review.objects.filter(review_date__gte=selection_timeout).values_list('user__discord_id', flat=True).distinct())
+    selection_cutoff = datetime.date.today() - timedelta(days=2)
+    recent_review_users = list(Review.objects.filter(review_date__date__gte=selection_cutoff).values_list('user__discord_id', flat=True).distinct())
   logger.debug(f"Checking selection blocked flag for user: {aotd_user.user.nickname} [Flag is currently: {aotd_user.selection_blocked_flag}]...")
   # Check if user is in the list of recent reviewers
   blocked = aotd_user.user.discord_id not in recent_review_users
