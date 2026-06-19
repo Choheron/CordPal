@@ -502,12 +502,15 @@ def getLastXSubOrRescueAlbums(request: HttpRequest, count: int):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Get last X count of albums
-  last_X_submissions_or_rescues = UserAction.objects.filter(Q(action_type='CREATE', entity_type='ALBUM') | Q(action_type='UPDATE', entity_type='ALBUM_OWNER')).order_by('-timestamp')[:count]
+  # Get last X count of albums, excluding any that have since been deleted
+  existing_album_ids = Album.objects.values_list('id', flat=True)
+  last_X_submissions_or_rescues = UserAction.objects.filter(
+    (Q(action_type='CREATE', entity_type='ALBUM') | Q(action_type='UPDATE', entity_type='ALBUM_OWNER')),
+    entity_id__in=existing_album_ids
+  ).order_by('-timestamp')[:count]
   # Build list of custom Album Objects
   action_list = []
   for album_action in last_X_submissions_or_rescues:
-    print(album_action.entity_id)
     obj = {}
     obj['action'] = album_action.action_type
     obj['entity'] = album_action.entity_type
