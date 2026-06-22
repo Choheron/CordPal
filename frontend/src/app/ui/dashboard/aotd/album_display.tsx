@@ -53,7 +53,7 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
   const album_cover_url = (props.album_mbid) ? `/dashboard/aotd/api/album-cover/${props.album_mbid}` : album_img_src;
   // Artist props
   const artist_name = (props.artist && props.artist['name']) ? props.artist['name'] : "Artist Name not Found";
-  const artist_url = (props.artist && props.artist['href']) ? props.artist['href'] : "https://www.google.com/search?q=sad+face";
+  const artist_url = (props.artist && props.artist['href']) ? props.artist['href'] : "https://www.google.com/search?q=sad+face"; // NO LONGER USED (SWITCHED TO ALL ALBUMS ARTIST SEARCH)
   // Add UI for display of owner if the owner is not the submitter
   const owner = (props.owner != '') ? props.owner : null;
   const transfer_date: string = (props.transfer_date) ? props.transfer_date : "01/01/0001, 01:01:01";
@@ -116,7 +116,7 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
             <b>{title}</b>
           </a>
           <p className="-mt-2 italic">{disambiguation}</p>
-          <a title={artist_name} href={artist_url} target="_noreferrer" className="text-sm lg:text-xl hover:underline -mt-2 w-fit">
+          <a title={artist_name} href={`/dashboard/aotd/album/all?artist=${artist_name}`} className="text-sm lg:text-xl hover:underline -mt-2 w-fit">
             {artist_name}
           </a>
           <Conditional showWhen={release_date != "Unknown"}>

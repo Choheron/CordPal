@@ -1,5 +1,15 @@
 'use client'
 
+// URL params used by this page (all optional):
+//   title      — album title filter text
+//   artist     — artist name filter text
+//   submitter  — discord_id of the selected submitter; single value, matched exactly
+//   aotd       — "1" to show only albums that have been Album Of the Day
+//   sort       — active sort column and direction, formatted as "column:direction"
+//                  e.g. sort=rating:descending  (default when absent)
+//                  valid columns: title | artist | submitter | submission_date | standard_deviation | rating | last_aotd
+//   page       — current page number (default 1); reset to 1 on any filter or sort change
+
 import {
   Table,
   TableHeader,
@@ -16,7 +26,7 @@ import { Checkbox } from "@heroui/checkbox";
 import { Pagination } from "@heroui/pagination";
 
 import React from "react";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { convertToLocalTZString, ratingToTailwindBgColor } from "@/app/lib/utils";
 import Link from "next/link";
 import { Conditional } from "@/app/ui/dashboard/conditional";
@@ -79,26 +89,73 @@ interface Props {
 }
 
 export default function AlbumsClient({ albums, timestamp }: Props) {
-  const [sortDescriptor, setSortDescriptor] = React.useState<any>({ column: "rating", direction: "descending" })
-  const [titleFilter, setTitleFilter] = React.useState("")
-  const [artistFilter, setArtistFilter] = React.useState("")
-  const [submitterFilter, setSubmitterFilter] = React.useState(new Set([]))
-  const [aotdFilter, setAotdFilter] = React.useState(false)
-  const [isPending, startTransition] = React.useTransition()
-  const [page, setPage] = React.useState(1)
-  const rowsPerPage = 50
+  const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
+  const [isPending, startTransition] = React.useTransition()
+  const rowsPerPage = 50
+
+  // Derived from URL params
+  const urlTitle = searchParams.get('title') ?? ''
+  const urlArtist = searchParams.get('artist') ?? ''
+  const urlSubmitter = searchParams.get('submitter') ?? ''
+  const aotdFilter = searchParams.get('aotd') === '1'
+  const page = Number(searchParams.get('page') ?? '1')
+  // Stored as "column:direction" in the URL; defaults to rating desc when absent
+  const sortDescriptor: any = React.useMemo(() => {
+    const s = searchParams.get('sort')
+    if (!s) return { column: "rating", direction: "descending" }
+    const [column, direction] = s.split(':')
+    return { column, direction: direction as "ascending" | "descending" }
+  }, [searchParams])
+  // UserDropdown expects selectedKeys as a Set
+  const submitterFilter = React.useMemo(
+    () => new Set(urlSubmitter ? [urlSubmitter] : []),
+    [urlSubmitter]
+  )
+
+  // Local state for text inputs — gives immediate feedback while URL update is debounced
+  const [titleInput, setTitleInput] = React.useState(urlTitle)
+  const [artistInput, setArtistInput] = React.useState(urlArtist)
+
+  // Merges updates into the current URL params and pushes a new history entry,
+  // so each filter change is reachable via the browser back button. Pass null to remove a param.
+  const updateParams = React.useCallback((updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString())
+    for (const [key, value] of Object.entries(updates)) {
+      if (value === null || value === '') params.delete(key)
+      else params.set(key, value)
+    }
+    const qs = params.toString()
+    router.push(qs ? `${pathname}?${qs}` : pathname)
+  }, [searchParams, router, pathname])
+
+  // Debounce text inputs → URL (300ms)
+  React.useEffect(() => {
+    if (titleInput === urlTitle) return
+    const t = setTimeout(() => updateParams({ title: titleInput, page: null }), 300)
+    return () => clearTimeout(t)
+  }, [titleInput, urlTitle, updateParams])
+
+  // Debounce artist input → URL (300ms)
+  React.useEffect(() => {
+    if (artistInput === urlArtist) return
+    const t = setTimeout(() => updateParams({ artist: artistInput, page: null }), 300)
+    return () => clearTimeout(t)
+  }, [artistInput, urlArtist, updateParams])
+
+  // Sync local text state back when URL changes (back/forward navigation)
+  React.useEffect(() => setTitleInput(urlTitle), [urlTitle])
+  React.useEffect(() => setArtistInput(urlArtist), [urlArtist])
 
   const displayedAlbumList = React.useMemo(() => {
     let list = albums
-    if (titleFilter) list = list.filter(a => (a['title'] as string).toLowerCase().includes(titleFilter.toLowerCase()))
-    if (artistFilter) list = list.filter(a => (a['artist']['name'] as string).toLowerCase().includes(artistFilter.toLowerCase()))
-    if (submitterFilter.size) list = list.filter(a => (a['submitter'] as string) === Object.values(submitterFilter)[0])
+    if (urlTitle) list = list.filter(a => (a['title'] as string).toLowerCase().includes(urlTitle.toLowerCase()))
+    if (urlArtist) list = list.filter(a => (a['artist']['name'] as string).toLowerCase().includes(urlArtist.toLowerCase()))
+    if (submitterFilter.size) list = list.filter(a => (a['submitter'] as string) === [...submitterFilter][0]) // spread, not Object.values() — plain Sets aren't enumerable as object properties
     if (aotdFilter) list = list.filter(a => a['last_aotd'] != null && a['rating'] != null)
     return sortAlbumList(list, sortDescriptor)
-  }, [albums, titleFilter, artistFilter, submitterFilter, aotdFilter, sortDescriptor])
-
-  React.useEffect(() => { setPage(1) }, [titleFilter, artistFilter, submitterFilter, aotdFilter, sortDescriptor])
+  }, [albums, urlTitle, urlArtist, submitterFilter, aotdFilter, sortDescriptor])
 
   const totalPages = Math.max(1, Math.ceil(displayedAlbumList.length / rowsPerPage))
   const paginatedAlbumList = React.useMemo(() => {
@@ -106,7 +163,9 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     return displayedAlbumList.slice(start, start + rowsPerPage)
   }, [displayedAlbumList, page, rowsPerPage])
 
-  const handleSortChange = (descriptor) => setSortDescriptor(descriptor)
+  const handleSortChange = (descriptor) => {
+    updateParams({ sort: `${descriptor.column}:${descriptor.direction}`, page: null })
+  }
 
   // Invalidate the server cache then re-run the server component with fresh data
   const hardRefresh = async () => {
@@ -202,12 +261,12 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
       <PageTitle text={`Album Data for ${(displayedAlbumList.length === albums.length) ? "all" : ""} ${isPending ? "LOADING" : displayedAlbumList.length} Albums`} />
       <div>
         <div className="flex flex-col sm:flex-row gap-1 w-full md:w-3/4 mx-auto">
-          <Input label="Title" placeholder="Filter by Title" value={titleFilter} onValueChange={setTitleFilter} />
-          <Input label="Artist" placeholder="Filter by Artist" value={artistFilter} onValueChange={setArtistFilter} />
-          <UserDropdown label="Submitter" setSelectionCallback={setSubmitterFilter} selectedKeys={submitterFilter} />
+          <Input label="Title" placeholder="Filter by Title" value={titleInput} onValueChange={setTitleInput} />
+          <Input label="Artist" placeholder="Filter by Artist" value={artistInput} onValueChange={setArtistInput} />
+          <UserDropdown label="Submitter" setSelectionCallback={(s: Set<any>) => updateParams({ submitter: [...s][0] ?? null, page: null })} selectedKeys={submitterFilter} />
         </div>
         <div className="w-full md:w-3/4 mx-auto my-1">
-          <Checkbox isSelected={aotdFilter} onValueChange={setAotdFilter} className="w-full ml-1">
+          <Checkbox isSelected={aotdFilter} onValueChange={(v) => updateParams({ aotd: v ? '1' : null, page: null })} className="w-full ml-1">
             Only Show Albums that have been Album Of the Day
           </Checkbox>
         </div>
@@ -296,11 +355,11 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
         </div>
         {totalPages > 1 && (
           <div className="flex justify-center mt-4 pb-4">
-            <Pagination 
-              total={totalPages} 
-              page={page} 
-              onChange={setPage} 
-              color="primary" 
+            <Pagination
+              total={totalPages}
+              page={page}
+              onChange={(p) => updateParams({ page: String(p) })}
+              color="primary"
             />
           </div>
         )}
