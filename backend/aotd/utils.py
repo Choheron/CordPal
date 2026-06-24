@@ -300,7 +300,8 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   ## Get date of user's AOTD User Data Creation
   user_start_date = user.creation_timestamp.date()
   ## Get count of AOTD objects since this date
-  possible_aotd_count = DailyAlbum.objects.filter(date__gte=user_start_date).count()
+  today = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date()
+  possible_aotd_count = DailyAlbum.objects.filter(date__gte=user_start_date).filter(date__lte=today).count()
   ## Calculate count of days that user did not review
   user_missed_review_count = possible_aotd_count - total_reviews
   ## Calculate review ratio
