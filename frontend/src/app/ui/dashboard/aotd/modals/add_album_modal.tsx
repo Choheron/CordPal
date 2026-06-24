@@ -175,6 +175,7 @@ export default function AddAlbumModal(props) {
       })
     }
     // Check user submission validity
+    setUserAllowedToSubmit(false) // Hard code block user from submission
     getUserSubmissionValidity()
     // Call cancel functionality to clear systems
     cancelPress()

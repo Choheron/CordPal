@@ -177,6 +177,7 @@ export async function submitAlbumToBackend(albumObject) {
   const responseJson = await submitAlbumResponse.json();
   // Revalidate requests to see recent submissions
   revalidateTag('album_submissions', "max")
+  updateTag(`album_${albumObject['album']['id']}`)
   // Return Status
   return {"status": submitAlbumResponse.status, "err_message": responseJson.err_message, "crid": submitAlbumResponse.headers.get("X-CRID")}
 }
@@ -197,6 +198,7 @@ export async function rescueAlbumFromBackend(albumObject) {
   });
   // Revalidate requests to see recent submissions or rescues
   revalidateTag('album_submissions', "max")
+  updateTag(`album_${albumObject['album']['id']}`)
   const responseJson = await response.json();
   return { status: response.status, err_message: responseJson.err_message, crid: response.headers.get("X-CRID") }
 }
