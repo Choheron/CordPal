@@ -251,14 +251,6 @@ def checkIfPrevAuth(request: HttpRequest):
   # Set output var if session exists
   if(validSession):
     validSession = checkPreviousAuthorization(request)
-  # Ensure user is logged in
-  # Pass the token fetched above to avoid two more DB queries inside isDiscordTokenExpired
-  if(validSession and isDiscordTokenExpired(request, token=token)):
-    try:
-      refreshDiscordToken(request)
-    except Exception as e:
-      logger.error(f"Filed to refresh discord token! Returning False. Error: {e}", extra={'crid': request.crid})
-      validSession = False
   # Return JsonResponse containing true or false in body
   logger.debug(f"Returning prevAuth status of: {validSession}...", extra={'crid': request.crid})
   out = {}

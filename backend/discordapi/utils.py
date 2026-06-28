@@ -58,15 +58,16 @@ def storeDiscordTokenInDatabase(request: HttpRequest, token_data: json):
 
 
 def isDiscordTokenExpired(request: HttpRequest, token: DiscordTokens = None):
-  logger.info("Checking if discord token is expired...", extra={'crid': request.crid})
+  # Retrieve user from session 
+  user = User.objects.get(discord_id = request.session.get('discord_id'))
+  logger.debug(f"Checking if {user.nickname}\'s discord token is expired...", extra={'crid': request.crid})
   # Accept a pre-fetched token so callers that already queried DiscordTokens
   # (e.g. checkIfPrevAuth) don't trigger two more DB round-trips here.
   if token is None:
-    user = User.objects.get(discord_id = request.session.get('discord_id'))
     token = DiscordTokens.objects.get(user = user)
   tokenExpireTime = token.expiry_date
   if((tokenExpireTime is not None) and (timezone.now() > tokenExpireTime)):
-    logger.info("Token IS expired...", extra={'crid': request.crid})
+    logger.info(f"NOTE: {user.nickname}\'s discord token is expired...", extra={'crid': request.crid})
     return True
   return False
 
@@ -113,19 +114,13 @@ def refreshDiscordProfilePic(request: HttpRequest, user=None, tokenData=None):
       tokenData = DiscordTokens.objects.get(user=user)
   except Exception as e:
     return False
-
   # This runs on every auth check — without this guard it makes a CDN HTTP
   # request on every page load. Only verify the avatar URL once per day.
   if user.last_avatar_check and (timezone.now() - user.last_avatar_check) < AVATAR_CHECK_INTERVAL:
     return
-
   avatar_res = requests.get(user.get_avatar_url())
   if(avatar_res.status_code == 404):
     logger.info("Refreshing user's discord profile picture...", extra={'crid': request.crid})
-    if(isDiscordTokenExpired(request, token=tokenData)):
-      refreshDiscordToken(request)
-      # tokenData is stale after a refresh — re-fetch before using the access token
-      tokenData = DiscordTokens.objects.get(user=user)
     reqHeaders = {
       'Authorization': f"{tokenData.token_type} {tokenData.access_token}"
     }
@@ -148,12 +143,13 @@ def refreshDiscordProfilePic(request: HttpRequest, user=None, tokenData=None):
 
 def checkPreviousAuthorization(request: HttpRequest):
   # Check if session is stored in data
-  logger.info("Checking if sessionid exists...", extra={'crid': request.crid})
+  logger.debug("Checking if sessionid exists...", extra={'crid': request.crid})
   try:
     # Get user instance and data
     user = User.objects.get(discord_id = request.session.get('discord_id'))
     tokenData = DiscordTokens.objects.get(user = user)
-    # Pass already-fetched objects to avoid re-querying inside refreshDiscordProfilePic
+    if isDiscordTokenExpired(request, token=tokenData):
+      refreshDiscordToken(request)
     refreshDiscordProfilePic(request, user=user, tokenData=tokenData)
     return True
   except Exception as e:
