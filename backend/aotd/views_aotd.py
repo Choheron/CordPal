@@ -95,6 +95,17 @@ def setAlbumOfDay(request: HttpRequest):
     checkSelectionFlag(spot_user)
   # Get current date
   day = datetime.date.today()
+  # Calculate yesterday's data
+  yesterday = day - datetime.timedelta(days=1)
+  try:
+    # Attempt to get previous AOtD Object and generate a timeline, as well as store final rating for that album in the AOtD object, also calculate standard deviation
+    yesterday_aotd = DailyAlbum.objects.get(date=yesterday)
+    generateDayRatingTimeline(yesterday_aotd)
+    yesterday_aotd.rating = getAlbumRating(yesterday_aotd.album.mbid, False, yesterday.strftime("%Y-%m-%d"))
+    yesterday_aotd.standard_deviation = retrieveAlbumSTD(yesterday_aotd.album.mbid, yesterday.strftime("%Y-%m-%d"), True)
+    yesterday_aotd.save()
+  except:
+    logger.error(f"ERROR IN GENERATING TIMELINE DATA FOR DATE: {yesterday.strftime('%Y-%m-%d')} TRACEBACK: {traceback.print_exc()}", extra={'crid': request.crid})
   # Check if a current album of the day already exists
   try:
     currDayAlbum = DailyAlbum.objects.get(date=day)
@@ -137,16 +148,6 @@ def setAlbumOfDay(request: HttpRequest):
   )
   # Save object
   albumOfTheDayObj.save()
-  yesterday = day - datetime.timedelta(days=1)
-  try:
-    # Attempt to get previous AOtD Object and generate a timeline, as well as store final rating for that album in the AOtD object, also calculate standard deviation
-    yesterday_aotd = DailyAlbum.objects.get(date=yesterday)
-    generateDayRatingTimeline(yesterday_aotd)
-    yesterday_aotd.rating = getAlbumRating(yesterday_aotd.album.mbid, False, yesterday.strftime("%Y-%m-%d"))
-    yesterday_aotd.standard_deviation = retrieveAlbumSTD(yesterday_aotd.album.mbid, yesterday.strftime("%Y-%m-%d"), True)
-    yesterday_aotd.save()
-  except:
-    logger.error(f"ERROR IN GENERATING TIMELINE DATA FOR DATE: {yesterday.strftime('%Y-%m-%d')} TRACEBACK: {traceback.print_exc()}", extra={'crid': request.crid})
   # Print success
   logger.info(f'{request.crid} - Successfully selected album of the day: \"{albumOfTheDayObj}\" submitted by: \"{albumOfTheDay.submitted_by.nickname}\"', extra={'crid': request.crid})
   return HttpResponse(f'Successfully selected album of the day: \"{albumOfTheDayObj}\" submitted by: \"{albumOfTheDay.submitted_by.nickname}\"')
@@ -438,3 +439,64 @@ def getDayTimelineData(request: HttpRequest, aotd_date: str):
     aotd_obj.save()
   # Return object data
   return JsonResponse(aotd_obj.rating_timeline)
+
+
+###
+# Recalculate aotd data for a specific date
+###
+def recalculateAOTDStats(request: HttpRequest, date: str = "YYYY-MM-DD", recalc_timeline: bool = False):
+  """
+  POST. Recomputes avg rating and STD for the AOTD on a given date, persisting the rating to DailyAlbum.
+
+  :param date: Target date in YYYY-MM-DD format.
+  :param recalc_timeline: If truthy, also regenerates the day rating timeline via generateDayRatingTimeline.
+  :returns: 200 on success | 400 bad date format | 404 no AOTD for date | 405 non-POST
+  """
+  # Make sure request is a post request
+  if(request.method != "POST"):
+    logger.warning(f"recalculateAOTDStats called with a non-POST method, returning 405.", extra={'crid': request.crid})
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Parse provided date string
+  try:
+    aotd_date = datetime.datetime.strptime(date, "%Y-%m-%d")
+  except Exception as e:
+    logger.error(f"Failed to parse provided date of {date}, err: {e}", extra={'crid': request.crid, "err": e})
+    return HttpResponse("Invalid date format, expected YYYY-MM-DD", status=400)
+  # Retreive AOTD
+  try:
+    aotd_obj = DailyAlbum.objects.get(date=aotd_date)
+  except:
+    logger.error(f"AOTD Object not found for passed in date: {date}", extra={'crid': request.crid})
+    return HttpResponse(f"No AOTD found for date: {date}", status=404)
+  # Recalculate Average score from reviews
+  rating = getAlbumRating(
+    mbid=aotd_obj.album.mbid,
+    rounded=False,
+    date=aotd_date,
+    force_recalc=True
+  )
+  # Store that rating in the database and save
+  aotd_obj.rating = rating
+  aotd_obj.save()
+  # Recalculate timeline data (if specifically provided)
+  if(recalc_timeline):
+    generateDayRatingTimeline(aotd_obj)
+  # Force a recalculation of the album's STD
+  stdev = retrieveAlbumSTD(
+    mbid=aotd_obj.album.mbid,
+    date=date,
+    force=True
+  )
+  # Log successful recalculation
+  logger.info(
+    f"Recalculated AOTD data for date: {date}. See extras for album data",
+    extra={
+      'crid': request.crid,
+      'rating': rating,
+      'stddev': stdev,
+      'review_count': Review.objects.filter(album__mbid=aotd_obj.album.mbid).filter(aotd_date=aotd_date).count()
+    }
+  )
+  return HttpResponse(status=200)

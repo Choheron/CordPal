@@ -68,13 +68,30 @@ def isUserAotdParticipant(request: HttpRequest):
  
 
 # Get album's average rating (by mbid passed in [NOT ALBUM OBJECT])
-def getAlbumRating(mbid, rounded=True, date: str = None):
+def getAlbumRating(mbid, rounded=True, date: datetime.date = None, force_recalc: bool = False):
+  '''
+  Returns the average review rating for an album on a given AOTD date.
+
+  If a finalized rating is already stored in DailyAlbum (i.e., rating != 11),
+  that value is returned directly. Otherwise, the rating is computed live from
+  the Review table. Rating 11 is the sentinel value meaning "not yet finalized."
+
+  Args:
+    mbid (str): MusicBrainz ID of the album. Must be the mbid, not an Album object.
+    rounded (bool): If True, rounds to the nearest 0.5. If False, returns the raw average.
+    date (datetime.date | None): AOTD date to query. Defaults to the most recent AOTD date for this mbid.
+    force_recalc (bool): If True, bypasses the stored rating and recalculates from reviews.
+
+  Returns:
+    float | None: The rating, or None if no reviews exist for the given date.
+  '''
   # Get most recent aotd date if date is not provided
   aotd_date = date if (date) else DailyAlbum.objects.filter(album__mbid=mbid).latest('date').date
   # Attempt to get aotd from database
   aotd = DailyAlbum.objects.get(date=aotd_date)
   # If there is already a value in the databse for this date (not an 11) then return that, else calculate rating 
-  if(aotd.rating != 11):
+  # Also recalculate if the force_recalc is passed in
+  if((not force_recalc) and (aotd.rating != 11)):
     return (round(aotd.rating) if rounded else aotd.rating)
   # Retrieve album from database
   albumObj = aotd.album
@@ -82,6 +99,7 @@ def getAlbumRating(mbid, rounded=True, date: str = None):
   reviewList = Review.objects.filter(album=albumObj, aotd_date=aotd_date)
   # Return None if the album has not been reviewed
   if(reviewList.count() == 0):
+    logger.warning(f'Album for date \'{aotd_date.strftime("%Y-%m-%d")}\' has no reviews.')
     return None
   # Calculate Average [DO NOT STORE IN DB UNTIL DAY IS OVER (Handled in Aotd selection method)]
   avg = reviewList.aggregate(avg=Avg('score'))['avg']
@@ -430,7 +448,7 @@ def retrieveAlbumSTD(mbid: str, date: str = None, force: bool = False) -> float:
     return aotdObj.standard_deviation
   # Get all ratings for an album
   reviewList = Review.objects.filter(album__mbid=mbid).filter(aotd_date=aotd_date)
-  # If reviewlist is empty return 0.00'
+  # If reviewlist is empty return 0.00
   standardDev = 0.00
   if(len(reviewList) != 0):
     # Iterate review list and get scores

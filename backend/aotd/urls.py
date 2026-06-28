@@ -109,6 +109,9 @@ urlpatterns = [
   path('getAOtDByMonth/<str:year>/<str:month>', views_aotd.getAOtDByMonth),
   # Get AOtD Rating Timeline
   path('getDayTimelineData/<str:aotd_date>', views_aotd.getDayTimelineData),
+  # Recalculate AOTD stats for a specific date; optional flag to also recalc timeline
+  path('recalculateAOTDStats/<str:date>/<str:recalc_timeline>', views_aotd.recalculateAOTDStats),
+  path('recalculateAOTDStats/<str:date>', views_aotd.recalculateAOTDStats),
   ## ============================================================================================================
   ## User Selection Outage Views
   ## ============================================================================================================
