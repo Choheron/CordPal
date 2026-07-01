@@ -457,7 +457,7 @@ def getAllAlbums(request: HttpRequest):
 ###
 def getAlbumAvgRating(request: HttpRequest, mbid: str, rounded: str = "true", date: str = None):
   # If date is not provided grab the most recent date of AOtD
-  aotd_date = date if (date) else DailyAlbum.objects.filter(album__mbid=mbid).latest('date').date
+  aotd_date = datetime.datetime.strptime(date, "%Y-%m-%d") if (date) else DailyAlbum.objects.filter(album__mbid=mbid).latest('date').date
   # Convert bool to string
   if(rounded == "true"):
     rounded = True
