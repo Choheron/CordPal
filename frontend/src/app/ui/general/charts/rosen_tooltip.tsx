@@ -136,7 +136,7 @@ const TooltipContent = React.forwardRef<HTMLDivElement, { children: React.ReactN
   return createPortal(
     isMobile ? (
       <div
-        className="fixed h-fit z-60 w-fit rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3"
+        className="fixed h-fit z-30 w-fit rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3"
         style={{
           top: context.tooltip.y,
           left: context.tooltip.x + 20,
@@ -147,7 +147,7 @@ const TooltipContent = React.forwardRef<HTMLDivElement, { children: React.ReactN
     ) : (
       <div
         ref={tooltipRef}
-        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3.5 py-2 rounded-lg fixed z-50"
+        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3.5 py-2 rounded-lg fixed z-30"
         style={getTooltipPosition()}
       >
         {children}

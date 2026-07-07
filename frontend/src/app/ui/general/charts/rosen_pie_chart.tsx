@@ -125,7 +125,7 @@ export function RosenPieChart(props) {
                 </div>
                 {angle >= MIN_ANGLE && (
                   <div
-                    className="absolute -translate-x-1/2 -translate-y-1/2 size-10 z-50"
+                    className="absolute -translate-x-1/2 -translate-y-1/2 size-10 z-30"
                     style={{ left: logoLeft, top: logoTop }}
                   >
                     {(d.data.nameType == 0) ? (
