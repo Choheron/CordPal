@@ -22,6 +22,7 @@ import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
 import { Spinner } from "@heroui/spinner";
 import { Input } from "@heroui/input";
+import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import { Checkbox } from "@heroui/checkbox";
 import { Pagination } from "@heroui/pagination";
 
@@ -185,6 +186,27 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
   const [tagInput, setTagInput] = React.useState(urlTag)
   const [artistInput, setArtistInput] = React.useState(urlArtist)
 
+  // Distinct tag texts across all loaded albums, most-used first — powers the tag filter's autocomplete
+  const tagOptions = React.useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const a of albums) {
+      for (const tag of a['tags'] ?? []) {
+        counts.set(tag['tag_text'], (counts.get(tag['tag_text']) ?? 0) + 1)
+      }
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([text]) => text)
+  }, [albums])
+
+  // Distinct artist names across all loaded albums, most-used first — powers the artist filter's autocomplete
+  const artistOptions = React.useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const a of albums) {
+      const name = a['artist']?.['name']
+      if (name) counts.set(name, (counts.get(name) ?? 0) + 1)
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name)
+  }, [albums])
+
   // Merges updates into the current URL params and pushes a new history entry,
   // so each filter change is reachable via the browser back button. Pass null to remove a param.
   const updateParams = React.useCallback((updates: Record<string, string | null>) => {
@@ -338,9 +360,35 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
       <PageTitle text={`Album Data for ${(displayedAlbumList.length === albums.length) ? "all" : ""} ${isPending ? "LOADING" : displayedAlbumList.length} Albums`} />
       <div>
         <div className="flex flex-col sm:flex-row gap-1 w-full md:w-4/5 mx-auto">
+          {/* Title Search Bar */}
           <Input label="Title" placeholder="Filter by Title" value={titleInput} onValueChange={setTitleInput} />
-          <Input label="Tag" placeholder="Filter by Tag" value={tagInput} onValueChange={setTagInput} />
-          <Input label="Artist" placeholder="Filter by Artist" value={artistInput} onValueChange={setArtistInput} />
+          {/* Tag search with autocomplete */}
+          <Autocomplete
+            label="Tag"
+            placeholder="Filter by Tag"
+            inputValue={tagInput}
+            onInputChange={setTagInput}
+            allowsCustomValue
+            menuTrigger="input"
+          >
+            {tagOptions.map((text) => (
+              <AutocompleteItem key={text}>{text}</AutocompleteItem>
+            ))}
+          </Autocomplete>
+          {/* Artist search with autocomplete */}
+          <Autocomplete
+            label="Artist"
+            placeholder="Filter by Artist"
+            inputValue={artistInput}
+            onInputChange={setArtistInput}
+            allowsCustomValue
+            menuTrigger="input"
+          >
+            {artistOptions.map((name) => (
+              <AutocompleteItem key={name}>{name}</AutocompleteItem>
+            ))}
+          </Autocomplete>
+          {/* User Dropdown Search Bar */}
           <UserDropdown label="Submitter" setSelectionCallback={(s: Set<any>) => updateParams({ submitter: [...s][0] ?? null, page: null })} selectedKeys={submitterFilter} />
         </div>
         <div className="w-full md:w-4/5 mx-auto my-1">
