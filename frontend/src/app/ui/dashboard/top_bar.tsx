@@ -126,9 +126,6 @@ export default function TopBar(props) {
                         {'text-decoration-line: underline bg-gradient-to-r from-neutral-900/0 via-neutral-900 to-neutral-900/0': pathname === link.href},
                         {'line-through': link.disabled})}
                     >
-                      <div className="text-xl">
-                        {link.icon}
-                      </div>
                       <Link 
                         key={index}
                         href={link.href}
@@ -136,6 +133,9 @@ export default function TopBar(props) {
                         size="sm"
                         className="text-center rounded-full text-white"
                       >
+                        <div className="text-xl pr-1">
+                          {link.icon}
+                        </div>
                         {link.name}
                       </Link>
                     </div>
