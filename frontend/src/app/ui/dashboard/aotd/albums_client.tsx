@@ -74,12 +74,12 @@ const sortAlbumList = (list: any[], descriptor: any) => {
 
 const columns = [
   { key: "title",             label: "ALBUM",          sortable: true,  width: "lg:w-[320px]" },
-  { key: "tags",              label: "TAGS",           sortable: false, width: "lg:w-[280px]" },
+  { key: "tags",              label: "TAGS",           sortable: false, width: "lg:w-[260px]" },
   { key: "artist",            label: "ARTIST",         sortable: true,  width: "lg:w-[100px]" },
-  { key: "submitter",         label: "SUBMITTER",      sortable: true,  width: "lg:w-[110px]" },
+  { key: "submitter",         label: "SUBMITTER",      sortable: true,  width: "lg:w-[120px]" },
   { key: "submission_date",   label: "SUBMITTED ON",   sortable: true,  width: "lg:w-[90px]" },
   { key: "standard_deviation",label: "STDDEV",         sortable: true,  width: "lg:w-[70px]" },
-  { key: "rating",            label: "RATING",         sortable: true, width: "lg:w-[90px]" },
+  { key: "rating",            label: "RATING",         sortable: true,  width: "lg:w-[90px]" },
   { key: "last_aotd",         label: "LAST AOD",       sortable: true,  width: "lg:w-[90px]" },
 ]
 const columnWidths: Record<string, string> = Object.fromEntries(columns.map(c => [c.key, c.width]))
@@ -283,9 +283,9 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
         )
       case "submitter":
         return (
-          <div className={`flex w-fit ${columnWidths.submitter} gap-2`}>
+          <div className={`flex ${columnWidths.submitter} gap-2 min-w-0`}>
             <Avatar src={`${album['submitter_avatar_url']}`} className="shrink-0" />
-            <p className="my-auto hidden md:block">{album['submitter_nickname']}</p>
+            <p className="my-auto hidden md:block truncate">{album['submitter_nickname']}</p>
           </div>
         )
       case "submission_date":
