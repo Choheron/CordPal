@@ -2,6 +2,7 @@ from django.db import models
 from django.forms.models import model_to_dict
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.utils import timezone
 
 import json
 
@@ -30,7 +31,7 @@ class Reaction(models.Model):
     }
     outObj['target_object_id'] = self.object_id
     outObj['emoji'] = self.emoji
-    outObj['creation_timestamp'] = self.creation_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
+    outObj['creation_timestamp'] = timezone.localtime(self.creation_timestamp).strftime("%m/%d/%Y, %H:%M:%S")
     outObj['custom_emoji'] = self.custom_emoji
     return outObj
 

@@ -377,7 +377,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
       temp['artist']['href'] = (albumObj.artist_url)
       temp['submitter'] = albumObj.submitted_by.discord_id
       temp['submitter_comment'] = albumObj.user_comment
-      temp['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+      temp['submission_date'] = timezone.localtime(albumObj.submission_date).strftime("%m/%d/%Y, %H:%M:%S")
       # Attach rating of album
       temp['rating'] = rating
       # Append out object to output
@@ -407,7 +407,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     # Attach submission numbers object to out JSON 
     out['stats']['user_stats'] = subNumObj
   # Return out object with timestamp
-  out['timestamp'] = timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
+  out['timestamp'] = timezone.localtime(timezone.now()).strftime("%m/%d/%Y, %H:%M:%S")
   return JsonResponse(out)
 
 

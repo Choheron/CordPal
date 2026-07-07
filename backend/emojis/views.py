@@ -2,6 +2,7 @@ from django.http import HttpRequest, HttpResponse, FileResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import FileSystemStorage
 from django.db.models import F
+from django.utils import timezone
 
 import json
 import logging
@@ -55,7 +56,7 @@ def listEmojis(request: HttpRequest):
       'keywords': emoji.keywords,
       'skins': [{'src': f'{backend_base}/emojis/serve/{emoji.emoji_id}/'}],
       'submitted_by': emoji.submitted_by.nickname if emoji.submitted_by else "UNKNOWN",
-      'submitted_at': emoji.submitted_at.strftime('%m/%d/%Y, %H:%M:%S') if emoji.submitted_at else "ERR DATE"
+      'submitted_at': timezone.localtime(emoji.submitted_at).strftime('%m/%d/%Y, %H:%M:%S') if emoji.submitted_at else "ERR DATE"
     })
   return JsonResponse({'emojis': out})
 

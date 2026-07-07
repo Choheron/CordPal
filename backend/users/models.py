@@ -96,8 +96,8 @@ class User(AbstractUser):
     out={}
     out['guid'] = self.guid
     out['username'] = self.username
-    out['last_updated_timestamp'] = self.last_updated_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
-    out['creation_timestamp'] = self.creation_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
+    out['last_updated_timestamp'] = timezone.localtime(self.last_updated_timestamp).strftime("%m/%d/%Y, %H:%M:%S")
+    out['creation_timestamp'] = timezone.localtime(self.creation_timestamp).strftime("%m/%d/%Y, %H:%M:%S")
     out['email'] = self.email
     out['nickname'] = self.nickname
     out['timezone_string'] = self.timezone_string
@@ -108,8 +108,8 @@ class User(AbstractUser):
     out['aotd_enrolled'] = self.aotd_enrolled
     out['is_active'] = self.is_active
     out['is_staff'] = self.is_staff
-    out['last_request_timestamp'] = self.last_request_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
-    out['last_heartbeat_timestamp'] = self.last_heartbeat_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
+    out['last_request_timestamp'] = timezone.localtime(self.last_request_timestamp).strftime("%m/%d/%Y, %H:%M:%S")
+    out['last_heartbeat_timestamp'] = timezone.localtime(self.last_heartbeat_timestamp).strftime("%m/%d/%Y, %H:%M:%S")
     return out
 
   # toString Method
@@ -142,7 +142,7 @@ class UserAction(models.Model):
     out['action_type'] = self.action_type
     out['entity_type'] = self.entity_type
     out['entity_id'] = self.entity_id
-    out['timestamp'] = self.timestamp.strftime("%m/%d/%Y, %H:%M:%S")
+    out['timestamp'] = timezone.localtime(self.timestamp).strftime("%m/%d/%Y, %H:%M:%S")
     out['details'] = self.details
     return out
 

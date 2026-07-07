@@ -296,7 +296,8 @@ class UserAlbumOutage(models.Model):
 
   # Return True if outage is currently in effect or False if not
   def isActive(self):
-    return ((self.start_date < timezone.now().date()) and (timezone.now().date() < self.end_date))
+    today = timezone.localtime(timezone.now()).date()
+    return ((self.start_date < today) and (today < self.end_date))
 
   # Convert to a dict
   def dict(self):

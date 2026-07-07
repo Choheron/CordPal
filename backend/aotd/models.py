@@ -126,7 +126,7 @@ class Album(models.Model):
   )
 
   def subDateToCalString(self):
-    return self.submission_date.strftime('%Y-%m-%d')
+    return timezone.localtime(self.submission_date).strftime('%Y-%m-%d')
 
   def relDateToCalString(self):
     if(self.release_date_date):
@@ -147,7 +147,7 @@ class Album(models.Model):
     out['album_url'] = self.album_url
     out['submitter'] = self.submitted_by.nickname
     out['submitter_id'] = self.submitted_by.discord_id
-    out['submission_date'] = self.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+    out['submission_date'] = timezone.localtime(self.submission_date).strftime("%m/%d/%Y, %H:%M:%S")
     out['release_date_str'] = self.release_date_str
     out['user_comment'] = self.user_comment
     recent_transfer = self.ownership_history.order_by('-transferred_at').first()
@@ -156,7 +156,7 @@ class Album(models.Model):
       out['submitter_id'] = recent_transfer.previous_owner.discord_id
       out['owner'] = self.submitted_by.nickname
       out['owner_id'] = self.submitted_by.discord_id
-      out['transfer_date'] = recent_transfer.transferred_at.strftime("%m/%d/%Y, %H:%M:%S")
+      out['transfer_date'] = timezone.localtime(recent_transfer.transferred_at).strftime("%m/%d/%Y, %H:%M:%S")
     if(include_raw):
       out['raw_album'] = self.raw_data
     return out
@@ -258,7 +258,7 @@ class AlbumCommentHistory(models.Model):
     return {
       "id": self.pk,
       "user_comment": self.user_comment,
-      "recorded_at": self.recorded_at.strftime("%m/%d/%Y, %H:%M:%S"),
+      "recorded_at": timezone.localtime(self.recorded_at).strftime("%m/%d/%Y, %H:%M:%S"),
       "edited_by": self.edited_by.discord_id if self.edited_by else None,
       "edited_by_nickname": self.edited_by.nickname if self.edited_by else None,
       "admin_edit": self.admin_edit,
@@ -278,7 +278,7 @@ class AlbumOwnershipHistory(models.Model):
     transferred_at = models.DateTimeField(default=now)
 
     def __str__(self):
-      return f"{self.album.title}: {self.previous_owner} → {self.new_owner} on {self.transferred_at.strftime('%d/%m/%Y, %H:%M:%S')}"
+      return f"{self.album.title}: {self.previous_owner} → {self.new_owner} on {timezone.localtime(self.transferred_at).strftime('%d/%m/%Y, %H:%M:%S')}"
 
 
 
@@ -360,8 +360,8 @@ class Review(models.Model):
       outObj['album'] = self.album.toJSON()
     outObj['score'] = self.score
     outObj['comment'] = self.review_text
-    outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")
-    outObj['last_updated'] = self.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
+    outObj['review_date'] = timezone.localtime(self.review_date).strftime("%m/%d/%Y, %H:%M:%S")
+    outObj['last_updated'] = timezone.localtime(self.last_updated).strftime("%m/%d/%Y, %H:%M:%S")
     outObj['first_listen'] = self.first_listen
     outObj['aotd_date'] = self.aotd_date.strftime("%Y-%m-%d")
     outObj['version'] = self.version
@@ -449,14 +449,14 @@ class ReviewHistory(models.Model):
     outObj['id'] = self.pk
     outObj['score'] = self.score
     outObj['comment'] = self.review_text
-    outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")
-    outObj['last_updated'] = self.last_updated.strftime("%m/%d/%Y, %H:%M:%S")
+    outObj['review_date'] = timezone.localtime(self.review_date).strftime("%m/%d/%Y, %H:%M:%S")
+    outObj['last_updated'] = timezone.localtime(self.last_updated).strftime("%m/%d/%Y, %H:%M:%S")
     outObj['first_listen'] = self.first_listen
     outObj['aotd_date'] = self.aotd_date.strftime("%Y-%m-%d")
     outObj['version'] = self.version
     outObj['advanced'] = self.advanced
     outObj['trackData'] = self.advancedReviewDict
-    outObj['recorded_at'] = self.recorded_at.strftime("%m/%d/%Y, %H:%M:%S")
+    outObj['recorded_at'] = timezone.localtime(self.recorded_at).strftime("%m/%d/%Y, %H:%M:%S")
     if(full):
       outObj['review'] = self.review.toJSON()
     return outObj
@@ -491,7 +491,8 @@ class UserAlbumOutage(models.Model):
 
   # Return True if outage is currently in effect or False if not
   def isActive(self):
-    return ((self.start_date < timezone.now().date()) and (timezone.now().date() < self.end_date))
+    today = timezone.localtime(timezone.now()).date()
+    return ((self.start_date < today) and (today < self.end_date))
 
   # Convert to a dict
   def dict(self):
@@ -507,7 +508,7 @@ class UserAlbumOutage(models.Model):
       out['admin_enactor_pk'] = self.admin_enactor.pk
       out['admin_enactor_discord_id'] = self.admin_enactor.discord_id
       out['admin_enactor_nickname'] = self.admin_enactor.nickname
-    out['creation_timestamp'] = self.creation_timestamp.strftime('%m/%d/%Y, %H:%M:%S')
+    out['creation_timestamp'] = timezone.localtime(self.creation_timestamp).strftime('%m/%d/%Y, %H:%M:%S')
     out['active'] = self.isActive()
     # Return outage as a dict
     return out
@@ -560,7 +561,7 @@ class UserChanceCache(models.Model):
     out['percentage'] = self.chance_percentage
     out['block_type'] = self.block_type
     out['reason'] = self.reason
-    out['last_updated'] = self.last_updated.strftime('%m/%d/%Y, %H:%M:%S')
+    out['last_updated'] = timezone.localtime(self.last_updated).strftime('%m/%d/%Y, %H:%M:%S')
     if(self.outage != None):
       out['outage'] = {}
       out['outage']["target_user"] = self.outage.user.discord_id
@@ -701,22 +702,23 @@ class AlbumTag(models.Model):
       details={"vote_type": vote_type, "tag_text": self.tag_text, "album_mbid": self.album.mbid}
     )
 
-  def toJSON(self, user=None):
+  def toJSON(self, user=None, short=False):
     upvotes = self.votes.filter(vote_type=1).count()
     downvotes = self.votes.filter(vote_type=-1).count()
-    out = {
-      'id': self.pk,
-      'tag_text': self.tag_text,
-      'emoji': self.emoji,
-      'submitted_by': self.submitted_by.nickname if self.submitted_by else None,
-      'submitted_by_id': self.submitted_by.discord_id if self.submitted_by else None,
-      'submitted_at': self.submitted_at.strftime("%m/%d/%Y, %H:%M:%S"),
-      'is_approved': self.is_approved,
-      'net_score': upvotes - downvotes,
-      'upvotes': upvotes,
-      'downvotes': downvotes,
-      'user_vote': None,
-    }
+    # Build out return dict
+    out = {}
+    out['id'] = self.pk
+    out['emoji'] = self.emoji
+    out['tag_text'] = self.tag_text
+    out['is_approved'] = self.is_approved
+    if(not short):
+      out['submitted_by'] = self.submitted_by.nickname if self.submitted_by else None
+      out['submitted_by_id'] = self.submitted_by.discord_id if self.submitted_by else None
+      out['submitted_at'] = timezone.localtime(self.submitted_at).strftime("%m/%d/%Y, %H:%M:%S")
+      out['net_score'] = upvotes - downvotes
+      out['upvotes'] = upvotes
+      out['downvotes'] = downvotes
+      out['user_vote'] = None
     if user:
       user_vote = self.votes.filter(user=user).first()
       out['user_vote'] = user_vote.vote_type if user_vote else None

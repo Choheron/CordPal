@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.utils.timezone import now
 
 import logging
@@ -36,7 +37,7 @@ class Quote(models.Model):
     out['speaker'] = self.speaker.toJSON() if self.speaker else None
     out['speaker_discord_id'] = self.speaker_discord_id 
     out['text'] = self.text
-    out['timestamp'] = self.timestamp.strftime("%m/%d/%Y, %H:%M:%S")
+    out['timestamp'] = timezone.localtime(self.timestamp).strftime("%m/%d/%Y, %H:%M:%S")
     return out
   
   # Get speaker discord ID

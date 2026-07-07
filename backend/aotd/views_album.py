@@ -1,5 +1,6 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 
 from .utils import (
   getAlbumRating,
@@ -296,14 +297,14 @@ def getAlbum(request: HttpRequest, mbid: str):
     out['submitter'] = albumObj.submitted_by.discord_id
     out['submitter_nickname'] = albumObj.submitted_by.nickname
     out['submitter_comment'] = albumObj.user_comment
-    out['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+    out['submission_date'] = timezone.localtime(albumObj.submission_date).strftime("%m/%d/%Y, %H:%M:%S")
     # If this album has been rescued, the original submitter is the previous owner in history
     recent_transfer = albumObj.ownership_history.order_by('-transferred_at').first()
     if recent_transfer and recent_transfer.previous_owner:
       out['submitter'] = recent_transfer.previous_owner.discord_id
       out['submitter_nickname'] = recent_transfer.previous_owner.nickname
       out['owner'] = albumObj.submitted_by.discord_id
-      out['transfer_date'] = recent_transfer.transferred_at.strftime("%m/%d/%Y, %H:%M:%S")
+      out['transfer_date'] = timezone.localtime(recent_transfer.transferred_at).strftime("%m/%d/%Y, %H:%M:%S")
     out['release_date_str'] = albumObj.raw_data['release-group']['first-release-date'] if ('first-release-date' in albumObj.raw_data['release-group'].keys()) else albumObj.release_date_str
     out['release_date'] = parseReleaseDate(out['release_date_str'])
     out['track_list'] = albumObj.track_list if albumObj.track_list else {"tracks": []}
@@ -440,12 +441,14 @@ def getAllAlbums(request: HttpRequest):
       'submitter_avatar_url': user.get_avatar_url() if user else None,
       'submitter_nickname': user.nickname if user else None,
       'submitter_comment': album.user_comment,
-      'submission_date': album.submission_date.strftime("%m/%d/%Y, %H:%M:%S"),
+      'submission_date': timezone.localtime(album.submission_date).strftime("%m/%d/%Y, %H:%M:%S"),
       'release_date_str': album.release_date_str,
       'release_date': album.release_date.strftime("%m/%d/%Y, %H:%M:%S") if album.release_date else None,
       'last_aotd': daily.get('date'),
       'rating': effective_rating,
       'standard_deviation': effective_stddev,
+      # Get user generated tags for the album
+      'tags': [tag.toJSON(short=True) for tag in album.tags.filter(is_approved=True)]
     })
 
   return JsonResponse({"timestamp": datetime.datetime.now(), "albums_list": albumList})
@@ -814,13 +817,13 @@ def getAlbumCommentHistory(request: HttpRequest, mbid: str):
     # preceding (older) edit was recorded; for the original it's the album submission date.
     created_at = history_qs[i + 1].recorded_at if i < last_i else album.submission_date
     row = entry.toJSON()
-    row['created_at'] = created_at.strftime("%m/%d/%Y, %H:%M:%S") if created_at else None
+    row['created_at'] = timezone.localtime(created_at).strftime("%m/%d/%Y, %H:%M:%S") if created_at else None
     # admin_edit: was *this* version created by an admin edit? That's the edit captured in
     # the next (older) history entry. The original was never created by an edit.
     row['admin_edit'] = history_qs[i + 1].admin_edit if i < last_i else False
     entries.append(row)
   # Current version started when the most recent history entry was recorded
-  current_created_at = history_qs[0].recorded_at.strftime("%m/%d/%Y, %H:%M:%S") if history_qs else None
+  current_created_at = timezone.localtime(history_qs[0].recorded_at).strftime("%m/%d/%Y, %H:%M:%S") if history_qs else None
   current_entry = {
     "id": None,
     "user_comment": album.user_comment,

@@ -111,7 +111,7 @@ def getUserOutages(request: HttpRequest, user_discord_id: str = None):
   # Get user
   user = User.objects.get(discord_id=(user_discord_id if user_discord_id else request.session['discord_id']))
   # Get outages for user that are upcoming
-  outages = Outages.objects.filter(user=user, end_date__gte=timezone.now().date())
+  outages = Outages.objects.filter(user=user, end_date__gte=timezone.localtime(timezone.now()).date())
   # Return a list of outages, converting each outage to a dict
   outList = []
   for outage in outages:
