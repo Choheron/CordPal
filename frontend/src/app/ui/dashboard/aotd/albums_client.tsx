@@ -33,6 +33,7 @@ import { Conditional } from "@/app/ui/dashboard/conditional";
 import ClientTimestamp from "@/app/ui/general/client_timestamp";
 import UserDropdown from "@/app/ui/general/userUiItems/user_dropdown";
 import PageTitle from "@/app/ui/dashboard/page_title";
+import { RiArrowDropRightLine, RiArrowDropDownLine } from "react-icons/ri";
 
 
 const sortAlbumList = (list: any[], descriptor: any) => {
@@ -72,15 +73,16 @@ const sortAlbumList = (list: any[], descriptor: any) => {
 }
 
 const columns = [
-  { key: "title",             label: "ALBUM",          sortable: true },
-  { key: "tags",              label: "TAGS",           sortable: false },
-  { key: "artist",            label: "ARTIST",         sortable: true },
-  { key: "submitter",         label: "SUBMITTER",      sortable: true },
-  { key: "submission_date",   label: "SUBMITTED ON",   sortable: true },
-  { key: "standard_deviation",label: "STDDEV",         sortable: true },
-  { key: "rating",            label: "RATING (IF AVAIL)", sortable: true },
-  { key: "last_aotd",         label: "LAST AOD",       sortable: true },
+  { key: "title",             label: "ALBUM",          sortable: true,  width: "lg:w-[320px]" },
+  { key: "tags",              label: "TAGS",           sortable: false, width: "lg:w-[280px]" },
+  { key: "artist",            label: "ARTIST",         sortable: true,  width: "lg:w-[100px]" },
+  { key: "submitter",         label: "SUBMITTER",      sortable: true,  width: "lg:w-[110px]" },
+  { key: "submission_date",   label: "SUBMITTED ON",   sortable: true,  width: "lg:w-[90px]" },
+  { key: "standard_deviation",label: "STDDEV",         sortable: true,  width: "lg:w-[70px]" },
+  { key: "rating",            label: "RATING",         sortable: true, width: "lg:w-[90px]" },
+  { key: "last_aotd",         label: "LAST AOD",       sortable: true,  width: "lg:w-[90px]" },
 ]
+const columnWidths: Record<string, string> = Object.fromEntries(columns.map(c => [c.key, c.width]))
 
 // Specific function for tag rendering, this is duplicated in album_tags.tsx and should be broken into a helper
 function renderEmoji(emoji: string, size: "sm" | "lg" = "sm") {
@@ -89,6 +91,61 @@ function renderEmoji(emoji: string, size: "sm" | "lg" = "sm") {
     return <img src={emoji} className={`${px} object-contain inline-block`} alt="emoji" />
   }
   return <span className={size === "lg" ? "text-xl leading-none" : "text-base leading-none"}>{emoji}</span>
+}
+
+// Fallback collapsed height before the real pill height is measured on mount
+const ONE_LINE_PX = 30
+// Collapses to one row of tags with an arrow toggle to the left, but only when the tags actually
+// wrap past one line. Clips to the measured height of an actual pill (not a guessed constant) so
+// the boundary lands exactly on a row edge — otherwise the next row's pill peeks through the clip.
+function TagsCell({ tags, widthClass }: { tags: any[]; widthClass: string }) {
+  const [expanded, setExpanded] = React.useState(false)
+  const [overflowing, setOverflowing] = React.useState(false)
+  const [rowHeight, setRowHeight] = React.useState(ONE_LINE_PX)
+  const wrapRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    const el = wrapRef.current
+    if (!el) return
+    const checkOverflow = () => {
+      const firstTag = el.firstElementChild as HTMLElement | null
+      if (!firstTag) return
+      const height = firstTag.getBoundingClientRect().height
+      setRowHeight(height)
+      setOverflowing(el.scrollHeight > height + 2)
+    }
+    checkOverflow()
+    const observer = new ResizeObserver(checkOverflow)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [tags])
+
+  return (
+    <div className={`flex items-start gap-1 w-fit ${widthClass}`}>
+      {overflowing && (
+        <button onClick={() => setExpanded(v => !v)} className="shrink-0 mt-1 text-blue-300 hover:text-blue-100">
+          {expanded ? <RiArrowDropDownLine size={14} /> : <RiArrowDropRightLine size={14} />}
+        </button>
+      )}
+      <div
+        ref={wrapRef}
+        className="flex flex-wrap gap-1 min-w-0 overflow-hidden"
+        style={{ maxHeight: expanded ? undefined : rowHeight }}
+      >
+        {tags.map((tag) => (
+          <div
+            key={tag.id}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border bg-blue-500/10 border-blue-500/40 text-blue-100 w-fit text-ellipsis`}
+          >
+            {tag.emoji && renderEmoji(tag.emoji)}
+            <p className="line-clamp-1">
+              {tag.tag_text}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 interface Props {
@@ -195,7 +252,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     switch (columnKey) {
       case "title":
         return (
-          <div className="w-fit lg:w-[300px]">
+          <div className={`w-fit ${columnWidths.title}`}>
             <Link href={"/dashboard/aotd/album/" + album['album_id']} prefetch={false}>
               <Button
                 radius="sm"
@@ -215,24 +272,10 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
           </div>
         )
       case "tags":
-        return (
-          <div className="w-fit lg:w-[175px] flex flex-wrap gap-1">
-            {album['tags'].map((tag) => (
-               <div
-                  key={tag.id}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border bg-blue-500/10 border-blue-500/40 text-blue-100 w-fit text-ellipsis`}
-                >
-                  {tag.emoji && renderEmoji(tag.emoji)}
-                  <p className="line-clamp-1">
-                    {tag.tag_text}
-                  </p>
-                </div>
-            ))}
-          </div>
-        )
+        return <TagsCell tags={album['tags']} widthClass={columnWidths.tags} />
       case "artist":
         return (
-          <div className="w-fit lg:w-[150px]">
+          <div className={`w-fit mx-auto ${columnWidths.artist}`}>
             <a href={album['artist']['href']} target="_noreferrer" className="w-fit text-md my-auto hover:underline text-xs md:text-sm">
               {album['artist']['name']}
             </a>
@@ -240,21 +283,21 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
         )
       case "submitter":
         return (
-          <div className="flex w-fit gap-2">
-            <Avatar src={`${album['submitter_avatar_url']}`} />
+          <div className={`flex w-fit ${columnWidths.submitter} gap-2`}>
+            <Avatar src={`${album['submitter_avatar_url']}`} className="shrink-0" />
             <p className="my-auto hidden md:block">{album['submitter_nickname']}</p>
           </div>
         )
       case "submission_date":
         return (
-          <div className="my-auto text-center">
+          <div className={`my-auto ${columnWidths.submission_date} mx-auto`}>
             <ClientTimestamp timestamp={album['submission_date']} />
           </div>
         )
       case "rating":
         return (
           (album['rating'] != null) ?
-            <div className="px-2 py-2">
+            <div className={`px-2 py-2 ${columnWidths.rating}`}>
               <p className={`text-center text-black ${ratingToTailwindBgColor(album['rating'])} rounded-full`}>
                 <b>{album['rating'].toFixed(2)}</b>
               </p>
@@ -265,8 +308,8 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
       case "standard_deviation":
         return (
           (album['standard_deviation'] != null) ?
-            <div className="px-auto w-full">
-              <p className="text-center text-white text-lg">
+            <div className={`w-fit mx-auto ${columnWidths.standard_deviation}`}>
+              <p className="text-white text-lg">
                 <b>{album['standard_deviation'].toFixed(2)}</b>
               </p>
             </div>
@@ -278,7 +321,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
         return (
           (album['last_aotd'] != null) ? (
             <Link href={`/dashboard/aotd/calendar/${dateArr[0]}/${dateArr[1]}/${dateArr[2]}`} prefetch={false}>
-              <Button radius="lg" className="w-full mx-auto hover:underline text-white" variant="solid">
+              <Button radius="lg" className={`w-full hover:underline text-white`} variant="solid">
                 <b>{album['last_aotd']}</b>
               </Button>
             </Link>
@@ -358,7 +401,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
           )}
         </div>
         {/* Desktop: Table */}
-        <div className="hidden md:block">
+        <div className="hidden md:block overflow-x-auto">
           <Table
             aria-label="Album Submissions"
             sortDescriptor={sortDescriptor}
@@ -368,7 +411,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
           >
             <TableHeader columns={columns}>
               {(column) =>
-                <TableColumn key={column.key} allowsSorting={column.sortable} className="w-fit text-center">{column.label}</TableColumn>
+                <TableColumn key={column.key} allowsSorting={column.sortable} className={`${column.width} text-center`}>{column.label}</TableColumn>
               }
             </TableHeader>
             <TableBody
