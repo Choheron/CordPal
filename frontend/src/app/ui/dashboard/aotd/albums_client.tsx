@@ -71,9 +71,9 @@ const sortAlbumList = (list: any[], descriptor: any) => {
   })
 }
 
-
 const columns = [
   { key: "title",             label: "ALBUM",          sortable: true },
+  { key: "tags",              label: "TAGS",           sortable: false },
   { key: "artist",            label: "ARTIST",         sortable: true },
   { key: "submitter",         label: "SUBMITTER",      sortable: true },
   { key: "submission_date",   label: "SUBMITTED ON",   sortable: true },
@@ -82,6 +82,14 @@ const columns = [
   { key: "last_aotd",         label: "LAST AOD",       sortable: true },
 ]
 
+// Specific function for tag rendering, this is duplicated in album_tags.tsx and should be broken into a helper
+function renderEmoji(emoji: string, size: "sm" | "lg" = "sm") {
+  const px = size === "lg" ? "w-6 h-6" : "w-4 h-4"
+  if (emoji.startsWith("http")) {
+    return <img src={emoji} className={`${px} object-contain inline-block`} alt="emoji" />
+  }
+  return <span className={size === "lg" ? "text-xl leading-none" : "text-base leading-none"}>{emoji}</span>
+}
 
 interface Props {
   albums: any[]
@@ -97,6 +105,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
 
   // Derived from URL params
   const urlTitle = searchParams.get('title') ?? ''
+  const urlTag = searchParams.get('tag') ?? ''
   const urlArtist = searchParams.get('artist') ?? ''
   const urlSubmitter = searchParams.get('submitter') ?? ''
   const aotdFilter = searchParams.get('aotd') === '1'
@@ -116,6 +125,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
 
   // Local state for text inputs — gives immediate feedback while URL update is debounced
   const [titleInput, setTitleInput] = React.useState(urlTitle)
+  const [tagInput, setTagInput] = React.useState(urlTag)
   const [artistInput, setArtistInput] = React.useState(urlArtist)
 
   // Merges updates into the current URL params and pushes a new history entry,
@@ -137,6 +147,13 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     return () => clearTimeout(t)
   }, [titleInput, urlTitle, updateParams])
 
+  // Debounce text inputs → URL (300ms)
+  React.useEffect(() => {
+    if (tagInput === urlTag) return
+    const t = setTimeout(() => updateParams({ tag: tagInput, page: null }), 300)
+    return () => clearTimeout(t)
+  }, [tagInput, urlTag, updateParams])
+
   // Debounce artist input → URL (300ms)
   React.useEffect(() => {
     if (artistInput === urlArtist) return
@@ -151,6 +168,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
   const displayedAlbumList = React.useMemo(() => {
     let list = albums
     if (urlTitle) list = list.filter(a => (a['title'] as string).toLowerCase().includes(urlTitle.toLowerCase()))
+    if (urlTag) list = list.filter(a => ((a['tags'].length != 0) && (a['tags'].some(tagObj => tagObj['tag_text'].toLowerCase().includes(urlTag.toLowerCase())))))
     if (urlArtist) list = list.filter(a => (a['artist']['name'] as string).toLowerCase().includes(urlArtist.toLowerCase()))
     if (submitterFilter.size) list = list.filter(a => (a['submitter'] as string) === [...submitterFilter][0]) // spread, not Object.values() — plain Sets aren't enumerable as object properties
     if (aotdFilter) list = list.filter(a => a['last_aotd'] != null && a['rating'] != null)
@@ -189,11 +207,27 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
                   className="my-auto shrink-0 size-10 md:size-10"
                   radius="sm"
                 />
-                <p className="w-fit text-lg hover:underline max-w-lg text-ellipsis hidden md:block">
+                <p className="w-fit text-lg hover:underline max-w-lg text-ellipsis hidden md:block line-clamp-1">
                   {album['title']}
                 </p>
               </Button>
             </Link>
+          </div>
+        )
+      case "tags":
+        return (
+          <div className="w-fit lg:w-[175px] flex flex-wrap gap-1">
+            {album['tags'].map((tag) => (
+               <div
+                  key={tag.id}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border bg-blue-500/10 border-blue-500/40 text-blue-100 w-fit text-ellipsis`}
+                >
+                  {tag.emoji && renderEmoji(tag.emoji)}
+                  <p className="line-clamp-1">
+                    {tag.tag_text}
+                  </p>
+                </div>
+            ))}
           </div>
         )
       case "artist":
@@ -260,18 +294,19 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     <>
       <PageTitle text={`Album Data for ${(displayedAlbumList.length === albums.length) ? "all" : ""} ${isPending ? "LOADING" : displayedAlbumList.length} Albums`} />
       <div>
-        <div className="flex flex-col sm:flex-row gap-1 w-full md:w-3/4 mx-auto">
+        <div className="flex flex-col sm:flex-row gap-1 w-full md:w-4/5 mx-auto">
           <Input label="Title" placeholder="Filter by Title" value={titleInput} onValueChange={setTitleInput} />
+          <Input label="Tag" placeholder="Filter by Tag" value={tagInput} onValueChange={setTagInput} />
           <Input label="Artist" placeholder="Filter by Artist" value={artistInput} onValueChange={setArtistInput} />
           <UserDropdown label="Submitter" setSelectionCallback={(s: Set<any>) => updateParams({ submitter: [...s][0] ?? null, page: null })} selectedKeys={submitterFilter} />
         </div>
-        <div className="w-full md:w-3/4 mx-auto my-1">
+        <div className="w-full md:w-4/5 mx-auto my-1">
           <Checkbox isSelected={aotdFilter} onValueChange={(v) => updateParams({ aotd: v ? '1' : null, page: null })} className="w-full ml-1">
             Only Show Albums that have been Album Of the Day
           </Checkbox>
         </div>
         <div>
-          <div className="flex w-full md:w-3/4 mx-auto justify-between my-1">
+          <div className="flex w-full md:w-4/5 mx-auto justify-between my-1">
             <p className="mt-auto">
               Data Last Updated: {convertToLocalTZString(new Date(timestamp), true)}
             </p>
@@ -329,7 +364,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
             sortDescriptor={sortDescriptor}
             onSortChange={handleSortChange}
             isStriped
-            className="max-w-full md:w-3/4 mx-auto"
+            className="max-w-full md:w-4/5 mx-auto"
           >
             <TableHeader columns={columns}>
               {(column) =>
