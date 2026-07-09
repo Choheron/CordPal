@@ -67,13 +67,13 @@ export default function PhotoFilterBlock(props) {
           idListOverride={props.artistList}
           description={"Filter photos by artist."}
         />
-        {/* <UserDropdown 
+        <UserDropdown 
           label="Tagged"
           placeholder="Filter by Tagged Users"
           isMultipleChoice={true}
           setSelectionCallback={setTagged}
           useNicknameKeys
-        /> */}
+        />
         <Link
           href={'/dashboard/photos'}
         >

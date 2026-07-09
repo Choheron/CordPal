@@ -177,18 +177,18 @@ def getImageIds(request: HttpRequest):
     res.status_code = 405
     return res
   # Get all objects
-  imageQuery = Image.objects.all()
+  imageQuery = Image.objects.all().order_by("upload_timestamp")
   # Retrieve data from request body and filter
-  if(body_params["tagged"] != 'undefined'): # NOTE: Tagged users current doesnt work
-    for nick in body_params['tagged']:
-      imageQuery = imageQuery.filter(tagged_users__nickname=nick)
+  if(body_params["tagged"] not in ('undefined', '')):
+    for nickname in body_params['tagged'].split(','):
+      imageQuery = imageQuery.filter(tagged_users__nickname=nickname)
   if(body_params["uploader"] != 'undefined'):
     imageQuery = imageQuery.filter(uploader__nickname=body_params['uploader'])
   if(body_params["artist"] != 'undefined'):
     imageQuery = imageQuery.filter(artist__nickname=body_params['artist'])
   # Declare and populate outstring
   outstring = ""
-  for image in imageQuery:
+  for image in imageQuery.distinct():
     outstring += f"{image.image_id},"
   return JsonResponse({"imageIds": outstring})
 

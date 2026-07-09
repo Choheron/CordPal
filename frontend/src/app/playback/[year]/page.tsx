@@ -15,6 +15,7 @@ import GlobalQuotesPlayback from '@/app/ui/playback/global_quotes_playback';
 const bartle = BBH_Sans_Bartle({
   weight: "400",
   adjustFontFallback: false,
+  fallback: ['sans-serif'],
 })
 
 export default async function page({

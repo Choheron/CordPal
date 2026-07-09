@@ -11,6 +11,7 @@ import { RiCloseCircleFill } from "react-icons/ri";
 const bartle = BBH_Sans_Bartle({
   weight: "400",
   adjustFontFallback: false,
+  fallback: ['sans-serif'],
 })
 
 export default function CordpalPlaybackBanner(props) {

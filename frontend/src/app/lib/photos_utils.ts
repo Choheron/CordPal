@@ -51,7 +51,7 @@ export async function getPhotoshops(uploader, artist, tagged) {
     method: "POST",
     credentials: "include",
     body: JSON.stringify(req_body),
-    cache: 'force-cache',
+    cache: 'no-store',
     next: { tags: ['all_photoshops'] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
@@ -94,6 +94,7 @@ export async function uploadImageToBackend(formData) {
   if(sessionCookie === "") {
     return false;
   }
+  console.log(`uploadImageToBackend: Sending image '${formData.get('filename')}' to backend '/photos/uploadImage/'`)
   const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/photos/uploadImage/`, {
     method: "POST",
     credentials: "include",
@@ -103,11 +104,17 @@ export async function uploadImageToBackend(formData) {
     },
     body: formData,
   });
+  const crid = uploadResponse.headers.get("X-CRID");
+  if(uploadResponse.status !== 200) {
+    console.error(`uploadImageToBackend: Upload of '${formData.get('filename')}' failed with status ${uploadResponse.status} (CRID: ${crid})`)
+  } else {
+    console.log(`uploadImageToBackend: Upload of '${formData.get('filename')}' succeeded (CRID: ${crid})`)
+  }
   // Revalidate photoshops tag
   updateTag('all_photoshops')
   return {
     status: uploadResponse.status,
-    crid: uploadResponse.headers.get("X-CRID")
+    crid: crid
   }
 }
 

@@ -60,21 +60,30 @@ export default function UploadPhotoModal(props) {
       // Mark button uploading
       await setUploading(true)
       // Send form data to backend
-      const responseObj = await uploadImageToBackend(uploadFormData)
-      // Alert user of success or failure to upload image
-      if((responseObj['status'] == 200)) {
-      addToast({
-        title: `Successfully submitted "${titleValue}"!`,
-        description: `${titleValue} has been uploaded to CordPal servers!`,
-        color: "success",
-      })
-    } else {
-      addToast({
-        title: `Failed to submit image!`,
-        description: `Album failiure submitted with the following error code: ${responseObj['status']}. Please contact server administrators with CRID: ${responseObj['crid']}.`,
-        color: "danger",
-      })
-    }
+      try {
+        const responseObj = await uploadImageToBackend(uploadFormData)
+        // Alert user of success or failure to upload image
+        if((responseObj['status'] == 200)) {
+          addToast({
+            title: `Successfully submitted "${titleValue}"!`,
+            description: `${titleValue} has been uploaded to CordPal servers!`,
+            color: "success",
+          })
+        } else {
+          addToast({
+            title: `Failed to submit image!`,
+            description: `Album failiure submitted with the following error code: ${responseObj['status']}. Please contact server administrators with CRID: ${responseObj['crid']}.`,
+            color: "danger",
+          })
+        }
+      } catch (error) {
+        console.error("Image upload failed before reaching backend:", error)
+        addToast({
+          title: `Failed to submit image!`,
+          description: `Upload of "${titleValue}" failed before reaching CordPal servers. The image may be too large (15 MB max).`,
+          color: "danger",
+        })
+      }
     }
     // Call cancel functionality to clear systems
     cancelPress()

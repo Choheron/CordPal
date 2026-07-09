@@ -18,6 +18,7 @@ import CordpalPlaybackBanner from "@/app/ui/playback/general/conditional_playbac
 const bartle = BBH_Sans_Bartle({
   weight: "400",
   adjustFontFallback: false,
+  fallback: ['sans-serif'],
 })
 
 export default async function Page({
