@@ -117,6 +117,8 @@ def checkSelectionFlag(aotd_user: AotdUserData, recent_review_users: list = None
           so a user is marked as blocked from selection if there will have been three days since their last review at the upcoming midnight.
     NOTE: recent_review_users and outage_user_ids can be pre-computed and passed in to avoid repeated DB queries when called in a loop.
   '''
+  # Inactive days cutoff
+  INACTIVE_DAYS = 14
   # Get user
   user = aotd_user.user
   # Get tomorrow date
@@ -154,9 +156,9 @@ def checkSelectionFlag(aotd_user: AotdUserData, recent_review_users: list = None
     logger.info(f"Changing `selection_blocked_flag` to {blocked} for {aotd_user.user.nickname}...")
     aotd_user.save()
   # Check if user should be marked as inactive
-  active_users = list(Review.objects.filter(review_date__gte=now() - timedelta(days=14)).values_list('user__discord_id', flat=True).distinct()) # A user is active if they have reviewed in the last 14 days
-  # A user is active if they are in the active users pool OR they appear in the outages pool as they had an outage
-  active = (aotd_user.user.discord_id in active_users) or (aotd_user.user.discord_id in inactivity_outage_map)
+  active_users = list(Review.objects.filter(review_date__gte=now() - timedelta(days=INACTIVE_DAYS)).values_list('user__discord_id', flat=True).distinct()) # A user is active if they have reviewed in the last 14 days
+  # A user is active if they are in the active users pool OR they appear in the outages pool as they had an outage or they have an account created within the last 14 days
+  active = (aotd_user.user.discord_id in active_users) or (aotd_user.user.discord_id in inactivity_outage_map) or (aotd_user.creation_timestamp > (now() - timedelta(days=INACTIVE_DAYS)))
   if(aotd_user.active != active):
     aotd_user.active = active
     logger.info(f"Changing `active` flag to {active} for {aotd_user.user.nickname}...")

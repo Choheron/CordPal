@@ -9,6 +9,7 @@ from .utils import (
 
 from .models import (
   AotdUserData,
+  UserChanceCache
 )
 from users.models import (
   User
@@ -64,11 +65,20 @@ def enrollUser(request: HttpRequest):
     aotdUserObj = AotdUserData.objects.get(user=userObj)
   except ObjectDoesNotExist:
     # Create a AotdUserData Object
-    newUser = AotdUserData(
+    aotdUserObj = AotdUserData(
       user=userObj
     )
-    newUser.save()
+    aotdUserObj.save()
     userObj.aotd_enrolled = True
     userObj.save()
+  # Check if a user chance cache has been added, if not, create one
+  try:
+    aotdUserCache = UserChanceCache.objects.get(aotd_user=aotdUserObj)
+  except ObjectDoesNotExist:
+    # Create a UserChanceCache Object
+    aotdUserCache = UserChanceCache(
+      aotd_user=aotdUserObj
+    )
+    aotdUserCache.save()
   # Return jsonResponse containing status
   return JsonResponse({ "enrolled": True })
