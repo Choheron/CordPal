@@ -546,7 +546,7 @@ class UserChanceCache(models.Model):
     on_delete=models.CASCADE,
     related_name="aotd_chance"
   )
-  chance_percentage = models.FloatField() # Percentage that user will be selected.
+  chance_percentage = models.FloatField(default=0.0) # Percentage that user will be selected.
   block_type = models.CharField(max_length=50, null=True) # Should be either "OUTAGE", "INACTIVITY", or None
   outage = models.OneToOneField(UserAlbumOutage, null=True, on_delete=models.CASCADE) # If user is under an outage, link to that outage.
   reason = models.TextField(null=True) # Reason for the percentage, should be empty if user is not blocked in any way (This will carry the outage reason as well if user is under outage)

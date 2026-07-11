@@ -49,6 +49,11 @@ export async function getAotdUserSettings() {
       Cookie: `sessionid=${sessionCookie};`
     }
   });
+  // Fall back to defaults on a backend error so a failed settings fetch doesnt crash the whole page render
+  if(!settingsResponse.ok) {
+    console.log(`getAotdUserSettings: Backend returned ${settingsResponse.status}, returning default settings`)
+    return { "hide_scores_prereview": false, "hide_tags_prereview": false, "active_aotd": false };
+  }
   const settingsData = await settingsResponse.json();
   return settingsData;
 }

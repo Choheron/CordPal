@@ -127,8 +127,14 @@ def getAotdUserSettings(request: HttpRequest):
     return res
   # Get user data from session
   user = getUserObj(request.session.get('discord_id'))
-  # Retrieve and return the user's AOTD settings
-  aotd_data = AotdUserData.objects.get(user=user)
+  # Retrieve the user's AOTD settings (new users have no AotdUserData until they enroll, return defaults instead of 500ing)
+  aotd_data = AotdUserData.objects.filter(user=user).first()
+  if(aotd_data is None):
+    return JsonResponse({
+      "hide_scores_prereview": False,
+      "hide_tags_prereview": False,
+      "active_aotd": False,
+    })
   return JsonResponse({
     "hide_scores_prereview": aotd_data.hide_scores_prereview,
     "hide_tags_prereview": aotd_data.hide_tags_prereview,
@@ -168,7 +174,8 @@ def getSelectionBlockedFlag(request: HttpRequest):
     return res
   # Get user data from session
   user = getUserObj(request.session.get('discord_id'))
-  # Retrieve and return that user's flag status
-  flag_status = (AotdUserData.objects.get(user=user)).selection_blocked_flag
+  # Retrieve and return that user's flag status (non-enrolled users have no AotdUserData, treat them as not blocked)
+  aotd_data = AotdUserData.objects.filter(user=user).first()
+  flag_status = aotd_data.selection_blocked_flag if (aotd_data) else False
   logger.info(f"Returning selection blocked flag status of {flag_status} for user {user.discord_id}...", extra={'crid': request.crid})
   return JsonResponse({"selection_blocked": flag_status})
