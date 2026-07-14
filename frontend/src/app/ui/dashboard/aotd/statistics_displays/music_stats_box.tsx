@@ -112,9 +112,18 @@ export default async function MusicStatsBox(props) {
           />
         </div>
         <div className="w-2/5 flex h-fit my-auto">
-          <p className="text-xs px-2 py-1 rounded-full w-1/2 text-right my-auto">
-            🔥 {user['current_streak']} {(user['streak_at_risk'] ? "⌛" : "")}
-          </p>
+          {/* Show streak if its greater than or equal to 3 */}
+          <Conditional showWhen={user['current_streak'] >= 3}>
+            <p className="text-xs px-2 py-1 rounded-full w-1/2 text-right my-auto">
+              🔥 {user['current_streak']}
+            </p>
+          </Conditional>
+          {/* Filler if not */}
+          <Conditional showWhen={user['current_streak'] < 3}>
+            <p className="text-xs px-2 py-1 rounded-full w-1/2 text-right my-auto">
+              
+            </p>
+          </Conditional>
           <div className="w-1/2">
             <p className="my-auto px-2 py-1 bg-gray-800 rounded-full w-fit ml-auto">
               {user['total_reviews']}
