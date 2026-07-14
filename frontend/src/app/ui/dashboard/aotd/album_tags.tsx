@@ -108,7 +108,7 @@ export default function AlbumTagsDisplay(props: Props) {
                 {tag.user_vote === 1 ? <RiArrowUpFill /> : <RiArrowUpLine />}
               </button>
               <button
-                className={`p-1 rounded cursor-pointer border transition-colors ${tag.user_vote === -1 ? "border-orange-500 bg-orange-500/20 text-orange-400" : "border-white/15 hover:border-white/40 hover:bg-white/10 text-white/50"}`}
+                className={`p-1 rounded cursor-pointer border transition-colors ${tag.user_vote === -1 ? "border-blue-500 bg-blue-500/20 text-blue-400" : "border-white/15 hover:border-white/40 hover:bg-white/10 text-white/50"}`}
                 onClick={() => tag.user_vote === -1 ? handleRemoveVote(tag.id) : handleVote(tag.id, -1)}
                 aria-label="Downvote"
               >
