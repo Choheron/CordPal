@@ -1,6 +1,5 @@
 from django.http import HttpRequest, HttpResponse, FileResponse, JsonResponse
 from django.core.files.storage import FileSystemStorage
-from django.utils import timezone
 
 import logging
 import os
@@ -127,7 +126,7 @@ def getImageInfo(request: HttpRequest, imageID: int):
   imageData['image_id'] = image.image_id
   imageData['title'] = image.title
   imageData['description'] = image.description
-  imageData['upload_timestamp'] = timezone.localtime(image.upload_timestamp).strftime("%m/%d/%Y, %H:%M:%S")
+  imageData['upload_timestamp'] = image.upload_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
   imageData['uploader'] = image.uploader.discord_id
   imageData['creator'] = image.artist.discord_id
   imageData['filename'] = image.filename[(image.filename.index("_") + 1):] # Remove hex in front for readability

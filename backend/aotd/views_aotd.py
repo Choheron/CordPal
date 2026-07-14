@@ -94,7 +94,7 @@ def setAlbumOfDay(request: HttpRequest):
   for spot_user in AotdUserData.objects.all():
     checkSelectionFlag(spot_user)
   # Get current date
-  day = datetime.date.today()
+  day = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date()
   # Calculate yesterday's data
   yesterday = day - datetime.timedelta(days=1)
   try:
@@ -221,8 +221,8 @@ def calculateAOTDChances(request: HttpRequest):
     res.status_code = 405
     return res
   # Get current date
-  day = datetime.date.today()
-  tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+  day = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date()
+  tomorrow = day + datetime.timedelta(days=1)
   # Get Date a two years ago to filter by
   two_year_ago = day - datetime.timedelta(days=730)
   # Get a map of all outages currently in effect
@@ -336,7 +336,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     res.status_code = 405
     return res
   # Get all AOtD Objects for this year and month
-  month_AOtD = DailyAlbum.objects.filter(date__year=year, date__month=month).filter(date__lte=timezone.now())
+  month_AOtD = DailyAlbum.objects.filter(date__year=year, date__month=month).filter(date__lte=datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date())
   # Create out object
   out = {}
   if(len(month_AOtD) != 0):
@@ -377,7 +377,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
       temp['artist']['href'] = (albumObj.artist_url)
       temp['submitter'] = albumObj.submitted_by.discord_id
       temp['submitter_comment'] = albumObj.user_comment
-      temp['submission_date'] = timezone.localtime(albumObj.submission_date).strftime("%m/%d/%Y, %H:%M:%S")
+      temp['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
       # Attach rating of album
       temp['rating'] = rating
       # Append out object to output
@@ -407,7 +407,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     # Attach submission numbers object to out JSON 
     out['stats']['user_stats'] = subNumObj
   # Return out object with timestamp
-  out['timestamp'] = timezone.localtime(timezone.now()).strftime("%m/%d/%Y, %H:%M:%S")
+  out['timestamp'] = timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
   return JsonResponse(out)
 
 
@@ -430,7 +430,7 @@ def getDayTimelineData(request: HttpRequest, aotd_date: str):
     return JsonResponse({"timeline": []})
   # Check if aotd object has a timeline (if its not today and doesnt have a timeline, something is wrong)
   # Get current date
-  day = datetime.date.today()
+  day = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date()
   aotd_date_obj = datetime.datetime.strptime(aotd_date, "%Y-%m-%d")
   if((day != aotd_date_obj.date()) and (aotd_obj.rating_timeline == {"timeline": []})):
     logger.error(f"ATTENTION: AOTD \"{aotd_obj.album.mbid}\" for date: {aotd_date} DID NOT HAVE A TIMELINE -- ATTEMPTING TO GENERATE ONE NOW", extra={'crid': request.crid})

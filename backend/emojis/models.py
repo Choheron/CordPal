@@ -2,7 +2,6 @@ import logging
 import os
 
 from django.db import models
-from django.utils import timezone
 from users.models import User
 
 logger = logging.getLogger()
@@ -44,10 +43,10 @@ class CustomEmoji(models.Model):
     out['serve_url']           = f'{backend_base}/emojis/serve/{self.emoji_id}/'
     out['use_count']           = self.use_count
     out['is_active']           = self.is_active
-    out['upload_timestamp']    = timezone.localtime(self.upload_timestamp).strftime('%m/%d/%Y, %H:%M:%S')
+    out['upload_timestamp']    = self.upload_timestamp.strftime('%m/%d/%Y, %H:%M:%S')
     out['submitted_by']        = self.submitted_by.nickname if self.submitted_by else None
     out['submitted_by_id']     = self.submitted_by.discord_id
-    out['submitted_at']        = timezone.localtime(self.submitted_at).strftime('%m/%d/%Y, %H:%M:%S') if self.submitted_at else "ERR DATE"
+    out['submitted_at']        = self.submitted_at.strftime('%m/%d/%Y, %H:%M:%S') if self.submitted_at else "ERR DATE"
     # Respect hide_submitted_at for non-admin callers
     if admin:
       out['hide_submitted_at'] = self.hide_submitted_at
@@ -55,7 +54,7 @@ class CustomEmoji(models.Model):
       out['filetype']          = self.filetype
     else:
       out['submitted_at'] = (
-        timezone.localtime(self.submitted_at).strftime('%m/%d/%Y, %H:%M:%S')
+        self.submitted_at.strftime('%m/%d/%Y, %H:%M:%S')
         if self.submitted_at and not self.hide_submitted_at
         else None
       )

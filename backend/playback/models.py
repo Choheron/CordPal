@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 from aotd.models import AotdUserData
 
@@ -16,7 +15,7 @@ class GlobalPlayback(models.Model):
     out = {}
     out['year'] = self.year
     out['payload'] = self.payload
-    out['generation_timestamp'] = timezone.localtime(self.generation_timestamp).strftime("%Y-%m-%d")
+    out['generation_timestamp'] = self.generation_timestamp.strftime("%Y-%m-%d")
     return out
 
 
@@ -42,7 +41,7 @@ class UserPlayback(models.Model):
     out['aotd_user'] = self.aotd_user.pk
     out['year'] = self.year
     out['payload'] = self.payload
-    out['generation_timestamp'] = timezone.localtime(self.generation_timestamp).strftime("%Y-%m-%d")
+    out['generation_timestamp'] = self.generation_timestamp.strftime("%Y-%m-%d")
     out['public'] = self.public
     return out
 

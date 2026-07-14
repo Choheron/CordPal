@@ -133,7 +133,7 @@ def getCurrentOutages(request: HttpRequest):
     res.status_code = 405
     return res
   # Get today
-  today = timezone.now()
+  today = timezone.localtime(timezone.now()).date()
   # Get outages currently in effect
   outages = Outages.objects.filter(start_date__lte=today, end_date__gte=today)
   # Return a list of outages, converting each outage to a dict

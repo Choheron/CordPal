@@ -31,12 +31,12 @@ class metadataMiddleware:
     if isinstance(response, JsonResponse):
       data = json.loads(response.content)
       data['meta'] = { 
-        'timestamp': timezone.localtime(timezone.now()).strftime("%d/%m/%Y, %H:%M:%S"),
+        'timestamp': timezone.now().strftime("%d/%m/%Y, %H:%M:%S"),
         'crid': request.crid
       }
       response.content = json.dumps(data)
     # Attach a header to show that this was not a cache hit
-    response['X-Generated-At'] = timezone.localtime(timezone.now()).strftime("%d/%m/%Y, %H:%M:%S") + " " + timezone.get_current_timezone_name()
+    response['X-Generated-At'] = timezone.now().strftime("%d/%m/%Y, %H:%M:%S") + " UTC"
     response["Access-Control-Expose-Headers"] = "X-Generated-At"
     # Attach header for CRID
     response['X-CRID'] = request.crid

@@ -121,10 +121,12 @@ def checkSelectionFlag(aotd_user: AotdUserData, recent_review_users: list = None
   INACTIVE_DAYS = 14
   # Get user
   user = aotd_user.user
+  # Get today in Central time
+  today = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date()
   # Get tomorrow date
-  tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+  tomorrow = today + datetime.timedelta(days=1)
   # Get 14 days ago
-  fortnight_ago = datetime.date.today() - datetime.timedelta(days=14)
+  fortnight_ago = today - datetime.timedelta(days=14)
   # Get a map of all outages in the last 14 days
   inactivity_outage_map = list(
     UserAlbumOutage.objects
@@ -145,7 +147,7 @@ def checkSelectionFlag(aotd_user: AotdUserData, recent_review_users: list = None
       logger.debug(f"User {user.nickname} is not under an outage")
   # Use pre-computed reviewer list if provided, otherwise query
   if recent_review_users is None:
-    selection_cutoff = datetime.date.today() - timedelta(days=2)
+    selection_cutoff = today - timedelta(days=2)
     recent_review_users = list(Review.objects.filter(review_date__date__gte=selection_cutoff).values_list('user__discord_id', flat=True).distinct())
   logger.debug(f"Checking selection blocked flag for user: {aotd_user.user.nickname} [Flag is currently: {aotd_user.selection_blocked_flag}]...")
   # Check if user is in the list of recent reviewers
@@ -366,7 +368,7 @@ def update_user_streak(user: User, date_override: datetime.date | None = None):
   date = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
   # Get required vars
   profile: AotdUserData = user.aotd_data
-  today = date_override if (date_override != None) else date.today()
+  today = date_override if (date_override != None) else date.date()
   # Grab most recent aotd date
   most_recent_aotd = DailyAlbum.objects.filter(date__lt=today).order_by("-date").first()
 
