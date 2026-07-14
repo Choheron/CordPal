@@ -56,6 +56,7 @@ class AotdUserData(models.Model):
   highest_score_mbid = models.CharField(max_length=256, null=True, default=None)
   highest_score_date = models.DateField(null=True, default=None)
   review_ratio = models.FloatField(default=0) # Corresponds to the number of days a user has reviewed versus the number they havent (since they joined)
+  review_rate = models.FloatField(default=0.0) # Corresponds to the rate at which a user reviews (total reviews/total possible reviews)
   # Track Review Streaks
   current_streak = models.PositiveIntegerField(default=0)
   '''User's current aotd Review streak'''

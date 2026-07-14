@@ -329,8 +329,10 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   ## Calculate review ratio
   try:
     review_ratio: float = total_reviews/user_missed_review_count
+    review_rate: float = ((total_reviews/possible_aotd_count) * 100)
   except ZeroDivisionError: 
     review_ratio: float = total_reviews
+    review_rate: float = 0.00
   # Get submission stats
   total_subs = Album.objects.filter(submitted_by=user).count()
   total_select = DailyAlbum.objects.filter(album__submitted_by=user)
@@ -354,6 +356,7 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   aotdUserObj.highest_score_mbid = highest_review_mbid
   aotdUserObj.highest_score_date = highest_review_date
   aotdUserObj.review_ratio = review_ratio
+  aotdUserObj.review_rate = review_rate
   # Update user Selection/Submission Data
   aotdUserObj.total_submissions = total_subs
   aotdUserObj.total_selected = total_select.count()
