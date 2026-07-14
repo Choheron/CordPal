@@ -105,13 +105,22 @@ export default async function MusicStatsBox(props) {
         key={`${user['discord_id']}-${user['total_reviews']}`}
         className="flex justify-between w-full my-1"
       >
-        <ReviewStatsUserCard 
-          userDiscordID={user['discord_id']} 
-          userReviewObj={user} 
-        />
-        <p className="my-auto px-2 py-1 bg-gray-800 rounded-full">
-          {user['total_reviews']}
-        </p>
+        <div className="w-3/5">
+          <ReviewStatsUserCard 
+            userDiscordID={user['discord_id']} 
+            userReviewObj={user} 
+          />
+        </div>
+        <div className="w-2/5 flex h-fit my-auto">
+          <p className="text-xs px-2 py-1 rounded-full w-1/2 text-right my-auto">
+            🔥 {user['current_streak']} {(user['streak_at_risk'] ? "⌛" : "")}
+          </p>
+          <div className="w-1/2">
+            <p className="my-auto px-2 py-1 bg-gray-800 rounded-full w-fit ml-auto">
+              {user['total_reviews']}
+            </p>
+          </div>
+        </div>
       </div>
     )
   })
