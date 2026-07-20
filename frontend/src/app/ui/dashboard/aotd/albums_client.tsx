@@ -256,9 +256,9 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     if (urlArtist) list = list.filter(a => (a['artist']['name'] as string).toLowerCase().includes(urlArtist.toLowerCase()))
     if (submitterFilter.size) list = list.filter(a => (a['submitter'] as string) === [...submitterFilter][0]) // spread, not Object.values() — plain Sets aren't enumerable as object properties
     // AOTD Filter block - TODO: Could likely be optimized
-    if (aotdFilter == "1") list = list.filter(a => a['last_aotd'] != null)
-    if (aotdFilter == "2") list = list.filter(a => a['last_aotd'] == null)
-    if (aotdFilter == "3") list = list.filter(a => a['last_aotd'] == null && !a['submitter_active'])
+    if (aotdFilter == "1") list = list.filter(a => a['last_aotd'] != null) // Only show albums that have been AOTD
+    if (aotdFilter == "2") list = list.filter(a => a['last_aotd'] == null) // Only show albums that have NOT been AOTD
+    if (aotdFilter == "3") list = list.filter(a => a['last_aotd'] == null && !a['submitter_active']) // Only show albums that can be rescued
     return sortAlbumList(list, sortDescriptor)
   }, [albums, urlTitle, urlArtist, submitterFilter, aotdFilter, sortDescriptor])
 
