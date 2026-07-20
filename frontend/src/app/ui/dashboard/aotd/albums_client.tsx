@@ -166,7 +166,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
   const urlTag = searchParams.get('tag') ?? ''
   const urlArtist = searchParams.get('artist') ?? ''
   const urlSubmitter = searchParams.get('submitter') ?? ''
-  const aotdFilter = searchParams.get('aotd') === '1'
+  const aotdFilter = searchParams.get('aotd') ?? '0'
   const page = Number(searchParams.get('page') ?? '1')
   // Stored as "column:direction" in the URL; defaults to rating desc when absent
   const sortDescriptor: any = React.useMemo(() => {
@@ -250,7 +250,8 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     if (urlTag) list = list.filter(a => ((a['tags'].length != 0) && (a['tags'].some(tagObj => tagObj['tag_text'].toLowerCase().includes(urlTag.toLowerCase())))))
     if (urlArtist) list = list.filter(a => (a['artist']['name'] as string).toLowerCase().includes(urlArtist.toLowerCase()))
     if (submitterFilter.size) list = list.filter(a => (a['submitter'] as string) === [...submitterFilter][0]) // spread, not Object.values() — plain Sets aren't enumerable as object properties
-    if (aotdFilter) list = list.filter(a => a['last_aotd'] != null && a['rating'] != null)
+    if (aotdFilter == "1") list = list.filter(a => a['last_aotd'] != null)
+    if (aotdFilter == "2") list = list.filter(a => a['last_aotd'] == null)
     return sortAlbumList(list, sortDescriptor)
   }, [albums, urlTitle, urlArtist, submitterFilter, aotdFilter, sortDescriptor])
 
@@ -391,9 +392,12 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
           {/* User Dropdown Search Bar */}
           <UserDropdown label="Submitter" setSelectionCallback={(s: Set<any>) => updateParams({ submitter: [...s][0] ?? null, page: null })} selectedKeys={submitterFilter} />
         </div>
-        <div className="w-full md:w-4/5 mx-auto my-1">
-          <Checkbox isSelected={aotdFilter} onValueChange={(v) => updateParams({ aotd: v ? '1' : null, page: null })} className="w-full ml-1">
-            Only Show Albums that have been Album Of the Day
+        <div className="w-full md:w-4/5 mx-auto my-1 flex flex-col">
+          <Checkbox isSelected={aotdFilter == "1"} onValueChange={(v) => updateParams({ aotd: v ? '1' : null, page: null })} className="w-full ml-1">
+            Filter by selected Albums
+          </Checkbox>
+          <Checkbox isSelected={aotdFilter == "2"} onValueChange={(v) => updateParams({ aotd: v ? '2' : null, page: null })} className="w-full ml-1">
+            Filter by non-selected Albums
           </Checkbox>
         </div>
         <div>
