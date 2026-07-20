@@ -396,9 +396,7 @@ def getAllAlbums(request: HttpRequest):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-
   now = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
-
   # Single DISTINCT ON query: latest DailyAlbum per album — replaced 3 correlated subqueries
   latest_daily = {
     d['album_id']: d
@@ -408,13 +406,12 @@ def getAllAlbums(request: HttpRequest):
       .distinct('album_id')
       .values('album_id', 'date', 'rating', 'standard_deviation')
   }
-
+  # Add filters to list
   albums = list(
     Album.objects
     .select_related('submitted_by')
     .defer('raw_data', 'track_list')
   )
-
   albumList = []
   for album in albums:
     user = album.submitted_by
@@ -438,6 +435,7 @@ def getAllAlbums(request: HttpRequest):
       },
       'submitter': user.discord_id if user else None,
       'submitter_avatar_url': user.get_avatar_url() if user else None,
+      'submitter_active': AotdUserData.objects.get(user=user).active if user else None,
       'submitter_nickname': user.nickname if user else None,
       'submitter_comment': album.user_comment,
       'submission_date': album.submission_date.strftime("%m/%d/%Y, %H:%M:%S"),

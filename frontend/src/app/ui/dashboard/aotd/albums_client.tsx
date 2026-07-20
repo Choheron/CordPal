@@ -166,6 +166,11 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
   const urlTag = searchParams.get('tag') ?? ''
   const urlArtist = searchParams.get('artist') ?? ''
   const urlSubmitter = searchParams.get('submitter') ?? ''
+  // AOTD Filter allowing users to filter by the following using checkboxes (including corresponding number)
+  // 0 - No Filter Implemented
+  // 1 - Only display albums that have been AOTD
+  // 2 - Only display albums that have not been AOTD
+  // 3 - Only display albums that can be rescued (Submitter is inactive and it has not been aotd)
   const aotdFilter = searchParams.get('aotd') ?? '0'
   const page = Number(searchParams.get('page') ?? '1')
   // Stored as "column:direction" in the URL; defaults to rating desc when absent
@@ -250,8 +255,10 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     if (urlTag) list = list.filter(a => ((a['tags'].length != 0) && (a['tags'].some(tagObj => tagObj['tag_text'].toLowerCase().includes(urlTag.toLowerCase())))))
     if (urlArtist) list = list.filter(a => (a['artist']['name'] as string).toLowerCase().includes(urlArtist.toLowerCase()))
     if (submitterFilter.size) list = list.filter(a => (a['submitter'] as string) === [...submitterFilter][0]) // spread, not Object.values() — plain Sets aren't enumerable as object properties
+    // AOTD Filter block - TODO: Could likely be optimized
     if (aotdFilter == "1") list = list.filter(a => a['last_aotd'] != null)
     if (aotdFilter == "2") list = list.filter(a => a['last_aotd'] == null)
+    if (aotdFilter == "3") list = list.filter(a => a['last_aotd'] == null && !a['submitter_active'])
     return sortAlbumList(list, sortDescriptor)
   }, [albums, urlTitle, urlArtist, submitterFilter, aotdFilter, sortDescriptor])
 
@@ -306,7 +313,12 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
         )
       case "submitter":
         return (
-          <div className={`flex ${columnWidths.submitter} gap-2 min-w-0`}>
+          <div className={`flex relative ${columnWidths.submitter} gap-2 min-w-0 overflow-hidden`}>
+            <Conditional showWhen={!album['submitter_active']}>
+              <p className="z-10 absolute top-[10px] -left-10 text-[6px] leading-none bg-red-600 -rotate-45 px-10 py-[2px]">
+                INACTIVE
+              </p>
+            </Conditional>
             <Avatar src={`${album['submitter_avatar_url']}`} className="shrink-0" />
             <p className="my-auto hidden md:block truncate">{album['submitter_nickname']}</p>
           </div>
@@ -398,6 +410,9 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
           </Checkbox>
           <Checkbox isSelected={aotdFilter == "2"} onValueChange={(v) => updateParams({ aotd: v ? '2' : null, page: null })} className="w-full ml-1">
             Filter by non-selected Albums
+          </Checkbox>
+          <Checkbox isSelected={aotdFilter == "3"} onValueChange={(v) => updateParams({ aotd: v ? '3' : null, page: null })} className="w-full ml-1">
+            Only show abandoned Albums
           </Checkbox>
         </div>
         <div>
