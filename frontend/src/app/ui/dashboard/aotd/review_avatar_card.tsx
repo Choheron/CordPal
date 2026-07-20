@@ -35,7 +35,7 @@ export default async function ReviewAvatarCard(props) {
         avatarClassNameOverride="size-[40px]"
       />
       {!hideScores && (
-        <div className="ml-12 max-h-[20px]">
+        <div className="ml-12 max-h-[20px] line-clamp-1">
           <div
             className="prose prose-invert prose-sm text-gray-500"
             dangerouslySetInnerHTML={{__html: reviewMessage}}
