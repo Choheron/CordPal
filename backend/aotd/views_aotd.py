@@ -172,7 +172,11 @@ def setAlbumOfDayADMIN(request: HttpRequest, date: str, mbid: str):
   # Get current date
   day = datetime.datetime.strptime(date, "%Y-%m-%d")
   # Define Album Object
-  albumOfTheDay = Album.objects.get(mbid=mbid)
+  if(mbid == "RAND"):
+    albumOfTheDay = Album.objects.order_by('?').first()
+  else:
+    albumOfTheDay = Album.objects.get(mbid=mbid)
+    
   # Create an album of the day object
   albumOfTheDayObj = DailyAlbum(
     album=albumOfTheDay,
