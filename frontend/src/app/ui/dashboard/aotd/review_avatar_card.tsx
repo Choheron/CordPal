@@ -16,24 +16,25 @@ export default async function ReviewAvatarCard(props) {
   const review = props.review_obj;
   const hideScores = props.hideScores ?? false;
   const reviewMessage = await (await doReviewEmbedReplacements(review)).message
+  // PopoverTrigger calls Children.only, which throws if React streams the trigger's
+  // subtree as a lazy reference — resolve the async UserCard before rendering
+  const userCard = await UserCard({
+    userDiscordID: review['user_id'],
+    customDescription: hideScores ? (
+      <p className="text-xs text-gray-500 italic">Score hidden</p>
+    ) : (
+      <StarRating
+        rating={review['score']}
+        className="text-yellow-400"
+        textSize="text-2xl xl:text-[25px]"
+      />
+    ),
+    avatarClassNameOverride: "size-[40px]",
+  })
 
   const cardContent = (
     <div className={`relative border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl transition-all overflow-hidden ${hideScores ? 'cursor-default' : 'hover:bg-black/40 hover:scale-105'}`}>
-      <UserCard
-        userDiscordID={review['user_id']}
-        customDescription={
-          hideScores ? (
-            <p className="text-xs text-gray-500 italic">Score hidden</p>
-          ) : (
-            <StarRating
-              rating={review['score']}
-              className="text-yellow-400"
-              textSize="text-2xl xl:text-[25px]"
-            />
-          )
-        }
-        avatarClassNameOverride="size-[40px]"
-      />
+      {userCard}
       {!hideScores && (
         <div className="ml-12 max-h-[20px] line-clamp-1">
           <div

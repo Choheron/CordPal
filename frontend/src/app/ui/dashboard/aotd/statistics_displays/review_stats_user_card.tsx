@@ -30,6 +30,14 @@ export default async function ReviewStatsUserCard(props) {
   const reviewData = props.userReviewObj;
   const lowestReviewData = await getAlbum(reviewData['lowest_score_album'])
   const highestReviewData = await getAlbum(reviewData['highest_score_album'])
+  // PopoverTrigger calls Children.only, which throws if React streams the trigger's
+  // subtree as a lazy reference — resolve the async UserCard before rendering
+  const triggerUserCard = await UserCard({
+    userDiscordID: reviewData['discord_id'],
+    inactive: !reviewData['active'],
+    avatarClassNameOverride: "size-[40px]",
+    customDescription: <p>Click for review stats</p>,
+  })
 
   function convertToHistoricalDateUrl(reviewDate: string) {
     try {
@@ -44,14 +52,7 @@ export default async function ReviewStatsUserCard(props) {
     <Popover placement="bottom" showArrow={true}>
       <PopoverTrigger>
         <div>
-          <UserCard
-            userDiscordID={reviewData['discord_id']}
-            inactive={!reviewData['active']}
-            avatarClassNameOverride="size-[40px]"
-            customDescription={
-              <p>Click for review stats</p>
-            }
-          />
+          {triggerUserCard}
         </div>
       </PopoverTrigger>
       <PopoverContent className="max-w-[350px]">

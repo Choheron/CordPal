@@ -4,11 +4,11 @@ import { isPlaybackAvailable } from "@/app/lib/playback_utils"
 import { isJanuary } from "@/app/lib/utils"
 import { Conditional } from "../../dashboard/conditional";
 
-import { BBH_Sans_Bartle } from 'next/font/google'
+import { BBH_Bartle } from 'next/font/google'
 import { useEffect, useState } from "react";
 import { RiCloseCircleFill } from "react-icons/ri";
 // Setup Font
-const bartle = BBH_Sans_Bartle({
+const bartle = BBH_Bartle({
   weight: "400",
   adjustFontFallback: false,
   fallback: ['sans-serif'],

@@ -7,12 +7,12 @@ import { RiArrowDownLine, RiCloseCircleLine, RiHome2Fill } from 'react-icons/ri'
 import GlobalAotdPlayback from '@/app/ui/playback/global_aotd_playback';
 import GlobalReviewPlayback from '@/app/ui/playback/global_review_playback';
 
-import { BBH_Sans_Bartle } from 'next/font/google'
+import { BBH_Bartle } from 'next/font/google'
 import GlobalReviewReactionPlayback from '@/app/ui/playback/global_review_reaction_playback';
 import GlobalPhotoPlaybackData from '@/app/ui/playback/global_photos_playback';
 import GlobalQuotesPlayback from '@/app/ui/playback/global_quotes_playback';
 // Setup Font
-const bartle = BBH_Sans_Bartle({
+const bartle = BBH_Bartle({
   weight: "400",
   adjustFontFallback: false,
   fallback: ['sans-serif'],
