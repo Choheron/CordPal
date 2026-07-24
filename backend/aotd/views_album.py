@@ -282,7 +282,6 @@ def getAlbum(request: HttpRequest, mbid: str):
     # Build return object
     out = {}
     out['album_pk'] = albumObj.pk
-    out['raw_album_data'] = json.dumps(albumObj.raw_data)
     out['release_group'] = json.dumps(albumObj.raw_data['release-group'])
     out['disambiguation'] = albumObj.disambiguation
     out['title'] = albumObj.title

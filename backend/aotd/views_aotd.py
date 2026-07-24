@@ -371,7 +371,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
         selection_counts[submitter] = 1
       # Build album object
       temp = {}
-      temp['raw_data'] = model_to_dict(albumObj)
+      # temp['raw_data'] = albumObj.raw_data
       temp['title'] = albumObj.title
       temp['album_id'] = albumObj.mbid
       temp['album_img_src'] = albumObj.cover_url
@@ -384,6 +384,8 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
       temp['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
       # Attach rating of album
       temp['rating'] = rating
+      # Retrieve album tags
+      temp['tags'] = [tag.toJSON(short=True) for tag in albumObj.tags.filter(is_approved=True)]
       # Append out object to output
       out[aotd.dateToCalString()] = temp
     # Convert submission numbers to array
@@ -410,6 +412,8 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     out['stats']['selection_total'] = len(month_AOtD)
     # Attach submission numbers object to out JSON 
     out['stats']['user_stats'] = subNumObj
+    # Attach tag stats to out json
+
   # Return out object with timestamp
   out['timestamp'] = timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
   return JsonResponse(out)

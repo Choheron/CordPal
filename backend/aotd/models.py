@@ -137,7 +137,7 @@ class Album(models.Model):
     else:
       return "Not Available"
 
-  def toJSON(self, include_raw=True):
+  def toJSON(self, include_raw=True, include_tags=False):
     """Return an Album as a JSON. (For HTTP JSON Responses)"""
     out = {}
     out['mbid'] = self.mbid
@@ -160,6 +160,8 @@ class Album(models.Model):
       out['transfer_date'] = recent_transfer.transferred_at.strftime("%m/%d/%Y, %H:%M:%S")
     if(include_raw):
       out['raw_album'] = self.raw_data
+    if(include_tags):
+      out['tags'] = [tag.toJSON(short=True) for tag in self.tags.filter(is_approved=True)]
     return out
 
   def save(self, edited_by=None, *args, **kwargs):
