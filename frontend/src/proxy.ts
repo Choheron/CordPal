@@ -5,6 +5,10 @@ import { verifyAuth, isMember } from './app/lib/discord_utils';
 // Pages reachable without guild membership
 const nonUserPages = ["/dashboard", "/dashboard/about", "/"];
 
+// Link-preview crawlers (Discord etc.) get rewritten to a public embed route instead of the auth redirect
+const linkPreviewBots = /discordbot|slackbot|twitterbot|telegrambot|whatsapp|facebookexternalhit/i;
+const aotdDayPage = /^\/dashboard\/aotd\/calendar\/(\d{4})\/(\d{2})\/(\d{2})\/?$/;
+
 function checkNonUserAccess(request: NextRequest) {
   return nonUserPages.indexOf(request.nextUrl.pathname) !== -1;
 }
@@ -13,6 +17,14 @@ export async function proxy(request: NextRequest) {
   // X-Heartbeat / X-Member-Check are internal calls that must bypass auth to avoid redirect loops
   if(request.headers.get("X-Heartbeat") || request.headers.get("X-Member-Check")) {
     return NextResponse.next();
+  }
+
+  // Serve link-preview crawlers a public OG-tags-only page (they have no session and would otherwise be redirected)
+  if(linkPreviewBots.test(request.headers.get("user-agent") ?? "")) {
+    const dayMatch = request.nextUrl.pathname.match(aotdDayPage);
+    if(dayMatch) {
+      return NextResponse.rewrite(new URL(`/dashboard/aotd/api/embed/${dayMatch[1]}/${dayMatch[2]}/${dayMatch[3]}`, request.url));
+    }
   }
 
   // Start both in parallel — layout needs isMember on all dashboard routes regardless
