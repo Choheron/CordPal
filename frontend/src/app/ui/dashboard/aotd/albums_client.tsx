@@ -204,17 +204,6 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([text]) => text)
   }, [albums])
 
-  // Distinct song names across all loaded albums, most-used first — powers the song filter's autocomplete
-  const songOptions = React.useMemo(() => {
-    const counts = new Map<string, number>()
-    for (const a of albums) {
-      for (const song of a['track_list'] ?? []) {
-        counts.set(song, (counts.get(song) ?? 0) + 1)
-      }
-    }
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([text]) => text)
-  }, [albums])
-
   // Distinct artist names across all loaded albums, most-used first — powers the artist filter's autocomplete
   const artistOptions = React.useMemo(() => {
     const counts = new Map<string, number>()
@@ -227,6 +216,14 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
 
   // Merges updates into the current URL params and pushes a new history entry,
   // so each filter change is reachable via the browser back button. Pass null to remove a param.
+  //
+  // Uses native pushState instead of router.push: router.push is a real App Router navigation,
+  // so every debounced keystroke would re-fetch the RSC payload for the new URL — which includes
+  // the entire albums_list prop (every album + full track lists) getting re-serialized, re-downloaded,
+  // and re-hydrated just to change a query param. That payload round-trip was the search lag.
+  // Next.js supports native pushState for exactly this (shallow routing): useSearchParams picks up
+  // the change and re-renders this component with the new params, but no server request is made —
+  // the albums data is already here and filtering is fully client-side anyway.
   const updateParams = React.useCallback((updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString())
     for (const [key, value] of Object.entries(updates)) {
@@ -234,8 +231,8 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
       else params.set(key, value)
     }
     const qs = params.toString()
-    router.push(qs ? `${pathname}?${qs}` : pathname)
-  }, [searchParams, router, pathname])
+    window.history.pushState(null, '', qs ? `${pathname}?${qs}` : pathname)
+  }, [searchParams, pathname])
 
   // Debounce text inputs -> URL (300ms) — changed fields flush together in a single push
   React.useEffect(() => {
@@ -382,19 +379,8 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
         <div className="flex flex-col sm:flex-row gap-1 w-full md:w-4/5 mx-auto">
           {/* Title Search Bar */}
           <Input label="Title" placeholder="Filter by Title" value={titleInput} onValueChange={setTitleInput} />
-          {/* Song search with autocomplete */}
-          <Autocomplete
-            label="Song"
-            placeholder="Filter by Songs"
-            inputValue={songInput}
-            onInputChange={setSongInput}
-            allowsCustomValue
-            menuTrigger="input"
-          >
-            {songOptions.map((text) => (
-              <AutocompleteItem key={text}>{text}</AutocompleteItem>
-            ))}
-          </Autocomplete>
+          {/* Song Search Bar */}
+          <Input label="Song" placeholder="Filter by Song" value={songInput} onValueChange={setSongInput} />
           {/* Tag search with autocomplete */}
           <Autocomplete
             label="Tag"

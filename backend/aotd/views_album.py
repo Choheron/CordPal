@@ -445,8 +445,8 @@ def getAllAlbums(request: HttpRequest):
       'standard_deviation': effective_stddev,
       # Get user generated tags for the album
       'tags': [tag.toJSON(short=True) for tag in album.tags.filter(is_approved=True)],
-      # Add track list
-      'track_list': [trackObj['title'] for trackObj in album.track_list['tracks']]
+      # Add track list (legacy albums may store a plain list instead of {"tracks": [...]})
+      'track_list': [trackObj['title'] for trackObj in (album.track_list.get('tracks', []) if isinstance(album.track_list, dict) else (album.track_list or []))]
     })
 
   return JsonResponse({"timestamp": datetime.datetime.now(), "albums_list": albumList})
