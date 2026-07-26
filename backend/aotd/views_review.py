@@ -181,7 +181,7 @@ def getUserReviewForAlbum(request: HttpRequest, mbid: str, date: str = None):
     return res
   # If date is not provided grab the most recent date of AOtD
   try:
-    aotd_date = datetime.datetime.strptime("%Y-%m-%d") if (date) else DailyAlbum.objects.filter(album__mbid=mbid).latest('date').date
+    aotd_date = datetime.datetime.strptime(date, "%Y-%m-%d") if (date) else DailyAlbum.objects.filter(album__mbid=mbid).latest('date').date
   except:
     out = {}
     out['review_list'] = []

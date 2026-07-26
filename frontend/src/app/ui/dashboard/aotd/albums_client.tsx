@@ -163,6 +163,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
 
   // Derived from URL params
   const urlTitle = searchParams.get('title') ?? ''
+  const urlSong = searchParams.get('song') ?? ''
   const urlTag = searchParams.get('tag') ?? ''
   const urlArtist = searchParams.get('artist') ?? ''
   const urlSubmitter = searchParams.get('submitter') ?? ''
@@ -188,6 +189,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
 
   // Local state for text inputs — gives immediate feedback while URL update is debounced
   const [titleInput, setTitleInput] = React.useState(urlTitle)
+  const [songInput, setSongInput] = React.useState(urlSong)
   const [tagInput, setTagInput] = React.useState(urlTag)
   const [artistInput, setArtistInput] = React.useState(urlArtist)
 
@@ -197,6 +199,17 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     for (const a of albums) {
       for (const tag of a['tags'] ?? []) {
         counts.set(tag['tag_text'], (counts.get(tag['tag_text']) ?? 0) + 1)
+      }
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([text]) => text)
+  }, [albums])
+
+  // Distinct song names across all loaded albums, most-used first — powers the song filter's autocomplete
+  const songOptions = React.useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const a of albums) {
+      for (const song of a['track_list'] ?? []) {
+        counts.set(song, (counts.get(song) ?? 0) + 1)
       }
     }
     return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([text]) => text)
@@ -224,34 +237,44 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     router.push(qs ? `${pathname}?${qs}` : pathname)
   }, [searchParams, router, pathname])
 
-  // Debounce text inputs → URL (300ms)
+  // Debounce text inputs -> URL (300ms)
   React.useEffect(() => {
     if (titleInput === urlTitle) return
     const t = setTimeout(() => updateParams({ title: titleInput, page: null }), 300)
     return () => clearTimeout(t)
   }, [titleInput, urlTitle, updateParams])
 
-  // Debounce text inputs → URL (300ms)
+  // Debounce text inputs -> URL (300ms)
   React.useEffect(() => {
     if (tagInput === urlTag) return
     const t = setTimeout(() => updateParams({ tag: tagInput, page: null }), 300)
     return () => clearTimeout(t)
   }, [tagInput, urlTag, updateParams])
 
-  // Debounce artist input → URL (300ms)
+  // Debounce artist input -> URL (300ms)
   React.useEffect(() => {
     if (artistInput === urlArtist) return
     const t = setTimeout(() => updateParams({ artist: artistInput, page: null }), 300)
     return () => clearTimeout(t)
   }, [artistInput, urlArtist, updateParams])
 
+  // Debounce song input -> URL (300ms)
+  React.useEffect(() => {
+    if (songInput === urlSong) return
+    const t = setTimeout(() => updateParams({ song: songInput, page: null }), 300)
+    return () => clearTimeout(t)
+  }, [songInput, urlSong, updateParams])
+
   // Sync local text state back when URL changes (back/forward navigation)
   React.useEffect(() => setTitleInput(urlTitle), [urlTitle])
+  React.useEffect(() => setSongInput(urlSong), [urlSong])
+  React.useEffect(() => setTagInput(urlTag), [urlTag])
   React.useEffect(() => setArtistInput(urlArtist), [urlArtist])
 
   const displayedAlbumList = React.useMemo(() => {
     let list = albums
     if (urlTitle) list = list.filter(a => (a['title'] as string).toLowerCase().includes(urlTitle.toLowerCase()))
+    if (urlSong) list = list.filter(a => ((a['track_list'].length != 0) && (a['track_list'].some(song => song.toLowerCase().includes(urlSong.toLowerCase())))))
     if (urlTag) list = list.filter(a => ((a['tags'].length != 0) && (a['tags'].some(tagObj => tagObj['tag_text'].toLowerCase().includes(urlTag.toLowerCase())))))
     if (urlArtist) list = list.filter(a => (a['artist']['name'] as string).toLowerCase().includes(urlArtist.toLowerCase()))
     if (submitterFilter.size) list = list.filter(a => (a['submitter'] as string) === [...submitterFilter][0]) // spread, not Object.values() — plain Sets aren't enumerable as object properties
@@ -260,7 +283,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     if (aotdFilter == "2") list = list.filter(a => a['last_aotd'] == null) // Only show albums that have NOT been AOTD
     if (aotdFilter == "3") list = list.filter(a => a['last_aotd'] == null && !a['submitter_active']) // Only show albums that can be rescued
     return sortAlbumList(list, sortDescriptor)
-  }, [albums, urlTitle, urlArtist, submitterFilter, aotdFilter, sortDescriptor])
+  }, [albums, urlTitle, urlSong, urlTag, urlArtist, submitterFilter, aotdFilter, sortDescriptor])
 
   const totalPages = Math.max(1, Math.ceil(displayedAlbumList.length / rowsPerPage))
   const paginatedAlbumList = React.useMemo(() => {
@@ -375,6 +398,19 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
         <div className="flex flex-col sm:flex-row gap-1 w-full md:w-4/5 mx-auto">
           {/* Title Search Bar */}
           <Input label="Title" placeholder="Filter by Title" value={titleInput} onValueChange={setTitleInput} />
+          {/* Song search with autocomplete */}
+          <Autocomplete
+            label="Song"
+            placeholder="Filter by Songs"
+            inputValue={songInput}
+            onInputChange={setSongInput}
+            allowsCustomValue
+            menuTrigger="input"
+          >
+            {songOptions.map((text) => (
+              <AutocompleteItem key={text}>{text}</AutocompleteItem>
+            ))}
+          </Autocomplete>
           {/* Tag search with autocomplete */}
           <Autocomplete
             label="Tag"

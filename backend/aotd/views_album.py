@@ -409,7 +409,7 @@ def getAllAlbums(request: HttpRequest):
   albums = list(
     Album.objects
     .select_related('submitted_by')
-    .defer('raw_data', 'track_list')
+    .defer('raw_data')
   )
   albumList = []
   for album in albums:
@@ -444,7 +444,9 @@ def getAllAlbums(request: HttpRequest):
       'rating': effective_rating,
       'standard_deviation': effective_stddev,
       # Get user generated tags for the album
-      'tags': [tag.toJSON(short=True) for tag in album.tags.filter(is_approved=True)]
+      'tags': [tag.toJSON(short=True) for tag in album.tags.filter(is_approved=True)],
+      # Add track list
+      'track_list': [trackObj['title'] for trackObj in album.track_list['tracks']]
     })
 
   return JsonResponse({"timestamp": datetime.datetime.now(), "albums_list": albumList})
