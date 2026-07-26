@@ -237,33 +237,17 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     router.push(qs ? `${pathname}?${qs}` : pathname)
   }, [searchParams, router, pathname])
 
-  // Debounce text inputs -> URL (300ms)
+  // Debounce text inputs -> URL (300ms) — changed fields flush together in a single push
   React.useEffect(() => {
-    if (titleInput === urlTitle) return
-    const t = setTimeout(() => updateParams({ title: titleInput, page: null }), 300)
+    const updates: Record<string, string | null> = {}
+    if (titleInput !== urlTitle) updates.title = titleInput
+    if (tagInput !== urlTag) updates.tag = tagInput
+    if (artistInput !== urlArtist) updates.artist = artistInput
+    if (songInput !== urlSong) updates.song = songInput
+    if (Object.keys(updates).length === 0) return
+    const t = setTimeout(() => updateParams({ ...updates, page: null }), 300)
     return () => clearTimeout(t)
-  }, [titleInput, urlTitle, updateParams])
-
-  // Debounce text inputs -> URL (300ms)
-  React.useEffect(() => {
-    if (tagInput === urlTag) return
-    const t = setTimeout(() => updateParams({ tag: tagInput, page: null }), 300)
-    return () => clearTimeout(t)
-  }, [tagInput, urlTag, updateParams])
-
-  // Debounce artist input -> URL (300ms)
-  React.useEffect(() => {
-    if (artistInput === urlArtist) return
-    const t = setTimeout(() => updateParams({ artist: artistInput, page: null }), 300)
-    return () => clearTimeout(t)
-  }, [artistInput, urlArtist, updateParams])
-
-  // Debounce song input -> URL (300ms)
-  React.useEffect(() => {
-    if (songInput === urlSong) return
-    const t = setTimeout(() => updateParams({ song: songInput, page: null }), 300)
-    return () => clearTimeout(t)
-  }, [songInput, urlSong, updateParams])
+  }, [titleInput, urlTitle, tagInput, urlTag, artistInput, urlArtist, songInput, urlSong, updateParams])
 
   // Sync local text state back when URL changes (back/forward navigation)
   React.useEffect(() => setTitleInput(urlTitle), [urlTitle])
