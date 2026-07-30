@@ -14,12 +14,14 @@ import { useEffect, useState } from "react";
 //  - reactionsList: List(Objects) - List of Objects containing reaction data from backend
 //  - userData: Object - User Data from Backend
 //  - emojiButtonOverride: String - Tailwind override for emoji button
+//  - readOnly: Boolean - [Optional] Hide the reaction button and disable reaction clicks (defaults to false)
 export default function ReviewEmojiMartClientWrapper(props) {
   const albumMbid = props.albumMbid
   const reviewID = props.reviewId
   const [reactionsList, setReactionsList] = useState((props.reactionsList) ? props.reactionsList : [])
   const userData = props.userData
   const userID = userData['guid']
+  const readOnly = (props.readOnly != null) ? props.readOnly : false
   const emojiButtonOverride = (props.emojiButtonOverride) ? props.emojiButtonOverride : "absolute -top-2 -right-2"
 
   // Callback to add reaction to backend
@@ -89,12 +91,14 @@ export default function ReviewEmojiMartClientWrapper(props) {
   return (
     <div className="w-full">
       {/* Reaction UI */}
-      <div className={emojiButtonOverride}>
-        <EmojiMartButton 
-          selectionCallback={handleSelection}
-          isDisabled={reactionsList.length == 20}
-        />
-      </div>
+      <Conditional showWhen={!readOnly}>
+        <div className={emojiButtonOverride}>
+          <EmojiMartButton 
+            selectionCallback={handleSelection}
+            isDisabled={reactionsList.length == 20}
+          />
+        </div>
+      </Conditional>
       {/* Reaction Emoji Display */}
       <Conditional showWhen={reactionsList.length != 0}>
         <div className="flex flex-wrap w-full max-w-full pt-1">
@@ -119,7 +123,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
                 <div 
                   key={index}
                   className={`rounded-xl flex gap-1 px-2 py-1 mx-1 border ${(didThisReact) ? "bg-blue-700/50 border-blue-500" : "bg-slate-700/50 border-slate-500"} hover:cursor-pointer hover:scale-105`}
-                  onClick={() => handleClick(emojiGroup, didThisReact)}
+                  onClick={() => (!readOnly) ? handleClick(emojiGroup, didThisReact) : null}
                 >
                   <p className="text-base h-fit my-auto">{displayEmoji(emojiGroup['objects'][0])}</p>
                   <p className="text-xs my-auto">{emojiGroup['count']}</p>

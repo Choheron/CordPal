@@ -84,12 +84,13 @@ export default async function ReviewPopoverContent(props) {
         </ScrollShadow>
       </div>
       {/* Emoji Reactions Display */}
-      <div className={`${(readOnly) ? "pointer-events-none invisible" : ""} w-full`}>
+      <div className={`w-full`}>
         <ReviewEmojiMartClientWrapper 
           userData={userData}
           reviewId={review['id']}
           albumMbid={review['album_id']}
           reactionsList={reactionsList}
+          readOnly={readOnly}
         />
       </div>
       {/* Advanced Review Display */}

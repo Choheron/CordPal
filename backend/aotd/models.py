@@ -360,7 +360,7 @@ class Review(models.Model):
     outObj['user_nickname'] = self.user.nickname
     outObj['album_id'] = self.album.mbid
     if(full):
-      outObj['album'] = self.album.toJSON()
+      outObj['album'] = self.album.toJSON(include_raw=False)
     outObj['score'] = self.score
     outObj['comment'] = self.review_text
     outObj['review_date'] = self.review_date.strftime("%m/%d/%Y, %H:%M:%S")

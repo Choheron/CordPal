@@ -387,6 +387,7 @@ def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
   # Declare outlist and populate
   out = {}
   out['reviews'] = []
+  review: Review
   for review in reviewsObj:
     outObj = review.toJSON(full = True)
     # Append to list
