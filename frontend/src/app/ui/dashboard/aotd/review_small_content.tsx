@@ -84,7 +84,7 @@ export default async function ReviewPopoverContent(props) {
         </ScrollShadow>
       </div>
       {/* Emoji Reactions Display */}
-      <div className={`${(readOnly) ? "pointer-events-none" : ""} w-full`}>
+      <div className={`${(readOnly) ? "pointer-events-none invisible" : ""} w-full`}>
         <ReviewEmojiMartClientWrapper 
           userData={userData}
           reviewId={review['id']}
@@ -95,7 +95,7 @@ export default async function ReviewPopoverContent(props) {
       {/* Advanced Review Display */}
       <Conditional showWhen={advanced}>
         <p className="mt-[6px] text-lg mr-auto ml-0">Track by Track:</p>
-        <div className="max-h-[400px] overflow-x-auto rounded-lg">
+        <div className="max-h-[400px] overflow-x-auto rounded-lg w-full px-2">
           {
             parsedTrackComments.map(async(songObj: any) => (
               <div 

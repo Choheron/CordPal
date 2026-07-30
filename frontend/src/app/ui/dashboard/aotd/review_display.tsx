@@ -12,6 +12,7 @@ import { getHasReviewedToday } from "@/app/lib/user_utils";
 export default async function ReviewDisplay(props) {
   // Setup Props (Query backend if no reviewlist is passed in)
   const reviews = (props.review_list != null) ? props.review_list : await getReviewsForAlbum(props.album_id, props.date);
+  const readOnly = (props.readOnly != null) ? props.readOnly : false
   // Get count of users in website
   const userCount = await getAotdUserCount();
   // If the user is an AOTD participant, check if they are about to lose a review streak
@@ -65,7 +66,12 @@ export default async function ReviewDisplay(props) {
         ) : (
           reviews.sort((a, b) => a['score'] < b['score'] ? 1 : -1).map((review, index) => (
             <div className="mx-auto w-full max-w-full" key={index}>
-              <ReviewAvatarCard index={index} review_obj={review} hideScores={hideScore} />
+              <ReviewAvatarCard 
+                index={index} 
+                review_obj={review} 
+                hideScores={hideScore}
+                readOnly={readOnly}
+              />
             </div>
           ))
         )

@@ -262,7 +262,8 @@ export default function AlbumReviewBox(props) {
                   >
                     <p className="text-sm sm:text-lg">{song['number']}. <b>{song['title']}</b></p>
                     <div className="flex px-1">
-                      <Slider   
+                      <Slider
+                        aria-label={`Rating for ${song['title']}`}
                         size="sm"
                         radius="sm"
                         step={1}
@@ -339,6 +340,7 @@ export default function AlbumReviewBox(props) {
                   </div>
                 </div>
                 <Slider
+                  aria-label="Album rating"
                   size="md"
                   radius="lg"
                   step={0.5}

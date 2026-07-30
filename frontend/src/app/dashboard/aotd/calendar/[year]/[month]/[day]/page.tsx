@@ -138,6 +138,7 @@ export default async function Page({
                 <Button
                   radius="full"
                   className={`${(isToday) ? 'invisible' : ''} w-fit hover:underline text-white`}
+                  isDisabled={isToday}
                   variant="solid"
                 >
                   <RiArrowRightCircleLine className="text-2xl" />
@@ -231,6 +232,7 @@ export default async function Page({
               date={date}
               historical={true}
               hideScore={hideScore}
+              readOnly={!isToday}
             />
           </div>
         </div>

@@ -16,6 +16,7 @@ export default async function ReviewAvatarCard(props) {
   const review = props.review_obj;
   const hideScores = props.hideScores ?? false;
   const reviewMessage = await (await doReviewEmbedReplacements(review)).message
+  const readOnly = (props.readOnly != null) ? props.readOnly : false 
   // PopoverTrigger calls Children.only, which throws if React streams the trigger's
   // subtree as a lazy reference — resolve the async UserCard before rendering
   const userCard = await UserCard({
@@ -56,7 +57,11 @@ export default async function ReviewAvatarCard(props) {
         >
           <PopoverTrigger>{cardContent}</PopoverTrigger>
           <PopoverContent className="relative w-[330px] max-h-dvh">
-            <ReviewPopoverContent reviewData={review} reviewMessage={reviewMessage}/>
+            <ReviewPopoverContent 
+              reviewData={review} 
+              reviewMessage={reviewMessage}
+              readOnly={readOnly}
+            />
           </PopoverContent>
         </Popover>
       )}
