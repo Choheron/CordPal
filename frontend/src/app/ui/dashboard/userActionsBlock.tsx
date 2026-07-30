@@ -24,28 +24,24 @@ export default async function UserActionsBlock(props) {
     switch(action) {
       case "CREATE":
         return {
-          border: "border-l-emerald-500",
           glow: "[box-shadow:inset_5px_0_10px_-3px_rgba(16,185,129,0.2)]",
           iconBg: "bg-emerald-500/15 text-emerald-400",
           icon: <RiAddLine />
         };
       case "UPDATE":
         return {
-          border: "border-l-sky-500",
           glow: "[box-shadow:inset_5px_0_10px_-3px_rgba(14,165,233,0.2)]",
           iconBg: "bg-sky-500/15 text-sky-400",
           icon: <RiEditLine />
         };
       case "DELETE":
         return {
-          border: "border-l-rose-500",
           glow: "[box-shadow:inset_5px_0_10px_-3px_rgba(244,63,94,0.2)]",
           iconBg: "bg-rose-500/15 text-rose-400",
           icon: <RiDeleteBin2Line />
         };
       default:
         return {
-          border: "border-l-zinc-500",
           glow: "",
           iconBg: "bg-zinc-500/15 text-zinc-400",
           icon: null
@@ -86,7 +82,7 @@ export default async function UserActionsBlock(props) {
       return deleter !== raw['submitter_id'] && deleter !== raw['owner_id']
     })()
     return (
-      <div className={`relative flex items-center w-full border-l-[3px] ${styles.border} ${styles.glow} bg-zinc-800/40 hover:bg-zinc-700/40 transition-colors rounded-r-lg pl-2.5 pr-4 py-2 gap-3 cursor-default overflow-hidden`}>
+      <div className={`relative flex items-center w-full rounded-sm ${styles.glow} bg-zinc-800/40 hover:bg-zinc-700/40 transition-colors rounded-r-lg pl-2.5 pr-4 py-2 gap-3 cursor-default overflow-hidden`}>
         <Conditional showWhen={isAdminAlbumDelete}>
           <p className="z-10 absolute top-3 -left-10 text-[10px] bg-red-600 font-bold -rotate-45 px-10">
             ADMIN

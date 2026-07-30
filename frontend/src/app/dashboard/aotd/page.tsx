@@ -30,7 +30,7 @@ export default async function music() {
         <AotdEnrollBox />
       </Conditional>
       <Conditional showWhen={aotd_participant}>
-        <div className="w-full 2xl:w-4/5 h-fit">
+        <div className="w-full 2xl:w-4/5">
           <div className="flex flex-col w-full justify-center 2xl:flex-row gap-2">
             {/* Left side Album of The Day Display */}
             <AlbumOfTheDayBox />
@@ -76,11 +76,14 @@ export default async function music() {
                   <b>View All Albums</b>
                 </Button>
               </Link>
-              <div className={`h-full mb-2 ${(last_year_has_aotd) ? "md:max-h-[450px]" : ""}`}>
-                <RecentSubmissions 
-                  actionList={recentSubmissionsResponse['action_list']} 
-                  timestamp={recentSubmissionsResponse['timestamp']}
-                />
+              {/* Force dynamic height sizing by making outer div relative and inner div absolute, this causes the parent to not scale on the absolute content */}
+              <div className={`mb-2 2xl:flex-1 2xl:min-h-[220px] 2xl:relative`}>
+                <div className="2xl:absolute 2xl:inset-0">
+                  <RecentSubmissions 
+                    actionList={recentSubmissionsResponse['action_list']} 
+                    timestamp={recentSubmissionsResponse['timestamp']}
+                  />
+                </div>
               </div>
             </div>
           </div>

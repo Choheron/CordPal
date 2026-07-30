@@ -1,5 +1,3 @@
-"use server"
-
 import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
 
 import StarRating from "../../general/star_rating";

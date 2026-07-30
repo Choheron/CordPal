@@ -88,9 +88,8 @@ export default function AlbumTagsDisplay(props: Props) {
       (props.currentUserId != null && tag.submitted_by_id === props.currentUserId && !tag.is_approved)
     )
     return (
-      <Tooltip content={`Submitted by: ${tag.submitted_by}`}>
+      <Tooltip key={tag.id} content={`Submitted by: ${tag.submitted_by}`}>
         <div
-          key={tag.id}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm border ${tag.is_approved ? "bg-blue-500/10 border-blue-500/40 text-blue-100" : "bg-white/5 border-white/15 text-white/60"}`}
         >
           {tag.emoji && renderEmoji(tag.emoji)}
