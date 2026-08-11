@@ -145,6 +145,7 @@ export default async function AlbumOfTheDayBox(props) {
             release_date_precision={albumData("release_date_precision")}
             trackList={albumData("track_list")['tracks']}
             hideScore={hideScore}
+            genre_list={albumData("genre_list")}
           />
           <div className="w-full max-w-full">
             <AlbumTagsDisplay

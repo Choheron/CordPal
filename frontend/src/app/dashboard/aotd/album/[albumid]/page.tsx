@@ -202,6 +202,7 @@ export default async function Page({
                   trackCount={albumData("track_list")['tracks']?.length}
                   trackList={albumData("track_list")['tracks']}
                   showAlbumRating={false}
+                  genre_list={albumData("genre_list")}
                 />
                 <Conditional showWhen={isYearAgoAlbum} >
                   <p className="w-full text-xs text-gray-500 italic text-center">This album was AOTD a year ago today! You can edit tags on this album.</p>

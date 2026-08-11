@@ -34,6 +34,8 @@ export default async function Page({
   const nextDay = getNextDay(new Date(Date.parse(date)))
   // Boolean to determine if this date is today
   const isToday = isTodayCheck()
+  // Boolean to determine if this date was yesterday (reactions stay open through the day after)
+  const isYesterday = isYesterdayCheck()
   // Boolean to determine if this date is exactly one year ago today
   const isYearAgo = date === getLastYearInTimezone("America/Chicago")
   // Fetch standard deviation for this date
@@ -60,10 +62,20 @@ export default async function Page({
     hideTags = aotdSettings['hide_tags_prereview'] && !hasReviewedToday
   }
 
-
   // This may be my ugliest function in this whole thing.... Timezones are really confusing me
   function isTodayCheck() {
     const date1String = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0])).toISOString().split('T')[0]
+    const splitDate = date.split("-")
+    const date2String = new Date(Date.parse(new Date(parseInt(splitDate[0]), parseInt(splitDate[1])-1, parseInt(splitDate[2])).toISOString().split('T')[0])).toISOString().split('T')[0]
+    // Return string equals
+    return date1String == date2String;
+  }
+
+  // Same as isTodayCheck, but shifts "now" back a day so the AOtD day-after also counts
+  function isYesterdayCheck() {
+    const today = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0]))
+    today.setDate(today.getDate() - 1)
+    const date1String = today.toISOString().split('T')[0]
     const splitDate = date.split("-")
     const date2String = new Date(Date.parse(new Date(parseInt(splitDate[0]), parseInt(splitDate[1])-1, parseInt(splitDate[2])).toISOString().split('T')[0])).toISOString().split('T')[0]
     // Return string equals
@@ -180,6 +192,7 @@ export default async function Page({
               release_date_precision={albumData("release_date_precision")}
               historical_date={date}
               hideScore={hideScore}
+              genre_list={albumData("genre_list")}
             />
             <Conditional showWhen={commentData.was_updated_since_aotd}>
               <div className="text-xs italic text-gray-400 px-2 pb-2">
@@ -232,7 +245,7 @@ export default async function Page({
               date={date}
               historical={true}
               hideScore={hideScore}
-              readOnly={!isToday}
+              readOnly={!(isToday || isYesterday)}
             />
           </div>
         </div>

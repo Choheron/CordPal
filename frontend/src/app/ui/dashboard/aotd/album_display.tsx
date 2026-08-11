@@ -37,6 +37,7 @@ type AlbumDisplayProps = {
   vertical?: boolean;                                       // Display vertically instead of side by side
   trackList?: { length: number; [key: string]: unknown }[]; // The tracks contained in the album
   hideScore?: boolean;                                      // Hide the score of the album
+  genre_list?: [];                                          // List of Genre tags from MusicBrainz
 }
 
 // GUI Display for an Album
@@ -51,6 +52,7 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
   const album_page_url = (props.album_mbid) ? `/dashboard/aotd/album/${props.album_mbid}` : album_url;
   const album_img_src = (props.album_img_src) ? props.album_img_src : "/images/album-not-found.png";
   const album_cover_url = (props.album_mbid) ? `/dashboard/aotd/api/album-cover/${props.album_mbid}` : album_img_src;
+  const genre_list = (props.genre_list) ? props.genre_list : [];
   // Artist props
   const artist_name = (props.artist && props.artist['name']) ? props.artist['name'] : "Artist Name not Found";
   const artist_url = (props.artist && props.artist['href']) ? props.artist['href'] : "https://www.google.com/search?q=sad+face"; // NO LONGER USED (SWITCHED TO ALL ALBUMS ARTIST SEARCH)
@@ -115,6 +117,11 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
           <a title={title} href={album_url} target="_noreferrer" className="text-xl lg:text-3xl hover:underline w-fit line-clamp-1">
             <b>{title}</b>
           </a>
+          <Conditional showWhen={genre_list.length != 0}>
+            <div className="text-xs -mt-2 line-clamp-1">
+              {genre_list.slice(0, (genre_list.length > 3) ? 3 : genre_list.length).map((obj) => obj["name"]).join(" - ")}
+            </div>
+          </Conditional>
           <p className="-mt-2 italic">{disambiguation}</p>
           <a title={artist_name} href={`/dashboard/aotd/album/all?artist=${artist_name}`} className="text-sm lg:text-xl hover:underline -mt-2 w-fit">
             {artist_name}

@@ -296,6 +296,7 @@ def getAlbum(request: HttpRequest, mbid: str):
     out['submitter_nickname'] = albumObj.submitted_by.nickname
     out['submitter_comment'] = albumObj.user_comment
     out['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
+    out['genre_list'] = sorted(albumObj.raw_data['release-group']['genres'], key=lambda genre: genre["count"], reverse=True) if ("genres" in albumObj.raw_data['release-group'].keys()) else []
     # If this album has been rescued, the original submitter is the previous owner in history
     recent_transfer = albumObj.ownership_history.order_by('-transferred_at').first()
     if recent_transfer and recent_transfer.previous_owner:
