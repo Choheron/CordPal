@@ -28,6 +28,7 @@ import pytz
 import requests
 from datetime import timedelta
 from django.db.models import Count, Q, F
+from django.db.models.fields.json import KeyTransform
 
 # Declare logging
 logger = logging.getLogger()
@@ -411,6 +412,7 @@ def getAllAlbums(request: HttpRequest):
     Album.objects
     .select_related('submitted_by')
     .defer('raw_data')
+    .annotate(genres=KeyTransform('genres', KeyTransform('release-group', 'raw_data')))
   )
   albumList = []
   for album in albums:
@@ -423,6 +425,9 @@ def getAllAlbums(request: HttpRequest):
 
     stddev = daily.get('standard_deviation')
     effective_stddev = stddev if (stddev is not None and stddev != 0.00) else None
+
+    # Parse Genre List (Returning only 3 Genres per album)
+    genre_list = [genre['name'] for genre in sorted(album.genres, key=lambda genre: genre["count"], reverse=True)[:3]] if album.genres else []
 
     albumList.append({
       'title': album.title,
@@ -444,6 +449,7 @@ def getAllAlbums(request: HttpRequest):
       'last_aotd': daily.get('date'),
       'rating': effective_rating,
       'standard_deviation': effective_stddev,
+      'genre_list': genre_list,
       # Get user generated tags for the album
       'tags': [tag.toJSON(short=True) for tag in album.tags.filter(is_approved=True)],
       # Add track list (legacy albums may store a plain list instead of {"tracks": [...]})

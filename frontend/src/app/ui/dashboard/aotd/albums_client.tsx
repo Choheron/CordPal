@@ -167,6 +167,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
   const urlTag = searchParams.get('tag') ?? ''
   const urlArtist = searchParams.get('artist') ?? ''
   const urlSubmitter = searchParams.get('submitter') ?? ''
+  const urlGenre = searchParams.get('genre') ?? ''
   // AOTD Filter allowing users to filter by the following using checkboxes (including corresponding number)
   // 0 - No Filter Implemented
   // 1 - Only display albums that have been AOTD
@@ -192,6 +193,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
   const [songInput, setSongInput] = React.useState(urlSong)
   const [tagInput, setTagInput] = React.useState(urlTag)
   const [artistInput, setArtistInput] = React.useState(urlArtist)
+  const [genreInput, setGenreInput] = React.useState(urlGenre)
 
   // Distinct tag texts across all loaded albums, most-used first — powers the tag filter's autocomplete
   const tagOptions = React.useMemo(() => {
@@ -210,6 +212,17 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     for (const a of albums) {
       const name = a['artist']?.['name']
       if (name) counts.set(name, (counts.get(name) ?? 0) + 1)
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name)
+  }, [albums])
+
+  // Distinct genre names across all loaded albums, most-used first — powers the genre filter's autocomplete
+  const genreOptions = React.useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const a of albums) {
+      for (const genre of a['genre_list'] ?? []) {
+        counts.set(genre, (counts.get(genre) ?? 0) + 1)
+      }
     }
     return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name)
   }, [albums])
@@ -241,10 +254,11 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     if (tagInput !== urlTag) updates.tag = tagInput
     if (artistInput !== urlArtist) updates.artist = artistInput
     if (songInput !== urlSong) updates.song = songInput
+    if (genreInput !== urlGenre) updates.genre = genreInput
     if (Object.keys(updates).length === 0) return
     const t = setTimeout(() => updateParams({ ...updates, page: null }), 300)
     return () => clearTimeout(t)
-  }, [titleInput, urlTitle, tagInput, urlTag, artistInput, urlArtist, songInput, urlSong, updateParams])
+  }, [titleInput, urlTitle, tagInput, urlTag, artistInput, urlArtist, songInput, urlSong, genreInput, urlGenre, updateParams])
 
   // Sync local text state back when URL changes (back/forward navigation)
   React.useEffect(() => setTitleInput(urlTitle), [urlTitle])
@@ -259,12 +273,13 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     if (urlTag) list = list.filter(a => ((a['tags'].length != 0) && (a['tags'].some(tagObj => tagObj['tag_text'].toLowerCase().includes(urlTag.toLowerCase())))))
     if (urlArtist) list = list.filter(a => (a['artist']['name'] as string).toLowerCase().includes(urlArtist.toLowerCase()))
     if (submitterFilter.size) list = list.filter(a => (a['submitter'] as string) === [...submitterFilter][0]) // spread, not Object.values() — plain Sets aren't enumerable as object properties
+    if (urlGenre) list = list.filter(a => ((a['genre_list'].length != 0) && (a['genre_list'].some(genre => genre.toLowerCase().includes(urlGenre.toLowerCase())))))
     // AOTD Filter block - TODO: Could likely be optimized
     if (aotdFilter == "1") list = list.filter(a => a['last_aotd'] != null) // Only show albums that have been AOTD
     if (aotdFilter == "2") list = list.filter(a => a['last_aotd'] == null) // Only show albums that have NOT been AOTD
     if (aotdFilter == "3") list = list.filter(a => a['last_aotd'] == null && !a['submitter_active']) // Only show albums that can be rescued
     return sortAlbumList(list, sortDescriptor)
-  }, [albums, urlTitle, urlSong, urlTag, urlArtist, submitterFilter, aotdFilter, sortDescriptor])
+  }, [albums, urlTitle, urlSong, urlGenre, urlTag, urlArtist, submitterFilter, aotdFilter, sortDescriptor])
 
   const totalPages = Math.max(1, Math.ceil(displayedAlbumList.length / rowsPerPage))
   const paginatedAlbumList = React.useMemo(() => {
@@ -379,8 +394,6 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
         <div className="flex flex-col sm:flex-row gap-1 w-full md:w-4/5 mx-auto">
           {/* Title Search Bar */}
           <Input label="Title" placeholder="Filter by Title" value={titleInput} onValueChange={setTitleInput} />
-          {/* Song Search Bar */}
-          <Input label="Song" placeholder="Filter by Song" value={songInput} onValueChange={setSongInput} />
           {/* Tag search with autocomplete */}
           <Autocomplete
             label="Tag"
@@ -409,6 +422,25 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
           </Autocomplete>
           {/* User Dropdown Search Bar */}
           <UserDropdown label="Submitter" setSelectionCallback={(s: Set<any>) => updateParams({ submitter: [...s][0] ?? null, page: null })} selectedKeys={submitterFilter} />
+        </div>
+        <div className="flex flex-col sm:flex-row gap-1 w-full md:w-4/5 mx-auto mt-1">
+            {/* Song Search Bar */}
+            <Input label="Song" placeholder="Filter by Song" value={songInput} onValueChange={setSongInput} />
+            {/* Genre Search Bar */}
+            {/* <Input label="Genre" placeholder="Filter by Genre" value={genreInput} onValueChange={setGenreInput} /> */}
+            {/* Genre search with autocomplete */}
+            <Autocomplete
+              label="Genre"
+              placeholder="Filter by Genre"
+              inputValue={genreInput}
+              onInputChange={setGenreInput}
+              allowsCustomValue
+              menuTrigger="input"
+            >
+              {genreOptions.map((name) => (
+                <AutocompleteItem key={name}>{name}</AutocompleteItem>
+              ))}
+            </Autocomplete>
         </div>
         <div className="w-full md:w-4/5 mx-auto my-1 flex flex-col">
           <Checkbox isSelected={aotdFilter == "1"} onValueChange={(v) => updateParams({ aotd: v ? '1' : null, page: null })} className="w-full ml-1">
