@@ -332,15 +332,17 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
         )
       case "submitter":
         return (
-          <div className={`flex relative ${columnWidths.submitter} gap-2 min-w-0 overflow-hidden`}>
-            <Conditional showWhen={!album['submitter_active']}>
-              <p className="z-10 absolute top-[10px] -left-10 text-[6px] leading-none bg-red-600 -rotate-45 px-10 py-[2px]">
-                INACTIVE
-              </p>
-            </Conditional>
-            <Avatar src={`${album['submitter_avatar_url']}`} className="shrink-0" />
-            <p className="my-auto hidden md:block truncate">{album['submitter_nickname']}</p>
-          </div>
+          <Link href={"/profile/" + album['submitter']} prefetch={false}>
+            <div className={`flex relative ${columnWidths.submitter} gap-2 min-w-0 overflow-hidden`}>
+              <Conditional showWhen={!album['submitter_active']}>
+                <p className="z-10 absolute top-[10px] -left-10 text-[6px] leading-none bg-red-600 -rotate-45 px-10 py-[2px]">
+                  INACTIVE
+                </p>
+              </Conditional>
+              <Avatar src={`${album['submitter_avatar_url']}`} className="shrink-0" />
+              <p className="my-auto hidden md:block truncate">{album['submitter_nickname']}</p>
+            </div>
+          </Link>
         )
       case "submission_date":
         return (
