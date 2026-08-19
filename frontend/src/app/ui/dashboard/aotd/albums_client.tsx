@@ -75,11 +75,11 @@ const sortAlbumList = (list: any[], descriptor: any) => {
 
 const columns = [
   { key: "title",             label: "ALBUM",          sortable: true,  width: "lg:w-[320px]" },
-  { key: "tags",              label: "TAGS",           sortable: false, width: "lg:w-[260px]" },
-  { key: "artist",            label: "ARTIST",         sortable: true,  width: "lg:w-[100px]" },
-  { key: "submitter",         label: "SUBMITTER",      sortable: true,  width: "lg:w-[120px]" },
+  { key: "tags",              label: "TAGS",           sortable: false, width: "lg:w-[220px]" },
+  { key: "artist",            label: "ARTIST",         sortable: true,  width: "lg:w-[120px]" },
+  { key: "submitter",         label: "SUBMITTER",      sortable: true,  width: "lg:w-[160px]" },
   { key: "submission_date",   label: "SUBMITTED ON",   sortable: true,  width: "lg:w-[90px]" },
-  { key: "standard_deviation",label: "STDDEV",         sortable: true,  width: "lg:w-[70px]" },
+  { key: "standard_deviation",label: "STDDEV",         sortable: true,  width: "lg:w-[50px]" },
   { key: "rating",            label: "RATING",         sortable: true,  width: "lg:w-[90px]" },
   { key: "last_aotd",         label: "LAST AOD",       sortable: true,  width: "lg:w-[90px]" },
 ]
@@ -144,6 +144,9 @@ function TagsCell({ tags, widthClass }: { tags: any[]; widthClass: string }) {
             </p>
           </div>
         ))}
+        <Conditional showWhen={tags.length == 0}>
+          <p>--</p>
+        </Conditional>
       </div>
     </div>
   )
@@ -301,7 +304,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     switch (columnKey) {
       case "title":
         return (
-          <div className={`w-fit ${columnWidths.title}`}>
+          <div className={`w-full ${columnWidths.title}`}>
             <Link href={"/dashboard/aotd/album/" + album['album_id']} prefetch={false}>
               <Button
                 radius="sm"
@@ -353,7 +356,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
       case "rating":
         return (
           (album['rating'] != null) ?
-            <div className={`px-2 py-2 ${columnWidths.rating}`}>
+            <div className={`px-1 py-1 mx-auto ${columnWidths.rating}`}>
               <p className={`text-center text-black ${ratingToTailwindBgColor(album['rating'])} rounded-full`}>
                 <b>{album['rating'].toFixed(2)}</b>
               </p>
