@@ -304,6 +304,7 @@ def getAlbum(request: HttpRequest, mbid: str):
       out['submitter'] = recent_transfer.previous_owner.discord_id
       out['submitter_nickname'] = recent_transfer.previous_owner.nickname
       out['owner'] = albumObj.submitted_by.discord_id
+      out['owner_nickname'] = albumObj.submitted_by.nickname
       out['transfer_date'] = recent_transfer.transferred_at.strftime("%m/%d/%Y, %H:%M:%S")
     out['release_date_str'] = albumObj.raw_data['release-group']['first-release-date'] if ('first-release-date' in albumObj.raw_data['release-group'].keys()) else albumObj.release_date_str
     out['release_date'] = parseReleaseDate(out['release_date_str'])
