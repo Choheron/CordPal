@@ -116,8 +116,8 @@ export default async function Page({
             Return to Main Page
           </Button>
         </Link>
-        <div className="w-fit mx-auto lg:max-w-[1080px] flex flex-col gap-2 lg:flex-row">
-          <div className="backdrop-blur-2xl px-3 py-3 my-2 mx-auto rounded-2xl bg-zinc-800/30 border border-neutral-800">
+        <div className="w-fit 2xl:w-4/6 mx-auto flex flex-col gap-2 lg:flex-row">
+          <div className="w-full backdrop-blur-2xl px-3 py-3 my-2 mx-auto rounded-2xl bg-zinc-800/30 border border-neutral-800">
             <div className="mx-1 mt-1 mb-4 flex justify-between w-full">
               {/* Previous Day Button */}
               <Link
@@ -250,7 +250,7 @@ export default async function Page({
           </div>
         </div>
         <Conditional showWhen={ratingTimeline.length != 0}>
-          <div className="w-full 2xl:w-3/4 mx-auto py-5">
+          <div className="w-full 2xl:w-4/6 mx-auto py-5">
             <div className="pb-5 pt-2 font-extralight text-lg underline">
               <p>Rating Change Timeline:</p>
             </div>

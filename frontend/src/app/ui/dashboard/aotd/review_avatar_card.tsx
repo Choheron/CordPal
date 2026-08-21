@@ -31,8 +31,18 @@ export default async function ReviewAvatarCard(props) {
     avatarClassNameOverride: "size-[40px]",
   })
 
+  const displayEmoji = (emojiObj, imgWidth = "20px") => {
+    if(emojiObj['custom_emoji'] == true) {
+      return (
+        <img src={emojiObj['emoji']} width={imgWidth} className="size-[14px] mx-auto my-auto"/>
+      )
+    } else {
+      return (emojiObj['emoji'])
+    }
+  }
+
   const cardContent = (
-    <div className={`relative border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl transition-all overflow-hidden ${hideScores ? 'cursor-default' : 'hover:bg-black/40 hover:scale-105'}`}>
+    <div className={`relative border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl transition-all ${hideScores ? 'cursor-default' : 'hover:bg-black/40 hover:scale-105'}`}>
       {userCard}
       {!hideScores && (
         <div className="ml-12 max-h-[20px] line-clamp-1">
@@ -42,6 +52,15 @@ export default async function ReviewAvatarCard(props) {
           />
         </div>
       )}
+      <div className="absolute -top-2 right-0 flex gap-1">
+        {review['reactions'].slice(0, 4).map((reaction, index) => {
+          return (
+            <div className="text-center pt-1 border-1 rounded-full size-[25px] text-xs border-gray-600 bg-black overflow-hidden">
+              {displayEmoji(reaction['objects'][0])}
+            </div>
+          )
+        })}
+      </div>
     </div>
   );
 

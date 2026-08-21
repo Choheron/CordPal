@@ -68,20 +68,11 @@ export default async function AlbumOfTheDayBox(props) {
   }
 
   return (
-    <div className="w-full lg:w-[1150px] flex flex-col lg:flex-row lg:gap-2">
-      <div className="backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-        <div className="relative w-full flex flex-col">
-          <Conditional showWhen={isAdmin}>
-            <div className="absolute bottom-0 right-0">
-              <ReplaceAlbumModal
-                albumObj={albumOfTheDayObj}
-                isButtonDisabled={!isAdmin}
-                isCurrentlyAOTD={true}
-                serverCallback={revalidateAOTD}
-              />
-            </div>
-          </Conditional>
-          <div className="flex flex-col md:flex-row w-full justify-between px-2 mt-1 mb-1">
+    <div className="w-full flex flex-col lg:flex-row lg:gap-2">
+      {/* AOTD Box with Review Input */}
+      <div className="w-full lg:w-full backdrop-blur-2xl px-2 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+        <div className="relative flex flex-col">
+          <div className="flex flex-row w-full justify-between mt-1 mb-1">
             <Link
               href={`/dashboard/aotd/calendar/${yesterdayStringArr[0]}/${yesterdayStringArr[1]}/${yesterdayStringArr[2]}`}
             >
@@ -93,11 +84,6 @@ export default async function AlbumOfTheDayBox(props) {
                 <b>Yesterday&apos;s Album</b>
               </Button>
             </Link>
-            <div className="w-full backdrop-blur-2xl px-2 py-1 md:mx-2 my-2 md:my-0 rounded-2xl bg-black/20 border border-neutral-800">
-              <p className="text-xs italic text-gray-300">
-                All album artwork, track titles, artist names, and related content are the property of their respective copyright holders.
-              </p>
-            </div>
             <Link
               href={`/dashboard/aotd/calendar/${todayDate.toISOString().split('T')[0].split("-")[0]}/${todayDate.toISOString().split('T')[0].split("-")[1]}`}
             >
@@ -128,25 +114,38 @@ export default async function AlbumOfTheDayBox(props) {
               </div>
             </Alert>
           </Conditional>
-          <AlbumDisplay 
-            title={albumData("title")}
-            disambiguation={albumData("disambiguation")}
-            album_img_src={albumData("album_img_src")}
-            album_id={albumData("album_id")}
-            album_src={`/dashboard/aotd/album/${albumData("album_id")}`}
-            album_mbid={albumData("album_id")}
-            artist={albumData("artist")}
-            submitter={albumData("submitter")}
-            owner={albumData("owner")}
-            transfer_date={albumData("transfer_date")}
-            submitter_comment={albumData("submitter_comment")}
-            submission_date={albumData("submission_date")}
-            release_date={albumData("release_date")}
-            release_date_precision={albumData("release_date_precision")}
-            trackList={albumData("track_list")['tracks']}
-            hideScore={hideScore}
-            genre_list={albumData("genre_list")}
-          />
+          <div className="relative">
+            <AlbumDisplay 
+              title={albumData("title")}
+              disambiguation={albumData("disambiguation")}
+              album_img_src={albumData("album_img_src")}
+              album_id={albumData("album_id")}
+              album_src={`/dashboard/aotd/album/${albumData("album_id")}`}
+              album_mbid={albumData("album_id")}
+              artist={albumData("artist")}
+              submitter={albumData("submitter")}
+              owner={albumData("owner")}
+              transfer_date={albumData("transfer_date")}
+              submitter_comment={albumData("submitter_comment")}
+              submission_date={albumData("submission_date")}
+              release_date={albumData("release_date")}
+              release_date_precision={albumData("release_date_precision")}
+              trackList={albumData("track_list")['tracks']}
+              hideScore={hideScore}
+              genre_list={albumData("genre_list")}
+              cover_override="h-[125px] w-[125px] md:h-[300px] md:w-[300px] 2xl:size-[410px]"
+            />
+            <Conditional showWhen={isAdmin}>
+              <div className="absolute bottom-0 right-0">
+                <ReplaceAlbumModal
+                  albumObj={albumOfTheDayObj}
+                  isButtonDisabled={!isAdmin}
+                  isCurrentlyAOTD={true}
+                  serverCallback={revalidateAOTD}
+                />
+              </div>
+            </Conditional>
+          </div>
           <div className="w-full max-w-full">
             <AlbumTagsDisplay
               mbid={albumData("album_id")}
@@ -159,6 +158,7 @@ export default async function AlbumOfTheDayBox(props) {
               hideTags={hideTags}
             />
           </div>
+          {/* Review Input Box */}
           <div className="w-full max-w-full">
             <AlbumReviewBox 
               album_id={albumData("album_id")}
@@ -185,8 +185,14 @@ export default async function AlbumOfTheDayBox(props) {
           <div className="w-full flex">
             <AddAlbumModal />
           </div>
+          <div className="w-full text-center h-fit backdrop-blur-2xl px-2 py-1 md:mx-2 my-2 md:my-0 rounded-2xl bg-black/20 border border-neutral-800">
+            <p className="text-xs italic text-gray-300">
+              All album artwork, track titles, artist names, and related content are the property of their respective copyright holders.
+            </p>
+          </div>
         </div>
       </div>
+      {/* Review Display Box */}
       <div className="static w-full lg:w-fit backdrop-blur-2xl px-2 py-2 mt-0 lg:my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
         <ReviewEventSource albumId={albumData("album_id")} />
         <ReviewDisplay 

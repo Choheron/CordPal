@@ -138,14 +138,49 @@ export default async function MusicStatsBox(props) {
   return (
     <div className="flex flex-col w-full justify-center xl:flex-row gap-2">
       <div className="mx-2 lg:mx-0 my-2 px-2 py-2 flex flex-col lg:flex-row gap-10 backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
+        {/* Album Submission Stats */}
+        <div className='w-full lg:w-1/4 mx-auto flex flex-col'>
+          <p className="mx-auto text-xl underline mb-1">
+            Album Submission Stats: 
+          </p>
+          <div className="flex gap-2 justify-between w-full">
+            <p>
+              Total Albums Submitted:
+            </p>
+            <p>
+              {albumStatsJson['total_albums']}
+            </p>
+          </div>
+          <div className="border py-1 px-2 border-neutral-800 bg-black/40 rounded-xl text-center max-w-[400px] my-1 text-sm italic font-extralight">
+            <p>
+              Selection status is shown as it would be for each user at midnight tonight, Central Time.
+            </p>
+          </div>
+          <Divider className="my-1" />
+          <div className="flex flex-col justify-between h-full mr-2">
+            <table className="table-fixed w-full">
+              <thead>
+                <tr>
+                  <th className="w-1/2">User</th>
+                  <th className="w-1/4 pl-1">AOtD</th>
+                  <th className="w-1/4 px-1">Unpicked</th>
+                </tr>
+              </thead>
+              <tbody>
+                {albumUserStatsTable}
+              </tbody>
+            </table>
+            <CreateOutageModal />
+          </div>
+        </div>
         {/* Lowest and Highest Album Stats */}
-        <div className="w-fit flex flex-col">
+        <div className="w-full lg:w-1/2 flex flex-col">
           {(empty_month) ? (
-            <div className='w-full lg:w-[800px] mx-auto flex flex-col'>
+            <div className='w-full mx-auto flex flex-col'>
               <p>Highest and lowest album data unavailable for this month</p>
             </div>
           ):(
-            <div className='w-full lg:w-[800px] mx-auto flex flex-col'>
+            <div className='w-full mx-auto flex flex-col'>
               {/* Album Highest Stats */}
               <p className="font-extralight w-full text-center text-xl">
                 {single_album ? `Only Album of ${monthToName(month)} ${year}` : `${monthToName(month)} ${year}'s Highest`}: {dateToString(highest_date)}
@@ -166,6 +201,7 @@ export default async function MusicStatsBox(props) {
                   historical_date={highest_date}
                   showAlbumRating={true}
                   showCalLink={true}
+                  star_text_override="text-lg md:text-2xl 2xl:text-4xl"
                 />
                 <div className="w-full max-w-full">
                   <AlbumTagsDisplay
@@ -201,6 +237,7 @@ export default async function MusicStatsBox(props) {
                       historical_date={lowest_date}
                       showAlbumRating={true}
                       showCalLink={true}
+                      star_text_override="text-lg md:text-2xl 2xl:text-4xl"
                     />
                     <div className="w-full max-w-full">
                       <AlbumTagsDisplay
@@ -217,12 +254,12 @@ export default async function MusicStatsBox(props) {
               )}
             </div>
           )}
-          <div className="lg:w-[650px] mx-auto px-2 py-2 mt-2 text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
+          <div className="lg:w-4/5 mx-auto px-2 py-2 mt-2 text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
             <p>In order to be considered for highest or lowest album, an album must have 4 or more reviews. Any album with 3 or less reviews will not be counted.</p>
           </div>
         </div>
         {/* Review Stats */}
-        <div className='min-w-[300px] w-[300px] mx-auto flex flex-col'>
+        <div className='w-full lg:w-1/4 mx-auto flex flex-col'>
           <p className="mx-auto text-xl underline mb-1">
             Review Stats: 
           </p>
@@ -236,41 +273,6 @@ export default async function MusicStatsBox(props) {
           </div>
           <Divider className="my-1" />
           {reviewUserStatsList}
-        </div>
-        {/* Album Submission Stats */}
-        <div className='min-w-[300px] w-[300px] mx-auto flex flex-col'>
-          <p className="mx-auto text-xl underline mb-1">
-            Album Submission Stats: 
-          </p>
-          <div className="flex gap-2 justify-between w-full">
-            <p>
-              Total Albums Submitted:
-            </p>
-            <p>
-              {albumStatsJson['total_albums']}
-            </p>
-          </div>
-          <div className="border py-1 px-2 border-neutral-800 bg-black/40 rounded-xl text-center max-w-[400px] my-1 text-sm italic font-extralight">
-            <p>
-              Selection status is shown as it would be for each user at midnight tonight, Central Time.
-            </p>
-          </div>
-          <Divider className="my-1" />
-          <div className="flex flex-col justify-between h-full mr-2">
-            <table className="table-fixed w-full">
-              <thead>
-                <tr>
-                  <th className="w-1/2">User</th>
-                  <th className="w-1/4 pl-1">AOtD</th>
-                  <th className="w-1/4 px-1">Unpicked</th>
-                </tr>
-              </thead>
-              <tbody>
-                {albumUserStatsTable}
-              </tbody>
-            </table>
-            <CreateOutageModal />
-          </div>
         </div>
       </div>
     </div>

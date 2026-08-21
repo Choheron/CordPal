@@ -38,6 +38,8 @@ type AlbumDisplayProps = {
   trackList?: { length: number; [key: string]: unknown }[]; // The tracks contained in the album
   hideScore?: boolean;                                      // Hide the score of the album
   genre_list?: [];                                          // List of Genre tags from MusicBrainz
+  cover_override?: string;                                  // Tailwind override for cover art size
+  star_text_override?: string;                              // Score Star Text Tailwind override
 }
 
 // GUI Display for an Album
@@ -53,6 +55,8 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
   const album_img_src = (props.album_img_src) ? props.album_img_src : "/images/album-not-found.png";
   const album_cover_url = (props.album_mbid) ? `/dashboard/aotd/api/album-cover/${props.album_mbid}` : album_img_src;
   const genre_list = (props.genre_list) ? props.genre_list : [];
+  // Prop to override image size
+  const cover_override = (props.cover_override) ? props.cover_override : ""
   // Artist props
   const artist_name = (props.artist && props.artist['name']) ? props.artist['name'] : "Artist Name not Found";
   const artist_url = (props.artist && props.artist['href']) ? props.artist['href'] : "https://www.google.com/search?q=sad+face"; // NO LONGER USED (SWITCHED TO ALL ALBUMS ARTIST SEARCH)
@@ -79,6 +83,8 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
   const track_list = (props.trackList) ? props.trackList : null;
   // Hide album score
   const hideScore = (props.hideScore) ? props.hideScore : false;
+  // Score Star text size override
+  const star_text_override = (props.star_text_override) ? props.star_text_override : "text-lg md:text-2xl lg:text-4xl"
   
 
   const dateToCalUrl = (dateStr) => {
@@ -102,7 +108,7 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
       <div className={`w-full my-auto flex ${(vertical) ? "flex-col" : "flex-row" } `}>
         <Link 
           href={album_page_url}
-          className="relative shrink-0 h-[125px] w-[125px] md:h-[300px] md:w-[300px]"
+          className={`relative shrink-0 ${(cover_override != "") ? cover_override : "h-[125px] w-[125px] md:h-[300px] md:w-[300px]"}`}
         >
           <Image
             src={album_cover_url}
@@ -118,11 +124,11 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
             <b>{title}</b>
           </a>
           <Conditional showWhen={genre_list.length != 0}>
-            <div className="text-xs -mt-2 line-clamp-1">
+            <div className="text-[10px] sm:text-xs -mt-1 sm:-mt-2 line-clamp-1">
               {genre_list.slice(0, (genre_list.length > 3) ? 3 : genre_list.length).map((obj) => obj["name"]).join(" - ")}
             </div>
           </Conditional>
-          <p className="-mt-2 italic">{disambiguation}</p>
+          <p className="-mt-1 sm:-mt-2 italic">{disambiguation}</p>
           <a title={artist_name} href={`/dashboard/aotd/album/all?artist=${artist_name}`} className="text-sm lg:text-xl hover:underline -mt-2 w-fit">
             {artist_name}
           </a>
@@ -145,28 +151,32 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
           </Conditional>
           <div className="flex flex-col gap-1 mt-0.5">
             <Conditional showWhen={userAuth && (owner != null)}>
-              <div className="flex items-center justify-start gap-2">
-                <p className="text-xs text-yellow-400/80 w-14 text-right shrink-0">Owner</p>
-                <UserCard
-                  userDiscordID={owner}
-                  avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[32px]"}
-                  fallbackName={"User Not Found"}
-                  isProfileLink
-                />
+              <div className="flex flex-col sm:flex-row items-center justify-start gap-2">
+                <div className="-mb-3 sm:mb-0 w-full sm:w-fit">
+                  <p className="text-xs text-yellow-400/80 w-14 text-left shrink-0">Owner</p>
+                  <UserCard
+                    userDiscordID={owner}
+                    avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[32px]"}
+                    fallbackName={"User Not Found"}
+                    isProfileLink
+                  />
+                </div>
                 <ClientTimestamp className="text-xs italic text-neutral-500" timestamp={transfer_date} full={false}/>
               </div>
             </Conditional>
             <Conditional showWhen={userAuth && (props.submitter != null)}>
-              <div className="flex items-center gap-2">
-                <p className={`text-xs w-14 text-right shrink-0 ${owner != null ? "text-neutral-500" : "text-neutral-400"}`}>
-                  {owner != null ? "Original" : "Submitter"}
-                </p>
-                <UserCard
-                  userDiscordID={submitter}
-                  avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[32px]"}
-                  fallbackName={"User Not Found"}
-                  isProfileLink
-                />
+              <div className="flex flex-col sm:flex-row items-center gap-2">
+                <div className="-mb-3 sm:mb-0 w-full sm:w-fit">
+                  <p className={`text-xs w-14 text-left shrink-0 ${owner != null ? "text-neutral-500" : "text-neutral-400"}`}>
+                    {owner != null ? "Original" : "Submitter"}
+                  </p>
+                  <UserCard
+                    userDiscordID={submitter}
+                    avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[32px]"}
+                    fallbackName={"User Not Found"}
+                    isProfileLink
+                  />
+                </div>
                 <ClientTimestamp className="text-xs italic text-neutral-500" timestamp={submission_date} full={false}/>
               </div>
             </Conditional>
@@ -183,7 +193,7 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
                 <StarRating 
                   className="text-yellow-400 text-xl"
                   rating={avg_rating} 
-                  textSize="text-lg md:text-2xl lg:text-4xl"
+                  textSize={star_text_override}
                 />
               </div>
             </div>

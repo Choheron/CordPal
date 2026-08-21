@@ -387,6 +387,8 @@ class Review(models.Model):
         }
     # Convert to list and attach to out obj
     outObj['reactions'] = list(rObj.values())
+    # Sort reactions list
+    outObj['reactions'].sort(key=lambda reaction: reaction["count"], reverse=True)
     return outObj
 
   def save(self, silent_update: bool = False, *args, **kwargs):

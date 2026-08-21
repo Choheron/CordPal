@@ -13,7 +13,7 @@ export default async function RecentSubmissions(props) {
   const recentActions = (props.actionList) ? props.actionList : [];
 
   return (
-    <div className="h-full w-full lg:w-[350px] flex flex-col backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
+    <div className="h-full w-full flex flex-col backdrop-blur-2xl rounded-2xl bg-zinc-800/30 border border-neutral-800">
       <p className='text-xl mx-auto py-2 font-extralight'>Recent Album Subs&#47;Rescues:</p>
       <div className="flex flex-col justify-around h-full mx-1 overflow-y-auto scrollbar-hide">
         {recentActions.length === 0 ? (
