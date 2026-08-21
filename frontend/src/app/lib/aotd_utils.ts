@@ -1068,8 +1068,8 @@ export async function addReviewReaction(reactObj) {
   const reviewReactStatus = reviewReactResponse.status
   // If status was a success, revalidate review tag 
   if(reviewReactStatus == 200) {
-    revalidateTag(`review_${reactObj['id']}`, "max")
-    revalidateTag(`album_review_${reactObj['album_mbid']}`, "max") // Revalidate review tag for the specific album
+    updateTag(`review_${reactObj['id']}`)
+    updateTag(`album_review_${reactObj['album_mbid']}`) // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactStatus;
@@ -1096,8 +1096,8 @@ export async function deleteReviewReaction(reactObj) {
   const reviewReactDeleteStatus = reviewReactDeleteResponse.status
   // If status was a success, revalidate review tag 
   if(reviewReactDeleteStatus == 200) {
-    revalidateTag(`review_${reactObj['id']}`, "max")
-    revalidateTag(`album_review_${reactObj['album_mbid']}`, "max") // Revalidate review tag for the specific album
+    updateTag(`review_${reactObj['id']}`)
+    updateTag(`album_review_${reactObj['album_mbid']}`) // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactDeleteStatus;

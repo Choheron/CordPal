@@ -24,6 +24,14 @@ export default function ReviewEmojiMartClientWrapper(props) {
   const readOnly = (props.readOnly != null) ? props.readOnly : false
   const emojiButtonOverride = (props.emojiButtonOverride) ? props.emojiButtonOverride : "absolute -top-2 -right-2"
 
+  // useState() only seeds from props on mount, it won't pick up new props on its own. When another
+  // user reacts, the SSE stream triggers router.refresh(), which re-renders our parent Server
+  // Component with fresh reactions - but this component stays mounted and would otherwise keep
+  // showing the stale list forever. This effect re-syncs state whenever the prop changes.
+  useEffect(() => {
+    setReactionsList(props.reactionsList ?? [])
+  }, [props.reactionsList])
+
   // Callback to add reaction to backend
   const handleSelection = async (emojiObj) => {
     const reviewReactionObj = {
