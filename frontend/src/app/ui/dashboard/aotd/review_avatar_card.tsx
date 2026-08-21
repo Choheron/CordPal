@@ -55,7 +55,7 @@ export default async function ReviewAvatarCard(props) {
       <div className="absolute -top-2 right-0 flex gap-1">
         {review['reactions'].slice(0, 4).map((reaction, index) => {
           return (
-            <div className="text-center pt-1 border-1 rounded-full size-[25px] text-xs border-gray-600 bg-black overflow-hidden">
+            <div key={`react-${index}`} className="text-center pt-1 border-1 rounded-full size-[25px] text-xs border-gray-600 bg-black overflow-hidden">
               {displayEmoji(reaction['objects'][0])}
             </div>
           )

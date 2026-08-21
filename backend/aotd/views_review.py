@@ -516,6 +516,11 @@ def submitReviewReaction(request: HttpRequest):
     except Reaction.DoesNotExist as e:
       # Create a new reaction
       createReaction(review, user, reqBody['emoji'], reqBody['custom'])
+    finally:
+      # Publish update to redis channel to propt rerender on frontend
+      redis_stream_name = f"{REDIS_CONNECTION_PUBSUB_NAMESPACE}-aotd_review:{review.album.mbid}"
+      logger.info(f"Publishing review event to Redis stream: {redis_stream_name}")
+      redis_connection.publish(redis_stream_name, json.dumps({'album_id': review.album.mbid}))
     # Return success object 
     return HttpResponse(status=200)
   except Exception as e:

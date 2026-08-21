@@ -432,20 +432,14 @@ export async function getReviewsForAlbum(mbid, date = null) {
   if(mbid == "") {
     return []
   }
-  // Check for sessionid in cookies
-  const sessionCookie = await getCookie('sessionid');
   // Url Tail Definition
   const urlTail = `/${mbid}${((date != null) ? `/${date}` : "")}`
   // Get all user reviews for an album
   console.log(`getReviewsForAlbum: Sending request to backend '/aotd/getReviewsForAlbum${urlTail}'`)
   const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getReviewsForAlbum${urlTail}`, {
     method: "GET",
-    credentials: "include",
     cache: 'force-cache',
     next: { tags: [`album_review_${mbid}`] },
-    headers: {
-      Cookie: `sessionid=${sessionCookie};`
-    },
   });
   const reviewListRes = await reviewResponse.json()
   return reviewListRes['review_list'];
@@ -1075,7 +1069,7 @@ export async function addReviewReaction(reactObj) {
   // If status was a success, revalidate review tag 
   if(reviewReactStatus == 200) {
     revalidateTag(`review_${reactObj['id']}`, "max")
-    revalidateTag(`album_review_${reactObj['mbid']}`, "max") // Revalidate review tag for the specific album
+    revalidateTag(`album_review_${reactObj['album_mbid']}`, "max") // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactStatus;
@@ -1103,7 +1097,7 @@ export async function deleteReviewReaction(reactObj) {
   // If status was a success, revalidate review tag 
   if(reviewReactDeleteStatus == 200) {
     revalidateTag(`review_${reactObj['id']}`, "max")
-    revalidateTag(`album_review_${reactObj['mbid']}`, "max") // Revalidate review tag for the specific album
+    revalidateTag(`album_review_${reactObj['album_mbid']}`, "max") // Revalidate review tag for the specific album
   }
   // Return Status
   return reviewReactDeleteStatus;
