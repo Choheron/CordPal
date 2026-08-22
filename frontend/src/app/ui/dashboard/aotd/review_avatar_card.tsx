@@ -31,6 +31,7 @@ export default async function ReviewAvatarCard(props) {
     avatarClassNameOverride: "size-[40px]",
   })
 
+  // Custom displayEmoji function to display small emojis above the review card
   const displayEmoji = (emojiObj, imgWidth = "20px") => {
     if(emojiObj['custom_emoji'] == true) {
       return (
@@ -52,10 +53,11 @@ export default async function ReviewAvatarCard(props) {
           />
         </div>
       )}
-      <div className="absolute -top-2 right-0 flex gap-1">
-        {review['reactions'].slice(0, 4).map((reaction, index) => {
+      {/* Display Emoji Reactions on the review card as a small flair */}
+      <div className="absolute -top-2 right-0 flex">
+        {review['reactions'].slice(0, 6).map((reaction, index) => {
           return (
-            <div key={`react-${index}`} className="text-center pt-1 border-1 rounded-full size-[25px] text-xs border-gray-600 bg-black overflow-hidden">
+            <div key={`react-${index}`} className={`text-center pt-1 border-1 rounded-full size-[25px] text-xs border-gray-600 bg-black overflow-hidden -ml-2`}>
               {displayEmoji(reaction['objects'][0])}
             </div>
           )

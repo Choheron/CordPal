@@ -109,7 +109,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
       </Conditional>
       {/* Reaction Emoji Display */}
       <Conditional showWhen={reactionsList.length != 0}>
-        <div className="flex flex-wrap w-full max-w-full pt-1">
+        <div className="flex flex-wrap w-full max-w-full">
           {reactionsList.map((emojiGroup, index) => {
             const didThisReact = isUserInReactList(emojiGroup['objects'])
             return (
@@ -130,7 +130,7 @@ export default function ReviewEmojiMartClientWrapper(props) {
               >
                 <div 
                   key={index}
-                  className={`rounded-xl flex gap-1 px-2 py-1 mx-1 border ${(didThisReact) ? "bg-blue-700/50 border-blue-500" : "bg-slate-700/50 border-slate-500"} hover:cursor-pointer hover:scale-105`}
+                  className={`rounded-xl flex gap-1 px-2 py-1 mt-1 mx-[3px] border ${(didThisReact) ? "bg-blue-700/50 border-blue-500" : "bg-slate-700/50 border-slate-500"} hover:cursor-pointer hover:scale-105`}
                   onClick={() => (!readOnly) ? handleClick(emojiGroup, didThisReact) : null}
                 >
                   <p className="text-base h-fit my-auto">{displayEmoji(emojiGroup['objects'][0])}</p>
