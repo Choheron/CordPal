@@ -1,6 +1,7 @@
 from django.http import HttpRequest
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Avg, Sum, StdDev, Q
+from django.db.models.functions import ExtractHour, ExtractMinute, ExtractSecond
 
 import logging
 from dotenv import load_dotenv
@@ -318,6 +319,16 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   highest_review_score = highest_review.score if highest_review else None
   highest_review_mbid = highest_review.album.mbid if highest_review else None
   highest_review_date = highest_review.aotd_date if highest_review else None
+  # Calculate average review timestamp (Their average seconds since midnight that they review)
+  # Making use of ExactHour/Minute/Second as it allows me to do database operations to get seconds since midnight, making this faster
+  review_seconds_since_midnight_sum = all_reviews.annotate(
+    review_seconds_since_midnight=(
+      ExtractHour('review_date', tzinfo=pytz.timezone('America/Chicago')) * 3600 +
+      ExtractMinute('review_date', tzinfo=pytz.timezone('America/Chicago')) * 60 +
+      ExtractSecond('review_date', tzinfo=pytz.timezone('America/Chicago'))
+    )
+  ).aggregate(Sum('review_seconds_since_midnight'))['review_seconds_since_midnight__sum']
+  review_seconds_since_midnight_average = review_seconds_since_midnight_sum/total_reviews
   # Calculate user's Review KD
   ## Get date of user's AOTD User Data Creation
   user_start_date = user.creation_timestamp.date()
@@ -357,6 +368,9 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   aotdUserObj.highest_score_date = highest_review_date
   aotdUserObj.review_ratio = review_ratio
   aotdUserObj.review_rate = review_rate
+  # Update user timestamp stats
+  aotdUserObj.review_seconds_since_midnight_sum = review_seconds_since_midnight_sum
+  aotdUserObj.review_seconds_since_midnight_average = review_seconds_since_midnight_average
   # Update user Selection/Submission Data
   aotdUserObj.total_submissions = total_subs
   aotdUserObj.total_selected = total_select.count()
@@ -364,6 +378,33 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
   aotdUserObj.average_selection_score = average_select_score
   # Save user data
   aotdUserObj.save()
+
+
+def buildUserReviewStatsData(aotdUser: AotdUserData) -> dict:
+  '''Build the shared review stats dict for a single AotdUserData object, used by both single-user and all-user stats endpoints'''
+  return {
+    "discord_id": aotdUser.user.discord_id,
+    "total_reviews": aotdUser.total_reviews,
+    "missed_reviews": aotdUser.missed_reviews,
+    "review_score_sum": aotdUser.review_score_sum,
+    "first_listen_percentage": aotdUser.first_listen_percentage,
+    "average_review_score": aotdUser.average_review_score,
+    "median_review_score": aotdUser.median_review_score,
+    "lowest_score_given": aotdUser.lowest_score_given,
+    "lowest_score_album": aotdUser.lowest_score_mbid,
+    "lowest_score_date": aotdUser.lowest_score_date.strftime("%m/%d/%Y, %H:%M:%S") if aotdUser.lowest_score_date else None,
+    "highest_score_given": aotdUser.highest_score_given,
+    "highest_score_album": aotdUser.highest_score_mbid,
+    "highest_score_date": aotdUser.highest_score_date.strftime("%m/%d/%Y, %H:%M:%S") if aotdUser.highest_score_date else None,
+    "review_ratio": aotdUser.review_ratio,
+    "review_rate": aotdUser.review_rate,
+    "review_seconds_since_midnight_sum": aotdUser.review_seconds_since_midnight_sum,
+    "review_seconds_since_midnight_average": aotdUser.review_seconds_since_midnight_average,
+    "current_streak": aotdUser.current_streak,
+    "longest_streak": aotdUser.longest_streak,
+    "last_review_date": aotdUser.last_review_date,
+    "streak_at_risk": aotdUser.isStreakAtRisk()
+  }
 
 
 def update_user_streak(user: User, date_override: datetime.date | None = None):

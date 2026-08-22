@@ -3,6 +3,7 @@ import MinimalAlbumDisplay from "../dashboard/aotd/minimal_album_display";
 import StarRating from "../general/star_rating";
 import { boolToEmoji, ratingToTailwindBgColor } from "@/app/lib/utils";
 import ReviewCountChartBox from "./review_count_chart_box";
+import ClientTimestamp from "../general/client_timestamp";
 
 // Display user favorite and least favorite albums
 // EXPECTED PROPS:
@@ -30,6 +31,12 @@ export default async function UserAotdDataDisplay(props) {
   const userReviewsObj = (aotdParticipant) ? await getAllUserReviews(userId) : null;
   // Get album stats
   const userAlbumStats = (aotdParticipant) ? await getUserAlbumsStats(userId) : null;
+
+  // Calculate Timestamp from seconds since midnight
+  const calcTimstamp = (secondsSinceMidnight: number) => {
+    const midnightTimestamp = new Date().setHours(0,0,0,0)
+    return new Date(midnightTimestamp + (secondsSinceMidnight * 1000))
+  }
 
   return (
     <div className="w-full mx-auto flex flex-col gap-2 backdrop-blur-2xl px-2 py-2 rounded-2xl bg-zinc-800/30 border border-neutral-800 font-extralight">
@@ -168,6 +175,14 @@ export default async function UserAotdDataDisplay(props) {
                     {reviewStats['longest_streak']}
                   </p>
                 </div>
+              </div>
+              <div className="flex flex-col text-center pb-2">
+                <p>Average Review Timestamp:</p>
+                <ClientTimestamp 
+                  onlyDateTimestamp={true} 
+                  timestamp={calcTimstamp(reviewStats['review_seconds_since_midnight_average']).toISOString()}
+                  className="bg-slate-800 w-fit h-fit mx-auto px-1 rounded-lg"
+                />
               </div>
               {/* Star Displays for Average and Median Review Scoring */}
               <div className="flex justify-around">

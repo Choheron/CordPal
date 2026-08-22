@@ -16,6 +16,7 @@ from .models import (
 from .utils import (
   checkSelectionFlag,
   calculateUserReviewData,
+  buildUserReviewStatsData,
   update_user_streak
 )
 from reactions.utils import (
@@ -224,28 +225,8 @@ def getAllUserReviewStats(request: HttpRequest):
     if(aotdUser.total_reviews == None or aotdUser.total_selected == None or aotdUser.review_ratio == 0):
       calculateUserReviewData(aotdUser)
     # Create a new object for the user
-    reviewData[aotdUser.user.discord_id] = {
-      "discord_id": aotdUser.user.discord_id,
-      "total_reviews": aotdUser.total_reviews, 
-      "missed_reviews": aotdUser.missed_reviews,
-      "review_score_sum": aotdUser.review_score_sum,
-      "first_listen_percentage": aotdUser.first_listen_percentage,
-      "average_review_score": aotdUser.average_review_score,
-      "median_review_score": aotdUser.median_review_score,
-      "lowest_score_given": aotdUser.lowest_score_given,
-      "lowest_score_album": aotdUser.lowest_score_mbid,
-      "lowest_score_date": aotdUser.lowest_score_date.strftime("%m/%d/%Y, %H:%M:%S") if aotdUser.lowest_score_date else None,
-      "highest_score_given": aotdUser.highest_score_given,
-      "highest_score_album": aotdUser.highest_score_mbid,
-      "highest_score_date": aotdUser.highest_score_date.strftime("%m/%d/%Y, %H:%M:%S") if aotdUser.highest_score_date else None,
-      "review_ratio": aotdUser.review_ratio,
-      "review_rate": aotdUser.review_rate,
-      "current_streak": aotdUser.current_streak,
-      "longest_streak": aotdUser.longest_streak,
-      "last_review_date": aotdUser.last_review_date,
-      "streak_at_risk": aotdUser.isStreakAtRisk(),
-      "active": aotdUser.active
-    }
+    reviewData[aotdUser.user.discord_id] = buildUserReviewStatsData(aotdUser)
+    reviewData[aotdUser.user.discord_id]["active"] = aotdUser.active
   # Convert user reviews object to list
   outList = []
   for user in reviewData:
@@ -272,30 +253,10 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
   # Get AotdUser Object
   aotdUser = AotdUserData.objects.get(user=user)
   # If this user has not had their data calculated, calculate it
-  if(aotdUser.total_reviews == None or aotdUser.total_selected == None or aotdUser.review_ratio == 0):
+  if(aotdUser.total_reviews == None or aotdUser.total_selected == None or aotdUser.review_ratio == 0 or aotdUser.review_seconds_since_midnight_sum ==0):
     calculateUserReviewData(aotdUser)
   # Create a new object for the user
-  out = {
-    "discord_id": aotdUser.user.discord_id,
-    "total_reviews": aotdUser.total_reviews, 
-    "missed_reviews": aotdUser.missed_reviews,
-    "review_score_sum": aotdUser.review_score_sum,
-    "first_listen_percentage": aotdUser.first_listen_percentage,
-    "average_review_score": aotdUser.average_review_score,
-    "median_review_score": aotdUser.median_review_score,
-    "lowest_score_given": aotdUser.lowest_score_given,
-    "lowest_score_album": aotdUser.lowest_score_mbid,
-    "lowest_score_date": aotdUser.lowest_score_date.strftime("%m/%d/%Y, %H:%M:%S") if aotdUser.lowest_score_date else None,
-    "highest_score_given": aotdUser.highest_score_given,
-    "highest_score_album": aotdUser.highest_score_mbid,
-    "highest_score_date": aotdUser.highest_score_date.strftime("%m/%d/%Y, %H:%M:%S") if aotdUser.highest_score_date else None,
-    "review_ratio": aotdUser.review_ratio,
-    "review_rate": aotdUser.review_rate,
-    "current_streak": aotdUser.current_streak,
-    "longest_streak": aotdUser.longest_streak,
-    "last_review_date": aotdUser.last_review_date,
-    "streak_at_risk": aotdUser.isStreakAtRisk()
-  }
+  out = buildUserReviewStatsData(aotdUser)
   # Get all reviews left by user
   user_reviews = Review.objects.filter(user=user)
   # Convert get list of objects per score
@@ -358,7 +319,7 @@ def getSimilarReviewsForRatings(request: HttpRequest):
     user_reviews = Review.objects.filter(user=user).filter(score=score).order_by('-last_updated')[:3]
     albums_for_score = []
     for review in user_reviews:
-      albums_for_score.append(review.album.toJSON())
+      albums_for_score.append(review.album.toJSON(include_raw=False))
     # Attach to out object
     out[f"{score + 0.0}"] = albums_for_score
     # Increment score

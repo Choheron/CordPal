@@ -38,7 +38,7 @@ export default async function Page({
       <div className="flex flex-col items-center lg:p-24 pt-10">
         {/* Page Title */}
         <PageTitle text={`${userData['nickname']}'s Profile`} />
-        <div className="flex flex-col xl:flex-row gap-2">
+        <div className="flex flex-col xl:flex-row xl:w-full 4xl:w-5/6 gap-2">
           <div className="w-full xl:w-1/2">
             <ProfileUserDisplay 
               userData={userData}

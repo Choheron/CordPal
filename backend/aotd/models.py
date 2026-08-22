@@ -69,6 +69,9 @@ class AotdUserData(models.Model):
   total_selected = models.IntegerField(default=None, null=True)
   selection_score_sum = models.FloatField(default=0)
   average_selection_score = models.FloatField(default=0)
+  # Track average review timestamp
+  review_seconds_since_midnight_sum = models.PositiveIntegerField(default=0)
+  review_seconds_since_midnight_average = models.PositiveIntegerField(default=0)
   # Active flag, use to initiate the "yard sale"/inactivity mechanic
   active = models.BooleanField(default=True)
   # User Settings (NOTE: Possibly move to another model if settings grow)

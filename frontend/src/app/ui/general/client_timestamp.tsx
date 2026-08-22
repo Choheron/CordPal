@@ -9,10 +9,12 @@ import { generateDateFromUTCString, zeroPad, formatDateString } from "@/app/lib/
 //  - full: Boolean - return full timestamp or shortened one
 //  - maintainUTC: Boolean - Dont convert to local timestamp (Default False)
 //  - datePrecision: String - Date precision, will be overwritten if "full" prop is true, defaults to "day"
+//  - onlyDateTimestamp: Boolean - Overhauls the response to be ONLY the hours, mins, and seconds clock
 export default function ClientTimestamp(props) {
   const full = (props.full) ? props.full : false;
   const datePrecision = (props.datePrecision) ? props.datePrecision : "day";
   var utcDate = new Date()
+  const onlyDateTimestamp = (props.onlyDateTimestamp) ? props.onlyDateTimestamp : false;
   try {
     utcDate = generateDateFromUTCString(props.timestamp)
   } catch {
@@ -38,7 +40,7 @@ export default function ClientTimestamp(props) {
     let hours = (adjustedDate.getHours() > 12)? adjustedDate.getHours() - 12 : adjustedDate.getHours();
     //if 00 then it is 12 am
     hours = (hours == 0)? 12 : hours;
-    return `${splitString[0]} ${zeroPad(splitString[1],2)} ${zeroPad(splitString[2],2)}` + ((full) ? ` ${zeroPad(hours,2)}:${zeroPad(adjustedDate.getMinutes(),2)}:${zeroPad(adjustedDate.getSeconds(),2)} ${suffix}` : "")
+    return `${splitString[0]} ${zeroPad(splitString[1],2)} ${zeroPad(splitString[2],2)}` + ((full || onlyDateTimestamp) ? ` ${zeroPad(hours,2)}:${zeroPad(adjustedDate.getMinutes(),2)}:${zeroPad(adjustedDate.getSeconds(),2)} ${suffix}` : "")
   }
 
   function applyPrecision(formattedString, precision = "day") {
@@ -55,6 +57,13 @@ export default function ClientTimestamp(props) {
     }
   }
 
+  // Special single day override timestamp
+  if(onlyDateTimestamp) {
+    return (
+      <p className={props.className}>{adjustedTimestamp.split(" ")[3]} {adjustedTimestamp.split(" ")[4]}</p>
+    )
+  }
+  // Normal nonoverrided paragraph
   return (
     <p className={props.className}>{applyPrecision(adjustedTimestamp, datePrecision)}</p>
   );
