@@ -163,6 +163,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
   const pathname = usePathname()
   const [isPending, startTransition] = React.useTransition()
   const rowsPerPage = 50
+  const onlyAOTDRawList = albums.filter(a => a['last_aotd'] != null)
 
   // Derived from URL params
   const urlTitle = searchParams.get('title') ?? ''
@@ -463,7 +464,27 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
             <p className="mt-auto">
               Data Last Updated: {convertToLocalTZString(new Date(timestamp), true)}
             </p>
-            <div className="flex">
+            <div className="flex gap-1">
+              <Button 
+                variant="solid" 
+                className="mt-auto bg-gradient-to-br from-green-700/80 to-green-800/80" 
+                isDisabled={isPending}
+                as={Link}
+                href={`/dashboard/aotd/calendar/${(onlyAOTDRawList[Math.floor(Math.random() * onlyAOTDRawList.length)])['last_aotd'].split("-").join("/")}`}
+                prefetch={false}
+              >
+                Random AOTD
+              </Button>
+              <Button 
+                variant="solid" 
+                className="mt-auto bg-gradient-to-br from-green-700/80 to-green-800/80" 
+                isDisabled={isPending}
+                as={Link}
+                href={`/dashboard/aotd/album/${(displayedAlbumList[Math.floor(Math.random() * displayedAlbumList.length)])['album_id']}`}
+                prefetch={false}
+              >
+                Random Album from Current Filters
+              </Button>
               <Button color="primary" variant="solid" className="mr-2 mt-auto" isDisabled={isPending} onPress={hardRefresh}>
                 <Conditional showWhen={!isPending}>Hard Refresh</Conditional>
                 <Conditional showWhen={isPending}><Spinner color="warning" /></Conditional>
