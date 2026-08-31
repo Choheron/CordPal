@@ -478,9 +478,9 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
               <Button 
                 variant="solid" 
                 className="mt-auto bg-gradient-to-br from-green-700/80 to-green-800/80" 
-                isDisabled={isPending}
+                isDisabled={isPending || (displayedAlbumList.length == 0)}
                 as={Link}
-                href={`/dashboard/aotd/album/${(displayedAlbumList[Math.floor(Math.random() * displayedAlbumList.length)])['album_id']}`}
+                href={`/dashboard/aotd/album/${(displayedAlbumList[Math.floor(Math.random() * displayedAlbumList.length)])?.album_id}`}
                 prefetch={false}
               >
                 Random Album from Current Filters
