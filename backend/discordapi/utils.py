@@ -118,27 +118,23 @@ def refreshDiscordProfilePic(request: HttpRequest, user=None, tokenData=None):
   # request on every page load. Only verify the avatar URL once per day.
   if user.last_avatar_check and (timezone.now() - user.last_avatar_check) < AVATAR_CHECK_INTERVAL:
     return
-  avatar_res = requests.get(user.get_avatar_url())
-  if(avatar_res.status_code == 404):
-    logger.info("Refreshing user's discord profile picture...", extra={'crid': request.crid})
-    reqHeaders = {
-      'Authorization': f"{tokenData.token_type} {tokenData.access_token}"
-    }
-    logger.info("Making request to discord api...", extra={'crid': request.crid})
-    try:
-      discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
-      if(discordRes.status_code != 200):
-        logger.warning("Error in request:\n" + str(discordRes.json()), extra={'crid': request.crid})
-        discordRes.raise_for_status()
-    except:
-      return HttpResponse(status=500)
-    discordResJSON = discordRes.json()
-    user.discord_avatar = discordResJSON['avatar']
-    user.last_avatar_check = timezone.now()
-    user.save()
-  else:
-    # Avatar still valid — only stamp the check time, avoid bumping last_updated_timestamp
-    User.objects.filter(pk=user.pk).update(last_avatar_check=timezone.now())
+  # Refresh user Profile Picture data
+  logger.info("Refreshing user's discord profile picture...", extra={'crid': request.crid})
+  reqHeaders = {
+    'Authorization': f"{tokenData.token_type} {tokenData.access_token}"
+  }
+  logger.info("Making request to discord api...", extra={'crid': request.crid})
+  try:
+    discordRes = requests.get(f"{os.getenv('DISCORD_API_ENDPOINT')}/users/@me", headers=reqHeaders)
+    if(discordRes.status_code != 200):
+      logger.warning("Error in request:\n" + str(discordRes.json()), extra={'crid': request.crid})
+      discordRes.raise_for_status()
+  except:
+    return HttpResponse(status=500)
+  discordResJSON = discordRes.json()
+  user.discord_avatar = discordResJSON['avatar']
+  user.last_avatar_check = timezone.now()
+  user.save()
 
 
 def checkPreviousAuthorization(request: HttpRequest):

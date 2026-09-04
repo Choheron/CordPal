@@ -169,8 +169,7 @@ def validateServerMember(request: HttpRequest):
     response = HttpResponse("/", status=302)
     response.delete_cookie("sessionid")
     return response
-  ### EMERGENCY OVERRIDE CODE
-  # # TODO: EMERGENCY FIX TO RESTORE ACCESS THIS ALLOWS ANYONE IN
+  ### EMERGENCY OVERRIDE CODE - IF UNCOMMENTED WILL ALLOW ALL USERS ACCESS TO SITE
   # out = {}
   # out['member'] = True
   # out['role'] = True

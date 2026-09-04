@@ -25,12 +25,26 @@ class LastSeenMiddleware:
   def __call__(self, request: HttpRequest):
     # Get Request Path
     full_path = request.get_full_path()
+    # Parse Request IP
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')    
+    if x_forwarded_for:
+      # The header can contain a comma-separated list of IPs. 
+      # The first one is typically the original client.
+      ip = x_forwarded_for.split(',')[0].strip()
+      ip_type = "x-forwarded-for"
+    else:
+      # Fall back to the direct connection IP
+      ip = request.META.get('REMOTE_ADDR')
+      ip_type = "direct"
+    # Attach the IP to the request object so downstream views can use it easily
+    request.client_ip = ip
+    request.client_ip_type = ip_type
     # Get session data from request
     try:
       # Get user object 
       user = User.objects.get(discord_id=request.session['discord_id'])
       # Log method call (With username)
-      self.logger.debug(f"Incoming Request - User: {user.discord_id}/\"{user.nickname}\"", extra={'crid': request.crid})
+      self.logger.debug(f"Incoming Request - User: {user.discord_id}/\"{user.nickname}\"", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
       # Get current timestamp
       time = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
       # Update only heartbeat timestamp if its a heartbeat call, otherwise update last_request_timestamp
@@ -38,26 +52,26 @@ class LastSeenMiddleware:
         if(full_path == "/users/heartbeat"):
           # Update timezone if timezone is in request
           user.timezone_string = json.loads(request.body)['heartbeat']['timezone']
-          self.logger.info(f"Setting timezone to {str(user.timezone_string)} for user {user.nickname}", extra={'crid': request.crid})
+          self.logger.info(f"Setting timezone to {str(user.timezone_string)} for user {user.nickname}", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
         user.last_heartbeat_timestamp = time
-        self.logger.debug(f"Setting last_heartbeat_timestamp to {str(time)} for user {user.nickname}", extra={'crid': request.crid})
+        self.logger.debug(f"Setting last_heartbeat_timestamp to {str(time)} for user {user.nickname}", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
         user.save()
       else:
         user.last_heartbeat_timestamp = time # Also update heartbeat, why not
         user.last_request_timestamp = time
-        self.logger.debug(f"Setting last_request_timestamp to {str(time)} for user {user.nickname}", extra={'crid': request.crid})
+        self.logger.debug(f"Setting last_request_timestamp to {str(time)} for user {user.nickname}", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
         user.save()
     except Exception as e:
       if(isinstance(e, User.DoesNotExist)):
         # Log method call (With username)
-        self.logger.debug(f"Incoming Request from user \"UNKNOWN\": {full_path}", extra={'crid': request.crid})
+        self.logger.debug(f"Incoming Request from user \"UNKNOWN\": {full_path}", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
       else:
         if(full_path == "/metrics"):
-          self.logger.debug(f"Reporting metrics to prometheus", extra={'crid': request.crid})
+          self.logger.debug(f"Reporting metrics to prometheus", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
         elif(full_path in self.no_user_validation_paths):
-          self.logger.info(f"Incoming request without a discord_id in request... Possibly a cron?", extra={'crid': request.crid})
+          self.logger.info(f"Incoming request without a discord_id in request... Possibly a cron?", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
         else:
-          self.logger.error(f"ERROR IN USER MIDDLEWARE TRACEBACK: {e}", extra={'crid': request.crid})
+          self.logger.error(f"ERROR IN USER MIDDLEWARE TRACEBACK: {e}", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
     
     # Code above this line is executed before the view is called
     # Retrieving the response 
