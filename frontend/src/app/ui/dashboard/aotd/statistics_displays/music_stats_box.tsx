@@ -89,10 +89,15 @@ export default async function MusicStatsBox(props) {
             {user['aotd_count']}
           </a>
         </td>
-        <td>
-          <p className="mx-auto px-2 py-1 bg-gray-800 rounded-full w-fit">
+        <td
+          className="text-center"
+        >
+          <a 
+            className="px-2 py-1 bg-gray-800 rounded-full w-fit"
+            href={`/dashboard/aotd/album/all?aotd=2&submitter=${user['discord_id']}`}
+          >
             {user['unpicked_count']}
-          </p>
+          </a>
         </td>
       </tr>
     )
