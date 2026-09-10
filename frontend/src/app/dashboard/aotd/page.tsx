@@ -30,7 +30,7 @@ export default async function music() {
         <AotdEnrollBox />
       </Conditional>
       <Conditional showWhen={aotd_participant}>
-        <div className="w-full xl:w-4/5 4xl:w-4/6">
+        <div className="w-full 3xl:w-4/5 5xl:w-4/6">
           <div className="flex flex-col w-full justify-center 2xl:flex-row">
             {/* Left side Album of The Day Display */}
             <div className="w-full 2xl:w-[80%]">
