@@ -185,7 +185,7 @@ export default async function AlbumOfTheDayBox(props) {
           <div className="w-full flex">
             <AddAlbumModal />
           </div>
-          <div className="w-full text-center h-fit backdrop-blur-2xl px-2 py-1 md:mx-2 my-2 md:my-0 rounded-2xl bg-black/20 border border-neutral-800">
+          <div className="w-full text-center h-fit backdrop-blur-2xl px-2 py-1 my-2 md:my-0 rounded-2xl bg-black/20 border border-neutral-800">
             <p className="text-xs italic text-gray-300">
               All album artwork, track titles, artist names, and related content are the property of their respective copyright holders.
             </p>
