@@ -14,7 +14,6 @@ import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 import { Conditional } from "../conditional";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import InfoPopover from "../../general/info_popover";
-import { uploadEmoji } from "@/app/lib/emoji_utils";
 
 
 // GUI Display for an Album Review Box
