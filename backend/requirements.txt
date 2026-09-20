@@ -17,3 +17,7 @@ prometheus_client
 numpy
 # Redis library for pub/sub stuff
 redis
+# Pillow library for review image upload and image manipulation
+Pillow
+# HTML Sanitization
+nh3

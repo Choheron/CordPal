@@ -118,7 +118,7 @@ export default async function Page({
             <p className="text-sm italic -mt-1">
               {album_data['artist']['name']}
             </p>
-            <Conditional showWhen={album_data['release_date'] != "Unknown"}>
+            <Conditional showWhen={!!album_data['release_date']}>
               <div className="text-xs lg:text-sm lg:-mt-1 group-hover:underline">
                 <ClientTimestamp 
                   className="" 

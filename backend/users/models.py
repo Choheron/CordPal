@@ -129,7 +129,7 @@ class UserAction(models.Model):
 
   user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="actions")
   action_type = models.CharField(max_length=10, choices=ACTION_TYPES)
-  entity_type = models.CharField(max_length=50)  # "ALBUM", "ALBUM_COMMENT", "ALBUM_OWNER", "ALBUM_SELECTION_OUTAGE", "ALBUM_TAG", "ALBUM_TAG_VOTE", "CUSTOM_EMOJI", "GLOBAL_TAG", "QUOTE", "REACTION", "REVIEW"
+  entity_type = models.CharField(max_length=50)  # "ALBUM", "ALBUM_COMMENT", "ALBUM_OWNER", "ALBUM_SELECTION_OUTAGE", "ALBUM_TAG", "ALBUM_TAG_VOTE", "CUSTOM_EMOJI", "GLOBAL_TAG", "QUOTE", "REACTION", "REVIEW", "REVIEW_IMAGE"
   entity_id = models.IntegerField()
   timestamp = models.DateTimeField(default=timezone.now, blank=True, null=True)
   details = models.JSONField(null=True, blank=True)  # Store extra details (e.g., old vs. new values)

@@ -76,6 +76,21 @@ const config: Config = {
               display: "inline",
               margin: "0px"
             },
+            '.reviewImage': {
+              display: 'block',
+              maxWidth: '100%',
+              maxHeight: '320px',
+              width: 'auto',
+              height: 'auto',
+              borderRadius: '0.5rem',
+              marginTop: '.5rem',
+              marginBottom: '.5rem',
+            },
+            'img[data-uploading]': {
+              width: '48px',
+              height: '48px',
+              opacity: '0.6',
+            },
           }
         },
         DEFAULT: { // This is for default prose class

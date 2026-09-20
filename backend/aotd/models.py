@@ -8,6 +8,8 @@ import logging
 import pytz
 import datetime
 import json
+import uuid
+import os
 
 from users.models import User
 from spotifyapi.models import Album as SpotAlbum
@@ -392,6 +394,8 @@ class Review(models.Model):
     outObj['reactions'] = list(rObj.values())
     # Sort reactions list
     outObj['reactions'].sort(key=lambda reaction: reaction["count"], reverse=True)
+    # Include a list of attached ReviewImage IDs (uses the reverse reference for ReviewImage model)
+    outObj['attached_images'] = [image.pk for image in self.images.all()] 
     return outObj
 
   def save(self, silent_update: bool = False, *args, **kwargs):
@@ -471,6 +475,81 @@ class ReviewHistory(models.Model):
 
   def __str__(self):
     return f"History for {self.review} at {self.recorded_at}"
+
+
+# Model for an image that a user has uplaoded for a Review, either via the upload button or by pasting the image
+# Effort: 2026 User Image Uploads in Reviews
+class ReviewImage(models.Model):
+  """
+  An image submitted by users to go in a review, these images are not like the photohops available elsewhere in CordPal and are only for use in Reviews.
+  Storage of these images adheres to a many-to-many relationship with reviews as we dont want duplicate images (determined by the image sha256 hash). Thos
+  hash allows us to have multiple reviews reference a single image.
+  """
+  image_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False) # Unique Image ID for internal tracking, also used in the URL to request the image from the backend
+  sha256 = models.CharField(max_length=64, unique=True, editable=False) # Deduplication key for images, allowing mulitple instances of the same image to use the same file reference
+  reviews = models.ManyToManyField(Review, blank=True, related_name="images") # Many to many link to the reviews that reference and use this image
+  uploader = models.ForeignKey(AotdUserData, on_delete=models.SET_NULL, null=True, blank=True, related_name="uploaded_review_images") # Who first uploaded or triggered the re-host. On a dedupe hit the original uploader is kept. Nullable to survive user deletion, like Image.uploader in photos
+  filename = models.CharField(max_length=64, editable=False) # Filename of the associated image, identified by <hex_code>.<ext> so there are no overlaps, these filenames do not need to be easily human readable. 
+  filetype = models.CharField(max_length=32, choices=[("image/webp", "WebP"), ("image/gif", "GIF")]) # The filetype, all files will be converted into webp files or remain as gifs if a gif has been uploaded
+  size_bytes = models.PositiveIntegerField() # Size of the image in bytes
+  width = models.PositiveIntegerField() # Width of the image in pixels
+  height = models.PositiveIntegerField() # Height of the image in pixels
+  source_url = models.TextField(null=True, blank=True) # Set only when the image was re-hosted from an external image url, TextField rather than URLField because URLField defaults to 200 characters and only validates in forms; CDN URLs can be longer.
+  uploaded_at = models.DateTimeField(auto_now_add=True) # Timestamp for when this image was first uploaded, never updated. Garbage collection pass uses the `last_used_at` field
+  last_used_at = models.DateTimeField(default=timezone.now) # Bumped on creation and on every dedupe hit via an explicit update. Drives the orphan GC cutoff so a re-pasted old orphan gets a fresh grace period. Not auto_now, would bump on save including edits and defeat the cutoff.
+
+  def delete(self, deleter=None, reason=None, system=False, *args, **kwargs):
+    """
+    Delete override. Requires a deleter to be passed — refuses and logs a
+    critical error if called without one (prevents silent, unattributed deletes).
+    Pass system=True for automated deletes (orphan GC cron) which have no user;
+    these are logged but do not create a UserAction, since UserAction.toJSON
+    requires a user.
+    """
+    from users.models import UserAction
+    if system:
+      logger.info(f'System delete of REVIEW_IMAGE (ID: {self.pk}, filename: {self.filename}) reason={reason}')
+      super().delete(*args, **kwargs)
+      return
+    if deleter is None:
+      logger.critical(f'ATTEMPTED DELETE OF REVIEW_IMAGE (ID: {self.pk}, filename: {self.filename}) WITH NO DELETER PASSED IN! KEEPING REVIEW_IMAGE.')
+      return
+    # Create a user action of a review image deletion, this should never happen with current methods, all deletions should be done by the system.
+    UserAction.objects.create(
+      user=deleter,
+      action_type='DELETE',
+      entity_type='REVIEW_IMAGE',
+      entity_id=self.pk,
+      details={
+        'reason': reason,
+        'filename': self.filename,
+        'sha256': self.sha256,
+      }
+    )
+    super().delete(*args, **kwargs)
+
+  def servePath(self):
+    """Return the frontend path to this ReviewImage"""
+    return f'/dashboard/aotd/api/review-image/{self.image_id.hex}'
+
+  def diskPath(self):
+    """Return the path on disk of where the image is stored"""
+    return os.path.join(os.getenv("REVIEW_IMAGE_PATH"), self.filename)
+
+  def touchLastUsed(self):
+    """Queryset update of last_used_at to now, so it does not run a full save()."""
+    ReviewImage.objects.filter(image_id=self.image_id).update(last_used_at=timezone.now())
+
+  def toJSON(self):
+    """Return this ReviewImage as a JSON. (For HTTP JSON Responses)"""
+    outObj = {}
+    outObj['image_id'] = self.image_id.hex
+    outObj['url'] = self.servePath()
+    outObj['filetype'] = self.filetype
+    outObj['width'] = self.width
+    outObj['height'] = self.height
+    outObj['uploaded_at'] = self.uploaded_at.strftime("%m/%d/%Y, %H:%M:%S")
+    return outObj
 
 
 # Model for an Album Selection Outage. Users or admins can impose selection outages where a user's albums will be unable to be selected

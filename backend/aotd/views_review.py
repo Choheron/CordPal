@@ -10,7 +10,8 @@ from .models import (
   DailyAlbum,
   AotdUserData,
   User,
-  ReviewHistory
+  ReviewHistory,
+  ReviewImage
 )
 
 from .utils import (
@@ -21,6 +22,10 @@ from .utils import (
 )
 from reactions.utils import (
   createReaction
+)
+from .review_image_utils import (
+  processReviewHtml,
+  extractReviewImageIds
 )
 
 import logging
@@ -71,51 +76,65 @@ def submitReview(request: HttpRequest):
   albumObj = Album.objects.get(mbid=reqBody['album_id'])
   # Log Review Information
   logger.info(f"Incoming review submission from user {userObj.nickname} for album {albumObj.title}...", extra={'crid': request.crid})
+  # Sanitize HTML bodies (for main review and advanced track reviews) from user and re-host external images
+  rehost_cache = {}
+  clean_body, dropped_links = processReviewHtml(reqBody['comment'], userObj.aotd_data, request.crid, rehost_cache)
+  # If review is advanced, parse track comments and handle re-hosting
+  if(reqBody['advanced'] == True):
+    clean_track_data = reqBody['trackData']
+    for track in clean_track_data.keys():
+      clean_track_body, dropped_track_links = processReviewHtml(clean_track_data[track]['cordpal_comment'], userObj.aotd_data, request.crid, rehost_cache)
+      clean_track_data[track]['cordpal_comment'] = clean_track_body
+      dropped_links.extend(dropped_track_links)
   # Check if a review already exists for this user
   try:
     try:
       reviewObj = Review.objects.get(album=albumObj, user=userObj, aotd_date=date)
       reviewObj.score = float(reqBody['score'])
-      reviewObj.review_text = reqBody['comment']
+      reviewObj.review_text = clean_body
       reviewObj.first_listen = reqBody['first_listen']
       reviewObj.advanced = reqBody['advanced']
       if(reqBody['advanced'] == True):
-        reviewObj.advancedReviewDict = reqBody['trackData']
+        reviewObj.advancedReviewDict = clean_track_data
       reviewObj.version = 2
       # Save/Update Object
       reviewObj.save()
     except Review.DoesNotExist:
       # Declare new Review object
-      newReview = Review(
+      reviewObj = Review(
         album=albumObj,
         user=userObj,
         score=float(reqBody['score']),
-        review_text=reqBody['comment'],
+        review_text=clean_body,
         first_listen=reqBody['first_listen'],
         advanced=reqBody['advanced'],
-        advancedReviewDict=reqBody['trackData'] if reqBody['advanced'] else None,
+        advancedReviewDict=clean_track_data if reqBody['advanced'] else None,
         aotd_date=date,
         version=2
       )
       # Save new Review data
-      newReview.save()
+      reviewObj.save()
       # Update user's streak data
       update_user_streak(userObj)
-    finally:
-      # Publish update to redis channel to propt rerender on frontend
-      redis_stream_name = f"{REDIS_CONNECTION_PUBSUB_NAMESPACE}-aotd_review:{reqBody['album_id']}"
-      logger.info(f"Publishing review event to Redis stream: {redis_stream_name}")
-      redis_connection.publish(redis_stream_name, json.dumps({'album_id': reqBody['album_id']}))
-  except:
-    logger.error(f"ERROR: Failed to save review for user \"{userObj.nickname}\" ({userObj.discord_id}) targeting album {albumObj.mbid} for date {date}!", extra={'crid': request.crid})
-    return HttpResponse(500)
+    # Extract ReviewImage IDs and perform links to ensure that ReviewImages are properly linked to the Reivew using them
+    advanced_review_bodies = [track.get('cordpal_comment') for track in reviewObj.advancedReviewDict.values()] if reviewObj.advanced and reviewObj.advancedReviewDict else []
+    review_image_ids = extractReviewImageIds(reviewObj.review_text, *advanced_review_bodies)
+    # Perform links using the related name for ReviewImages on the created Review
+    reviewObj.images.add(*ReviewImage.objects.filter(image_id__in=review_image_ids))
+    # Publish update to redis channel to propt rerender on frontend
+    redis_stream_name = f"{REDIS_CONNECTION_PUBSUB_NAMESPACE}-aotd_review:{reqBody['album_id']}"
+    logger.info(f"Publishing review event to Redis stream: {redis_stream_name}")
+    redis_connection.publish(redis_stream_name, json.dumps({'album_id': reqBody['album_id']}))
+  except Exception as e:
+    logger.exception(f"ERROR: Failed to save review for user \"{userObj.nickname}\" ({userObj.discord_id}) targeting album {albumObj.mbid} for date {date}. Exception: {str(e)}!", extra={'crid': request.crid})
+    return HttpResponse(status=500)
   # Update user selection_blocked and activity flag status
   checkSelectionFlag(AotdUserData.objects.get(user=userObj))
   # Update review stats
   calculateUserReviewData(AotdUserData.objects.get(user=userObj))
   # Log success
   logger.info(f"Successfully saved review submission from user {userObj.nickname} for album {albumObj.title}...", extra={'crid': request.crid})
-  return HttpResponse(200)
+  return JsonResponse({'dropped': dropped_links})
 
 
 ###
