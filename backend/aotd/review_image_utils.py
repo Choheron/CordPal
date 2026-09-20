@@ -11,15 +11,22 @@ import logging
 import socket
 import ipaddress
 import requests
+import nh3
 import os
+import re
 import uuid
 import hashlib
 
 from collections import namedtuple
 from urllib.parse import urlsplit, urljoin
+from html import unescape
 from PIL import Image, ImageOps
 from io import BytesIO
+from dotenv import load_dotenv
 
+# Determine runtime enviornment
+APP_ENV = os.getenv('APP_ENV') or 'DEV'
+load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
 
 # Declare logging
 logger = logging.getLogger()
@@ -32,12 +39,57 @@ MAX_PIXELS = 100_000_000
 MAX_SIDE_PX = 2000
 WEBP_QUALITY = 85
 # External fetch (re-hosting) limits. These run inline during submitReview while the user waits, so they are deliberately tight.
+MAX_UPLOAD_BYTES = 20 * 1024 * 1024                     # Reject a direct upload larger than this before its bytes are read into memory
 MAX_FETCH_BYTES = 20 * 1024 * 1024                      # Abandon a remote body once it passes this many bytes
 FETCH_CONNECT_TIMEOUT_S = 3                             # Seconds to wait for the TCP connection to open
 FETCH_READ_TIMEOUT_S = 5                                # Seconds to wait between chunks once connected
 MAX_REDIRECTS = 3                                       # Image CDNs rarely need more than one or two hops
 FETCH_USER_AGENT = 'CordPal/0.0.1 ( www.cordpal.app )'  # Matches the MusicBrainz calls in aotd/utils.py
 CGNAT_RANGE = ipaddress.ip_network('100.64.0.0/10')     # Carrier-grade NAT; Tailscale hands these out. Not covered by is_private.
+# HTML and Review Sanitization constants
+# Hostnames whose <img src> values are left alone by the re-host pass. Everything else is fetched and re-hosted.
+FIRST_PARTY_HOSTS = {
+  'www.cordpal.app',
+  'cordpal.app',
+  urlsplit(os.getenv('BACKEND_BASE_URL', '')).hostname,
+}
+# Recognises a first-party review-image path and captures the 32-hex image id. Anchored at both ends so a
+# lookalike with extra segments or a hyphenated UUID does not match. Used by isFirstPartySrc and extractReviewImageIds.
+REVIEW_IMAGE_PATH_RE = re.compile(r'^/dashboard/aotd/api/review-image/([0-9a-f]{32})$')
+# Tags nh3 keeps; anything not listed is stripped. Derived from what the editor's extensions emit:
+#   StarterKit      -> p br strong em s h1 h2 h3 ul ol li blockquote hr code pre  (code/pre come from shortcuts, not the toolbar)
+#   pasted HTML     -> b i  (TipTap reads these as bold/italic)
+#   Color/TextStyle -> span
+#   Image           -> img
+#   Youtube         -> div iframe
+# Verify against editor.getHTML() with every toolbar button, an emoji, and a YouTube link before trusting this list.
+ALLOWED_TAGS = {
+  'p', 'br', 'strong', 'em', 's', 'b', 'i',
+  'h1', 'h2', 'h3',
+  'ul', 'ol', 'li',
+  'blockquote', 'hr', 'code', 'pre',
+  'span', 'img', 'div', 'iframe',
+}
+# Attributes nh3 keeps, per tag. This controls attribute PRESENCE only; attribute VALUES are checked by the
+# attribute_filter callback passed to nh3.clean (see the two patterns below). Tags absent here keep no attributes.
+ALLOWED_ATTR = {
+  'span':   {'style'},
+  'ol':     {'start'},
+  'img':    {'src', 'alt', 'title', 'class'},
+  'div':    {'data-youtube-video'},
+  'iframe': {'src', 'width', 'height', 'allowfullscreen', 'frameborder', 'start'},
+}
+# Value checks used by the attribute_filter callback:
+COLOR_STYLE_RE = re.compile(r'^\s*color:\s*(#[0-9a-fA-F]{3,8}|rgba?\([\d\s,.%]+\)|[a-zA-Z]+)\s*;?\s*$')
+# An iframe src must be a YouTube embed URL with an 11-character video id and optional query string.
+YOUTUBE_EMBED_RE = re.compile(r'^https://www\.youtube(?:-nocookie)?\.com/embed/[A-Za-z0-9_-]{11}(?:[?&][\w=&%-]*)?$')
+# An img class may only be one of the two classes the editor assigns.
+ALLOWED_IMG_CLASSES = {'customEmoji', 'reviewImage'}
+# Fetch budget for one submit: after this many external images have been fetched, the rest are dropped and reported.
+MAX_FETCHES_PER_SUBMIT = 10
+# Orphan GC grace period: an image with no referencing reviews is deleted once last_used_at is older than this.
+# Long enough for an overnight draft; a dedupe hit bumps last_used_at, so a re-pasted old orphan starts over.
+ORPHAN_GRACE_HOURS = 24
 
 ## ============================================================================================================
 ## Exception and Type Definitions
@@ -51,6 +103,142 @@ class ReviewImageError(Exception):
     self.status_code = status_code
 
 ProcessedImage = namedtuple('ProcessedImage', ['data', 'content_type', 'ext', 'width', 'height'])
+
+## ============================================================================================================
+## HTML manipulation and sanitization
+## ============================================================================================================
+
+def isFirstPartySrc(src: str) -> bool:
+  """Determine if a passed in image source is a first party host"""
+  if src.startswith('/'):
+    return True
+  host = urlsplit(src).hostname
+  return host is not None and host.lower() in FIRST_PARTY_HOSTS
+
+
+def sanitizeReviewHtml(html: str | None) -> str:
+  """
+  Utilizes nh3.clean to sanitize HTML, using configured allowlists and attribute filters, drops any img or iframe left without a src. Treat None as empty.
+  """
+  # Return empty string if None is passed in
+  if html is None:
+    return ""
+  # Sanitize the passed in html
+  clean_html = nh3.clean(
+    html, # HTML to be sanitized
+    tags=ALLOWED_TAGS, # Tags to be be kept during sanitization
+    attributes=ALLOWED_ATTR, # Which attribute names survive tag sanitization
+    attribute_filter=_reviewAttributeFilter, # Checking attributes against a filter
+    url_schemes={'http', 'https'}, # Allowed URL schemes
+    link_rel=None, # nh3 would otherwise inject rel="noopener noreferrer" onto anchors
+    strip_comments=True, # Default but added for clarity in the future
+  )
+  # The attribute filter can remove a src (a data: placeholder, a non-YouTube iframe) but nh3 leaves the now-empty
+  # element behind. An <img> or <iframe> is stripped.
+  # nh3 serialises <img> as a void tag with no closing slash, and <iframe> always with an explicit closing tag.
+  # The negative lookahead `(?![^>]*\bsrc=)` means "no src= attribute anywhere before the closing >".
+  clean_html = re.sub(r'<img(?![^>]*\bsrc=)[^>]*>', '', clean_html)
+  clean_html = re.sub(r'<iframe(?![^>]*\bsrc=)[^>]*>.*?</iframe>', '', clean_html, flags=re.S)
+  return clean_html
+
+
+def _reviewAttributeFilter(tag: str, attribute: str, value: str) -> str | None:
+  if tag == 'span' and attribute == 'style':
+    return value if COLOR_STYLE_RE.match(value) else None
+  if tag == 'img' and attribute == 'class':
+    return value if value in ALLOWED_IMG_CLASSES else None
+  if tag == 'img' and attribute == 'src':
+    return value if value.startswith(('https://', 'http://', '/')) else None
+  if tag == 'iframe' and attribute == 'src':
+    return value if YOUTUBE_EMBED_RE.match(value) else None
+  return value
+
+
+def rehostExternalImages(html: str, uploader: AotdUserData, crid: str = "NOT_PROVIDED", cache: dict | None = None) -> tuple[str, list[str]]:
+  """
+  Walk <img> tags in the HTML and for each external src, fetch the image, store it locally, swap the src or drop the tag on error. Return the rewritten HTML and list of source URLs dropped.
+  Cache maps source URL to the first-party path so the backfill fetches each URL once; submitReview passes nothing.
+
+  Must run AFTER sanitizeReviewHtml: it relies on nh3's normalised output (double-quoted attributes, one src per tag, o data: sources), which is what makes a regex walk safe here.
+  """
+  # Prep all variables
+  if cache is None:
+    cache = {}
+  dropped: list[str] = []
+  fetches_used = 0
+  # Helper function to swap the old source with the new one
+  def _swapSrc(tag: str, new_src: str) -> str:
+    """Replace only the src value; alt, title, and class ride along untouched."""
+    return re.sub(r'\bsrc="[^"]*"', f'src="{new_src}"', tag, count=1)
+  # Image replacement helper function 
+  def _replaceImg(match: re.Match) -> str:
+    """Replace and image tag with a local one, after retrieving the image from the external host and re-hosting it locally."""
+    nonlocal fetches_used
+    tag = match.group(0)
+    src_match = re.search(r'\bsrc="([^"]*)"', tag)
+    if src_match is None:
+      # sanitizeReviewHtml already strips src-less <img>, so this is belt and braces.
+      return ''
+    # nh3 HTML-escapes attribute values (e.g. & becomes &amp;). Unescape before treating it as a URL.
+    src = unescape(src_match.group(1))
+    # CASE 1: first-party (an upload path, a custom emoji, anything on our own hosts). Leave the tag as-is.
+    if isFirstPartySrc(src):
+      return tag
+    # CASE 2: already re-hosted earlier in this call or this backfill run. Swap without fetching.
+    if src in cache:
+      logger.info("External image already re-hosted this run, reusing cached path", extra={'crid': crid, 'src': src})
+      return _swapSrc(tag, cache[src])
+    # CASE 3: fetch budget spent. These fetches run inline while the user waits, so a review stuffed with
+    # external images is cut off here; the remainder are dropped and reported rather than fetched.
+    if fetches_used >= MAX_FETCHES_PER_SUBMIT:
+      logger.warning("External image fetch budget exhausted, dropping image", extra={'crid': crid, 'src': src, 'budget': MAX_FETCHES_PER_SUBMIT})
+      dropped.append(src)
+      return ''
+    # CASE 4: fetch, store (hash + dedupe + write + row), swap. Any ReviewImageError along the way means the
+    # image is unreachable, oversized, not an image, or points somewhere it must not: drop the tag.
+    fetches_used += 1
+    try:
+      raw = fetchExternalImage(src, crid)
+      image = storeReviewImage(raw, uploader, source_url=src, crid=crid)
+    except ReviewImageError as e:
+      logger.warning("Dropping external image that could not be re-hosted", extra={'crid': crid, 'src': src, 'reason': str(e)})
+      dropped.append(src)
+      return ''
+    # Get new image source
+    new_src = image.servePath()
+    cache[src] = new_src
+    logger.info("External image re-hosted", extra={'crid': crid, 'src': src, 'new_src': new_src})
+    # Return the swapped image result
+    return _swapSrc(tag, new_src)
+  # nh3 serialises <img> as a void tag: '<img ...>' with no closing slash and no children, so a single pattern
+  # that stops at the first '>' matches exactly one tag.
+  rewritten = re.sub(r'<img\b[^>]*>', _replaceImg, html)
+  return rewritten, dropped
+
+
+def processReviewHtml(html: str | None, uploader: AotdUserData, crid: str = "NOT_PROVIDED", cache: dict | None = None) -> tuple[str, list[str]]:
+  """
+  Process review HTML, this is the function the backfill script and submitReview should call.
+  Sanitize first, then re-host: the re-host pass relies on nh3's normalised output, and sanitizing first means
+  data: placeholders and junk never reach the fetcher. Returns (clean_html, dropped_source_urls).
+  """
+  return rehostExternalImages(sanitizeReviewHtml(html), uploader, crid=crid, cache=cache)
+
+
+def extractReviewImageIds(*htmls: str) -> set[str]:
+  """All 32-hex IDs found in first-party review-image src values across any number of HTML strings. Used by the link step."""
+  ids: set[str] = set()
+  for html in htmls:
+    if not html:
+      continue  # None or empty: a review body or track comment that was never written
+    # Pull every src value out of every <img>, then keep only the ones shaped like a review-image path.
+    # A set so the same image referenced twice in one review yields one id.
+    for src in re.findall(r'<img\b[^>]*\bsrc="([^"]*)"', html):
+      match = REVIEW_IMAGE_PATH_RE.match(unescape(src))
+      if match:
+        ids.add(match.group(1))
+  return ids
+
 
 ## ============================================================================================================
 ## Byte, Disk, and Network Functions
@@ -191,10 +379,7 @@ def fetchExternalImage(url: str, crid: str = "NOT_PROVIDED") -> bytes:
   The returned bytes have NOT been proven to be an image yet; the caller hands them to
   processImageBytes, which is the only judge of that.
 
-  Client-facing error messages are deliberately generic ("could not be fetched") no matter what went
-  wrong. If we told the caller "connection refused" versus "timed out", the endpoint would become a
-  port scanner for our own network: an attacker could learn which internal ports have something
-  listening. The detailed reason always goes to the server log with the CRID instead.
+  Client-facing error messages are  generic ("could not be fetched"). Details on an error are in logs with CRID provided instead.
   """
   logger.info("Attempting to fetch external image", extra={'crid': crid, 'url': url})
   # Loop because a response may be a redirect, in which case come back around with the new URL.

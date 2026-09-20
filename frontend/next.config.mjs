@@ -4,7 +4,7 @@ const nextConfig = {
   reactStrictMode: false,
   experimental: {
     serverActions: {
-      bodySizeLimit: '15mb', // Photo uploads pass through the uploadImageToBackend server action (default 1mb rejects most photos)
+      bodySizeLimit: '20mb', // Photo uploads pass through the uploadImageToBackend server action (default 1mb rejects most photos)
     },
   },
   images: {

@@ -8,7 +8,8 @@ from . import (
   views_user,
   views_oauth,
   views_outage,
-  views_tags
+  views_tags,
+  views_review_images
 )
 
 urlpatterns = [
@@ -87,6 +88,12 @@ urlpatterns = [
   path('getReviewHistoricalByID/<int:id>', views_review.getReviewHistoricalByID),
   # Cronjob to check review streaks
   path('resetStreaks', views_review.resetStreaks),
+  ## ============================================================================================================
+  ## ReviewImage Views
+  ## ============================================================================================================
+  path('uploadReviewImage', views_review_images.uploadReviewImage),
+  path('serveReviewImage/<str:hex>', views_review_images.serveReviewImage),
+  path('cleanupOrphanReviewImages', views_review_images.cleanupOrphanReviewImages),
   ## ============================================================================================================
   ## Album Of the Day Views
   ## ============================================================================================================

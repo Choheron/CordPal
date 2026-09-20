@@ -96,6 +96,7 @@ CORD_SERVER_ID              # Guild ID gating access
 CORD_ROLE_ID                # Role required to enter
 PHOTOSHOP_PATH              # Disk path for photo uploads
 EMOJI_PATH                  # Disk path for emoji files
+REVIEW_IMAGE_PATH           # Disk path for images uploaded into AOTD reviews
 BACKEND_BASE_URL            # Used for internal server-to-server calls
 REDIS_HOST
 REDIS_PORT

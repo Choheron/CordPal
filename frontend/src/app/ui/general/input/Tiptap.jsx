@@ -7,14 +7,15 @@ import Youtube from '@tiptap/extension-youtube'
 import { CustomImage } from './replacers/customImage'
 import { EditorProvider, useCurrentEditor, Extension } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import React, { useEffect, useState } from 'react'
-import { 
-  RiArrowGoBackFill, RiArrowGoForwardFill, RiBold, 
-  RiFormatClear, RiH1, RiH2, RiH3, RiH4, RiH5, RiH6, RiItalic, 
-  RiListOrdered2, RiListUnordered, RiPageSeparator, RiParagraph, 
-  RiQuoteText, RiSeparator, RiStrikethrough 
+import React, { useEffect, useRef, useState } from 'react'
+import {
+  RiArrowGoBackFill, RiArrowGoForwardFill, RiBold,
+  RiFormatClear, RiH1, RiH2, RiH3, RiH4, RiH5, RiH6, RiImageAddLine, RiItalic,
+  RiListOrdered2, RiListUnordered, RiPageSeparator, RiParagraph,
+  RiQuoteText, RiSeparator, RiStrikethrough
 } from 'react-icons/ri'
 import { SmilieReplacer } from './replacers/smilie_replacer'
+import { ACCEPTED_TYPES, insertUploadingImages } from './replacers/reviewImageUpload'
 import EmojiMartButton from './emoji_mart_popover'
 
 // TipTap Rich editor box
@@ -34,6 +35,8 @@ export default function TipTap(props) {
   const MenuBar = () => {
     const { editor } = useCurrentEditor()
     const [expanded, setExpanded] = useState(false)
+    // Hidden file input behind the image button; the button just clicks it
+    const fileInputRef = useRef(null)
 
     const buttonTailwind = (button_name, level) => {
       const out = "font-extralight border border-black px-2 py-1 sm:py-0 hover:brightness-90 rounded-full mx-[2px]"
@@ -72,6 +75,25 @@ export default function TipTap(props) {
           >
             <RiListUnordered />
           </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className={buttonTailwind()}
+            aria-label="Upload image"
+          >
+            <RiImageAddLine />
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={ACCEPTED_TYPES.join(',')}
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              insertUploadingImages(editor.view, Array.from(e.target.files ?? []))
+              // Reset so choosing the same file again still fires onChange
+              e.target.value = ''
+            }}
+          />
 
           {/* Extra buttons — always visible on sm+, hidden on mobile unless expanded */}
           <button
@@ -263,8 +285,29 @@ export default function TipTap(props) {
           editorProps={{
             attributes: {
               class: `prose prose-invert prose-sm max-w-full focus:outline-none overflow-y-scroll overflow-x-auto ${textAreaClassName}`,
-            }}
-          }
+            },
+            // Pasted image FILES (a screenshot, a file copied from a file manager) go through the upload flow.
+            // "Copy Image" on a GIF puts a STILL PNG file on the clipboard alongside HTML pointing at the real GIF, so
+            // when HTML with an <img> is present, prefer it: ProseMirror keeps the hotlink and the backend re-hosts the
+            // animated original on submit. Files win only when there is no HTML image.
+            handlePaste: (view, event) => {
+              const html = event.clipboardData?.getData('text/html') ?? ''
+              if (/<img\b/i.test(html)) return false
+              const files = Array.from(event.clipboardData?.files ?? []).filter(f => ACCEPTED_TYPES.includes(f.type))
+              if (files.length === 0) return false
+              insertUploadingImages(view, files)
+              return true
+            },
+            // Same for dropped files, inserted where the mouse was. `moved` is true when ProseMirror is dragging its own content around inside the editor, which is not an upload.
+            handleDrop: (view, event, _slice, moved) => {
+              if (moved) return false
+              const files = Array.from(event.dataTransfer?.files ?? []).filter(f => ACCEPTED_TYPES.includes(f.type))
+              if (files.length === 0) return false
+              const pos = view.posAtCoords({ left: event.clientX, top: event.clientY })?.pos
+              insertUploadingImages(view, files, pos)
+              return true
+            },
+          }}
         ></EditorProvider>
       </div>
     </>

@@ -19,3 +19,5 @@ numpy
 redis
 # Pillow library for review image upload and image manipulation
 Pillow
+# HTML Sanitization
+nh3

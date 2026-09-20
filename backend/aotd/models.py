@@ -395,7 +395,7 @@ class Review(models.Model):
     # Sort reactions list
     outObj['reactions'].sort(key=lambda reaction: reaction["count"], reverse=True)
     # Include a list of attached ReviewImage IDs (uses the reverse reference for ReviewImage model)
-    outObj['attached_images'] = [image.pk for image in self.images] 
+    outObj['attached_images'] = [image.pk for image in self.images.all()] 
     return outObj
 
   def save(self, silent_update: bool = False, *args, **kwargs):

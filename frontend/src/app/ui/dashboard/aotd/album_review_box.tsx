@@ -14,6 +14,7 @@ import SimilarRatingsBox from "./tooltips/similar_ratings_box";
 import { Conditional } from "../conditional";
 import { ratingToTailwindBgColor } from "@/app/lib/utils";
 import InfoPopover from "../../general/info_popover";
+import { uploadEmoji } from "@/app/lib/emoji_utils";
 
 
 // GUI Display for an Album Review Box
@@ -75,6 +76,9 @@ export default function AlbumReviewBox(props) {
   )
   // Track loading state for submit review button
   const [awaitingResponse, setAwaitingResponse] = useState(false)
+  // Track custom image upload and block submission on it
+  const isUploading = comment.includes("data-uploading")
+  || Object.values(songReviewObj).some((s: any) => s.cordpal_comment?.includes("data-uploading"))
 
   // Get steps for song by song ratings
   const getSongSteps = () => {
@@ -188,10 +192,16 @@ export default function AlbumReviewBox(props) {
     setAwaitingResponse(false)
     // Alert user based on response
     if(response.status == 200) {
+      // Sources the backend could not fetch while re-hosting external images; those tags were removed from the review
+      const dropped: string[] = response.dropped ?? []
       addToast({
         title: `Successfully submitted Review!`,
-        description: `Your ${out['score']} star review has been submitted and confirmed!`,
-        color: "success",
+        description: `Your ${out['score']} star review has been submitted and confirmed! ` + (
+          (dropped.length > 0)
+            ? `${dropped.length} image${dropped.length == 1 ? "" : "s"} could not be fetched from external hosts and ${dropped.length == 1 ? "was" : "were"} removed: ${dropped.join(", ")}`
+            : "All uploaded images were saved."
+        ),
+        color: (dropped.length > 0) ? "warning" : "success",
       })
     } else {
       addToast({
@@ -396,7 +406,7 @@ export default function AlbumReviewBox(props) {
                 <Checkbox
                   isSelected={isReady}
                   onValueChange={setIsReady}
-                  isDisabled={!isReviewUpdated}
+                  isDisabled={!isReviewUpdated || isUploading}
                 >
                   Ready to {(props.hasUserSubmitted)? "Update" : "Submit"}
                 </Checkbox>
@@ -408,7 +418,7 @@ export default function AlbumReviewBox(props) {
                 )}
               </div>
               <Button
-                isDisabled={!isReady}
+                isDisabled={!isReady || isUploading}
                 onPress={submitReview}
                 isLoading={awaitingResponse}
               >

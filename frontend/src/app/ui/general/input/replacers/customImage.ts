@@ -14,6 +14,17 @@ export const CustomImage = Image.extend({
           }
         },
       },
+      // Upload placeholder
+      uploading: {
+        default: null,
+        parseHTML: element => element.getAttribute('data-uploading'),
+        renderHTML: attributes => {
+          if (!attributes.uploading) return {}
+          return {
+            'data-uploading': attributes.uploading,
+          }
+        },
+      },
     }
   },
 })

@@ -568,10 +568,13 @@ export async function submitReviewToBackend(reviewObject) {
   // Revalidate AOTD calls for calendar views
   const now = new Date()
   revalidateTag(`calendar-${now.getFullYear()}-${padNumber(now.getMonth() + 1)}`, "max")
+  // Parse return json. A failed submit returns an empty body, so tolerate non-JSON rather than throwing here.
+  const responseObj = await submitReviewResponse.json().catch(() => ({}))
   // Return callback code
   return {
     status: submitReviewResponse.status,
-    crid: submitReviewResponse.headers.get("X-CRID")
+    crid: submitReviewResponse.headers.get("X-CRID"),
+    dropped: responseObj?.dropped ?? []
   }
 }
 
