@@ -65,7 +65,7 @@ export default async function ReviewDisplay(props) {
           </div>
         ) : (
           reviews.sort((a, b) => a['score'] < b['score'] ? 1 : -1).map((review, index) => (
-            <div className="mx-auto w-full max-w-full" key={index}>
+            <div className="mx-auto w-full max-w-full" key={review['id']}>
               <ReviewAvatarCard 
                 index={index} 
                 review_obj={review} 

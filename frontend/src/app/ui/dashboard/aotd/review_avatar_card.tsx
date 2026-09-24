@@ -1,10 +1,10 @@
-import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
-
 import StarRating from "../../general/star_rating";
 import UserCard from "../../general/userUiItems/user_card";
 
 import ReviewPopoverContent from "./review_small_content";
 import { doReviewEmbedReplacements } from "@/app/lib/review_utils";
+import { getReviewViewStatus } from "@/app/lib/aotd_utils";
+import ReviewViewPopoverWrapper from "./reviewsWrappers/client_review_view_popover_wrapper";
 
 // GUI Display for a single review as a popover/avatar combo
 // Expected Props:
@@ -13,6 +13,7 @@ import { doReviewEmbedReplacements } from "@/app/lib/review_utils";
 export default async function ReviewAvatarCard(props) {
   const review = props.review_obj;
   const hideScores = props.hideScores ?? false;
+  const viewData = (hideScores) ? ({'viewed': false}) : (await getReviewViewStatus(review['id']))
   const reviewMessage = await (await doReviewEmbedReplacements(review)).message
   const readOnly = (props.readOnly != null) ? props.readOnly : false 
   // PopoverTrigger calls Children.only, which throws if React streams the trigger's
@@ -43,7 +44,8 @@ export default async function ReviewAvatarCard(props) {
   }
 
   const cardContent = (
-    <div className={`relative border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl transition-all ${hideScores ? 'cursor-default' : 'hover:bg-black/40 hover:scale-105'}`}>
+    <div className={`relative border border-gray-800 bg-black/20 rounded-2xl pt-1 pb-2 px-3 shadow-2xl ${hideScores ? 'cursor-default' : ''}`}>
+      {/* Display user card and current score */}
       {userCard}
       {!hideScores && (
         <div className="ml-12 max-h-[20px] line-clamp-1">
@@ -69,21 +71,18 @@ export default async function ReviewAvatarCard(props) {
   return (
     <div className="mx-auto" key={props.index}>
       {hideScores ? cardContent : (
-        <Popover
-          placement="bottom"
-          showArrow={true}
-          shouldCloseOnScroll={false}
+        <ReviewViewPopoverWrapper
+          reviewId={review['id']}
+          trigger={cardContent}
+          viewData={viewData}
         >
-          <PopoverTrigger>{cardContent}</PopoverTrigger>
-          <PopoverContent className="relative w-[330px] max-h-dvh">
-            <ReviewPopoverContent 
-              reviewData={review} 
-              reviewMessage={reviewMessage}
-              readOnly={readOnly}
-            />
-          </PopoverContent>
-        </Popover>
+          <ReviewPopoverContent
+            reviewData={review}
+            reviewMessage={reviewMessage}
+            readOnly={readOnly}
+          />
+        </ReviewViewPopoverWrapper>
       )}
     </div>
-  );
+  )
 }

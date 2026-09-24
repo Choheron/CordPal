@@ -23,6 +23,9 @@ logger = logging.getLogger(__name__)
 def generateTimelineDict():
   return { "timeline": [] }
 
+## =====================================================================================
+#region AOTD USER DATA BASED MODELS
+## =====================================================================================
 
 # Model for aotd data that corresponds to a user - This being in existance will serve as a way of checking for AOTD signup.
 class AotdUserData(models.Model):
@@ -91,6 +94,115 @@ class AotdUserData(models.Model):
       return False
     return True if (self.last_review_date.strftime("%Y-%m-%d") != date_now.strftime("%Y-%m-%d")) else False
 
+# Model for an Album Selection Outage. Users or admins can impose selection outages where a user's albums will be unable to be selected
+class UserAlbumOutage(models.Model):
+  """
+  A date range during which a user's albums are ineligible for AOTD selection.
+  Can be self-imposed or admin-enacted. Deletion is audited and requires a deleter
+  to be passed explicitly.
+  """
+  user = models.ForeignKey(
+    User,
+    on_delete=models.CASCADE,
+  )
+  start_date = models.DateField()
+  end_date = models.DateField()
+  reason = models.TextField(blank=True, null=True)
+  admin_enacted = models.BooleanField(default=False) # Flag to signify if an admin enacted this outage
+  admin_enactor = models.ForeignKey( # If the admin_enacted flag is true, this field will contain the admin that created the outage
+    User,
+    on_delete=models.SET_NULL,
+    default=None,
+    related_name="outage_admin_enactor",
+    null=True
+  )
+  creation_timestamp = models.DateTimeField(null=True, default=now)
+
+  # Return True if outage is currently in effect or False if not
+  def isActive(self):
+    today = timezone.localtime(timezone.now()).date()
+    return ((self.start_date < today) and (today < self.end_date))
+
+  # Convert to a dict
+  def dict(self):
+    out = {}
+    out['user_pk'] = self.user.pk
+    out['user_discord_id'] = self.user.discord_id
+    out['user_nickname'] = self.user.nickname
+    out['start_date'] = self.start_date.strftime('%Y-%m-%d')
+    out['end_date'] = self.end_date.strftime('%Y-%m-%d')
+    out['reason'] = self.reason
+    out['admin_enacted'] = self.admin_enacted
+    if(self.admin_enactor):
+      out['admin_enactor_pk'] = self.admin_enactor.pk
+      out['admin_enactor_discord_id'] = self.admin_enactor.discord_id
+      out['admin_enactor_nickname'] = self.admin_enactor.nickname
+    out['creation_timestamp'] = self.creation_timestamp.strftime('%m/%d/%Y, %H:%M:%S')
+    out['active'] = self.isActive()
+    # Return outage as a dict
+    return out
+
+  # Custom delete function to log the user action
+  def delete(self, deleter=None, delete_reason=None, *args, **kwargs):
+    # Log the action before actually deleting
+    from users.models import UserAction  # Import inside to avoid circular import
+
+    # If deleter is not provided, log critical log and do not delete album
+    if(deleter == None):
+      logger.critical(f"ATTEMPTED DELETE OF ALBUM_SELECTION_OUTAGE (ID: {self.pk}) WITH NO DELETER USER PASSED IN! KEEPING OUTAGE: {self.pk}")
+      return
+    # Create user action log
+    UserAction.objects.create(
+      user=deleter,
+      action_type="DELETE",
+      entity_type="ALBUM_SELECTION_OUTAGE",
+      entity_id=self.pk,
+      details={"delete_reason": delete_reason, "deleted_outage": self.pk, "outage_raw_data": json.dumps(self.dict()) }
+    )
+    # Call Django's default delete method
+    super().delete(*args, **kwargs)
+
+
+# Storage for User chance object, representing the chance that a user will be selected for the next AOtD
+class UserChanceCache(models.Model):
+  """
+  Cached record of a user's current probability of being selected for the next AOTD.
+  Stores the computed percentage alongside any block reason (outage or inactivity).
+  Refreshed periodically; the last_updated timestamp indicates cache freshness.
+  """
+  aotd_user = models.OneToOneField(
+    AotdUserData,
+    on_delete=models.CASCADE,
+    related_name="aotd_chance"
+  )
+  chance_percentage = models.FloatField(default=0.0) # Percentage that user will be selected.
+  block_type = models.CharField(max_length=50, null=True) # Should be either "OUTAGE", "INACTIVITY", or None
+  outage = models.OneToOneField(UserAlbumOutage, null=True, on_delete=models.CASCADE) # If user is under an outage, link to that outage.
+  reason = models.TextField(null=True) # Reason for the percentage, should be empty if user is not blocked in any way (This will carry the outage reason as well if user is under outage)
+  last_updated = models.DateTimeField(auto_now=True)
+
+  def toJSON(self):
+    """Convert cache object to a dict for HTTP transfer"""
+    out = {}
+    out['aotd_user_id'] = self.aotd_user.pk
+    out['user_id'] = self.aotd_user.user.guid
+    out['user_nickname'] = self.aotd_user.user.nickname
+    out['percentage'] = self.chance_percentage
+    out['block_type'] = self.block_type
+    out['reason'] = self.reason
+    out['last_updated'] = self.last_updated.strftime('%m/%d/%Y, %H:%M:%S')
+    if(self.outage != None):
+      out['outage'] = {}
+      out['outage']["target_user"] = self.outage.user.discord_id
+      out['outage']["admin_outage"] = f"{self.outage.admin_enacted}"
+      out['outage']["outage_start"] = self.outage.start_date.strftime('%Y-%m-%d')
+      out['outage']["outage_end"] = self.outage.end_date.strftime('%Y-%m-%d')
+    return out
+
+#endregion
+## =====================================================================================
+#region ALBUM BASED MODELS
+## =====================================================================================
 
 # Model for an album that has been submitted for album of the day
 class Album(models.Model):
@@ -289,7 +401,6 @@ class AlbumOwnershipHistory(models.Model):
       return f"{self.album.title}: {self.previous_owner} → {self.new_owner} on {self.transferred_at.strftime('%d/%m/%Y, %H:%M:%S')}"
 
 
-
 # Model for an album of the day
 class DailyAlbum(models.Model):
   """
@@ -326,6 +437,10 @@ class DailyAlbum(models.Model):
   def __str__(self):
     return f"Album for {self.date}: {self.album}"
 
+#endregion
+## =====================================================================================
+#region REVIEW BASED MODELS
+## =====================================================================================
 
 # Model for a User's review of an album.
 class Review(models.Model):
@@ -349,9 +464,31 @@ class Review(models.Model):
   # Advanced Review Support (Added in June of 2025)
   advanced = models.BooleanField(default = False, null=False)
   advancedReviewDict = models.JSONField(default=None, null=True)
+  # Track review viewership
+  views = models.ManyToManyField(AotdUserData, through="ReviewView")
 
   class Meta:
     unique_together = ('album', 'user', 'aotd_date')  # Prevent duplicate reviews for the same user and album
+
+  def getAttachedImages(self):
+    """
+    Return a list of all attached ReviewImage objects
+    """
+    return [image for image in self.images.all()]
+
+
+  def viewedBy(self, user_guid: int, crid: str = "N/A"):
+    """
+    Returns two values if the passed-in user guid is found in the views list: viewed_bool, ReviewView
+    """
+    # Retreive view object for non-submitter user
+    try:
+      viewObj: ReviewView = ReviewView.objects.filter(review__pk=self.pk).get(aotdUser__user__guid=user_guid)
+      return True, viewObj
+    except models.ObjectDoesNotExist:
+      logger.debug(f"User GUID {user_guid} is not in view list for Review {self.pk}...", extra={'crid': crid})
+      return False, None
+  
 
   def toJSON(self, full: bool = False):
     """
@@ -552,111 +689,44 @@ class ReviewImage(models.Model):
     return outObj
 
 
-# Model for an Album Selection Outage. Users or admins can impose selection outages where a user's albums will be unable to be selected
-class UserAlbumOutage(models.Model):
+# Through Model for a View on a Review from a user, this allows us to store a generic relation between the two that tracks updates and most recent views
+# Effort: Track Review Viewership on a user level for UI indications of new reivews
+class ReviewView(models.Model):
   """
-  A date range during which a user's albums are ineligible for AOTD selection.
-  Can be self-imposed or admin-enacted. Deletion is audited and requires a deleter
-  to be passed explicitly.
+  A model to represent a generic view from a AotdUserData object to a review, tracks most recent view time. This allows us to display a UI element for new and updated reviews
+  that a user has not yet viewed in full. Reviews should automatically be marked viewed for the user who submitted the review. 
   """
-  user = models.ForeignKey(
-    User,
-    on_delete=models.CASCADE,
-  )
-  start_date = models.DateField()
-  end_date = models.DateField()
-  reason = models.TextField(blank=True, null=True)
-  admin_enacted = models.BooleanField(default=False) # Flag to signify if an admin enacted this outage
-  admin_enactor = models.ForeignKey( # If the admin_enacted flag is true, this field will contain the admin that created the outage
-    User,
-    on_delete=models.SET_NULL,
-    default=None,
-    related_name="outage_admin_enactor",
-    null=True
-  )
-  creation_timestamp = models.DateTimeField(null=True, default=now)
+  aotdUser = models.ForeignKey(AotdUserData, on_delete=models.CASCADE)
+  review = models.ForeignKey(Review, on_delete=models.CASCADE)
+  first_viewed = models.DateTimeField(auto_now_add=True) # Track when the review was first viewed by this user. 
+  last_viewed_at = models.DateTimeField(default=timezone.now) # Track every time a user views a review, allowing us to ensure views are tracked up to date.
 
-  # Return True if outage is currently in effect or False if not
-  def isActive(self):
-    today = timezone.localtime(timezone.now()).date()
-    return ((self.start_date < today) and (today < self.end_date))
+  class Meta:
+    constraints = [
+      models.UniqueConstraint(
+        fields=["aotdUser", "review"], 
+        name="unique_review_view_group"
+      )
+    ]
 
-  # Convert to a dict
-  def dict(self):
-    out = {}
-    out['user_pk'] = self.user.pk
-    out['user_discord_id'] = self.user.discord_id
-    out['user_nickname'] = self.user.nickname
-    out['start_date'] = self.start_date.strftime('%Y-%m-%d')
-    out['end_date'] = self.end_date.strftime('%Y-%m-%d')
-    out['reason'] = self.reason
-    out['admin_enacted'] = self.admin_enacted
-    if(self.admin_enactor):
-      out['admin_enactor_pk'] = self.admin_enactor.pk
-      out['admin_enactor_discord_id'] = self.admin_enactor.discord_id
-      out['admin_enactor_nickname'] = self.admin_enactor.nickname
-    out['creation_timestamp'] = self.creation_timestamp.strftime('%m/%d/%Y, %H:%M:%S')
-    out['active'] = self.isActive()
-    # Return outage as a dict
-    return out
-
-  # Custom delete function to log the user action
-  def delete(self, deleter=None, delete_reason=None, *args, **kwargs):
-    # Log the action before actually deleting
-    from users.models import UserAction  # Import inside to avoid circular import
-
-    # If deleter is not provided, log critical log and do not delete album
-    if(deleter == None):
-      logger.critical(f"ATTEMPTED DELETE OF ALBUM_SELECTION_OUTAGE (ID: {self.pk}) WITH NO DELETER USER PASSED IN! KEEPING OUTAGE: {self.pk}")
-      return
-    # Create user action log
-    UserAction.objects.create(
-      user=deleter,
-      action_type="DELETE",
-      entity_type="ALBUM_SELECTION_OUTAGE",
-      entity_id=self.pk,
-      details={"delete_reason": delete_reason, "deleted_outage": self.pk, "outage_raw_data": json.dumps(self.dict) }
-    )
-    # Call Django's default delete method
-    super().delete(*args, **kwargs)
-
-
-# Storage for User chance object, representing the chance that a user will be selected for the next AOtD
-class UserChanceCache(models.Model):
-  """
-  Cached record of a user's current probability of being selected for the next AOTD.
-  Stores the computed percentage alongside any block reason (outage or inactivity).
-  Refreshed periodically; the last_updated timestamp indicates cache freshness.
-  """
-  aotd_user = models.OneToOneField(
-    AotdUserData,
-    on_delete=models.CASCADE,
-    related_name="aotd_chance"
-  )
-  chance_percentage = models.FloatField(default=0.0) # Percentage that user will be selected.
-  block_type = models.CharField(max_length=50, null=True) # Should be either "OUTAGE", "INACTIVITY", or None
-  outage = models.OneToOneField(UserAlbumOutage, null=True, on_delete=models.CASCADE) # If user is under an outage, link to that outage.
-  reason = models.TextField(null=True) # Reason for the percentage, should be empty if user is not blocked in any way (This will carry the outage reason as well if user is under outage)
-  last_updated = models.DateTimeField(auto_now=True)
+  def touchLastViewed(self):
+    """Queryset update of last_viewed_at to now, so it does not run a full save()."""
+    ReviewView.objects.filter(pk=self.pk).update(last_viewed_at=timezone.now())
 
   def toJSON(self):
-    """Convert cache object to a dict for HTTP transfer"""
+    """Return this ReviewView as a JSON. (For HTTP JSON Responses)"""
     out = {}
-    out['aotd_user_id'] = self.aotd_user.pk
-    out['user_id'] = self.aotd_user.user.guid
-    out['user_nickname'] = self.aotd_user.user.nickname
-    out['percentage'] = self.chance_percentage
-    out['block_type'] = self.block_type
-    out['reason'] = self.reason
-    out['last_updated'] = self.last_updated.strftime('%m/%d/%Y, %H:%M:%S')
-    if(self.outage != None):
-      out['outage'] = {}
-      out['outage']["target_user"] = self.outage.user.discord_id
-      out['outage']["admin_outage"] = f"{self.outage.admin_enacted}"
-      out['outage']["outage_start"] = self.outage.start_date.strftime('%Y-%m-%d')
-      out['outage']["outage_end"] = self.outage.end_date.strftime('%Y-%m-%d')
+    out['aotd_user_discord_id'] = self.aotdUser.user.discord_id
+    out['aotd_user_id'] = self.aotdUser.pk
+    out['review_id'] = self.review.pk
+    out['first_viewed'] = self.first_viewed.strftime("%m/%d/%Y, %H:%M:%S")
+    out['last_viewed_at'] = self.last_viewed_at.strftime("%m/%d/%Y, %H:%M:%S")
     return out
 
+#endregion
+## =====================================================================================
+#region TAGGING MODELS
+## =====================================================================================
 
 # Global Tag for all albums (appearing as suggestions for future albums)
 class GlobalTag(models.Model):
@@ -813,3 +883,5 @@ class AlbumTag(models.Model):
 
   def __str__(self):
     return f'"{self.tag_text}" on {self.album.title}'
+
+#endregion 

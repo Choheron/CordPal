@@ -11,7 +11,8 @@ from .models import (
   AotdUserData,
   User,
   ReviewHistory,
-  ReviewImage
+  ReviewImage,
+  ReviewView
 )
 
 from .utils import (
@@ -133,8 +134,85 @@ def submitReview(request: HttpRequest):
   # Update review stats
   calculateUserReviewData(AotdUserData.objects.get(user=userObj))
   # Log success
-  logger.info(f"Successfully saved review submission from user {userObj.nickname} for album {albumObj.title}...", extra={'crid': request.crid})
-  return JsonResponse({'dropped': dropped_links})
+  logger.info(f"Successfully saved review submission from user {userObj.nickname} for album {albumObj.title}...", extra={'crid': request.crid, "review_pk": reviewObj.pk})
+  return JsonResponse({'dropped': dropped_links, 'review_pk': reviewObj.pk})
+
+
+###
+# Mark Review as viewed by a user
+###
+def markReviewViewed(request: HttpRequest, review_pk):
+  # Make sure request is a post request
+  if(request.method != "POST"):
+    logger.warning(f"markReviewViewed called with a non-POST method, returning 405.", extra={'crid': request.crid})
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Retrieve user from session cookie, then grab the AOTD user objct
+  user = getUserObj(request.session.get('discord_id'))
+  try:
+    aotdUserObj = AotdUserData.objects.get(user__guid=user.guid)
+  except ObjectDoesNotExist as e:
+    logger.exception(f"AOTD User Data for user {user.guid} not found", extra={'crid': request.crid, 'user_guid': user.guid})
+    return JsonResponse({'success': False, 'error': f"AOTD User Data for user {user.guid} not found"}, status=404)
+  # Retrieve review using pk
+  try:
+    review = Review.objects.get(pk=review_pk)
+  except ObjectDoesNotExist as e:
+    logger.exception(f"Review with pk {review_pk} not found", extra={'crid': request.crid, 'user_guid': user.guid, 'review_pk': review_pk})
+    return JsonResponse({'success': False, 'error': f"Review with pk {review_pk} not found"}, status=404)
+  # If current user is the creator of the review, spoof a fake response to avoid creating a needless ReviewView object
+  if(review.user.guid == user.guid):
+    return JsonResponse({'success': True, 'error': "N/A"}, status=200)
+  # Mark this user as having reviewed the located review, creating or updating as needed.
+  viewObj, created = ReviewView.objects.get_or_create(aotdUser=aotdUserObj, review=review)
+  if(not created):
+    viewObj.touchLastViewed()
+  # Log successful update and return success code
+  logger.info(f"Successfully marked review {review.pk} as viewed by user {user.guid} ({user.nickname})", extra={
+    'crid': request.crid,
+    "user": user.toJSON(),
+    "review_id": review.pk
+  })
+  return JsonResponse({'success': True, 'error': "N/A"}, status=200)
+
+
+###
+# Get the view status of a review from a user
+###
+def getReviewViewStatus(request: HttpRequest, review_pk):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning(f"getReviewViewStatus called with a non-GET method, returning 405.", extra={'crid': request.crid})
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Retrieve user from session cookie
+  user = getUserObj(request.session.get('discord_id'))
+  # Retrieve review using pk
+  try:
+    review = Review.objects.get(pk=review_pk)
+  except ObjectDoesNotExist as e:
+    logger.exception(f"Review with pk {review_pk} not found", extra={'crid': request.crid, 'user_guid': user.guid, 'review_pk': review_pk, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': f"Review with pk {review_pk} not found"}, status=404)
+  # If this user is the submitter of the review, short circut and return
+  if(review.user.guid == user.guid):
+    return JsonResponse({
+        "success": True,
+        "viewed": True,
+        "updated": False
+      }, status=200)
+  # Retrieve view status of user to review
+  viewed, viewObj = review.viewedBy(user.guid, crid=request.crid)
+  # Calculate if a review has been updated since last seen
+  if(viewed):
+    updated = viewObj.last_viewed_at < review.last_updated
+  # Return review viewership data for this specific user, viewed means the user has reviewed it, updated means the review has been updated since the user viewed it.
+  return JsonResponse({
+    "success": True,
+    "viewed": viewed,
+    "updated": updated if viewed else None
+  }, status=200)
 
 
 ###

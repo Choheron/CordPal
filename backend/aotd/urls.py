@@ -88,12 +88,13 @@ urlpatterns = [
   path('getReviewHistoricalByID/<int:id>', views_review.getReviewHistoricalByID),
   # Cronjob to check review streaks
   path('resetStreaks', views_review.resetStreaks),
-  ## ============================================================================================================
-  ## ReviewImage Views
-  ## ============================================================================================================
+  ## ==== ReviewImage Views
   path('uploadReviewImage', views_review_images.uploadReviewImage),
   path('serveReviewImage/<str:hex>', views_review_images.serveReviewImage),
   path('cleanupOrphanReviewImages', views_review_images.cleanupOrphanReviewImages),
+  ## ==== ReviewView Views
+  path("markReviewViewed/<int:review_pk>", views_review.markReviewViewed),
+  path("getReviewViewStatus/<int:review_pk>", views_review.getReviewViewStatus),
   ## ============================================================================================================
   ## Album Of the Day Views
   ## ============================================================================================================
