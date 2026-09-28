@@ -7,7 +7,7 @@ import { markReviewViewed } from "@/app/lib/aotd_utils"
 
 // Green flags a review this user has never opened, orange one edited since they last did
 const indicatorFor = (viewData) => {
-  if(viewData['viewed']) return "bg-green-500"
+  if(viewData['viewed'] === false) return "bg-green-500"
   return (viewData['updated']) ? "bg-orange-500" : ""
 }
 
