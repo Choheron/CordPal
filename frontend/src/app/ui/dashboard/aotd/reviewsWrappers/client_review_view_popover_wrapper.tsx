@@ -7,7 +7,7 @@ import { markReviewViewed } from "@/app/lib/aotd_utils"
 
 // Green flags a review this user has never opened, orange one edited since they last did
 const indicatorFor = (viewData) => {
-  if(!viewData['viewed']) return "bg-green-500"
+  if(viewData['viewed']) return "bg-green-500"
   return (viewData['updated']) ? "bg-orange-500" : ""
 }
 
@@ -39,7 +39,7 @@ export default function ReviewViewPopoverWrapper(props) {
     markReviewViewed(props.reviewId)
   }
 
-  const indicatorDot = <div className={`absolute -top-1 -left-1 ${indicator} size-3 rounded-full z-10`} />
+  const indicatorDot = <div className={`absolute -top-1 -left-1 ${indicator} size-3 rounded-full z-10 animate-pulse`} />
 
   if(props.disabled) {
     return (
