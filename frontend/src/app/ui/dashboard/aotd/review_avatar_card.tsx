@@ -13,7 +13,7 @@ import ReviewViewPopoverWrapper from "./reviewsWrappers/client_review_view_popov
 export default async function ReviewAvatarCard(props) {
   const review = props.review_obj;
   const hideScores = props.hideScores ?? false;
-  const viewData = (hideScores) ? ({'viewed': false}) : (await getReviewViewStatus(review['id']))
+  const viewData = await getReviewViewStatus(review['id'])
   const reviewMessage = await (await doReviewEmbedReplacements(review)).message
   const readOnly = (props.readOnly != null) ? props.readOnly : false 
   // PopoverTrigger calls Children.only, which throws if React streams the trigger's
@@ -70,19 +70,18 @@ export default async function ReviewAvatarCard(props) {
 
   return (
     <div className="mx-auto" key={props.index}>
-      {hideScores ? cardContent : (
-        <ReviewViewPopoverWrapper
-          reviewId={review['id']}
-          trigger={cardContent}
-          viewData={viewData}
-        >
-          <ReviewPopoverContent
-            reviewData={review}
-            reviewMessage={reviewMessage}
-            readOnly={readOnly}
-          />
-        </ReviewViewPopoverWrapper>
-      )}
+      <ReviewViewPopoverWrapper
+        reviewId={review['id']}
+        trigger={cardContent}
+        viewData={viewData}
+        disabled={hideScores}
+      >
+        <ReviewPopoverContent
+          reviewData={review}
+          reviewMessage={reviewMessage}
+          readOnly={readOnly}
+        />
+      </ReviewViewPopoverWrapper>
     </div>
   )
 }

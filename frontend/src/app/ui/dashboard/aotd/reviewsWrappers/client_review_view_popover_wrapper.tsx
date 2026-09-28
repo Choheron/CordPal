@@ -17,6 +17,7 @@ const indicatorFor = (viewData) => {
 //  - viewData: Object - Backend view status ({viewed, updated})
 //  - trigger: Node - Server rendered review card
 //  - children: Node - Server rendered popover content
+//  - disabled: Boolean - Show the indicator only, no popover (scores hidden)
 export default function ReviewViewPopoverWrapper(props) {
   const [indicator, setIndicator] = useState(indicatorFor(props.viewData))
   const marked = useRef(false)
@@ -38,6 +39,17 @@ export default function ReviewViewPopoverWrapper(props) {
     markReviewViewed(props.reviewId)
   }
 
+  const indicatorDot = <div className={`absolute -top-1 -left-1 ${indicator} size-3 rounded-full z-10`} />
+
+  if(props.disabled) {
+    return (
+      <div className="relative">
+        {indicatorDot}
+        {props.trigger}
+      </div>
+    )
+  }
+
   return (
     <Popover
       placement="bottom"
@@ -48,7 +60,7 @@ export default function ReviewViewPopoverWrapper(props) {
       <PopoverTrigger>
         <div className="relative transition-all hover:bg-black/40 hover:scale-105">
           {/* New Content indicator */}
-          <div className={`absolute -top-1 -left-1 ${indicator} size-3 rounded-full z-10`} />
+          {indicatorDot}
           {props.trigger}
         </div>
       </PopoverTrigger>
