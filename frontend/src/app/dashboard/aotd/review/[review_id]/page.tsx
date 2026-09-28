@@ -2,7 +2,7 @@
 
 import { Divider } from "@heroui/divider"
 
-import { getAlbum, getReviewHistoricalByID, getTenorGifData } from "@/app/lib/aotd_utils"
+import { getAlbum, getReviewHistoricalByID } from "@/app/lib/aotd_utils"
 import { getUserData } from "@/app/lib/user_utils"
 import { convertToLocalTZString, generateDateFromUTCString, padNumber, ratingToTailwindBgColor, songRatingToString } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
@@ -40,18 +40,16 @@ export default async function Page({
   const returnUrl = (isReviewToday) ? `/dashboard/aotd` : `/dashboard/aotd/calendar/${reviewDateObj.getFullYear()}/${padNumber(reviewDateObj.getMonth() + 1)}/${padNumber(reviewDateObj.getDate())}`
 
 
-  const doEmbedReplacements = async(reviewText) => {
-    // Parse review text to display embeds 
+  const doEmbedReplacements = (reviewText) => {
+    // Parse review text to display embeds
     // Regex for youtube video embedding
     const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\?[\w=&%-]*)?(?:&t=(\d+h)?(\d+m)?(\d+s)?)?/g;
-    // Regex for tenor gif embedding
-    const tenorRegex = /(?:https?:\/\/)?(?:www\.)?tenor\.com\/view\/[a-zA-Z0-9_-]+-(\d+)/g;
     // Placeholder text
     let temp: any = reviewText
     // Parse Review Text
     if(review_data['version'] == 1) {
       // Do youtube link replacements [ONLY IF THIS IS A VERSION 1 REVIEW]
-      temp =  review_data['comment'].replace(youtubeRegex, (match, videoId, hours, minutes, seconds) => {
+      temp =  temp.replace(youtubeRegex, (match, videoId, hours, minutes, seconds) => {
         // Convert timestamp to seconds
         const h = hours ? parseInt(hours) * 3600 : 0;
         const m = minutes ? parseInt(minutes) * 60 : 0;
@@ -62,37 +60,17 @@ export default async function Page({
         return `<iframe width="600" height="337.5" class="mx-auto" src="https://www.youtube.com/embed/${videoId}${startParam}" frameborder="0" allowfullscreen></iframe>`;
       })
     }
-
-    // Do Tenor Link Replacements
-    // Extract all Tenor GIF IDs
-    const tenorMatches = [...temp.matchAll(tenorRegex)];
-    if (tenorMatches.length > 0) {
-      // Fetch all Tenor GIF URLs asynchronously
-      const gifPromises = tenorMatches.map(async ([match, gifId]) => {
-        const gifUrl = await getTenorGifData(gifId);
-        return { match, gifUrl };
-      });
-
-      const gifResults = await Promise.all(gifPromises);
-
-      // Replace Tenor URLs with their corresponding <img> tags
-      gifResults.forEach(({ match, gifUrl }) => {
-        temp = temp.replace(match, `<img src="${gifUrl}" frameborder="0" width="300" height="auto" class="max-w-300 h-full mx-auto" />`);
-      });
-    }
     // Return final message text
     return temp
   }
 
 
   // Replace overall review message embeds
-  const reviewMessage = await doEmbedReplacements(review_data['comment'])
-  const parsedTrackComments = review_data['advanced'] ? await Promise.all(
-      Object.values(review_data['trackData']).sort((a: any, b: any) => a.number - b.number).map(async (songObj: any) => {
-        const parsedComment = await doEmbedReplacements(songObj['cordpal_comment']);
-        return { ...songObj, parsedComment };
-      })
-    ) : [];
+  const reviewMessage = doEmbedReplacements(review_data['comment'])
+  const parsedTrackComments = review_data['advanced'] ? Object.values(review_data['trackData'])
+      .sort((a: any, b: any) => a.number - b.number)
+      .map((songObj: any) => ({ ...songObj, parsedComment: doEmbedReplacements(songObj['cordpal_comment']) }))
+    : [];
 
 
   return (

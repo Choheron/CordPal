@@ -445,7 +445,6 @@ export async function getReviewsForAlbum(mbid, date = null) {
   return reviewListRes['review_list'];
 }
 
-
 //
 // Get Reviews from Backend
 // - RETURN: JSON Object of List of reviews
@@ -570,12 +569,64 @@ export async function submitReviewToBackend(reviewObject) {
   revalidateTag(`calendar-${now.getFullYear()}-${padNumber(now.getMonth() + 1)}`, "max")
   // Parse return json. A failed submit returns an empty body, so tolerate non-JSON rather than throwing here.
   const responseObj = await submitReviewResponse.json().catch(() => ({}))
+  // Revalidate review PK specific tags (as response returns the new review's PK)
+  if(responseObj?.review_pk) {
+    updateTag(`album_review_view_status_${responseObj?.review_pk}`)
+    updateTag(`review_${responseObj?.review_pk}`)
+  }
   // Return callback code
   return {
     status: submitReviewResponse.status,
     crid: submitReviewResponse.headers.get("X-CRID"),
     dropped: responseObj?.dropped ?? []
   }
+}
+
+
+//
+// Check the viewship status of a review for a specific user
+// - RETURN: JSON Object outlining viewership status
+//
+export async function getReviewViewStatus(review_pk) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Query the backend for this user's specific review view status state 
+  console.log(`getReviewViewStatus: Sending request to backend '/aotd/getReviewViewStatus/${review_pk}'`)
+  const reviewViewStatusRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getReviewViewStatus/${review_pk}`, {
+    method: "GET",
+    cache: 'force-cache',
+    next: { tags: [`album_review_view_status_${review_pk}`] },
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const reviewViewStatusJson = await reviewViewStatusRes.json()
+  return reviewViewStatusJson;
+}
+
+
+//
+// Update/Mark a Review's View status for a specific user
+// - RETURN: JSON Object outlining status of mark request
+//
+export async function markReviewViewed(review_pk) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Query the backend for this user's specific review view status state 
+  console.log(`markReviewViewed: Sending request to backend '/aotd/markReviewViewed/${review_pk}'`)
+  const reviewMarkViewStatusRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/markReviewViewed/${review_pk}`, {
+    method: "POST",
+    cache: 'no-store',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const reviewViewStatusJson = await reviewMarkViewStatusRes.json()
+  updateTag(`album_review_view_status_${review_pk}`)
+  return {
+    'json': reviewViewStatusJson,
+    'status': reviewMarkViewStatusRes.status
+  };
 }
 
 
@@ -660,18 +711,13 @@ export async function getAlbumsStats() {
 // - RETURN: Json Obejcts
 //
 export async function getLowestHighestAlbumStats() {
-  // Check for sessionid in cookies
-  const sessionCookie = await getCookie('sessionid');
   // Query Backend for lowest and highest album stats
   console.log(`getLowestHighestAlbumStats: Sending request to backend '/aotd/getLowestHighestAlbumStats'`)
   const albumLowHighStatResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getLowestHighestAlbumStats`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: ['AOTD'] },
-    headers: {
-      Cookie: `sessionid=${sessionCookie};`
-    },
+    next: { tags: ['AOTD'] }
   });
   const albumLowHighStatJson = await albumLowHighStatResponse.json()
   return albumLowHighStatJson;
@@ -838,36 +884,6 @@ export async function getUserAlbumsStats(userId: string = "") {
 }
 
 
-//
-// Tenor Integration to get GIF Data from Tenor based on passed in URL or Gif ID
-// Params:
-//   - tenor_url: String - Full tenor url
-//   - tenor_gif_id: String - Tenor gif ID
-//
-export async function getTenorGifData(tenor_url: string = "", tenor_gif_id: string = "") {
-  // Validate what has been passed in
-  let gif_id: any = "";
-  if(tenor_url != "") {
-    gif_id = tenor_url.split("-").at(-1)
-  } else if(tenor_gif_id != "") {
-    gif_id = tenor_gif_id
-  } else {
-    throw new Error("A gif ID or URL must be provided...");
-  }
-  // TENOR API SUPPORT ENDED AS GOOGLE ENDED TENOR API - INSTEAD JUST RETURN BAD URL SO I KNOW IF GIFS ARE APPEARING WRONG
-  // // Build backend URL
-  // const callUrl = `${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/tenor/getGifUrl/${gif_id}`
-  // // Make call to backend
-  // console.log(`getTenorGifData: Sending request to backend '${callUrl}'`)
-  // const tenorGifResponse = await fetch(callUrl, {
-  //   method: "GET",
-  //   next: { revalidate: 86400 }
-  // });
-  // const retJson = await tenorGifResponse.json();
-  // Return URL
-  // return retJson['url']
-  return "https://placehold.co/400x200?text=GIF+NO+LONGER+AVAILABLE+ON+TENOR+CONTACT+CORDPAL+SUPPORT"
-}
 
 //
 // Get user's similarly rated albums for the review slider tooltip
@@ -1118,6 +1134,7 @@ export async function getReviewByID(review_id) {
   const getReviewResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getReviewByID/${review_id}`, {
     method: "GET",
     credentials: "include",
+    cache: 'force-cache',
     next: { tags: [`review_${review_id}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
@@ -1139,6 +1156,7 @@ export async function getReviewHistoricalByID(review_id) {
   const getReviewHistoricalResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getReviewHistoricalByID/${review_id}`, {
     method: "GET",
     credentials: "include",
+    cache: 'force-cache',
     next: { tags: [`review_${review_id}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
@@ -1162,6 +1180,7 @@ export async function getAlbumSTD(mbid, date = "") {
   const getAlbumSTDResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAlbumSTD${urlTail}`, {
     method: "GET",
     credentials: "include",
+    cache: 'force-cache',
     next: { tags: [`album_review_${mbid}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
