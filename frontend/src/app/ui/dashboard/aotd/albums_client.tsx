@@ -3,7 +3,7 @@
 // URL params used by this page (all optional):
 //   title      — album title filter text
 //   artist     — artist name filter text
-//   submitter  — discord_id of the selected submitter; single value, matched exactly
+//   submitter  — guid of the selected submitter; single value, matched exactly
 //   aotd       — "1" to show only albums that have been Album Of the Day
 //   sort       — active sort column and direction, formatted as "column:direction"
 //                  e.g. sort=rating:descending  (default when absent)
@@ -276,7 +276,7 @@ export default function AlbumsClient({ albums, timestamp }: Props) {
     if (urlSong) list = list.filter(a => ((a['track_list'].length != 0) && (a['track_list'].some(song => song.toLowerCase().includes(urlSong.toLowerCase())))))
     if (urlTag) list = list.filter(a => ((a['tags'].length != 0) && (a['tags'].some(tagObj => tagObj['tag_text'].toLowerCase().includes(urlTag.toLowerCase())))))
     if (urlArtist) list = list.filter(a => (a['artist']['name'] as string).toLowerCase().includes(urlArtist.toLowerCase()))
-    if (submitterFilter.size) list = list.filter(a => (a['submitter'] as string) === [...submitterFilter][0]) // spread, not Object.values() — plain Sets aren't enumerable as object properties
+    if (submitterFilter.size) list = list.filter(a => String(a['submitter']) === String([...submitterFilter][0])) // spread, not Object.values() — plain Sets aren't enumerable as object properties
     if (urlGenre) list = list.filter(a => ((a['genre_list'].length != 0) && (a['genre_list'].some(genre => genre.toLowerCase().includes(urlGenre.toLowerCase())))))
     // AOTD Filter block - TODO: Could likely be optimized
     if (aotdFilter == "1") list = list.filter(a => a['last_aotd'] != null) // Only show albums that have been AOTD

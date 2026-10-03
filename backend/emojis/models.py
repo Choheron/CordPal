@@ -45,7 +45,7 @@ class CustomEmoji(models.Model):
     out['is_active']           = self.is_active
     out['upload_timestamp']    = self.upload_timestamp.strftime('%m/%d/%Y, %H:%M:%S')
     out['submitted_by']        = self.submitted_by.nickname if self.submitted_by else None
-    out['submitted_by_id']     = self.submitted_by.discord_id
+    out['submitted_by_id']     = self.submitted_by.guid
     out['submitted_at']        = self.submitted_at.strftime('%m/%d/%Y, %H:%M:%S') if self.submitted_at else "ERR DATE"
     # Respect hide_submitted_at for non-admin callers
     if admin:

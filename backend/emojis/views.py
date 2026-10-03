@@ -13,7 +13,7 @@ import pytz
 from dotenv import load_dotenv
 
 from .models import CustomEmoji
-from users.utils import getUserObj
+from users.utils import getSessionUser
 
 # Declare logging
 logger = logging.getLogger()
@@ -110,7 +110,7 @@ def uploadEmoji(request: HttpRequest):
     res.status_code = 405
     return res
   # Retrieve the requesting user
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user:
     logger.error("uploadEmoji called by unauthenticated user.", extra={'crid': request.crid})
     return JsonResponse({'error': 'Not authenticated'}, status=401)
@@ -195,7 +195,7 @@ def recordEmojiUse(request: HttpRequest, emoji_id: int):
     res.status_code = 405
     return res
   # Require authentication — no anonymous use tracking
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user:
     return JsonResponse({'error': 'Not authenticated'}, status=401)
   # Atomically increment use count — F() expression prevents race conditions
@@ -220,7 +220,7 @@ def deleteEmoji(request: HttpRequest, emoji_id: int):
     res.status_code = 405
     return res
   # Verify admin access
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user or not user.is_staff:
     return JsonResponse({'error': 'Admin access required'}, status=403)
   # Parse JSON body
@@ -260,7 +260,7 @@ def adminListEmojis(request: HttpRequest):
     res.status_code = 405
     return res
   # Verify admin access
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user or not user.is_staff:
     return JsonResponse({'error': 'Admin access required'}, status=403)
   # Retrieve all emojis — no is_active filter, admins see everything
@@ -285,7 +285,7 @@ def updateEmojiMeta(request: HttpRequest, emoji_id: int):
     res.status_code = 405
     return res
   # Verify admin access
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user or not user.is_staff:
     return JsonResponse({'error': 'Admin access required'}, status=403)
   # Retrieve the emoji to update

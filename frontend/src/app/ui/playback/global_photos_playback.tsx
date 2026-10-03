@@ -8,7 +8,7 @@ import { getUserData } from "@/app/lib/user_utils"
 
 export default async function GlobalPhotoPlaybackData(props) {
   const photoStats = props['photoPlaybackData']
-  const mostTaggedNickname = (await getUserData(photoStats['most_tagged_user']['discord_id']))['nickname']
+  const mostTaggedNickname = (await getUserData(photoStats['most_tagged_user']['pk']))['nickname']
 
   const backgroundGradientTQ = "bg-gradient-to-bl from-slate-900 to-slate-950"
 
@@ -17,10 +17,10 @@ export default async function GlobalPhotoPlaybackData(props) {
       return {
         key: index,
         position: index + 1,
-        userdiscordid: (
-          <UserCard userDiscordID={data['uploader__discord_id']} isProfileLink={true}/>
+        usercard: (
+          <UserCard userId={data['uploader']} isProfileLink={true}/>
         ),
-        userid: data['uploader__discord_id'],
+        userid: data['uploader'],
         percentage: `${((parseFloat(data['upload_count'])/parseFloat(photoStats['total_submissions'])) * 100).toFixed(2)}%`,
         count: data['upload_count']
       }
@@ -31,7 +31,7 @@ export default async function GlobalPhotoPlaybackData(props) {
         label: "#"
       },
       {
-        key: "userdiscordid",
+        key: "usercard",
         label: "USER",
       },
       {
@@ -50,7 +50,7 @@ export default async function GlobalPhotoPlaybackData(props) {
           {/* Artist of the Most Photos */}
           <PlaybackAward 
             title="The Artist"
-            userId={photoStats['most_artist_user']['discord_id']} 
+            userId={photoStats['most_artist_user']['pk']} 
             flavor_text={`${mostTaggedNickname} photoshops dont make themselves`}
             emoji="🎨"
             showNickname
@@ -67,7 +67,7 @@ export default async function GlobalPhotoPlaybackData(props) {
           {/* Tagged in the most photos */}
           <PlaybackAward 
             title="The Muse"
-            userId={photoStats['most_tagged_user']['discord_id']} 
+            userId={photoStats['most_tagged_user']['pk']} 
             flavor_text="Splona Lisa"
             emoji="🖌️"
             showNickname

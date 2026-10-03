@@ -20,8 +20,8 @@ type AlbumDisplayProps = {
     name: string;                                           // Name of the artist
     href: string;                                           // URL to access the artist on external [EXTERNAL]
   };
-  submitter?: string;                                       // Discord ID of the user that submitted this album
-  owner?: string;                                           // Discord ID of current owner of album, OPTIONAL as this will only be passed if the owner is not the submitter
+  submitter?: string;                                       // GUID of the user that submitted this album
+  owner?: string;                                           // GUID of current owner of album, OPTIONAL as this will only be passed if the owner is not the submitter
   submitter_comment?: string;                               // Optional comment left by the album submitter
   submission_date?: string;                                 // String representation of the submission date
   transfer_date?: string;                                   // String representation of the transfer date, OPTIONAL as this will only be passed if the owner is not the submitter
@@ -155,7 +155,7 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
                 <div className="-mb-3 sm:mb-0 w-full sm:w-fit">
                   <p className="text-xs text-yellow-400/80 w-14 text-left shrink-0">Owner</p>
                   <UserCard
-                    userDiscordID={owner}
+                    userId={owner}
                     avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[32px]"}
                     fallbackName={"User Not Found"}
                     isProfileLink
@@ -171,7 +171,7 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
                     {owner != null ? "Original" : "Submitter"}
                   </p>
                   <UserCard
-                    userDiscordID={submitter}
+                    userId={submitter}
                     avatarClassNameOverride={"flex-shrink-0 size-[20px] sm:size-[32px]"}
                     fallbackName={"User Not Found"}
                     isProfileLink

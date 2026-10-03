@@ -16,7 +16,7 @@ import { ratingToTailwindBgColor } from "@/app/lib/utils";
 //  - artist: Object - Object of Artist Data (Expected fields in object below)
 //      > name: String - Name of Artist
 //      > href: String - Url to access artist on MusicBrainz [EXTERNAL URL]
-//  - submitter: String - (Optional) The discord id of the user that submitted this album, not applicable in all use cases
+//  - submitter: String - (Optional) The guid of the user that submitted this album, not applicable in all use cases
 //  - submitter_comment: String - (Optional) An optional comment that the album submitter may have left with this album
 //  - submission_date: String - (Optional) A String representation of the submission date of the Album
 //  - album_mbid: String - (Optional) Album MusicBrainz ID for retrieval of average from database
@@ -74,7 +74,7 @@ export default async function MinimalAlbumDisplay(props: any) {
         <Conditional showWhen={(submitter && showSubmitInfo)}>
           <div className="w-fit mx-auto">
             <UserCard 
-              userDiscordID={submitter} 
+              userId={submitter} 
               fallbackName={"User Not Found"}
               customDescription={(
                 <p>

@@ -47,8 +47,8 @@ def run():
       text = quote['text']
       timestamp = datetime.datetime.strptime(quote['timestamp'],"%m/%d/%Y, %H:%M:%S")
       # Attempt to retrieve user data for submitter and speaker
-      submitterObj: User = userUtils.getUserObj(submitterId)
-      speakerObj: User = userUtils.getUserObj(userId)
+      submitterObj: User = userUtils.getUserObjByDiscordId(submitterId)
+      speakerObj: User = userUtils.getUserObjByDiscordId(userId)
       # Log if either are not found
       if(submitterObj == None):
         logger.warning(f"User with submitter id of {submitterId} NOT FOUND.", extra=logExtra)

@@ -203,7 +203,7 @@ export default async function Page({
                   initialTags={albumTags ?? []}
                   isEnrolled={true}
                   isAdmin={isAdmin}
-                  currentUserId={isYearAgoAlbum ? user_data['discord_id'] : undefined}
+                  currentUserId={isYearAgoAlbum ? user_data['guid'] : undefined}
                   readOnly={!isYearAgoAlbum}
                 />
               </div>

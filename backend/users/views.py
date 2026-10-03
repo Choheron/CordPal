@@ -9,6 +9,7 @@ from .models import (
   UserAction
 )
 from discordapi.models import DiscordTokens
+from .utils import getSessionUser
 
 import logging
 import os
@@ -60,7 +61,7 @@ def getUserList(request: HttpRequest):
   out['users'] = {}
   for user in userList:
     tempDict = {}
-    tempDict['discord_id'] = user.discord_id
+    tempDict['guid'] = user.guid
     tempDict['avatar_url'] = user.get_avatar_url()
     tempDict['nickname'] = user.nickname
     tempDict['last_request_timestamp'] = user.last_request_timestamp
@@ -73,7 +74,7 @@ def getUserList(request: HttpRequest):
 ###
 # Get user data for the current session's user or the passed in ID
 ###
-def getUserData(request: HttpRequest, user_discord_id: str = ""):
+def getUserData(request: HttpRequest, user_guid: int | None = None):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("getUserData called with a non-GET method, returning 405.", extra={'crid': request.crid})
@@ -81,14 +82,15 @@ def getUserData(request: HttpRequest, user_discord_id: str = ""):
     res.status_code = 405
     return res
   # Determine if this call is to use session or passed in value
-  if(user_discord_id != ""):
-    request_id = user_discord_id
+  if(user_guid is not None):
+    request_id = user_guid
   else:
-    request_id = str(request.session['discord_id'])
+    request_id = getSessionUser(request).guid
   # Retrieve user data from database, if its not there create one.
   try:
-    logger.debug(f"Attempting to retreive user data for user id: {user_discord_id}...", extra={'crid': request.crid})
-    userData = User.objects.get(discord_id = request_id)
+    logger.debug(f"Attempting to retreive user data for user id: {user_guid}...", extra={'crid': request.crid})
+    # Fall back to discord id so profile links from before the guid switch still resolve
+    userData = User.objects.filter(guid = request_id).first() or User.objects.get(discord_id = request_id)
   except:
     res = HttpResponse("User Not Found")
     res.status_code = 404
@@ -105,7 +107,7 @@ def getUserData(request: HttpRequest, user_discord_id: str = ""):
 ###
 # Get user avatar url for the current session's user or the passed in ID
 ###
-def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
+def getUserAvatarURL(request: HttpRequest, user_guid: int | None = None):
   # Make sure request is a GET request
   if(request.method != "GET"):
     logger.warning("getUserAvatarURL called with a non-GET method, returning 405.", extra={'crid': request.crid})
@@ -113,13 +115,13 @@ def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
     res.status_code = 405
     return res
   # Determine if this call is to use session or passed in value
-  if(user_discord_id != ""):
-    request_id = user_discord_id
+  if(user_guid is not None):
+    request_id = user_guid
   else:
-    request_id = str(request.session['discord_id'])
+    request_id = getSessionUser(request).guid
   # Retrieve user data from database
   try:
-    userData = User.objects.get(discord_id = request_id)
+    userData = User.objects.get(guid = request_id)
   except:
     res = HttpResponse("User Not Found")
     res.status_code(404)
@@ -133,7 +135,7 @@ def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
 ###
 # Get a boolean if a user is an admin or not
 ###
-def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
+def isUserAdmin(request: HttpRequest, user_guid: int | None = None):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("isUserAdmin called with a non-GET method, returning 405.", extra={'crid': request.crid})
@@ -141,14 +143,14 @@ def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
     res.status_code = 405
     return res
   # Determine if this call is to use session or passed in value
-  if(user_discord_id != ""):
-    request_id = user_discord_id
+  if(user_guid is not None):
+    request_id = user_guid
   else:
-    request_id = str(request.session['discord_id'])
+    request_id = getSessionUser(request).guid
   # Retrieve user data from database, if its not there create one.
   try:
-    logger.debug(f"Attempting to retreive user data for user id: {user_discord_id}...", extra={'crid': request.crid})
-    userData = User.objects.get(discord_id = request_id)
+    logger.debug(f"Attempting to retreive user data for user id: {user_guid}...", extra={'crid': request.crid})
+    userData = User.objects.get(guid = request_id)
   except:
     res = HttpResponse("User Not Found")
     res.status_code = 404
@@ -175,11 +177,11 @@ def updateUserData(request: HttpRequest):
   # Body data
   reqBody = json.loads(request.body)
   # Update default user fields
+  user = getSessionUser(request)
   if reqBody.get('default'):
-    User.objects.filter(discord_id=request.session['discord_id']).update(**reqBody['default'])
+    User.objects.filter(guid=user.guid).update(**reqBody['default'])
   # Update AOTD user settings
   if reqBody.get('aotd'):
-    user = User.objects.get(discord_id=request.session['discord_id'])
     AotdUserData.objects.filter(user=user).update(**reqBody['aotd'])
   # Return success code
   return HttpResponse(200)
@@ -188,15 +190,15 @@ def updateUserData(request: HttpRequest):
 ###
 # Get a specific user's last request timestamp
 ###
-def isOnline(request: HttpRequest, user_discord_id: str):
+def isOnline(request: HttpRequest, user_guid: int):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning("isOnline called with a non-GET method, returning 405.", extra={'crid': request.crid})
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Get user object from discord id
-  user = User.objects.all().get(discord_id=user_discord_id)
+  # Get user object from guid
+  user = User.objects.all().get(guid=user_guid)
   # Get timestamp and return
   out = {"online": user.is_online()}
   # Return additional information stating how longs its been since the user has been seen
@@ -229,7 +231,7 @@ def getAllOnlineData(request: HttpRequest):
     temp['status'] = user.online_status()
     temp['last_request_timestamp'] = user.last_request_timestamp
     temp['last_heartbeat_timestamp'] = user.last_heartbeat_timestamp
-    out[user.discord_id] = temp
+    out[user.guid] = temp
   # Return users and timestamp
   out['timestamp'] = timezone.now()
   return JsonResponse(out)
@@ -278,7 +280,7 @@ def heartbeat(request: HttpRequest):
     res.status_code = 405
     return res
   try:
-    user = User.objects.get(discord_id=request.session['discord_id'])
+    user = getSessionUser(request)
     logger.debug(f"Heartbeat received from {user.nickname}...", extra={'crid': request.crid})
   except:
     logger.warning(f"HEARTBEAT RECIEVED FROM UNKNOWN USER!", extra={'crid': request.crid})
@@ -327,7 +329,7 @@ def isFieldUnique(request: HttpRequest):
 ###
 # Get Login Methods allowed for a user
 ###
-def getLoginMethods(request: HttpRequest, user_discord_id: str = ""):
+def getLoginMethods(request: HttpRequest, user_guid: int | None = None):
   # Make sure request is a GET request
   if(request.method != "GET"):
     logger.warning("getLoginMethods called with a non-GET method, returning 405.", extra={'crid': request.crid})
@@ -335,12 +337,12 @@ def getLoginMethods(request: HttpRequest, user_discord_id: str = ""):
     res.status_code = 405
     return res
   # Determine if this call is to use session or passed in value
-  if(user_discord_id != ""):
-    request_id = user_discord_id
+  if(user_guid is not None):
+    request_id = user_guid
   else:
-    request_id = str(request.session['discord_id'])
+    request_id = getSessionUser(request).guid
   # Get User
-  user = User.objects.get(discord_id=request_id)
+  user = User.objects.get(guid=request_id)
   # Methods list
   methods = []
   # If they have a discord key entry, add discord
@@ -360,7 +362,7 @@ def getLoginMethods(request: HttpRequest, user_discord_id: str = ""):
 ###
 # Get password validators text
 ###
-def getPasswordValidators(request: HttpRequest, user_discord_id: str = ""):
+def getPasswordValidators(request: HttpRequest, user_guid: int | None = None):
   # Make sure request is a GET request
   if(request.method != "GET"):
     logger.warning("getPasswordValidators called with a non-GET method, returning 405.", extra={'crid': request.crid})
@@ -460,8 +462,8 @@ def traditionalLogin(request: HttpRequest):
       out['errorType'] = "PASS"
       out["message"] = "Username/Password not found or Incorrect."
       return JsonResponse(out)
-    # If password is correct, attach the discord_id to the session and return success
-    request.session['discord_id'] = user.discord_id
+    # If password is correct, attach the user guid to the session and return success
+    request.session['user_guid'] = user.guid
     request.session.modified = True
     out = {}
     out['success'] = True

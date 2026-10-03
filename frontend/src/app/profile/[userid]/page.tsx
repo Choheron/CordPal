@@ -7,6 +7,7 @@ import PageTitle from "@/app/ui/dashboard/page_title";
 import ProfileUserDisplay from "@/app/ui/profile/profile_user_display";
 import UserAotdDataDisplay from "@/app/ui/profile/user_aotd_data_display";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import UserQuotesDisplay from "@/app/ui/profile/user_quotes_display";
 import { RiHome2Fill } from "react-icons/ri";
 
@@ -20,8 +21,12 @@ export default async function Page({
   const userid = (await params).userid
   // Retreive data from backend
   const userData = await getUserData(userid);
+  // Old profile links use discord ids, send them to the guid based url
+  if(userData['guid'] && String(userData['guid']) !== userid) {
+    redirect(`/profile/${userData['guid']}`)
+  }
   // Get status of user being online
-  const onlineData = await isUserOnline(userData['discord_id'])
+  const onlineData = await isUserOnline(userData['guid'])
 
   return (
     <main className="relative">

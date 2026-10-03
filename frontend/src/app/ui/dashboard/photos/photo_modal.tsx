@@ -49,11 +49,11 @@ export default function PhotoModal(props) {
       "title": "TITLE",
       "description": "DESCRIPTION",
       "upload_timestamp": "STRING OF TIME",
-      "uploader": "DISCORD ID",
-      "creator": "DISCORD ID",
+      "uploader": "USER GUID",
+      "creator": "USER GUID",
       "tagged_users": [
-          "DISCORD ID",
-          "DISCORD ID"
+          "USER GUID",
+          "USER GUID"
       ]
     }
   */

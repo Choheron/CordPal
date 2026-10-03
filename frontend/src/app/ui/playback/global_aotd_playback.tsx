@@ -21,10 +21,10 @@ export default async function GlobalAotdPlayback(props) {
       return {
         key: index,
         position: index + 1,
-        userdiscordid: (
-          <UserCard userDiscordID={data['album__submitted_by__discord_id']} isProfileLink={true}/>
+        usercard: (
+          <UserCard userId={data['album__submitted_by']} isProfileLink={true}/>
         ),
-        userid: data['album__submitted_by__discord_id'],
+        userid: data['album__submitted_by'],
         percentage: `${((parseFloat(data['selection_count'])/parseFloat(aotdStats['total_selections'])) * 100).toFixed(2)}%`,
         count: data['selection_count']
       }
@@ -35,7 +35,7 @@ export default async function GlobalAotdPlayback(props) {
         label: "#"
       },
       {
-        key: "userdiscordid",
+        key: "usercard",
         label: "USER",
       },
       {
@@ -62,10 +62,10 @@ export default async function GlobalAotdPlayback(props) {
       return {
         key: index,
         position: index + 1,
-        userdiscordid: (
-          <UserCard userDiscordID={data['submitted_by__discord_id']} isProfileLink={true}/>
+        usercard: (
+          <UserCard userId={data['submitted_by']} isProfileLink={true}/>
         ),
-        userid: data['submitted_by__discord_id'],
+        userid: data['submitted_by'],
         percentage: `${((parseFloat(data['submission_count'])/parseFloat(aotdStats['total_submissions'])) * 100).toFixed(2)}%`,
         count: data['submission_count']
       }
@@ -76,7 +76,7 @@ export default async function GlobalAotdPlayback(props) {
         label: "#"
       },
       {
-        key: "userdiscordid",
+        key: "usercard",
         label: "USER",
       },
       {

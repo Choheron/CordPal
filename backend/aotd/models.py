@@ -127,7 +127,6 @@ class UserAlbumOutage(models.Model):
   def dict(self):
     out = {}
     out['user_pk'] = self.user.pk
-    out['user_discord_id'] = self.user.discord_id
     out['user_nickname'] = self.user.nickname
     out['start_date'] = self.start_date.strftime('%Y-%m-%d')
     out['end_date'] = self.end_date.strftime('%Y-%m-%d')
@@ -135,7 +134,6 @@ class UserAlbumOutage(models.Model):
     out['admin_enacted'] = self.admin_enacted
     if(self.admin_enactor):
       out['admin_enactor_pk'] = self.admin_enactor.pk
-      out['admin_enactor_discord_id'] = self.admin_enactor.discord_id
       out['admin_enactor_nickname'] = self.admin_enactor.nickname
     out['creation_timestamp'] = self.creation_timestamp.strftime('%m/%d/%Y, %H:%M:%S')
     out['active'] = self.isActive()
@@ -193,7 +191,7 @@ class UserChanceCache(models.Model):
     out['last_updated'] = self.last_updated.strftime('%m/%d/%Y, %H:%M:%S')
     if(self.outage != None):
       out['outage'] = {}
-      out['outage']["target_user"] = self.outage.user.discord_id
+      out['outage']["target_user"] = self.outage.user.guid
       out['outage']["admin_outage"] = f"{self.outage.admin_enacted}"
       out['outage']["outage_start"] = self.outage.start_date.strftime('%Y-%m-%d')
       out['outage']["outage_end"] = self.outage.end_date.strftime('%Y-%m-%d')
@@ -264,16 +262,16 @@ class Album(models.Model):
     out['cover_url'] = self.cover_url
     out['album_url'] = self.album_url
     out['submitter'] = self.submitted_by.nickname
-    out['submitter_id'] = self.submitted_by.discord_id
+    out['submitter_id'] = self.submitted_by.guid
     out['submission_date'] = self.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
     out['release_date_str'] = self.release_date_str
     out['user_comment'] = self.user_comment
     recent_transfer = self.ownership_history.order_by('-transferred_at').first()
     if recent_transfer and recent_transfer.previous_owner:
       out['submitter'] = recent_transfer.previous_owner.nickname
-      out['submitter_id'] = recent_transfer.previous_owner.discord_id
+      out['submitter_id'] = recent_transfer.previous_owner.guid
       out['owner'] = self.submitted_by.nickname
-      out['owner_id'] = self.submitted_by.discord_id
+      out['owner_id'] = self.submitted_by.guid
       out['transfer_date'] = recent_transfer.transferred_at.strftime("%m/%d/%Y, %H:%M:%S")
     if(include_raw):
       out['raw_album'] = self.raw_data
@@ -322,8 +320,8 @@ class Album(models.Model):
       entity_type="ALBUM_OWNER",
       entity_id=self.pk,
       details={
-          "previous_owner_id": previous_owner.discord_id if previous_owner else None,
-          "new_owner_id": rescuer.discord_id
+          "previous_owner_id": previous_owner.guid if previous_owner else None,
+          "new_owner_id": rescuer.guid
       }
     )
     self.submitted_by = rescuer
@@ -379,7 +377,7 @@ class AlbumCommentHistory(models.Model):
       "id": self.pk,
       "user_comment": self.user_comment,
       "recorded_at": self.recorded_at.strftime("%m/%d/%Y, %H:%M:%S"),
-      "edited_by": self.edited_by.discord_id if self.edited_by else None,
+      "edited_by": self.edited_by.guid if self.edited_by else None,
       "edited_by_nickname": self.edited_by.nickname if self.edited_by else None,
       "admin_edit": self.admin_edit,
     }
@@ -498,7 +496,7 @@ class Review(models.Model):
     """
     outObj = {}
     outObj['id'] = self.pk
-    outObj['user_id'] = self.user.discord_id
+    outObj['user_id'] = self.user.guid
     outObj['user_nickname'] = self.user.nickname
     outObj['album_id'] = self.album.mbid
     if(full):
@@ -716,7 +714,6 @@ class ReviewView(models.Model):
   def toJSON(self):
     """Return this ReviewView as a JSON. (For HTTP JSON Responses)"""
     out = {}
-    out['aotd_user_discord_id'] = self.aotdUser.user.discord_id
     out['aotd_user_id'] = self.aotdUser.pk
     out['review_id'] = self.review.pk
     out['first_viewed'] = self.first_viewed.strftime("%m/%d/%Y, %H:%M:%S")
@@ -870,7 +867,7 @@ class AlbumTag(models.Model):
     out['is_approved'] = self.is_approved
     if(not short):
       out['submitted_by'] = self.submitted_by.nickname if self.submitted_by else None
-      out['submitted_by_id'] = self.submitted_by.discord_id if self.submitted_by else None
+      out['submitted_by_id'] = self.submitted_by.guid if self.submitted_by else None
       out['submitted_at'] = self.submitted_at.strftime("%m/%d/%Y, %H:%M:%S")
       out['net_score'] = upvotes - downvotes
       out['upvotes'] = upvotes

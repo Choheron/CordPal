@@ -6,9 +6,10 @@ from .utils import (
   calculateUserReviewData,
   get_album_from_mb,
   retrieveAlbumSTD,
-  hasReviewedToday
+  hasReviewedToday,
+  getSessionAotdUser
 )
-from users.utils import getUserObj
+from users.utils import getUserObj, getSessionUser
 from .models import (
   AotdUserData,
   Album,
@@ -69,7 +70,7 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
   validityStatus['canSubmit'] = True
   validityStatus['reason'] = "User is able to submit albums."
   # Get user from database
-  userObj = getUserObj(request.session.get('discord_id'))
+  userObj = getSessionUser(request)
   # Fill date if it isnt provided (Defauly to current time)
   if(date == ""):
     date = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d')
@@ -137,7 +138,7 @@ def checkIfAlbumAlreadyExists(request: HttpRequest, release_group_id: str):
     if(albumObject):
       logger.info(f"Album does already exist, name: {albumObject.title}!", extra={'crid': request.crid})
     out['exists'] = True
-    out['submitter_id'] = albumObject.submitted_by.discord_id
+    out['submitter_id'] = albumObject.submitted_by.guid
     out['submitter_nickname'] = albumObject.submitted_by.nickname
     out['submitter_active'] = albumObject.submitted_by.aotd_data.active # Determine if the user who submitted this album is active
     out['has_been_aotd'] = (DailyAlbum.objects.filter(album=albumObject).count() > 0) # Determine if the album attempting to be submitted as been AOTD before
@@ -173,7 +174,7 @@ def submitAlbum(request: HttpRequest):
     return JsonResponse(out, status=out['status'])
   except ObjectDoesNotExist as e:
     # Get user from database
-    user = getUserObj(request.session.get('discord_id'))
+    user = getSessionUser(request)
     # Query musicbrainz to get full album data using mbid (to avoid issues with params)
     newAlbum = get_album_from_mb(reqBody['album']['id'])
     # Populate submitter and user comment
@@ -206,7 +207,7 @@ def rescueAlbum(request: HttpRequest):
     logger.warning(f"rescueAlbum called with a non-POST method, returning 405.", extra={'crid': request.crid})
     return HttpResponse(status=405)
   reqBody = json.loads(request.body)
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   release_group_id = reqBody['album']['release-group']['id']
   logger.info(f"User {user.nickname} attempting to rescue album with release group ID {release_group_id}.", extra={'crid': request.crid})
   try:
@@ -248,14 +249,14 @@ def deleteAlbum(request: HttpRequest):
   try:
     albumObject = Album.objects.get(mbid = reqBody['album_id'])
     # Get user object from request
-    user = getUserObj(request.session['discord_id'])
+    user = getSessionUser(request)
     # If user has not submitted the attempted delete, throw an error (Does not apply to admins)
     if((albumObject.submitted_by != user) and (not user.is_staff)):
-      logger.warning(f"deleteAlbum: User {user.discord_id}/{user.nickname} attempted to delete Album: {reqBody['album_id']}, however did not submit said Album!", extra={'crid': request.crid})
+      logger.warning(f"deleteAlbum: User {user.guid}/{user.nickname} attempted to delete Album: {reqBody['album_id']}, however did not submit said Album!", extra={'crid': request.crid})
       return HttpResponse(status=403)
     # Check if the album has been AOtD
     if(DailyAlbum.objects.filter(album=albumObject).count() > 0):
-      logger.warning(f"deleteAlbum: User {user.discord_id}/{user.nickname} attempted to delete Album: {reqBody['album_id']}, FAILED due to Album having been AOtD!", extra={'crid': request.crid})
+      logger.warning(f"deleteAlbum: User {user.guid}/{user.nickname} attempted to delete Album: {reqBody['album_id']}, FAILED due to Album having been AOtD!", extra={'crid': request.crid})
       return HttpResponse(status=403)
     # Delete album object from database
     albumObject.delete(deleter=user, reason=reqBody['reason'])
@@ -293,7 +294,7 @@ def getAlbum(request: HttpRequest, mbid: str):
     out['artist'] = {}
     out['artist']['name'] = albumObj.artist
     out['artist']['href'] = (albumObj.artist_url if albumObj.artist_url != "" else albumObj.raw_data['album']['artists'][0]['external_urls']['aotd'])
-    out['submitter'] = albumObj.submitted_by.discord_id
+    out['submitter'] = albumObj.submitted_by.guid
     out['submitter_nickname'] = albumObj.submitted_by.nickname
     out['submitter_comment'] = albumObj.user_comment
     out['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
@@ -301,9 +302,9 @@ def getAlbum(request: HttpRequest, mbid: str):
     # If this album has been rescued, the original submitter is the previous owner in history
     recent_transfer = albumObj.ownership_history.order_by('-transferred_at').first()
     if recent_transfer and recent_transfer.previous_owner:
-      out['submitter'] = recent_transfer.previous_owner.discord_id
+      out['submitter'] = recent_transfer.previous_owner.guid
       out['submitter_nickname'] = recent_transfer.previous_owner.nickname
-      out['owner'] = albumObj.submitted_by.discord_id
+      out['owner'] = albumObj.submitted_by.guid
       out['owner_nickname'] = albumObj.submitted_by.nickname
       out['transfer_date'] = recent_transfer.transferred_at.strftime("%m/%d/%Y, %H:%M:%S")
     out['release_date_str'] = albumObj.raw_data['release-group']['first-release-date'] if ('first-release-date' in albumObj.raw_data['release-group'].keys()) else albumObj.release_date_str
@@ -439,7 +440,7 @@ def getAllAlbums(request: HttpRequest):
         'name': album.artist,
         'href': album.artist_url,
       },
-      'submitter': user.discord_id if user else None,
+      'submitter': user.guid if user else None,
       'submitter_avatar_url': user.get_avatar_url() if user else None,
       'submitter_active': AotdUserData.objects.get(user=user).active if user else None,
       'submitter_nickname': user.nickname if user else None,
@@ -528,8 +529,9 @@ def getLastXSubOrRescueAlbums(request: HttpRequest, count: int):
     obj['action_details'] = album_action.details
     if(album_action.action_type == "UPDATE"):
       # Dynamically append user data if it appears in action details (TODO: Make this more dynamic than just hardcoded stuff)
-      obj['action_details']['new_owner_nick'] = AotdUserData.objects.get(user__discord_id=obj['action_details']['new_owner_id']).user.nickname
-      obj['action_details']['previous_owner_nick'] = AotdUserData.objects.get(user__discord_id=obj['action_details']['previous_owner_id']).user.nickname
+      obj['action_details']['new_owner_nick'] = AotdUserData.objects.get(user__guid=obj['action_details']['new_owner_id']).user.nickname
+      previous_owner_id = obj['action_details']['previous_owner_id']
+      obj['action_details']['previous_owner_nick'] = AotdUserData.objects.get(user__guid=previous_owner_id).user.nickname if previous_owner_id else None
     # Append to List
     action_list.append(obj)
   return JsonResponse({ "action_list": action_list, "timestamp" : datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")})
@@ -589,9 +591,9 @@ def getAlbumsStats(request: HttpRequest):
     userData['submission_count'] = Album.objects.filter(submitted_by=user.user).count()
     userData['aotd_count'] = DailyAlbum.objects.filter(album__submitted_by=user.user).count()
     userData['unpicked_count'] = f"{max(0, (Album.objects.filter(submitted_by=user.user).count() - DailyAlbum.objects.filter(album__submitted_by=user.user, date__gte=two_year_ago).count()))}/100"
-    userData['discord_id'] = user.user.discord_id
+    userData['guid'] = user.user.guid
     userData['nickname'] = user.user.nickname
-    chance_view_response = json.loads(getChanceOfAotdSelect(request, user.user.discord_id).content)
+    chance_view_response = json.loads(getChanceOfAotdSelect(request, user.user.guid).content)
     userData['selection_blocked'] = (chance_view_response['block_type'] != None)
     userData['selection_chance'] = chance_view_response['percentage']
     userData['block_type'] = chance_view_response['block_type']
@@ -612,7 +614,7 @@ def getAlbumsStats(request: HttpRequest):
 ###
 # Get a specific user's Album Stats
 ###
-def getUserAlbumsStats(request: HttpRequest, user_discord_id: str | None = None):
+def getUserAlbumsStats(request: HttpRequest, user_guid: int | None = None):
   # Avoid circular import
   from .views_aotd import getChanceOfAotdSelect
   # Make sure request is a get request
@@ -622,7 +624,7 @@ def getUserAlbumsStats(request: HttpRequest, user_discord_id: str | None = None)
     res.status_code = 405
     return res
   # Get all aotd users
-  spotUser = AotdUserData.objects.get(user__discord_id=user_discord_id) if user_discord_id else AotdUserData.objects.get(user__discord_id=(request.session.get('discord_id')))
+  spotUser = AotdUserData.objects.get(user__guid=user_guid) if user_guid is not None else getSessionAotdUser(request)
   # Get user Data
   userData = {}
   two_year_ago = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date() - datetime.timedelta(days=730)
@@ -637,9 +639,9 @@ def getUserAlbumsStats(request: HttpRequest, user_discord_id: str | None = None)
     userData['last_selected_date'] = "--"
     userData['days_since_selected'] = (datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date() - spotUser.creation_timestamp.date()).days
   userData['unpicked_count'] = f"{max(0, (Album.objects.filter(submitted_by=spotUser.user).count() - DailyAlbum.objects.filter(album__submitted_by=spotUser.user, date__gte=two_year_ago).count()))}/100"
-  userData['discord_id'] = spotUser.user.discord_id
+  userData['guid'] = spotUser.user.guid
   userData['nickname'] = spotUser.user.nickname
-  chance_view_response = json.loads(getChanceOfAotdSelect(request, spotUser.user.discord_id).content)
+  chance_view_response = json.loads(getChanceOfAotdSelect(request, spotUser.user.guid).content)
   userData['selection_blocked'] = (chance_view_response['block_type'] != None)
   userData['selection_chance'] = chance_view_response['percentage']
   userData['block_type'] = chance_view_response['block_type']
@@ -712,14 +714,14 @@ def getSubmissionsByMonth(request: HttpRequest, year: str, month: str):
   out = {}
   # Get all submissions this month
   submissions = Album.objects.filter(submission_date__year=year, submission_date__month=month)
-  users = submissions.values_list('submitted_by__discord_id', flat=True).distinct()
+  users = submissions.values_list('submitted_by_id', flat=True).distinct()
   # Iterate through and get counts
   out['submission_counts'] = []
   for user_id in users:
     out['submission_counts'].append({
-        "discord_id": user_id, 
-        "count": submissions.filter(submitted_by__discord_id=user_id).count(),
-        "percent": ((submissions.filter(submitted_by__discord_id=user_id).count()/float(len(submissions))) * 100)
+        "guid": user_id, 
+        "count": submissions.filter(submitted_by_id=user_id).count(),
+        "percent": ((submissions.filter(submitted_by_id=user_id).count()/float(len(submissions))) * 100)
       })
   # Also build out an object containing all of the users submissions for the month and that users stats for the month
   out['user_stats'] = {}
@@ -727,9 +729,9 @@ def getSubmissionsByMonth(request: HttpRequest, year: str, month: str):
     # Temp stats dict
     user_stats = {}
     # Get submissions by this user
-    submissions_temp = submissions.filter(submitted_by__discord_id=user_id)
+    submissions_temp = submissions.filter(submitted_by_id=user_id)
     # Populate stats object
-    user_stats['discord_id'] = f"{user_id}", 
+    user_stats['guid'] = f"{user_id}", 
     user_stats["count"] = submissions_temp.count(),
     user_stats["percent"] = ((submissions_temp.count()/float(len(submissions))) * 100) if (len(submissions_temp) != 0) else 0
     user_stats["submissions"] = []
@@ -749,7 +751,7 @@ def getSubmissionsByMonth(request: HttpRequest, year: str, month: str):
 ###
 # Return true if user is the uploader of the selected album, false if not
 ###
-def isUserAlbumUploader(request: HttpRequest, mbid: str, user_discord_id: str = None):
+def isUserAlbumUploader(request: HttpRequest, mbid: str, user_guid: int | None = None):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning(f"isUserAlbumUploader called with a non-GET method, returning 405.", extra={'crid': request.crid})
@@ -757,7 +759,7 @@ def isUserAlbumUploader(request: HttpRequest, mbid: str, user_discord_id: str = 
     res.status_code = 405
     return res
   # If a user id is not provided, retrieve from request
-  user = getUserObj(user_discord_id if user_discord_id else request.session['discord_id'])
+  user = getUserObj(user_guid) if user_guid is not None else getSessionUser(request)
   # Get album using aotd ID
   album = Album.objects.get(mbid=mbid)
   # Get submitter status
@@ -786,13 +788,13 @@ def updateAlbumSubmission(request: HttpRequest):
   except ObjectDoesNotExist:
     return HttpResponse("Album not found", status=404)
   # Only the original submitter or staff may edit
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if album.submitted_by != user and not user.is_staff:
-    logger.warning(f"updateAlbumSubmission: User {user.discord_id}/{user.nickname} attempted to edit comment on album {mbid} without permission.", extra={'crid': request.crid})
+    logger.warning(f"updateAlbumSubmission: User {user.guid}/{user.nickname} attempted to edit comment on album {mbid} without permission.", extra={'crid': request.crid})
     return HttpResponse("Forbidden", status=403)
   album.user_comment = new_comment
   album.save(edited_by=user)
-  logger.info(f"updateAlbumSubmission: User {user.discord_id}/{user.nickname} updated comment on album {mbid}.", extra={'crid': request.crid})
+  logger.info(f"updateAlbumSubmission: User {user.guid}/{user.nickname} updated comment on album {mbid}.", extra={'crid': request.crid})
   return HttpResponse(status=200)
 
 
@@ -834,7 +836,7 @@ def getAlbumCommentHistory(request: HttpRequest, mbid: str):
     "id": None,
     "user_comment": album.user_comment,
     "created_at": current_created_at,
-    "edited_by": history_qs[0].edited_by.discord_id,
+    "edited_by": history_qs[0].edited_by.guid,
     "edited_by_nickname": history_qs[0].edited_by.nickname,
     "admin_edit": history_qs[0].admin_edit if history_qs else False
   }

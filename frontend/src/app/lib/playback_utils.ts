@@ -13,11 +13,11 @@ const getCookie = async (name: string) => {
 // Determine if CordPal Playback is available for the passed in params.
 // - RETURN: Boolen indicating availability
 //
-export async function isPlaybackAvailable(year, user_discord_id = null) {
+export async function isPlaybackAvailable(year, user_guid = null) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Create URL tail
-  const urlTail = (user_discord_id) ? `${year}/${user_discord_id}` : `${year}`
+  const urlTail = (user_guid) ? `${year}/${user_guid}` : `${year}`
   // Check if playback is available
   console.log(`isPlaybackAvailable: Sending request to backend '/playback/isPlaybackAvailable/${urlTail}'`)
   const playbackAvailableResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/playback/isPlaybackAvailable/${urlTail}`, {

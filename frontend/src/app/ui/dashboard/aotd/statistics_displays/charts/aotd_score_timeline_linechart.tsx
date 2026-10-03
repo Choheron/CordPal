@@ -32,8 +32,7 @@ export async function AOtDScoreTimelineLineChart(props) {
       value: item.value.toFixed(2), // The average value of the album by this timestamp
       user_id: item.user_id,
       user_nickname: item.user_nickname,
-      user_discord_id: item.user_discord_id,
-      user_avatar_url: await getUserAvatarURL(item.user_discord_id),
+      user_avatar_url: await getUserAvatarURL(item.user_id),
       type: item.type,
       score: item.score.toFixed(2), // The score given for this object
       review_id: item.review_id

@@ -27,7 +27,7 @@ urlpatterns = [
   path('getAotdUserCount', views_user.getAotdUserCount),
   path('getSelectionBlockedFlag', views_user.getSelectionBlockedFlag),
   # Below URL has two variations (one for lack of URL Param)
-  path('getHasReviewedToday/<str:user_discord_id>', views_user.getHasReviewedToday),
+  path('getHasReviewedToday/<int:user_guid>', views_user.getHasReviewedToday),
   path('getHasReviewedToday', views_user.getHasReviewedToday),
   path('getAotdUserSettings', views_user.getAotdUserSettings),
   ## ============================================================================================================
@@ -55,12 +55,12 @@ urlpatterns = [
   # Statistics Endpoints
   path('getAlbumsStats', views_album.getAlbumsStats),
   # Below URL has two variations (one for lack of URL Param)
-  path('getUserAlbumsStats/<str:user_discord_id>', views_album.getUserAlbumsStats),
+  path('getUserAlbumsStats/<int:user_guid>', views_album.getUserAlbumsStats),
   path('getUserAlbumsStats', views_album.getUserAlbumsStats),
   path('getLowestHighestAlbumStats', views_album.getLowestHighestAlbumStats), 
   path('getSubmissionsByMonth/<str:year>/<str:month>', views_album.getSubmissionsByMonth),
   # Below URL has two variations (one for lack of URL Param)
-  path('isUserAlbumUploader/<str:mbid>/<str:user_discord_id>', views_album.isUserAlbumUploader),
+  path('isUserAlbumUploader/<str:mbid>/<int:user_guid>', views_album.isUserAlbumUploader),
   path('isUserAlbumUploader/<str:mbid>', views_album.isUserAlbumUploader),
   path('updateAlbumSubmission', views_album.updateAlbumSubmission),
   path('getAlbumCommentHistory/<str:mbid>', views_album.getAlbumCommentHistory),
@@ -76,10 +76,10 @@ urlpatterns = [
   path('getUserReviewForAlbum/<str:mbid>/<str:date>', views_review.getUserReviewForAlbum),
   path('getUserReviewForAlbum/<str:mbid>', views_review.getUserReviewForAlbum),
   path('getAllUserReviewStats', views_review.getAllUserReviewStats),
-  path('getUserReviewStats/<str:user_discord_id>', views_review.getUserReviewStats),
+  path('getUserReviewStats/<int:user_guid>', views_review.getUserReviewStats),
   path('getSimilarReviewsForRatings', views_review.getSimilarReviewsForRatings),
   # Below URL has two variations, for lack of userID provided
-  path('getAllUserReviews/<str:user_discord_id>', views_review.getAllUserReviews),
+  path('getAllUserReviews/<int:user_guid>', views_review.getAllUserReviews),
   path('getAllUserReviews', views_review.getAllUserReviews),
   path('getReviewStatsByMonth/<str:year>/<str:month>', views_review.getReviewStatsByMonth),
   path('submitReviewReaction', views_review.submitReviewReaction),
@@ -111,7 +111,7 @@ urlpatterns = [
   path('getAotdDates/<str:mbid>', views_aotd.getAotdDates),
   # Below URL has two variations, one in which a date is provided and one where it isnt
   # Get chance a certian user's album will be picked given current conditions
-  path('getChanceOfAotdSelect/<str:user_discord_id>', views_aotd.getChanceOfAotdSelect),
+  path('getChanceOfAotdSelect/<int:user_guid>', views_aotd.getChanceOfAotdSelect),
   path('getChanceOfAotdSelect', views_aotd.getChanceOfAotdSelect),
   # Get all AOtD Instances for a month
   path('getAOtDByMonth/<str:year>/<str:month>', views_aotd.getAOtDByMonth),
@@ -126,7 +126,7 @@ urlpatterns = [
   path('createOutage', views_outage.createOutage),
   path('deleteOutage', views_outage.deleteOutage),
   # Below URL has two variations (one for lack of URL Param)
-  path('getUserOutages/<str:user_discord_id>', views_outage.getUserOutages),
+  path('getUserOutages/<int:user_guid>', views_outage.getUserOutages),
   path('getUserOutages', views_outage.getUserOutages),
   path('getCurrentOutages', views_outage.getCurrentOutages),
   path('getOutagesByDate/<str:date>', views_outage.getOutagesByDate),

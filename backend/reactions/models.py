@@ -25,7 +25,7 @@ class Reaction(models.Model):
     outObj['id'] = self.pk
     outObj['user_id'] = self.user.pk
     outObj['user_data'] = {
-      "discord_id": self.user.discord_id,
+      "guid": self.user.guid,
       "nickname": self.user.nickname
     }
     outObj['target_object_id'] = self.object_id

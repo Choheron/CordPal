@@ -19,7 +19,7 @@ export default async function ReviewAvatarCard(props) {
   // PopoverTrigger calls Children.only, which throws if React streams the trigger's
   // subtree as a lazy reference — resolve the async UserCard before rendering
   const userCard = await UserCard({
-    userDiscordID: review['user_id'],
+    userId: review['user_id'],
     customDescription: hideScores ? (
       <p className="text-xs text-gray-500 italic">Score hidden</p>
     ) : (

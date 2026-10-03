@@ -2,9 +2,9 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 
 from .utils import (
-  getUserObj,
+  getSessionUser,
   isUserAotdParticipant,
-  getAotdUserObj
+  getSessionAotdUser
 )
 
 from .models import (
@@ -45,7 +45,7 @@ def isAotdParticipant(request: HttpRequest):
     res.status_code = 405
     return res
   # Get user discord id
-  userObj = getAotdUserObj(request.session.get("discord_id"))
+  userObj = getSessionAotdUser(request)
   # return jsonResponse containing status
   return JsonResponse({'connected': (userObj != None)})
 
@@ -59,7 +59,7 @@ def enrollUser(request: HttpRequest):
     res.status_code = 405
     return res
   # Get user discord id
-  userObj = getUserObj(request.session.get("discord_id"))
+  userObj = getSessionUser(request)
   # Check if a user already exists
   try:
     aotdUserObj = AotdUserData.objects.get(user=userObj)

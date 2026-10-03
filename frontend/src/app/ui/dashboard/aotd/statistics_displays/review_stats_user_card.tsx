@@ -11,10 +11,10 @@ import { Conditional } from "../../conditional"
 
 // User Card showing the review stats for a user
 // Expected Props:
-//   - userDiscordID: String - User Discord ID for backend handling
+//   - userId: String - User GUID for backend handling
 //   - userReviewObj: Object - Object containing the following data/format:
 //        {
-//          "discord_id": review.user.discord_id, # This is the same as the key, just for ease of reference 
+//          "guid": review.user.guid, # This is the same as the key, just for ease of reference 
 //          "total_reviews": 0, 
 //          "review_score_sum": 0,
 //          "average_review_score": -1, # This will be calculated at the end
@@ -33,7 +33,7 @@ export default async function ReviewStatsUserCard(props) {
   // PopoverTrigger calls Children.only, which throws if React streams the trigger's
   // subtree as a lazy reference — resolve the async UserCard before rendering
   const triggerUserCard = await UserCard({
-    userDiscordID: reviewData['discord_id'],
+    userId: reviewData['guid'],
     inactive: !reviewData['active'],
     avatarClassNameOverride: "size-[40px]",
     customDescription: <p>Click for review stats</p>,
@@ -57,7 +57,7 @@ export default async function ReviewStatsUserCard(props) {
       </PopoverTrigger>
       <PopoverContent className="max-w-[350px]">
         <UserCard 
-          userDiscordID={props.userDiscordID}
+          userId={props.userId}
           avatarClassNameOverride="size-[40px]"
           customDescription={
             <p>Review Statistics</p>

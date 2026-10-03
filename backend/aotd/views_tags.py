@@ -6,7 +6,7 @@ from django.db.models import Count
 import json
 import logging
 
-from users.utils import getUserObj
+from users.utils import getSessionUser
 from votes.models import Vote
 from .models import Album, AlbumTag, GlobalTag
 
@@ -38,7 +38,7 @@ def getTagsForAlbum(request: HttpRequest, mbid: str):
   except ObjectDoesNotExist:
     return JsonResponse({'error': 'Album not found'}, status=404)
   # Get Tags for the album including if the user has cast a vote on the tag
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   tags = AlbumTag.objects.filter(album=album).order_by('-is_approved', '-submitted_at')
   return JsonResponse({'tags': [t.toJSON(user=user) for t in tags]})
 
@@ -52,7 +52,7 @@ def submitTag(request: HttpRequest):
     res.status_code = 405
     return res
   # Retreieve user submitting the tag
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user:
     logger.error("User is not authenticated", extra={'crid': request.crid})
     return JsonResponse({'error': 'Not authenticated'}, status=401)
@@ -109,7 +109,7 @@ def voteOnTag(request: HttpRequest):
     res.status_code = 405
     return res
   # Retreieve user submitting the tag
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user:
     logger.error("User is not authenticated", extra={'crid': request.crid})
     return JsonResponse({'error': 'Not authenticated'}, status=401)
@@ -154,7 +154,7 @@ def removeVoteFromTag(request: HttpRequest):
     res.status_code = 405
     return res
   # Retreieve user submitting the tag
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user:
     logger.error("User is not authenticated", extra={'crid': request.crid})
     return JsonResponse({'error': 'Not authenticated'}, status=401)
@@ -195,7 +195,7 @@ def deleteTag(request: HttpRequest):
     res.status_code = 405
     return res
   # Retreieve user submitting the tag
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user:
     logger.error("User is not authenticated", extra={'crid': request.crid})
     return JsonResponse({'error': 'Not authenticated'}, status=401)
@@ -274,7 +274,7 @@ def createGlobalTag(request: HttpRequest):
     res.status_code = 405
     return res
   # Get user creating the global tag
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user or not user.is_staff:
     return JsonResponse({'error': 'Admin access required'}, status=403)
   # Parse JSON Body
@@ -299,7 +299,7 @@ def deleteGlobalTag(request: HttpRequest):
     res.status_code = 405
     return res
   # Get user deleting the global tag
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user or not user.is_staff:
     return JsonResponse({'error': 'Admin access required'}, status=403)
   # Parse JSON Body
@@ -324,7 +324,7 @@ def getGlobalTags(request: HttpRequest):
     res.status_code = 405
     return res
   # Get user requesting tags and ensure they are admin
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user or not user.is_staff:
     return JsonResponse({'error': 'Admin access required'}, status=403)
   # Return list of tags

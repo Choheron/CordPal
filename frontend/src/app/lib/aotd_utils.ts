@@ -888,7 +888,7 @@ export async function getUserAlbumsStats(userId: string = "") {
 //
 // Get user's similarly rated albums for the review slider tooltip
 //
-export async function getSimilarReviewsForRatings(user_discord_id: string) {
+export async function getSimilarReviewsForRatings(user_guid: string) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   
@@ -897,7 +897,7 @@ export async function getSimilarReviewsForRatings(user_discord_id: string) {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
-    next: { tags: [`review_submissions_${user_discord_id}`] },
+    next: { tags: [`review_submissions_${user_guid}`] },
     headers: {
       Cookie: `sessionid=${sessionCookie};`
     },
@@ -931,11 +931,11 @@ export async function getAotdDates(mbid) {
 //
 // Get the percentage chance of a user's album submission being picked for AOtD
 //
-export async function getChanceOfAotdSelect(user_discord_id: string = "") {
+export async function getChanceOfAotdSelect(user_guid: string = "") {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Determine URL tail
-  const urlTail = (user_discord_id != "") ? `/${user_discord_id}` : ""
+  const urlTail = (user_guid != "") ? `/${user_guid}` : ""
   
   console.log(`getChanceOfAotdSelect: Sending request to backend '/aotd/getChanceOfAotdSelect${urlTail}'`)
   const aotdChanceResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getChanceOfAotdSelect${urlTail}`, {
@@ -1021,11 +1021,11 @@ export async function getReviewStatsByMonth(year: string = "", month: string = "
 //
 // Get outage dates for a user
 //
-export async function getUserOutages(user_discord_id = null) {
+export async function getUserOutages(user_guid = null) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Determine URL tail
-  const urlTail = (user_discord_id) ? `/${user_discord_id}` : ""
+  const urlTail = (user_guid) ? `/${user_guid}` : ""
   // Make backend request
   console.log(`getOutages: Sending request to backend '/aotd/getUserOutages${urlTail}'`)
   const getOutagesResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getUserOutages${urlTail}`, {

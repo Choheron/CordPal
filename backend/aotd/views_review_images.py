@@ -12,7 +12,7 @@ from .review_image_utils import (
   MAX_UPLOAD_BYTES,
   ORPHAN_GRACE_HOURS,
 )
-from users.utils import getUserObj
+from users.utils import getSessionUser
 from django.utils import timezone
 
 import logging
@@ -32,25 +32,25 @@ def uploadReviewImage(request: HttpRequest):
     res.status_code = 405
     return res
   # Retrieve the requesting user from the session; no user means no valid session cookie
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user:
     logger.error("uploadReviewImage called by unauthenticated user.", extra={'crid': request.crid})
     return JsonResponse({'success': False, 'error': 'Not authenticated'}, status=401)
   # Only AOTD-enrolled users can write reviews, so only they can own review images
   aotdUserObj = AotdUserData.objects.filter(user=user).first()
   if not aotdUserObj:
-    logger.warning("uploadReviewImage called by a user with no AOTD enrollment.", extra={'crid': request.crid, 'discord_id': user.discord_id, 'nickname': user.nickname})
+    logger.warning("uploadReviewImage called by a user with no AOTD enrollment.", extra={'crid': request.crid, 'user_guid': user.guid, 'nickname': user.nickname})
     return JsonResponse({'success': False, 'error': 'Not enrolled in Album of the Day'}, status=403)
   # Retrieve file from attachment; a request with no file is a client error, not a crash
   img_file = request.FILES.get('attached_image')
   if img_file is None:
-    logger.warning("uploadReviewImage called with no attached_image file.", extra={'crid': request.crid, 'discord_id': user.discord_id, 'files_received': list(request.FILES.keys())})
+    logger.warning("uploadReviewImage called with no attached_image file.", extra={'crid': request.crid, 'user_guid': user.guid, 'files_received': list(request.FILES.keys())})
     return JsonResponse({'success': False, 'error': 'Upload failed as no image file was provided for upload: attached_image file is required'}, status=400)
   # Reject oversized uploads before reading their bytes into memory. Django reports size from the upload handler
   # without loading the file, so this check is free. The client downscales photos before sending, so hitting this
   # means the browser-side resize failed or was bypassed.
   if img_file.size > MAX_UPLOAD_BYTES:
-    logger.warning("uploadReviewImage rejected an oversized file.", extra={'crid': request.crid, 'discord_id': user.discord_id, 'upload_name': img_file.name, 'upload_size': img_file.size, 'max_bytes': MAX_UPLOAD_BYTES})
+    logger.warning("uploadReviewImage rejected an oversized file.", extra={'crid': request.crid, 'user_guid': user.guid, 'upload_name': img_file.name, 'upload_size': img_file.size, 'max_bytes': MAX_UPLOAD_BYTES})
     return JsonResponse({'success': False, 'error': f'File is too large ({img_file.size} bytes). Maximum size is {MAX_UPLOAD_BYTES // (1024 * 1024)} MB'}, status=400)
   # Handle processing and storage of image, as well as creation of a ReviewImage
   try:

@@ -16,7 +16,7 @@ const vibes = Great_Vibes ({
 
 export default async function QuoteItem(props) {
   const textStyle = (props['cursive'] == 'true') ? `${dancing.className}` : `${albertSans.className}`;
-  const userID = (props.quoteObject.speaker) ? props.quoteObject.speaker.discord_id : props.quoteObject.speaker_discord_id
+  const userID = (props.quoteObject.speaker) ? props.quoteObject.speaker.guid : null
   const nickname = (props.quoteObject.speaker) ? props.quoteObject.speaker.nickname : props.quoteObject.speaker_discord_id
 
   // Apply Regex on markdown style quotes
@@ -34,7 +34,7 @@ export default async function QuoteItem(props) {
       <div className="flex flex-col z-10 justify-around w-full">
         <div className="flex w-fit">
           <UserCard 
-            userDiscordID={userID} 
+            userId={userID} 
             fallbackName={nickname}
             avatarClassNameOverride={"flex-shrink-0 size-[20px] xl:size-[40px]"}
           />

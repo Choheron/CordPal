@@ -51,9 +51,27 @@ def getSpotifyUser(discord_id):
     return None
   
 
-def getUserObj(discord_id):
-  """Return User Object corresponding to discord id"""
-  try:
-    return User.objects.filter(discord_id=discord_id).first()
-  except ObjectDoesNotExist:
-    return None
+def getUserObj(user_guid):
+  """Return User Object corresponding to guid"""
+  return User.objects.filter(guid=user_guid).first()
+
+
+def getUserObjByDiscordId(discord_id):
+  """Return User Object corresponding to discord id (For data keyed by discord, e.g. the bot)"""
+  return User.objects.filter(discord_id=discord_id).first()
+
+
+def getSessionUser(request: HttpRequest):
+  """Return User Object for the session's user guid, or None"""
+  user_guid = request.session.get('user_guid')
+  if user_guid is None:
+    # Sessions created before the guid switch only hold discord_id, upgrade them in place
+    legacy_discord_id = request.session.get('discord_id')
+    if legacy_discord_id is None:
+      return None
+    user = User.objects.filter(discord_id=legacy_discord_id).first()
+    if user is not None:
+      request.session['user_guid'] = user.guid
+      request.session.pop('discord_id', None)
+    return user
+  return User.objects.filter(guid=user_guid).first()

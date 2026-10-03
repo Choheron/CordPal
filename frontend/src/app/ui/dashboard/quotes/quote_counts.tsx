@@ -17,7 +17,7 @@ export default async function QuoteCounts(props) {
         <div key={userSum['count']} className="flex justify-between w-full min-w-64">
           <div>
             <UserCard 
-              userDiscordID={userSum['discord_id']} 
+              userId={userSum['guid']} 
               fallbackName={userSum['nickname']} 
               isProfileLink={true}
             />

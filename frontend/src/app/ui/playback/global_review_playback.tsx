@@ -16,10 +16,10 @@ export default async function GlobalReviewPlayback(props) {
       return {
         key: index,
         position: index + 1,
-        userdiscordid: (
-          <UserCard userDiscordID={data['user__discord_id']} isProfileLink={true}/>
+        usercard: (
+          <UserCard userId={data['user']} isProfileLink={true}/>
         ),
-        userid: data['user__discord_id'],
+        userid: data['user'],
         percentage: `${((parseFloat(data['total_reviews'])/parseFloat(reviewStats['total_reviews'])) * 100).toFixed(2)}%`,
         count: data['total_reviews'],
         streak: `🔥 ${data['longest_review_streak']}`
@@ -31,7 +31,7 @@ export default async function GlobalReviewPlayback(props) {
         label: "#"
       },
       {
-        key: "userdiscordid",
+        key: "usercard",
         label: "USER",
       },
       {
@@ -56,7 +56,7 @@ export default async function GlobalReviewPlayback(props) {
           {/* Most Review Edits */}
           <PlaybackAward 
             title="The Thinker"
-            userId={reviewStats['most_review_edits']['review__user__discord_id']} 
+            userId={reviewStats['most_review_edits']['review__user']} 
             flavor_text="Are you sure?"
             emoji="🖋️"
             showNickname
@@ -72,7 +72,7 @@ export default async function GlobalReviewPlayback(props) {
           {/* Least Review Edits */}
           <PlaybackAward 
             title="Set In Stone"
-            userId={reviewStats['least_review_edits']['review__user__discord_id']} 
+            userId={reviewStats['least_review_edits']['review__user']} 
             flavor_text="Type Once, Cry Once"
             emoji="🗿"
             showNickname
@@ -95,10 +95,10 @@ export default async function GlobalReviewPlayback(props) {
       return {
         key: index,
         position: index + 1,
-        userdiscordid: (
-          <UserCard userDiscordID={data['user__discord_id']} isProfileLink={true}/>
+        usercard: (
+          <UserCard userId={data['user']} isProfileLink={true}/>
         ),
-        userid: data['user__discord_id'],
+        userid: data['user'],
         count: data['average_score_given'].toFixed(3)
       }
     })
@@ -108,7 +108,7 @@ export default async function GlobalReviewPlayback(props) {
         label: "#"
       },
       {
-        key: "userdiscordid",
+        key: "usercard",
         label: "USER",
       },
       {
@@ -123,7 +123,7 @@ export default async function GlobalReviewPlayback(props) {
           {/* Biggest Lover */}
           <PlaybackAward 
             title="Biggest Lover"
-            userId={reviewStats['highest_average']['user__discord_id']} 
+            userId={reviewStats['highest_average']['user']} 
             flavor_text="I just think they're neat"
             emoji="❤️"
             showNickname
@@ -139,7 +139,7 @@ export default async function GlobalReviewPlayback(props) {
           {/* Biggest Hater */}
           <PlaybackAward 
             title="Biggest Hater"
-            userId={reviewStats['lowest_average']['user__discord_id']} 
+            userId={reviewStats['lowest_average']['user']} 
             flavor_text="This shit ass"
             emoji="💔"
             showNickname
@@ -164,10 +164,10 @@ export default async function GlobalReviewPlayback(props) {
       return {
         key: index,
         position: index + 1,
-        userdiscordid: (
-          <UserCard userDiscordID={data['user__discord_id']} isProfileLink={true}/>
+        usercard: (
+          <UserCard userId={data['user']} isProfileLink={true}/>
         ),
-        userid: data['user__discord_id'],
+        userid: data['user'],
         count: data['review_score_std'].toFixed(3)
       }
     })
@@ -177,7 +177,7 @@ export default async function GlobalReviewPlayback(props) {
         label: "#"
       },
       {
-        key: "userdiscordid",
+        key: "usercard",
         label: "USER",
       },
       {
@@ -194,7 +194,7 @@ export default async function GlobalReviewPlayback(props) {
           {/* Mr. Opinionated */}
           <PlaybackAward 
             title="Mr. Opinionated"
-            userId={reviewStats['highest_stddev']['user__discord_id']} 
+            userId={reviewStats['highest_stddev']['user']} 
             flavor_text="Highest Standard Deviation"
             emoji="🎭"
             showNickname
@@ -210,7 +210,7 @@ export default async function GlobalReviewPlayback(props) {
           {/* Ol' Reliable */}
           <PlaybackAward 
             title={`Ol' Reliable`}
-            userId={reviewStats['lowest_stddev']['user__discord_id']} 
+            userId={reviewStats['lowest_stddev']['user']} 
             flavor_text="Lowest Standard Deviation"
             emoji="🎯"
             showNickname
