@@ -50,7 +50,7 @@ export default async function ReviewAvatarCard(props) {
       {!hideScores && (
         <div className="ml-12 max-h-[20px] line-clamp-1">
           <div
-            className="prose prose-invert prose-sm text-gray-500"
+            className="prose prose-invert prose-sm text-gray-500 [&_a]:pointer-events-none"
             dangerouslySetInnerHTML={{__html: reviewMessage}}
           />
         </div>

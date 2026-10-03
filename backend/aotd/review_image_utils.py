@@ -62,9 +62,10 @@ REVIEW_IMAGE_PATH_RE = re.compile(r'^/dashboard/aotd/api/review-image/([0-9a-f]{
 #   Color/TextStyle -> span
 #   Image           -> img
 #   Youtube         -> div iframe
+#   Link            -> a
 # Verify against editor.getHTML() with every toolbar button, an emoji, and a YouTube link before trusting this list.
 ALLOWED_TAGS = {
-  'p', 'br', 'strong', 'em', 's', 'b', 'i',
+  'p', 'br', 'strong', 'em', 's', 'b', 'i', 'a',
   'h1', 'h2', 'h3',
   'ul', 'ol', 'li',
   'blockquote', 'hr', 'code', 'pre',
@@ -78,6 +79,7 @@ ALLOWED_ATTR = {
   'img':    {'src', 'alt', 'title', 'class'},
   'div':    {'data-youtube-video'},
   'iframe': {'src', 'width', 'height', 'allowfullscreen', 'frameborder', 'start'},
+  'a':      {'href'}
 }
 # Value checks used by the attribute_filter callback:
 COLOR_STYLE_RE = re.compile(r'^\s*color:\s*(#[0-9a-fA-F]{3,8}|rgba?\([\d\s,.%]+\)|[a-zA-Z]+)\s*;?\s*$')
@@ -130,8 +132,9 @@ def sanitizeReviewHtml(html: str | None) -> str:
     attributes=ALLOWED_ATTR, # Which attribute names survive tag sanitization
     attribute_filter=_reviewAttributeFilter, # Checking attributes against a filter
     url_schemes={'http', 'https'}, # Allowed URL schemes
-    link_rel=None, # nh3 would otherwise inject rel="noopener noreferrer" onto anchors
+    link_rel="noopener noreferrer nofollow", # Default link settings
     strip_comments=True, # Default but added for clarity in the future
+    set_tag_attribute_values={'a': {'target': '_blank'}}
   )
   # The attribute filter can remove a src (a data: placeholder, a non-YouTube iframe) but nh3 leaves the now-empty
   # element behind. An <img> or <iframe> is stripped.
@@ -151,6 +154,8 @@ def _reviewAttributeFilter(tag: str, attribute: str, value: str) -> str | None:
     return value if value.startswith(('https://', 'http://', '/')) else None
   if tag == 'iframe' and attribute == 'src':
     return value if YOUTUBE_EMBED_RE.match(value) else None
+  if tag == 'a' and attribute == 'href':
+    return value if value.startswith(('https://', 'http://')) else None
   return value
 
 

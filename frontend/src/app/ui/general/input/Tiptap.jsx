@@ -4,10 +4,11 @@ import { Color } from '@tiptap/extension-color'
 import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
 import Youtube from '@tiptap/extension-youtube'
+import Link from '@tiptap/extension-link'
 import { CustomImage } from './replacers/customImage'
 import { EditorProvider, useCurrentEditor, Extension } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   RiArrowGoBackFill, RiArrowGoForwardFill, RiBold,
   RiFormatClear, RiH1, RiH2, RiH3, RiH4, RiH5, RiH6, RiImageAddLine, RiItalic,
@@ -205,10 +206,19 @@ export default function TipTap(props) {
     SmilieReplacer,
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
     TextStyle.configure({ types: [ListItem.name] }),
-    // Below is commented out because it causes conflicts with the tenor gif integration
-    // Link.configure({
-    //   defaultProtocol: 'https',
-    // }),
+    // Support Youtube Videos
+    Youtube.configure({
+      controls: true,
+      nocookie: false,
+      width: 300,
+      height: 168.75
+    }),
+    // Support Linking
+    Link.configure({
+      openOnClick: false, autolink: true, linkOnPaste: true, defaultProtocol: 'https',
+      protocols: ['http', 'https'],
+      HTMLAttributes: { target: '_blank', rel: 'noopener noreferrer nofollow' },
+    }),
     StarterKit.configure({
       bulletList: {
         keepMarks: true,
@@ -218,13 +228,6 @@ export default function TipTap(props) {
         keepMarks: true,
         keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
       },
-    }),
-    // Support Youtube Videos
-    Youtube.configure({
-      controls: true,
-      nocookie: false,
-      width: 300,
-      height: 168.75
     }),
     CustomImage.configure({
       inline: true,

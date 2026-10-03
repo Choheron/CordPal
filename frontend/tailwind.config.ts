@@ -95,6 +95,13 @@ const config: Config = {
         },
         DEFAULT: { // This is for default prose class
           css: {
+            // Link colors (prose-invert reads the -invert- variable)
+            '--tw-prose-links': theme("colors.blue.600"),
+            '--tw-prose-invert-links': theme("colors.blue.400"),
+            a: {
+              textDecoration: "none",
+              "&:hover": { textDecoration: "underline" },
+            },
             // Override specific Prose styles
             "div[data-youtube-video]": {
               cursor: "move",

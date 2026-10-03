@@ -216,7 +216,10 @@ export default async function AlbumDisplay(props: AlbumDisplayProps) {
         <div className="w-full max-w-full pt-2">
           <p className="text-sm italic text-gray-300 pl-2">Submitter included the following comment:</p>
           <div className="rounded-2xl p-2 text-sm bg-black/20 border border-neutral-800 max-h-32 sm:max-h-20 overflow-y-auto">
-            {submitter_comment}
+            {/* Split on URLs (capture group keeps them at odd indices) so they render as links; trailing punctuation is left as text */}
+            {submitter_comment.split(/(https?:\/\/[^\s]*[^\s.,!?;:)\]'"])/g).map((part, index) => (index % 2 == 1) ? (
+              <a key={index} href={part} target="_blank" rel="noopener noreferrer nofollow" className="text-blue-400 hover:underline break-all">{part}</a>
+            ) : part)}
           </div>
         </div>
       </Conditional>
