@@ -7,7 +7,7 @@ import QuoteItem from "../dashboard/quotes/quoteItem"
 // Display user quote data in a box
 // EXPECTED PROPS:
 // - userData: Object [REQUIRED] - User Data object to be passed in, expects data outlined in backend
-// - userId: String [REQUIRED] - User's discord ID
+// - userId: String [REQUIRED] - User's guid
 export default async function UserQuotesDisplay(props) {
   const userId = props.userId
   const quotesList: Array<Object> = await getUserQuotes(userId)

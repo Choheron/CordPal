@@ -37,7 +37,7 @@ export default async function AlbumOfTheDayBox(props) {
   // Get album data
   const albumOfTheDayObj = await getAlbumOfTheDayData()
   const albumReview = await getUserReviewForAlbum(albumData("album_id"))
-  const similarReviewData = await getSimilarReviewsForRatings(user_data['discord_id'])
+  const similarReviewData = await getSimilarReviewsForRatings(user_data['guid'])
   // Retrieve review data on this level instead of at reviewbox level
   let reviewList = await getReviewsForAlbum(albumData("album_id"));
   const albumTags = await getTagsForAlbum(albumData("album_id"));
@@ -152,7 +152,7 @@ export default async function AlbumOfTheDayBox(props) {
               initialTags={albumTags ?? []}
               isEnrolled={aotd_participant}
               isAdmin={isAdmin}
-              currentUserId={user_data["discord_id"]}
+              currentUserId={user_data["guid"]}
               readOnly={false}
               pollIntervalMs={30000}
               hideTags={hideTags}

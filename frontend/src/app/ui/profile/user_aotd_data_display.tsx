@@ -7,7 +7,7 @@ import ClientTimestamp from "../general/client_timestamp";
 
 // Display user favorite and least favorite albums
 // EXPECTED PROPS:
-// - userId: String [REQUIRED] - Discord User ID for data fetching from backend
+// - userId: String [REQUIRED] - User GUID for data fetching from backend
 // - aotdParticipant: Boolean [REQUIRED] - Boolean if a user is a participant in album of the day
 export default async function UserAotdDataDisplay(props) {
   const userId = props.userId
@@ -15,7 +15,7 @@ export default async function UserAotdDataDisplay(props) {
   // Get user fav and least fav album data
   // Review Stats Format:
   // {
-  //   discord_id: '143849159747698689',
+  //   guid: 2,
   //   total_reviews: 18,
   //   review_score_sum: 112,
   //   average_review_score: 6.222222222222222,

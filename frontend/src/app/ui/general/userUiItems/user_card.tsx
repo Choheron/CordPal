@@ -7,7 +7,7 @@ import { Conditional } from "../../dashboard/conditional";
 
 // GUI Representation for a single user
 // Expected Props:
-// - userDiscordID: String ID of user being displayed
+// - userId: GUID of user being displayed
 // - fallbackName: (Optional) String name for if data fetch fails
 // - fallbacksrc: (Optional) String image source for if data fetch fails
 // - customDescription: (Optional) HTML Code of a custom description
@@ -24,10 +24,10 @@ export default async function UserCard(props) {
   const inactive = (props.inactive) ? props.inactive : false;
 
   try {
-    var userData = await getUserData(props.userDiscordID)
-    var userAvatarURL = await getUserAvatarURL(props.userDiscordID)
+    var userData = await getUserData(props.userId)
+    var userAvatarURL = await getUserAvatarURL(props.userId)
     if(showOnlineDot) {
-      var onlineObject = await isUserOnline(props.userDiscordID)
+      var onlineObject = await isUserOnline(props.userId)
     } else {
       onlineObject = {online: null, status: "offline"}
     }
@@ -87,7 +87,7 @@ export default async function UserCard(props) {
   if(profileLink) {
     return(
       <a 
-        href={`/profile/${props.userDiscordID}`}
+        href={`/profile/${props.userId}`}
       >
         {user_card()}
       </a>

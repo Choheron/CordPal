@@ -6,7 +6,7 @@ import { onlineStatusToTailwindBgColor } from "@/app/lib/utils";
 
 // GUI Representation for a single user
 // Expected Props:
-// - userDiscordID: String ID of user being displayed
+// - userId: GUID of user being displayed
 // - fallbacksrc: (Optional) String image source for if data fetch fails
 // - isProfileLink: Boolean (Optional) [DEFAULT FALSE] - Should the usercard be treated as a link to the user's profile
 // - onlineBadge: Boolean (Optional) [DEFAULT FALSE] - Show a dot in the top left signifying if the user is online or not
@@ -16,10 +16,10 @@ export default async function UserAvatar(props) {
   const showOnlineDot = (props.onlineBadge) ? props.onlineBadge : false;
 
   try {
-    var userData = await getUserData(props.userDiscordID)
-    var userAvatarURL = await getUserAvatarURL(props.userDiscordID)
+    var userData = await getUserData(props.userId)
+    var userAvatarURL = await getUserAvatarURL(props.userId)
     if(showOnlineDot) {
-      var onlineObject = await isUserOnline(props.userDiscordID)
+      var onlineObject = await isUserOnline(props.userId)
     } else {
       onlineObject = {online: null, status: "offline"}
     }
@@ -61,7 +61,7 @@ export default async function UserAvatar(props) {
   if(profileLink) {
     return(
       <a 
-        href={`/profile/${props.userDiscordID}`}
+        href={`/profile/${props.userId}`}
       >
         {user_avatar()}
       </a>

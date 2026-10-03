@@ -93,7 +93,7 @@ export function RosenPieChart(props) {
                     <p>{d.data.name} </p>
                   ):(
                     <UserCard 
-                      userDiscordID={d.data.name} 
+                      userId={d.data.name} 
                     />
                   )}
                 </div>
@@ -138,7 +138,7 @@ export function RosenPieChart(props) {
                     ):(
                       <UserAvatar 
                         isProfileLink
-                        userDiscordID={d.data.name} 
+                        userId={d.data.name} 
                       />
                     )}
                   </div>

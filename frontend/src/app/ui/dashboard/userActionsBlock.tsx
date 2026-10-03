@@ -78,8 +78,9 @@ export default async function UserActionsBlock(props) {
     const isAdminAlbumDelete = (() => {
       if (action['entity_type'] !== "ALBUM" || action['action_type'] !== "DELETE" || !action['details']) return false
       const raw = action['details']['album_raw_data']
-      const deleter = action['user']['discord_id']
-      return deleter !== raw['submitter_id'] && deleter !== raw['owner_id']
+      // Album snapshots recorded before the guid switch store discord ids
+      const deleterIds = [action['user']['guid'], action['user']['discord_id']]
+      return !deleterIds.includes(raw['submitter_id']) && !deleterIds.includes(raw['owner_id'])
     })()
     return (
       <div className={`relative flex items-center w-full rounded-sm ${styles.glow} bg-zinc-800/40 hover:bg-zinc-700/40 transition-colors rounded-r-lg pl-2.5 pr-4 py-2 gap-3 cursor-default overflow-hidden`}>
@@ -93,7 +94,7 @@ export default async function UserActionsBlock(props) {
         </div>
         <div className="w-[30%] min-w-0">
           <UserCard
-            userDiscordID={action['user']['discord_id']}
+            userId={action['user']['guid']}
             avatarClassNameOverride={"flex-shrink-0 size-[28px] sm:size-[34px]"}
             fallbackName={"User Not Found"}
           />

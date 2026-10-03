@@ -45,10 +45,10 @@ def hasReviewedToday(user: User) -> bool:
   return Review.objects.filter(review_date__date=today, user=user).exists()
 
 
-def getAotdUserObj(discord_id):
-  """Return Aotd Specific User Object corresponding to discord id"""
+def getAotdUserObj(user_guid):
+  """Return Aotd Specific User Object corresponding to guid"""
   try:
-    return AotdUserData.objects.get(user__discord_id=discord_id)
+    return AotdUserData.objects.get(user__guid=user_guid)
   except ObjectDoesNotExist:
     return None
 
@@ -152,19 +152,19 @@ def checkSelectionFlag(aotd_user: AotdUserData, recent_review_users: list = None
   # Use pre-computed reviewer list if provided, otherwise query
   if recent_review_users is None:
     selection_cutoff = today - timedelta(days=2)
-    recent_review_users = list(Review.objects.filter(review_date__date__gte=selection_cutoff).values_list('user__discord_id', flat=True).distinct())
+    recent_review_users = list(Review.objects.filter(review_date__date__gte=selection_cutoff).values_list('user_id', flat=True).distinct())
   logger.debug(f"Checking selection blocked flag for user: {aotd_user.user.nickname} [Flag is currently: {aotd_user.selection_blocked_flag}]...")
   # Check if user is in the list of recent reviewers
-  blocked = aotd_user.user.discord_id not in recent_review_users
+  blocked = aotd_user.user.pk not in recent_review_users
   # If value is different, update it
   if(aotd_user.selection_blocked_flag != blocked):
     aotd_user.selection_blocked_flag = blocked
     logger.info(f"Changing `selection_blocked_flag` to {blocked} for {aotd_user.user.nickname}...")
     aotd_user.save()
   # Check if user should be marked as inactive
-  active_users = list(Review.objects.filter(review_date__gte=now() - timedelta(days=INACTIVE_DAYS)).values_list('user__discord_id', flat=True).distinct()) # A user is active if they have reviewed in the last 14 days
+  active_users = list(Review.objects.filter(review_date__gte=now() - timedelta(days=INACTIVE_DAYS)).values_list('user_id', flat=True).distinct()) # A user is active if they have reviewed in the last 14 days
   # A user is active if they are in the active users pool OR they appear in the outages pool as they had an outage or they have an account created within the last 14 days
-  active = (aotd_user.user.discord_id in active_users) or (aotd_user.user.discord_id in inactivity_outage_map) or (aotd_user.creation_timestamp > (now() - timedelta(days=INACTIVE_DAYS)))
+  active = (aotd_user.user.pk in active_users) or (aotd_user.user.pk in inactivity_outage_map) or (aotd_user.creation_timestamp > (now() - timedelta(days=INACTIVE_DAYS)))
   if(aotd_user.active != active):
     aotd_user.active = active
     logger.info(f"Changing `active` flag to {active} for {aotd_user.user.nickname}...")
@@ -181,7 +181,6 @@ def generateDayRatingTimeline(aotd_obj: DailyAlbum):
       "timestamp": reviewObj.last_updated.astimezone(pytz.UTC).isoformat(),
       "value": getAlbumPartialReviewScore(review = reviewObj), # The average value of the album by this timestamp
       "user_id": reviewObj.user.pk,
-      "user_discord_id": reviewObj.user.discord_id,
       "user_nickname": reviewObj.user.nickname,
       "type": "Review",
       "score": reviewObj.score, # The score given for this object
@@ -194,7 +193,6 @@ def generateDayRatingTimeline(aotd_obj: DailyAlbum):
       "timestamp": updateObj.last_updated.astimezone(pytz.UTC).isoformat(),
       "value": getAlbumPartialReviewScore(update = updateObj), # The average value of the album by this timestamp
       "user_id": updateObj.review.user.pk,
-      "user_discord_id": updateObj.review.user.discord_id,
       "user_nickname": updateObj.review.user.nickname,
       "type": "First Update" if is_first_submission else "Update",
       "score": updateObj.score, # The score given for this object
@@ -386,7 +384,7 @@ def calculateUserReviewData(aotdUserObj: AotdUserData):
 def buildUserReviewStatsData(aotdUser: AotdUserData) -> dict:
   '''Build the shared review stats dict for a single AotdUserData object, used by both single-user and all-user stats endpoints'''
   return {
-    "discord_id": aotdUser.user.discord_id,
+    "guid": aotdUser.user.guid,
     "total_reviews": aotdUser.total_reviews,
     "missed_reviews": aotdUser.missed_reviews,
     "review_score_sum": aotdUser.review_score_sum,

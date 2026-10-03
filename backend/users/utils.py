@@ -51,12 +51,14 @@ def getSpotifyUser(discord_id):
     return None
   
 
-def getUserObj(discord_id):
-  """Return User Object corresponding to discord id"""
-  try:
-    return User.objects.filter(discord_id=discord_id).first()
-  except ObjectDoesNotExist:
-    return None
+def getUserObj(user_guid):
+  """Return User Object corresponding to guid"""
+  return User.objects.filter(guid=user_guid).first()
+
+
+def getUserObjByDiscordId(discord_id):
+  """Return User Object corresponding to discord id (For data keyed by discord, e.g. the bot)"""
+  return User.objects.filter(discord_id=discord_id).first()
 
 
 def getSessionUser(request: HttpRequest):

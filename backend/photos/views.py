@@ -55,7 +55,7 @@ def uploadImage(request: HttpRequest):
     img_filetype = request.POST.get('filetype')
     # Retrieve additional needed data for DB field (Handle lack of provided image creator)
     if(img_creator != ""):
-      img_creator = User.objects.get(discord_id = img_creator)
+      img_creator = User.objects.get(guid = img_creator)
     else:
       img_creator = None
     img_uploader = getSessionUser(request)
@@ -63,7 +63,7 @@ def uploadImage(request: HttpRequest):
     img_tagged_users_list = []
     if(img_tagged_users != ""):
       for userID in img_tagged_users.split(","):
-        img_tagged_users_list.append(User.objects.get(discord_id = userID))
+        img_tagged_users_list.append(User.objects.get(guid = userID))
     # Generate new filename
     img_filename = uuid.uuid4().hex + "_" + img_filename
     # Create new image object
@@ -128,13 +128,13 @@ def getImageInfo(request: HttpRequest, imageID: int):
   imageData['title'] = image.title
   imageData['description'] = image.description
   imageData['upload_timestamp'] = image.upload_timestamp.strftime("%m/%d/%Y, %H:%M:%S")
-  imageData['uploader'] = image.uploader.discord_id
-  imageData['creator'] = image.artist.discord_id
+  imageData['uploader'] = image.uploader.guid
+  imageData['creator'] = image.artist.guid
   imageData['filename'] = image.filename[(image.filename.index("_") + 1):] # Remove hex in front for readability
   imageData['tagged_users'] = []
-  # Get list of discord IDs
+  # Get list of user guids
   for user in image.tagged_users.all():
-    imageData['tagged_users'].append(user.discord_id)
+    imageData['tagged_users'].append(user.guid)
   # Return json
   return JsonResponse(imageData)
 
@@ -194,7 +194,7 @@ def getImageIds(request: HttpRequest):
 
 
 ###
-# Return a list of all discord User IDs that have submitted photoshops
+# Return a list of all User guids that have submitted photoshops
 ###
 def getAllUploaders(request: HttpRequest):
   # Make sure request is a get request
@@ -205,12 +205,12 @@ def getAllUploaders(request: HttpRequest):
     return res
   # Get distinct uploaders
   uploaders = Image.objects.all().values("uploader").distinct()
-  # Iterate through uploaders and create list of discord IDs
+  # Iterate through uploaders and create list of user guids
   out = []
   for uploader in uploaders:
     uploader_obj = User.objects.get(pk=uploader['uploader'])
     tempDict = {}
-    tempDict['discord_id'] = uploader_obj.discord_id
+    tempDict['guid'] = uploader_obj.guid
     tempDict['avatar_url'] = uploader_obj.get_avatar_url()
     tempDict['nickname'] = uploader_obj.nickname
     # Store tempDict in out json
@@ -219,7 +219,7 @@ def getAllUploaders(request: HttpRequest):
 
 
 ###
-# Return a list of all discord User IDs that have been marked as artists
+# Return a list of all User guids that have been marked as artists
 ###
 def getAllArtists(request: HttpRequest):
   # Make sure request is a get request
@@ -230,12 +230,12 @@ def getAllArtists(request: HttpRequest):
     return res
   # Get distinct artists
   artists = Image.objects.all().values("artist").distinct()
-  # Iterate through artists and create list of discord IDs
+  # Iterate through artists and create list of user guids
   out = []
   for artist in artists:
     artist_obj = User.objects.get(pk=artist['artist'])
     tempDict = {}
-    tempDict['discord_id'] = artist_obj.discord_id
+    tempDict['guid'] = artist_obj.guid
     tempDict['avatar_url'] = artist_obj.get_avatar_url()
     tempDict['nickname'] = artist_obj.nickname
     # Store tempDict in out json

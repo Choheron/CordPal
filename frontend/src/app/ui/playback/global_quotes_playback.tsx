@@ -15,10 +15,10 @@ export default async function GlobalQuotesPlayback(props) {
       return {
         key: index,
         position: index + 1,
-        userdiscordid: (
-          <UserCard userDiscordID={data['speaker__discord_id']} isProfileLink={true}/>
+        usercard: (
+          <UserCard userId={data['speaker']} isProfileLink={true}/>
         ),
-        userid: data['speaker__discord_id'],
+        userid: data['speaker'],
         percentage: `${((parseFloat(data['total_quotes'])/parseFloat(quoteStats['total_submitted'])) * 100).toFixed(2)}%`,
         count: data['total_quotes']
       }
@@ -29,7 +29,7 @@ export default async function GlobalQuotesPlayback(props) {
         label: "#"
       },
       {
-        key: "userdiscordid",
+        key: "usercard",
         label: "USER",
       },
       {
@@ -56,10 +56,10 @@ export default async function GlobalQuotesPlayback(props) {
       return {
         key: index,
         position: index + 1,
-        userdiscordid: (
-          <UserCard userDiscordID={data['submitter__discord_id']} isProfileLink={true}/>
+        usercard: (
+          <UserCard userId={data['submitter']} isProfileLink={true}/>
         ),
-        userid: data['submitter__discord_id'],
+        userid: data['submitter'],
         percentage: `${((parseFloat(data['total_submissions'])/parseFloat(quoteStats['total_submitted'])) * 100).toFixed(2)}%`,
         count: data['total_submissions']
       }
@@ -70,7 +70,7 @@ export default async function GlobalQuotesPlayback(props) {
         label: "#"
       },
       {
-        key: "userdiscordid",
+        key: "usercard",
         label: "USER",
       },
       {
@@ -89,7 +89,7 @@ export default async function GlobalQuotesPlayback(props) {
           {/* Most Quoted User */}
           <PlaybackAward 
             title="The Public Speaker"
-            userId={quoteStats['most_quoted_user']['speaker__discord_id']} 
+            userId={quoteStats['most_quoted_user']['speaker']} 
             flavor_text="Dont Quote That"
             emoji="🔊"
             showNickname
@@ -106,7 +106,7 @@ export default async function GlobalQuotesPlayback(props) {
           {/* Most Quote Submissions */}
           <PlaybackAward 
             title="The Court Stenographer"
-            userId={quoteStats['most_quote_submissions']['submitter__discord_id']} 
+            userId={quoteStats['most_quote_submissions']['submitter']} 
             flavor_text="Somebody Quote That"
             emoji="👀"
             showNickname

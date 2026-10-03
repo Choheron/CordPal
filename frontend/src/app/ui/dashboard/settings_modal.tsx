@@ -260,7 +260,7 @@ export default function SettingsModal(props) {
           {() => (
             <>
               <ModalHeader className="flex flex-col items-center gap-1 pt-6 pb-2">
-                <a href={`/profile/${userInfo['discord_id']}`} className="group flex flex-col items-center gap-2">
+                <a href={`/profile/${userInfo['guid']}`} className="group flex flex-col items-center gap-2">
                   <img
                     src={props.avatarURL}
                     className="rounded-full w-20 ring-2 ring-white/10 group-hover:ring-white/30 transition-all"

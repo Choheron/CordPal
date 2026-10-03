@@ -32,18 +32,18 @@ export default function MonthlyUserStats(props) {
   const users = props.aotdUserData.map((user, index) => {
     const userObj = {
       key: index,
-      discord_id: user['discord_id'],
+      guid: user['guid'],
       avatar_url: user['avatar_src'],
       nickname: user['nickname']
     }
     // Only return a user if they have left reviews or submitted items
-    if(getUserReviewData(user['discord_id'], 'review_count') != 0) {
+    if(getUserReviewData(user['guid'], 'review_count') != 0) {
       return userObj
     }
   })
 
   // Display albums submitted by the user with the passed in id
-  const displayAlbums = (discord_id, title, albumsList) => {
+  const displayAlbums = (guid, title, albumsList) => {
     const getArtist = (albumObj) => {return (albumObj['artist']['name']) ? albumObj['artist']['name'] : albumObj['artist']}
 
     return (
@@ -81,27 +81,27 @@ export default function MonthlyUserStats(props) {
   }
 
   // Return user review data (for readability lower down)
-  function getUserReviewData(discord_id, data_key) {
+  function getUserReviewData(guid, data_key) {
     try{
-      return (user_review_stats[discord_id][data_key])
+      return (user_review_stats[guid][data_key])
     } catch {
       return 0
     }
   }
 
   // Return user submission data (for readability lower down)
-  function getUserSubData(discord_id, data_key) {
+  function getUserSubData(guid, data_key) {
     try{
-      return (user_sub_stats[discord_id][data_key])
+      return (user_sub_stats[guid][data_key])
     } catch {
       return 0
     }
   }
 
   // Return user selection data (for readability lower down)
-  function getUserSelData(discord_id, data_key) {
+  function getUserSelData(guid, data_key) {
     try{
-      return (user_sel_stats[discord_id][data_key])
+      return (user_sel_stats[guid][data_key])
     } catch {
       return 0
     }
@@ -142,13 +142,13 @@ export default function MonthlyUserStats(props) {
                   <div className="flex justify-between w-full mt-1">
                     <p className="my-auto">Reviews Submitted:</p>
                     <p className="my-auto px-4 py-1 bg-gray-800 rounded-full">
-                      {getUserReviewData(item.discord_id, 'review_count')}
+                      {getUserReviewData(item.guid, 'review_count')}
                     </p>
                   </div>
                   <div className="flex justify-between w-full mt-1">
                     <p className="my-auto">First Listens:</p>
                     <p className="my-auto px-4 py-1 bg-gray-800 rounded-full">
-                      {getUserReviewData(item.discord_id, 'first_listen_count')}
+                      {getUserReviewData(item.guid, 'first_listen_count')}
                     </p>
                   </div>
                   <Divider className="my-1" />
@@ -157,27 +157,27 @@ export default function MonthlyUserStats(props) {
                       Average Review Score:
                     </p>
                     <div className="font-normal">
-                      <p className={`my-auto mx-auto px-2 py-1 mb-1 ${ratingToTailwindBgColor(getUserReviewData(item.discord_id, 'review_average').toFixed(2))} rounded-full text-black w-fit`}>
-                        <b>{getUserReviewData(item.discord_id, 'review_average').toFixed(2)}</b>
+                      <p className={`my-auto mx-auto px-2 py-1 mb-1 ${ratingToTailwindBgColor(getUserReviewData(item.guid, 'review_average').toFixed(2))} rounded-full text-black w-fit`}>
+                        <b>{getUserReviewData(item.guid, 'review_average').toFixed(2)}</b>
                       </p>
                       <StarRating
-                        rating={getUserReviewData(item.discord_id, 'review_average')}
+                        rating={getUserReviewData(item.guid, 'review_average')}
                         textSize={"text-2xl"}
                       />
                     </div>
                   </div>
                   <CustomPercentageDisplay
                     title={"Percentage of First Time Listens:"}
-                    percentage={getUserReviewData(item.discord_id, 'first_listen_percentage').toFixed(2)}
+                    percentage={getUserReviewData(item.guid, 'first_listen_percentage').toFixed(2)}
                     underColor="bg-green-600"
-                    underLabel={getUserReviewData(item.discord_id, 'first_listen_count')}
+                    underLabel={getUserReviewData(item.guid, 'first_listen_count')}
                     overColor="bg-green-900"
-                    overLabel={getUserReviewData(item.discord_id, 'review_count') - getUserReviewData(item.discord_id, 'first_listen_count')} 
+                    overLabel={getUserReviewData(item.guid, 'review_count') - getUserReviewData(item.guid, 'first_listen_count')} 
                   />
                   <Divider className="my-1" />
                   <p>Review Scores/Percentages Chart:</p>
                   <RosenBarChartHorizontal 
-                    data={getUserReviewData(item.discord_id, 'score_breakdown').map((scoreObj, index) => {
+                    data={getUserReviewData(item.guid, 'score_breakdown').map((scoreObj, index) => {
                       return(
                         {
                           "key_label": "Score",
@@ -197,19 +197,19 @@ export default function MonthlyUserStats(props) {
                   <div className="flex justify-between w-full mt-1">
                     <p className="my-auto">Albums Submitted:</p>
                     <p className="my-auto px-4 py-1 bg-gray-800 rounded-full">
-                      {getUserSubData(item.discord_id, 'count')}
+                      {getUserSubData(item.guid, 'count')}
                     </p>
                   </div>
                   <CustomPercentageDisplay
                     title={`Percentage vs Total:`}
-                    percentage={getUserSubData(item.discord_id, 'percent').toFixed(2)}
+                    percentage={getUserSubData(item.guid, 'percent').toFixed(2)}
                     underColor="bg-green-600"
-                    underLabel={getUserSubData(item.discord_id, 'count')}
+                    underLabel={getUserSubData(item.guid, 'count')}
                     overColor="bg-green-900"
-                    overLabel={subData['submission_total'] - getUserSubData(item.discord_id, 'count')} 
+                    overLabel={subData['submission_total'] - getUserSubData(item.guid, 'count')} 
                   />
                   <Divider className="my-1" />
-                  {displayAlbums(item.discord_id, "Albums Submitted:", ((getUserSubData(item.discord_id, 'submissions')) ? getUserSubData(item.discord_id, 'submissions') : []))}
+                  {displayAlbums(item.guid, "Albums Submitted:", ((getUserSubData(item.guid, 'submissions')) ? getUserSubData(item.guid, 'submissions') : []))}
                 </div>
                 {/* Selection Stats for User */}
                 <div className="flex flex-col w-full mt-2 text-center border border-zinc-800 rounded-xl p-2 px-3 bg-slate-400/10">
@@ -218,22 +218,22 @@ export default function MonthlyUserStats(props) {
                   <div className="flex justify-between w-full mt-1">
                     <p className="my-auto">Albums Selected:</p>
                     <p className="my-auto px-4 py-1 bg-gray-800 rounded-full">
-                      {getUserSelData(item.discord_id, 'count')}
+                      {getUserSelData(item.guid, 'count')}
                     </p>
                   </div>
                   <CustomPercentageDisplay
                     title={`Percentage vs Total:`}
-                    percentage={getUserSelData(item.discord_id, 'percent').toFixed(2)}
+                    percentage={getUserSelData(item.guid, 'percent').toFixed(2)}
                     underColor="bg-green-600"
-                    underLabel={getUserSelData(item.discord_id, 'count')}
+                    underLabel={getUserSelData(item.guid, 'count')}
                     overColor="bg-green-900"
-                    overLabel={aotdStats['selection_total'] - getUserSelData(item.discord_id, 'count')} 
+                    overLabel={aotdStats['selection_total'] - getUserSelData(item.guid, 'count')} 
                   />
                   <Divider className="my-1" />
                   {displayAlbums(
-                    item.discord_id, 
+                    item.guid, 
                     "Albums Selected:", 
-                    ((getUserSelData(item.discord_id, 'selection_dates') != 0) ? getUserSelData(item.discord_id, 'selection_dates') : [] ).map((date) => aotdData[date])
+                    ((getUserSelData(item.guid, 'selection_dates') != 0) ? getUserSelData(item.guid, 'selection_dates') : [] ).map((date) => aotdData[date])
                   )}
                 </div>
               </div>

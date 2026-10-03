@@ -13,14 +13,14 @@ import {User} from "@heroui/user";
 // - label: label for select
 // - placeholder: placeholder for select
 // - setSelectionCallback: Function to callback for setting the selected data
-// - useNicknameKeys: Boolean - Use user nickname as key instead of discord id
+// - useNicknameKeys: Boolean - Use user nickname as key instead of guid
 // - selectedKeys: Set - List of keys to be selected on default
-// - idListOverride: List - OPTIONAL: List of Discord USER IDs to override from backend request 
+// - idListOverride: List - OPTIONAL: List of users to override from backend request 
 // - description: String - Description to show below dropdown
 // - isRequired: Boolean - If the dropdown is required or not
 export default function UserDropdown(props) {
   interface IUser {
-    discord_id: string;
+    guid: number;
     nickname: string;
     avatar_url: string;
   }
@@ -33,7 +33,7 @@ export default function UserDropdown(props) {
     async function fetchUsers() {
       const fetchedUsers: any = (props.idListOverride) ? props.idListOverride : await getUserList();
       // Deduplicate by the field used as the SelectItem key to prevent React key collision warnings
-      const keyField = props.useNicknameKeys ? 'nickname' : 'discord_id';
+      const keyField = props.useNicknameKeys ? 'nickname' : 'guid';
       const seen = new Set();
       const uniqueUsers = fetchedUsers.filter((u: IUser) => {
         if (seen.has(u[keyField])) return false;
@@ -62,7 +62,7 @@ export default function UserDropdown(props) {
       isRequired={props.isRequired}
     >
       {(user) => (
-        <SelectItem key={(props.useNicknameKeys) ? (user as IUser).nickname : (user as IUser).discord_id} textValue={(user as IUser).nickname}>
+        <SelectItem key={(props.useNicknameKeys) ? (user as IUser).nickname : (user as IUser).guid} textValue={(user as IUser).nickname}>
           <User
             className="w-full"
             name={(user as IUser)['nickname']}

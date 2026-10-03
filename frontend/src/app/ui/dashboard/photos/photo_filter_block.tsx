@@ -11,8 +11,8 @@ import Link from "next/link";
 
 // Block to filter photoshops by various criteria
 // Expected Props:
-// - uploaderList: List - List of Discord IDs to populate the uplaoder list
-// - artistList: List - List of Discord IDs to populate the artist list
+// - uploaderList: List - List of users to populate the uplaoder list
+// - artistList: List - List of users to populate the artist list
 export default function PhotoFilterBlock(props) {
   // Get Router
   const router = useRouter();

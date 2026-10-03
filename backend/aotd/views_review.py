@@ -127,7 +127,7 @@ def submitReview(request: HttpRequest):
     logger.info(f"Publishing review event to Redis stream: {redis_stream_name}")
     redis_connection.publish(redis_stream_name, json.dumps({'album_id': reqBody['album_id']}))
   except Exception as e:
-    logger.exception(f"ERROR: Failed to save review for user \"{userObj.nickname}\" ({userObj.discord_id}) targeting album {albumObj.mbid} for date {date}. Exception: {str(e)}!", extra={'crid': request.crid})
+    logger.exception(f"ERROR: Failed to save review for user \"{userObj.nickname}\" ({userObj.guid}) targeting album {albumObj.mbid} for date {date}. Exception: {str(e)}!", extra={'crid': request.crid})
     return HttpResponse(status=500)
   # Update user selection_blocked and activity flag status
   checkSelectionFlag(AotdUserData.objects.get(user=userObj))
@@ -322,8 +322,8 @@ def getAllUserReviewStats(request: HttpRequest):
     if(aotdUser.total_reviews == None or aotdUser.total_selected == None or aotdUser.review_ratio == 0 or aotdUser.review_seconds_since_midnight_sum == 0):
       calculateUserReviewData(aotdUser)
     # Create a new object for the user
-    reviewData[aotdUser.user.discord_id] = buildUserReviewStatsData(aotdUser)
-    reviewData[aotdUser.user.discord_id]["active"] = aotdUser.active
+    reviewData[aotdUser.user.guid] = buildUserReviewStatsData(aotdUser)
+    reviewData[aotdUser.user.guid]["active"] = aotdUser.active
   # Convert user reviews object to list
   outList = []
   for user in reviewData:
@@ -332,7 +332,7 @@ def getAllUserReviewStats(request: HttpRequest):
   return JsonResponse({'total_reviews': totalReviews, 'review_data': outList})
 
 
-def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
+def getUserReviewStats(request: HttpRequest, user_guid: int | None = None):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning(f"getUserReviewStats called with a non-GET method, returning 405.", extra={'crid': request.crid})
@@ -340,7 +340,7 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
     res.status_code = 405
     return res
   # Get user object from DB
-  user = User.objects.get(discord_id=user_discord_id) if user_discord_id else getSessionUser(request)
+  user = User.objects.get(guid=user_guid) if user_guid is not None else getSessionUser(request)
   # Get AotdUser Object
   aotdUser = AotdUserData.objects.get(user=user)
   # If this user has not had their data calculated, calculate it
@@ -425,7 +425,7 @@ def getSimilarReviewsForRatings(request: HttpRequest):
 ###
 # Get ALL Reviews made by a user
 ###
-def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
+def getAllUserReviews(request: HttpRequest, user_guid: int | None = None):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning(f"getAllUserReviews called with a non-GET method, returning 405.", extra={'crid': request.crid})
@@ -433,7 +433,7 @@ def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
     res.status_code = 405
     return res
   # Retrieve user from session cookie
-  user = getSessionUser(request) if (user_discord_id == None) else getUserObj(user_discord_id)
+  user = getSessionUser(request) if (user_guid == None) else getUserObj(user_guid)
   # Get all reviews
   reviewsObj = user.aotd_reviews.all()
   # Declare outlist and populate
@@ -470,13 +470,13 @@ def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
   stat_totalFirstListens = monthReviews.filter(first_listen=True).count()
   stat_firstListenPercentage = (stat_totalFirstListens/float(stat_reviewTotal) * 100) if (stat_reviewTotal != 0) else 0
   # Get stats related to user
-  users = monthReviews.values_list('user__discord_id', flat=True).distinct()
+  users = monthReviews.values_list('user_id', flat=True).distinct()
   # Track user's total review count and sum of reviews, get user averages
   stat_userStats = {}
   stat_biggestHater = (None, None)
   stat_biggestLover = (None, None)
   for user_id in users:
-    userReviews = monthReviews.filter(user__discord_id=user_id)
+    userReviews = monthReviews.filter(user_id=user_id)
     reviewCount = userReviews.count()
     reviewSum = userReviews.aggregate(Sum('score'))['score__sum']
     averageScore = (reviewSum/float(reviewCount)) if (reviewCount != 0) else 0
@@ -489,7 +489,7 @@ def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
         stat_biggestHater = (user_id, averageScore)
     # Add user data to userStats
     stat_userStats[user_id] = {
-      "discord_id": user_id,
+      "guid": user_id,
       "review_count": reviewCount,
       "review_sum": reviewSum,
       "review_average": averageScore,
@@ -512,8 +512,8 @@ def getReviewStatsByMonth(request: HttpRequest, year: str, month: str):
     for user_id in users:
       stat_userStats[user_id]['score_breakdown'].append({
         "score": f"{score + 0.0}",
-        "count": reviews.filter(user__discord_id=user_id).count(),
-        "percent": ((reviews.filter(score=score).filter(user__discord_id=user_id).count()/float(stat_userStats[user_id]['review_count']) * 100) if (stat_userStats[user_id]['review_count'] != 0) else 0)
+        "count": reviews.filter(user_id=user_id).count(),
+        "percent": ((reviews.filter(score=score).filter(user_id=user_id).count()/float(stat_userStats[user_id]['review_count']) * 100) if (stat_userStats[user_id]['review_count'] != 0) else 0)
       })
     # Increment score
     score += 0.5

@@ -80,17 +80,17 @@ export async function getAllOnlineData() {
 //
 // Retrieve discord user Avatar URL
 // Params:
-// - Discord ID String (Conditional on if we are searching for a different user)
+// - User GUID (Conditional on if we are searching for a different user)
 // RETURN: Json containing url
 //
-export async function getUserAvatarURL(discord_id = "") {
+export async function getUserAvatarURL(user_guid = "") {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Reurn false if cookie is missing
   if(sessionCookie === "") {
     return false;
   }
-  const avatarURLResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserAvatarURL${(discord_id === "") ? '' : '/' + discord_id}`, {
+  const avatarURLResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserAvatarURL${(user_guid === "") ? '' : '/' + user_guid}`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
@@ -105,17 +105,17 @@ export async function getUserAvatarURL(discord_id = "") {
 //
 // Retrieve boolean on if a user is an admin
 // Params:
-// - Discord ID String (Conditional on if we are searching for a different user)
+// - User GUID (Conditional on if we are searching for a different user)
 // RETURN: boolean
 //
-export async function isUserAdmin(discord_id = "") {
+export async function isUserAdmin(user_guid = "") {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Reurn false if cookie is missing
   if(sessionCookie === "") {
     return false;
   }
-  const isUserAdminResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/isUserAdmin${(discord_id === "") ? '' : '/' + discord_id}`, {
+  const isUserAdminResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/isUserAdmin${(user_guid === "") ? '' : '/' + user_guid}`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
@@ -131,17 +131,17 @@ export async function isUserAdmin(discord_id = "") {
 //
 // Retrieve boolean on if a user is an admin
 // Params:
-// - Discord ID String (Conditional on if we are searching for a different user)
+// - User GUID (Conditional on if we are searching for a different user)
 // RETURN: boolean
 //
-export async function isUserAlbumUploader(album_mbid: string, discord_id: string = "") {
+export async function isUserAlbumUploader(album_mbid: string, user_guid: string = "") {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Reurn false if cookie is missing
   if(sessionCookie === "") {
     return false;
   }
-  const isUserUploaderResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/isUserAlbumUploader/${album_mbid}${(discord_id === "") ? '' : '/' + discord_id}`, {
+  const isUserUploaderResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/isUserAlbumUploader/${album_mbid}${(user_guid === "") ? '' : '/' + user_guid}`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
@@ -157,17 +157,17 @@ export async function isUserAlbumUploader(album_mbid: string, discord_id: string
 //
 // Retrieve user data using session info
 // Params:
-// - Discord ID String (Conditional on if we are searching for a different user)
+// - User GUID (Conditional on if we are searching for a different user)
 // RETURN: Json containing user data from DB
 //
-export async function getUserData(discord_id = "") {
+export async function getUserData(user_guid = "") {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Reurn false if cookie is missing
   if(sessionCookie === "") {
     return false;
   }
-  const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserData${(discord_id === "") ? '' : '/' + discord_id}`, {
+  const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getUserData${(user_guid === "") ? '' : '/' + user_guid}`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
@@ -216,14 +216,14 @@ export async function updateUserData(updatedJSON) {
 // - JSON containing the database keys and the new values
 // RETURN: Boolean for if a user is online or not
 //
-export async function isUserOnline(discord_id) {
+export async function isUserOnline(user_guid) {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Reurn false if cookie is missing
   if(sessionCookie === "") {
     return false;
   }
-  const userOnlineResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/isOnline/${discord_id}`, {
+  const userOnlineResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/isOnline/${user_guid}`, {
     method: "GET",
     credentials: "include",
     cache: 'no-cache',
@@ -319,14 +319,14 @@ export async function isUserFieldUnique(field: string, value: string) {
 //
 // Get all possible login methods for user
 //
-export async function getUserLoginMethods(discord_id = "") {
+export async function getUserLoginMethods(user_guid = "") {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Reurn false if cookie is missing
   if(sessionCookie === "") {
     return false;
   }
-  const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getLoginMethods${(discord_id === "") ? '' : '/' + discord_id}`, {
+  const userDataResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/users/getLoginMethods${(user_guid === "") ? '' : '/' + user_guid}`, {
     method: "GET",
     credentials: "include",
     cache: 'force-cache',
@@ -414,7 +414,7 @@ export async function getRecentUserActions() {
 //
 // Return boolean of if user has reviewed today or not 
 //
-export async function getHasReviewedToday(discord_id = "") {
+export async function getHasReviewedToday(user_guid = "") {
   // Check for sessionid in cookies
   const sessionCookie = await getCookie('sessionid');
   // Reurn false if cookie is missing
@@ -422,7 +422,7 @@ export async function getHasReviewedToday(discord_id = "") {
     return false;
   }
   // Determine URL tail
-  const urlTail = (discord_id != "") ? `/${discord_id}` : ''
+  const urlTail = (user_guid != "") ? `/${user_guid}` : ''
   const userReviewTodayResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getHasReviewedToday${urlTail}`, {
     method: "GET",
     credentials: "include",

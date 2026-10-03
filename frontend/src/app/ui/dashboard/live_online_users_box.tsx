@@ -77,10 +77,10 @@ export default function OnlineUsersBox(props) {
             <Spinner className="w-full h-full" />
           ):(
               userList.sort((a, b) => userSort(a, b)).map((userObj, index) => {
-                const discord_id = userObj['discord_id']
+                const user_guid = userObj['guid']
                 return (
                   <a 
-                    href={`/profile/${discord_id}`}
+                    href={`/profile/${user_guid}`}
                     key={index}
                   >
                     <User
@@ -88,8 +88,8 @@ export default function OnlineUsersBox(props) {
                       name={userObj['nickname']}
                       description={(
                         <div className="flex">
-                          <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${onlineStatusToTailwindBgColor(onlineObject[discord_id]['status'])}`}></div>
-                          <p>{(onlineObject[discord_id] && onlineObject[discord_id]['online']) ? onlineObject[discord_id]['status'] : `Seen ${(onlineObject[discord_id]) ? onlineObject[discord_id]['last_seen'] : "--"}`}</p>
+                          <div className={`w-[8px] h-[8px] ml-0 mr-1 my-auto rounded-full border-1 border-black ${onlineStatusToTailwindBgColor(onlineObject[user_guid]['status'])}`}></div>
+                          <p>{(onlineObject[user_guid] && onlineObject[user_guid]['online']) ? onlineObject[user_guid]['status'] : `Seen ${(onlineObject[user_guid]) ? onlineObject[user_guid]['last_seen'] : "--"}`}</p>
                         </div>
                       )}
                       avatarProps={{

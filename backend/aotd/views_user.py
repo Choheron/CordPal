@@ -43,9 +43,9 @@ def getAotdUsersObj(request: HttpRequest):
   out = {}
   for spotUser in spotUserList:
     tempDict = model_to_dict(spotUser)
-    tempDict['discord_id'] = spotUser.user.discord_id
+    tempDict['guid'] = spotUser.user.guid
     # Store tempDict in out json
-    out[tempDict['discord_id']] = tempDict
+    out[tempDict['guid']] = tempDict
   return JsonResponse(out)
 
 
@@ -65,7 +65,7 @@ def getAotdUsersList(request: HttpRequest):
   out = []
   for spotUser in spotUserList:
     tempDict = model_to_dict(spotUser)
-    tempDict['discord_id'] = spotUser.user.discord_id
+    tempDict['guid'] = spotUser.user.guid
     tempDict['avatar_src'] = spotUser.user.get_avatar_url()
     tempDict['nickname'] = spotUser.user.nickname
     # Store tempDict in out json
@@ -108,7 +108,7 @@ def getAotdData(request: HttpRequest):
     userAOTDObj = AotdUserData.objects.filter(user = userObj).first()
     dir_response = model_to_dict(userAOTDObj)
     dir_response['user'] = userAOTDObj.user.nickname
-    dir_response['user_discord_id'] = userAOTDObj.user.discord_id
+    dir_response['user_guid'] = userAOTDObj.user.guid
     dir_response['streak_at_risk'] = userAOTDObj.isStreakAtRisk()
     return JsonResponse(dir_response)
   else:
@@ -145,7 +145,7 @@ def getAotdUserSettings(request: HttpRequest):
 ###
 # Return if the current user has reviewed today's AOTD
 ###
-def getHasReviewedToday(request: HttpRequest, user_discord_id: str | None = None):
+def getHasReviewedToday(request: HttpRequest, user_guid: int | None = None):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning(f"getHasReviewedToday called with a non-GET method, returning 405.", extra={'crid': request.crid})
@@ -154,11 +154,11 @@ def getHasReviewedToday(request: HttpRequest, user_discord_id: str | None = None
     return res
   # If a user is not passed in, get from session.
   # Else use the passed in user id.
-  if(user_discord_id is None):
+  if(user_guid is None):
     # Get user data from session
     user = getSessionUser(request)
   else:
-    user = getUserObj(user_discord_id)
+    user = getUserObj(user_guid)
   return JsonResponse({"has_reviewed_today": hasReviewedToday(user)})
 
 
@@ -177,5 +177,5 @@ def getSelectionBlockedFlag(request: HttpRequest):
   # Retrieve and return that user's flag status (non-enrolled users have no AotdUserData, treat them as not blocked)
   aotd_data = AotdUserData.objects.filter(user=user).first()
   flag_status = aotd_data.selection_blocked_flag if (aotd_data) else False
-  logger.info(f"Returning selection blocked flag status of {flag_status} for user {user.discord_id}...", extra={'crid': request.crid})
+  logger.info(f"Returning selection blocked flag status of {flag_status} for user {user.guid}...", extra={'crid': request.crid})
   return JsonResponse({"selection_blocked": flag_status})

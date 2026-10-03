@@ -121,13 +121,13 @@ def setAlbumOfDay(request: HttpRequest):
   # Define Album Object
   albumOfTheDay = None
   # Get all users currently in an outage
-  outage_users = list(UserAlbumOutage.objects.filter(start_date__lte=day, end_date__gte=day).values_list('user__discord_id', flat=True))
+  outage_users = list(UserAlbumOutage.objects.filter(start_date__lte=day, end_date__gte=day).values_list('user_id', flat=True))
   logger.warning(f"Outage Users: {outage_users}", extra={'crid': request.crid})
   # Get list of all users who are currently AOtD selection blocked
-  blocked_users = list(AotdUserData.objects.filter(selection_blocked_flag=True).values_list('user__discord_id', flat=True))
+  blocked_users = list(AotdUserData.objects.filter(selection_blocked_flag=True).values_list('user_id', flat=True))
   logger.warning(f"Blocked Users: {blocked_users}", extra={'crid': request.crid})
   # Get set of all eligible albums
-  albumPool = Album.objects.all().exclude(submitted_by__discord_id__in=blocked_users).exclude(submitted_by__discord_id__in=outage_users)
+  albumPool = Album.objects.all().exclude(submitted_by_id__in=blocked_users).exclude(submitted_by_id__in=outage_users)
   while(not selected):
     # If no eligible albums, error out..
     if(len(albumPool) == 0):
@@ -239,7 +239,7 @@ def calculateAOTDChances(request: HttpRequest):
   # Pre-compute recent reviewers once — passed to checkSelectionFlag to avoid N repeated queries
   # Cutoff is today - 2 days: a user is blocked if midnight tonight would be 3+ days since their last review
   selection_cutoff = day - datetime.timedelta(days=2)
-  recent_review_users = list(Review.objects.filter(review_date__date__gte=selection_cutoff).values_list('user__discord_id', flat=True).distinct())
+  recent_review_users = list(Review.objects.filter(review_date__date__gte=selection_cutoff).values_list('user_id', flat=True).distinct())
   # Single fetch of all users with annotations, forced to list so it can be reused in-memory
   user_list = list(AotdUserData.objects.select_related('user').annotate(
     total_album_submissions=Count('user__submitted_albums', distinct=True),
@@ -313,7 +313,7 @@ def calculateAOTDChances(request: HttpRequest):
 ###
 # Return the percentage chance that a user's album will be picked (taken from DB)
 ###
-def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
+def getChanceOfAotdSelect(request: HttpRequest, user_guid: int | None = None):
   # Make sure request is a get request
   if(request.method != "GET"):
     logger.warning(f"getChanceOfAotdSelect called with a non-GET method, returning 405.", extra={'crid': request.crid})
@@ -321,7 +321,7 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
     res.status_code = 405
     return res
   # Get current chance object from cache
-  aotdUser: AotdUserData = (getAotdUserObj(user_discord_id) if (user_discord_id != "") else getSessionAotdUser(request))
+  aotdUser: AotdUserData = (getAotdUserObj(user_guid) if (user_guid is not None) else getSessionAotdUser(request))
   # Get user percentage
   out: UserChanceCache = aotdUser.aotd_chance
   # Return object
@@ -365,7 +365,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
           lowest_aotd = aotd
           lowest_aotd_rating = rating
       # Increment submitter selection count
-      submitter = albumObj.submitted_by.discord_id
+      submitter = albumObj.submitted_by.guid
       if(submitter in selection_counts):
         selection_counts[submitter] += 1
       else:
@@ -380,7 +380,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
       temp['artist'] = {}
       temp['artist']['name'] = albumObj.artist
       temp['artist']['href'] = (albumObj.artist_url)
-      temp['submitter'] = albumObj.submitted_by.discord_id
+      temp['submitter'] = albumObj.submitted_by.guid
       temp['submitter_comment'] = albumObj.user_comment
       temp['submission_date'] = albumObj.submission_date.strftime("%m/%d/%Y, %H:%M:%S")
       # Attach rating of album
@@ -395,7 +395,7 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     for user in selection_counts.keys():
       datesList = list(date for date in out.keys() if (out[date]['submitter'] == user))
       tempObj = {
-        "discord_id": user, 
+        "guid": user, 
         "count": selection_counts[user], 
         "percent": ((selection_counts[user]/float(len(month_AOtD))) * 100), 
         "selection_dates": datesList

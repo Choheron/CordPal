@@ -113,7 +113,7 @@ export default async function Page({
         <div className="flex flex-col mb-3">
           <div className="group">
             <UserCard 
-              userDiscordID={review_data['user_id']} 
+              userId={review_data['user_id']} 
               customDescription={
                 <p className="text-gray-400/80 group-hover:underline">View User Profile</p>
               }

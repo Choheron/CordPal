@@ -64,10 +64,10 @@ export default async function GlobalReviewReactionPlayback(props) {
       return {
         key: index,
         position: index + 1,
-        userdiscordid: (
-          <UserCard userDiscordID={data['user__discord_id']} isProfileLink={true}/>
+        usercard: (
+          <UserCard userId={data['user']} isProfileLink={true}/>
         ),
-        userid: data['user__discord_id'],
+        userid: data['user'],
         percentage: `${((parseFloat(data['total_reactions'])/parseFloat(reactionStats['total_reactions'])) * 100).toFixed(2)}%`,
         count: data['total_reactions']
       }
@@ -78,7 +78,7 @@ export default async function GlobalReviewReactionPlayback(props) {
         label: "#"
       },
       {
-        key: "userdiscordid",
+        key: "usercard",
         label: "USER",
       },
       {
@@ -97,7 +97,7 @@ export default async function GlobalReviewReactionPlayback(props) {
           {/* Most Reactions Given */}
           <PlaybackAward 
             title="Emoji Enthusiast"
-            userId={reactionStats['most_reactions_given']['user__discord_id']} 
+            userId={reactionStats['most_reactions_given']['user']} 
             flavor_text="Reaction Andy"
             emoji="📣"
             showNickname
@@ -113,7 +113,7 @@ export default async function GlobalReviewReactionPlayback(props) {
           {/* Most Reactions Recieved */}
           <PlaybackAward 
             title="Crowd Pleaser"
-            userId={reactionStats['most_reactions_received']['user__discord_id']} 
+            userId={reactionStats['most_reactions_received']['user']} 
             flavor_text="Laughing Rat Farmer"
             emoji="🥇"
             showNickname

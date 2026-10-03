@@ -22,7 +22,7 @@ export default async function MonthlySubmissionCountsPie(props) {
   const submission_pie_chart_data = subData['submission_counts'].sort((a, b) => ((a["count"] < b["count"]) ? 1 : -1)).map((subObj, index) => {
     return(
       {
-        "name": subObj['discord_id'],
+        "name": subObj['guid'],
         "nameType": 1,
         "value": subObj['count'],
         "percent": `${Number(subObj['percent']).toFixed(2)}%`,

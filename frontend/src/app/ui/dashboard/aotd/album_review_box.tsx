@@ -178,7 +178,7 @@ export default function AlbumReviewBox(props) {
     out['score'] = `${rating}`
     out['comment'] = comment 
     out['first_listen'] = isFirstListen
-    out['userId'] = userData['discord_id']
+    out['userId'] = userData['guid']
     out['advanced'] = advanced
     if(advanced){
       out['trackData'] = songReviewObj

@@ -72,7 +72,7 @@ export default async function MonthlyReviewStats(props) {
           <Divider className="mb-1" />
           <UserCard
             isProfileLink
-            userDiscordID={biggest_lover_id}
+            userId={biggest_lover_id}
             customDescription={
               <StarRating
                 rating={user_stats[biggest_lover_id]['review_average']}
@@ -95,7 +95,7 @@ export default async function MonthlyReviewStats(props) {
           <Divider className="mb-1" />
           <UserCard
             isProfileLink
-            userDiscordID={biggest_hater_id}
+            userId={biggest_hater_id}
             customDescription={
               <StarRating
                 rating={user_stats[biggest_hater_id]['review_average']}

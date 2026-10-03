@@ -48,7 +48,7 @@ export default async function MusicStatsBox(props) {
       >
         <td className="line-clamp-1 mx-2">
           <UserCard
-            userDiscordID={user['discord_id']}
+            userId={user['guid']}
             avatarClassNameOverride="size-[35px] flex-shrink-0"
             inactive={!user['active']}
             customDescription={(
@@ -84,7 +84,7 @@ export default async function MusicStatsBox(props) {
         <td>
           <a 
             className="block mx-auto px-2 py-1 bg-gray-800 rounded-full w-fit" 
-            href={`/dashboard/aotd/album/all?aotd=1&submitter=${user['discord_id']}`}
+            href={`/dashboard/aotd/album/all?aotd=1&submitter=${user['guid']}`}
           >
             {user['aotd_count']}
           </a>
@@ -94,7 +94,7 @@ export default async function MusicStatsBox(props) {
         >
           <a 
             className="px-2 py-1 bg-gray-800 rounded-full w-fit"
-            href={`/dashboard/aotd/album/all?aotd=2&submitter=${user['discord_id']}`}
+            href={`/dashboard/aotd/album/all?aotd=2&submitter=${user['guid']}`}
           >
             {user['unpicked_count']}
           </a>
@@ -107,12 +107,12 @@ export default async function MusicStatsBox(props) {
   const reviewUserStatsList = userReviewStatsJson['review_data'].sort((a, b) => a['total_reviews'] < b['total_reviews'] ? 1 : -1).map((user) => {
     return (
       <div 
-        key={`${user['discord_id']}-${user['total_reviews']}`}
+        key={`${user['guid']}-${user['total_reviews']}`}
         className="flex justify-between w-full my-1"
       >
         <div className="w-3/5">
           <ReviewStatsUserCard 
-            userDiscordID={user['discord_id']} 
+            userId={user['guid']} 
             userReviewObj={user} 
           />
         </div>
@@ -214,7 +214,7 @@ export default async function MusicStatsBox(props) {
                     initialTags={highest_album_tags}
                     isEnrolled={aotd_participant}
                     isAdmin={isAdmin}
-                    currentUserId={user_data["discord_id"]}
+                    currentUserId={user_data["guid"]}
                     readOnly={true}
                   />
                 </div>
@@ -250,7 +250,7 @@ export default async function MusicStatsBox(props) {
                         initialTags={lowest_album_tags}
                         isEnrolled={aotd_participant}
                         isAdmin={isAdmin}
-                        currentUserId={user_data["discord_id"]}
+                        currentUserId={user_data["guid"]}
                         readOnly={true}
                       />
                     </div>

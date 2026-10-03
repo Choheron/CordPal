@@ -30,7 +30,7 @@ export default async function ReviewPopoverContent(props) {
   return (
     <div className="flex flex-col items-center pt-1 z-50">
       <UserCard 
-        userDiscordID={review['user_id']} 
+        userId={review['user_id']} 
         customDescription="View profile"
         isProfileLink
       />

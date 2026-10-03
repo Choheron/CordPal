@@ -35,8 +35,8 @@ def submitQuote(request: HttpRequest):
     logger.error("Request body malformed", extra={'crid': request.crid, "error_msg": repr(e)})
     return HttpResponse("Malformed Request Body.", status_code=400)
   # Attempt to retrieve user data for submitter and speaker
-  submitterObj: User = userUtils.getUserObj(submitterId)
-  speakerObj: User = userUtils.getUserObj(speakerId)
+  submitterObj: User = userUtils.getUserObjByDiscordId(submitterId)
+  speakerObj: User = userUtils.getUserObjByDiscordId(speakerId)
   # Log if either are not found
   if(submitterObj == None):
     logger.warning(f"User with submitter id of {submitterId} NOT FOUND.", extra={'crid': request.crid})
@@ -70,7 +70,7 @@ def submitQuote(request: HttpRequest):
   return HttpResponse(status_code=200)
 
 
-def getUserSpokenQuotes(request: HttpRequest, user_discord_id: str):
+def getUserSpokenQuotes(request: HttpRequest, user_guid: int):
   """Request all spoken quotes from a user, returns a JSON containing a list."""
   # Make sure request is a GET request
   if(request.method != "GET"):
@@ -78,13 +78,8 @@ def getUserSpokenQuotes(request: HttpRequest, user_discord_id: str):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Retrieve user object from ID if possible
-  userObj = userUtils.getUserObj(user_discord_id)
   # Query all quotes 
-  if(userObj != None):
-    quotes = Quote.objects.filter(speaker=userObj)
-  else:
-    quotes = Quote.objects.filter(speaker_discord_id=user_discord_id)
+  quotes = Quote.objects.filter(speaker__guid=user_guid)
   # Order quotes by timestamp showing most recent
   quotes = quotes.order_by("-timestamp")
   # Iterate all quotes and create out list
@@ -111,12 +106,12 @@ def getAllQuotesList(request: HttpRequest, sortMethod: str = "timestamp_descendi
   for speakID in speakers:
     if(speakID != None):
       # Retrieve user object from ID if possible
-      userObj = userUtils.getUserObj(speakID)
+      userObj = userUtils.getUserObjByDiscordId(speakID)
       # Build Summary Object
       summaryObj.append({
         "count": (quotes.filter(speaker__discord_id=speakID).count() + quotes.filter(speaker_discord_id=speakID).count()),
         "nickname": userObj.nickname if (userObj) else speakID,
-        "discord_id": speakID
+        "guid": userObj.guid if (userObj) else None
       })
   # Sort quotes based on passed in sorting method
   if(sortMethod == "timestamp_descending"):

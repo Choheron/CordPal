@@ -123,7 +123,7 @@ def getGlobalPlaybackData(request: HttpRequest, year: int, recalculate: str = "F
     return JsonResponse({'error': f"No global Cordpal Playback data found for {year}"}, status=404)
 
 
-def getUserPlaybackData(request: HttpRequest, year: int, user_discord_id: str | None = None, recalculate: str = "FALSE"):
+def getUserPlaybackData(request: HttpRequest, year: int, user_guid: int | None = None, recalculate: str = "FALSE"):
   '''
   Retrieve "CordPal Playback" data for a user given a year and user. An admin can request a recalculation of the cordpal data by passing true in the recalculate parameter. Must be a GET request.
   
@@ -131,8 +131,8 @@ def getUserPlaybackData(request: HttpRequest, year: int, user_discord_id: str | 
   :type request: HttpRequest
   :param year: Playback year to query
   :type year: int
-  :param user_discord_id: Discord ID of user to query
-  :type user_discord_id: str
+  :param user_guid: GUID of user to query
+  :type user_guid: int
   :param recalculate: Should a recalulation/generation of the passed in year be attempted?
   :type recalculate: str
   '''
@@ -143,7 +143,7 @@ def getUserPlaybackData(request: HttpRequest, year: int, user_discord_id: str | 
     res.status_code = 405
     return res
   # Parse user id and retrieve data as needed
-  aotd_user = AotdUserData.objects.get(user__discord_id=user_discord_id) if user_discord_id else getSessionAotdUser(request)
+  aotd_user = AotdUserData.objects.get(user__guid=user_guid) if user_guid is not None else getSessionAotdUser(request)
   # Make recalculation checks and act accordingly
   if(recalculate == "TRUE"):
     # Check if user is admin and if so, delete and recalculate data for user playback data
@@ -161,7 +161,7 @@ def getUserPlaybackData(request: HttpRequest, year: int, user_discord_id: str | 
     return JsonResponse({'error': f"No user Cordpal Playback {year} data found for user {aotd_user.user.pk}"}, status=404)
   
 
-def isPlaybackAvailable(request: HttpRequest, year: int, user_discord_id: str | None = None):
+def isPlaybackAvailable(request: HttpRequest, year: int, user_guid: int | None = None):
   '''
   Return a JSON object containing a simple "available" field with a true or false value.
   
@@ -169,8 +169,8 @@ def isPlaybackAvailable(request: HttpRequest, year: int, user_discord_id: str | 
   :type request: HttpRequest
   :param year: Playback year to query
   :type year: int
-  :param user_discord_id: Discord ID of user to query
-  :type user_discord_id: str | None
+  :param user_guid: GUID of user to query
+  :type user_guid: int | None
   '''
   # Make sure request is a get request
   if(request.method != "GET"):
@@ -180,9 +180,9 @@ def isPlaybackAvailable(request: HttpRequest, year: int, user_discord_id: str | 
     return res
   # If a user id is provided, check for that, else check for general sitewide data
   available = False
-  if(user_discord_id):
+  if(user_guid is not None):
     try:
-      temp = UserPlayback.objects.filter(year=year).get(aotd_user__user__discord_id=user_discord_id)
+      temp = UserPlayback.objects.filter(year=year).get(aotd_user__user__guid=user_guid)
       available = True
     except:
       pass

@@ -120,7 +120,7 @@ export async function uploadImageToBackend(formData) {
 
 
 //
-// Get list of all uploader Discord IDs
+// Get list of all uploader GUIDs
 //
 export async function getAllUploaders() {
   // Check for sessionid in cookies
@@ -148,7 +148,7 @@ export async function getAllUploaders() {
 
 
 //
-// Get list of all artist Discord IDs
+// Get list of all artist GUIDs
 //
 export async function getAllArtists() {
   // Check for sessionid in cookies

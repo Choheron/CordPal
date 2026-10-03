@@ -74,7 +74,7 @@ class LastSeenMiddleware:
         if(full_path == "/metrics"):
           self.logger.debug(f"Reporting metrics to prometheus", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
         elif(full_path in self.no_user_validation_paths):
-          self.logger.info(f"Incoming request without a discord_id in request... Possibly a cron?", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
+          self.logger.info(f"Incoming request without a session user... Possibly a cron?", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
         else:
           self.logger.error(f"ERROR IN USER MIDDLEWARE TRACEBACK: {e}", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
     
