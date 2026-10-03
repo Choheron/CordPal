@@ -4,7 +4,7 @@ import { Divider } from "@heroui/divider"
 
 import { getAlbum, getReviewHistoricalByID } from "@/app/lib/aotd_utils"
 import { getUserData } from "@/app/lib/user_utils"
-import { convertToLocalTZString, generateDateFromUTCString, padNumber, ratingToTailwindBgColor, songRatingToString } from "@/app/lib/utils"
+import { convertToLocalTZString, generateDateFromUTCString, isTodayCheck, isYesterdayCheck, padNumber, ratingToTailwindBgColor, songRatingToString } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import ReviewHistoryAccordion from "@/app/ui/dashboard/aotd/review_history_accordion"
@@ -31,11 +31,11 @@ export default async function Page({
   // Parse some data from review object
   const reviewDate = convertToLocalTZString(reviewDateObj, false)
 
-  // Determine return url based on if the review is for today's AOtD or not (EXTREMELY UGLY, I HAVE GOT TO FIGURE OUT THIS DATE STUFF)
-  const timezoneDate = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0])).toISOString().split('T')[0].replaceAll("-", "/")
+  // Determine return url based on if the review is for today or yesterday's AOTD
   const reviewDateSplit = review_data['review_date'].split(",")[0].split("/")
-  const reviewDateFormatted = `${reviewDateSplit[2]}/${padNumber(reviewDateSplit[0])}/${padNumber(reviewDateSplit[1])}`
-  const isReviewToday = (timezoneDate == reviewDateFormatted)
+  const reviewDateFormatted = `${reviewDateSplit[2]}-${padNumber(reviewDateSplit[0])}-${padNumber(reviewDateSplit[1])}`
+  const isReviewToday = isTodayCheck(reviewDateFormatted)
+  const readOnly = !(isReviewToday || isYesterdayCheck(reviewDateFormatted))
   // Determine if today is the current review date
   const returnUrl = (isReviewToday) ? `/dashboard/aotd` : `/dashboard/aotd/calendar/${reviewDateObj.getFullYear()}/${padNumber(reviewDateObj.getMonth() + 1)}/${padNumber(reviewDateObj.getDate())}`
 
@@ -194,6 +194,7 @@ export default async function Page({
           reviewId={review_data['id']}
           reactionsList={review_data['reactions']}
           emojiButtonOverride="absolute -bottom-11 -left-1"
+          readOnly={readOnly}
         />
       </div>
 

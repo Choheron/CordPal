@@ -5,7 +5,7 @@ import { Button } from "@heroui/button"
 import { Divider } from "@heroui/divider"
 
 import { getAlbumOfTheDayData, getAlbumSTD, getDayTimelineData, getTagsForAlbum, getAotdUserSettings, isAotdParticipant, getAlbumCommentAtDate } from "@/app/lib/aotd_utils"
-import { getNextDay, getPrevDay, getLastYearInTimezone, padNumber, ratingToTailwindBgColor } from "@/app/lib/utils"
+import { getNextDay, getPrevDay, getLastYearInTimezone, padNumber, isTodayCheck, isYesterdayCheck } from "@/app/lib/utils"
 import { getHasReviewedToday, getUserData, isUserAdmin } from "@/app/lib/user_utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
@@ -33,9 +33,9 @@ export default async function Page({
   // Get next day's date (null if next day is in the future)
   const nextDay = getNextDay(new Date(Date.parse(date)))
   // Boolean to determine if this date is today
-  const isToday = isTodayCheck()
+  const isToday = isTodayCheck(date)
   // Boolean to determine if this date was yesterday (reactions stay open through the day after)
-  const isYesterday = isYesterdayCheck()
+  const isYesterday = isYesterdayCheck(date)
   // Boolean to determine if this date is exactly one year ago today
   const isYearAgo = date === getLastYearInTimezone("America/Chicago")
   // Fetch standard deviation for this date
@@ -60,26 +60,6 @@ export default async function Page({
     ])
     hideScore = aotdSettings['hide_scores_prereview'] && !hasReviewedToday
     hideTags = aotdSettings['hide_tags_prereview'] && !hasReviewedToday
-  }
-
-  // This may be my ugliest function in this whole thing.... Timezones are really confusing me
-  function isTodayCheck() {
-    const date1String = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0])).toISOString().split('T')[0]
-    const splitDate = date.split("-")
-    const date2String = new Date(Date.parse(new Date(parseInt(splitDate[0]), parseInt(splitDate[1])-1, parseInt(splitDate[2])).toISOString().split('T')[0])).toISOString().split('T')[0]
-    // Return string equals
-    return date1String == date2String;
-  }
-
-  // Same as isTodayCheck, but shifts "now" back a day so the AOtD day-after also counts
-  function isYesterdayCheck() {
-    const today = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0]))
-    today.setDate(today.getDate() - 1)
-    const date1String = today.toISOString().split('T')[0]
-    const splitDate = date.split("-")
-    const date2String = new Date(Date.parse(new Date(parseInt(splitDate[0]), parseInt(splitDate[1])-1, parseInt(splitDate[2])).toISOString().split('T')[0])).toISOString().split('T')[0]
-    // Return string equals
-    return date1String == date2String;
   }
 
   // Pull data from album object, return empty string if not available

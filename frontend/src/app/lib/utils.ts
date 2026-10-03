@@ -351,3 +351,23 @@ export function songRatingToString(songReview) {
     default: return "UNKNOWN"
   }
 }
+
+// This may be my ugliest function in this whole thing.... Timezones are really confusing me
+export function isTodayCheck(dateString) {
+  const date1String = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0])).toISOString().split('T')[0]
+  const splitDate = dateString.split("-")
+  const date2String = new Date(Date.parse(new Date(parseInt(splitDate[0]), parseInt(splitDate[1])-1, parseInt(splitDate[2])).toISOString().split('T')[0])).toISOString().split('T')[0]
+  // Return string equals
+  return date1String == date2String;
+}
+
+// Same as isTodayCheck, but shifts "now" back a day so the AOtD day-after also counts
+export function isYesterdayCheck(dateString) {
+  const today = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0]))
+  today.setDate(today.getDate() - 1)
+  const date1String = today.toISOString().split('T')[0]
+  const splitDate = dateString.split("-")
+  const date2String = new Date(Date.parse(new Date(parseInt(splitDate[0]), parseInt(splitDate[1])-1, parseInt(splitDate[2])).toISOString().split('T')[0])).toISOString().split('T')[0]
+  // Return string equals
+  return date1String == date2String;
+}

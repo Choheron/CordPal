@@ -2,7 +2,7 @@ import { Button } from "@heroui/button"
 
 import { getAlbum, getAlbumAvgRating, getAotdDates, getAotdUserSettings, getTagsForAlbum, getAlbumCommentHistory } from "@/app/lib/aotd_utils"
 import { getHasReviewedToday, getUserData, isUserAdmin, isUserAlbumUploader } from "@/app/lib/user_utils"
-import { getLastYearInTimezone, milliToString, monthToName, ratingToTailwindBgColor } from "@/app/lib/utils"
+import { getLastYearInTimezone, isTodayCheck, milliToString, monthToName, ratingToTailwindBgColor } from "@/app/lib/utils"
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/aotd/album_display"
@@ -46,15 +46,6 @@ export default async function Page({
   // Determine if scores should be hidden (hide-scores-prereview setting)
   const reviewToday = await getHasReviewedToday();
   const hideScore = (await getAotdUserSettings())['hide_scores_prereview'] && !reviewToday;
-
-
-  function isTodayCheck(date: string) {
-    const todayStr = new Date(Date.parse(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }).split(",")[0])).toISOString().split('T')[0]
-    const splitDate = date.split("-")
-    const dateString = new Date(Date.parse(new Date(parseInt(splitDate[0]), parseInt(splitDate[1])-1, parseInt(splitDate[2])).toISOString().split('T')[0])).toISOString().split('T')[0]
-    // Return string equals
-    return todayStr == dateString;
-  }
   
 
   // Box of historical review dates - Generate series of review displays based on dates
