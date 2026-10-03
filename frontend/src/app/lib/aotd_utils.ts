@@ -728,16 +728,11 @@ export async function getLowestHighestAlbumStats() {
 // - RETURN: Json Obejcts
 //
 export async function getAllAlbums() {
-  // Check for sessionid in cookies
-  const sessionCookie = await getCookie('sessionid');
   console.log(`getAllAlbums: Sending request to backend '/aotd/getAllAlbums'`)
   const allAlbumsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAllAlbums`, {
     method: "GET",
     cache: 'force-cache',
     next: { tags: ['album_submissions', 'AOTD'] },
-    headers: {
-      Cookie: `sessionid=${sessionCookie};`
-    },
   });
   const allAlbumsJson = await allAlbumsResponse.json()
   return allAlbumsJson;
