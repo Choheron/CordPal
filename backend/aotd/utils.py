@@ -26,7 +26,7 @@ from .models import (
 )
 
 from users.utils import (
-  getUserObj
+  getSessionUser
 )
 
 # Declare logging
@@ -53,14 +53,17 @@ def getAotdUserObj(discord_id):
     return None
 
 
+def getSessionAotdUser(request: HttpRequest):
+  """Return Aotd Specific User Object for the session's user, or None"""
+  return AotdUserData.objects.filter(user=getSessionUser(request)).first()
+
+
 # Return status of user's aotd connection (true if user has enrolled in aotd)
 def isUserAotdParticipant(request: HttpRequest):
   '''Return status of user's aotd connection (true if user has enrolled in aotd)'''
   try:
-    # Retrieve users discord_id from session
-    discord_id = request.session.get("discord_id")
-    # Get user object from DB
-    site_user = User.objects.get(discord_id=discord_id)
+    # Get user object from session
+    site_user = getSessionUser(request)
     # Return boolean of aotd connection status
     return site_user.aotd_enrolled
   except Exception as e:

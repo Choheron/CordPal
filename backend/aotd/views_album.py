@@ -6,9 +6,10 @@ from .utils import (
   calculateUserReviewData,
   get_album_from_mb,
   retrieveAlbumSTD,
-  hasReviewedToday
+  hasReviewedToday,
+  getSessionAotdUser
 )
-from users.utils import getUserObj
+from users.utils import getUserObj, getSessionUser
 from .models import (
   AotdUserData,
   Album,
@@ -69,7 +70,7 @@ def checkIfUserCanSubmit(request: HttpRequest, date: str = ""):
   validityStatus['canSubmit'] = True
   validityStatus['reason'] = "User is able to submit albums."
   # Get user from database
-  userObj = getUserObj(request.session.get('discord_id'))
+  userObj = getSessionUser(request)
   # Fill date if it isnt provided (Defauly to current time)
   if(date == ""):
     date = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).strftime('%Y-%m-%d')
@@ -173,7 +174,7 @@ def submitAlbum(request: HttpRequest):
     return JsonResponse(out, status=out['status'])
   except ObjectDoesNotExist as e:
     # Get user from database
-    user = getUserObj(request.session.get('discord_id'))
+    user = getSessionUser(request)
     # Query musicbrainz to get full album data using mbid (to avoid issues with params)
     newAlbum = get_album_from_mb(reqBody['album']['id'])
     # Populate submitter and user comment
@@ -206,7 +207,7 @@ def rescueAlbum(request: HttpRequest):
     logger.warning(f"rescueAlbum called with a non-POST method, returning 405.", extra={'crid': request.crid})
     return HttpResponse(status=405)
   reqBody = json.loads(request.body)
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   release_group_id = reqBody['album']['release-group']['id']
   logger.info(f"User {user.nickname} attempting to rescue album with release group ID {release_group_id}.", extra={'crid': request.crid})
   try:
@@ -248,7 +249,7 @@ def deleteAlbum(request: HttpRequest):
   try:
     albumObject = Album.objects.get(mbid = reqBody['album_id'])
     # Get user object from request
-    user = getUserObj(request.session['discord_id'])
+    user = getSessionUser(request)
     # If user has not submitted the attempted delete, throw an error (Does not apply to admins)
     if((albumObject.submitted_by != user) and (not user.is_staff)):
       logger.warning(f"deleteAlbum: User {user.discord_id}/{user.nickname} attempted to delete Album: {reqBody['album_id']}, however did not submit said Album!", extra={'crid': request.crid})
@@ -529,7 +530,8 @@ def getLastXSubOrRescueAlbums(request: HttpRequest, count: int):
     if(album_action.action_type == "UPDATE"):
       # Dynamically append user data if it appears in action details (TODO: Make this more dynamic than just hardcoded stuff)
       obj['action_details']['new_owner_nick'] = AotdUserData.objects.get(user__discord_id=obj['action_details']['new_owner_id']).user.nickname
-      obj['action_details']['previous_owner_nick'] = AotdUserData.objects.get(user__discord_id=obj['action_details']['previous_owner_id']).user.nickname
+      previous_owner_id = obj['action_details']['previous_owner_id']
+      obj['action_details']['previous_owner_nick'] = AotdUserData.objects.get(user__discord_id=previous_owner_id).user.nickname if previous_owner_id else None
     # Append to List
     action_list.append(obj)
   return JsonResponse({ "action_list": action_list, "timestamp" : datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")})
@@ -622,7 +624,7 @@ def getUserAlbumsStats(request: HttpRequest, user_discord_id: str | None = None)
     res.status_code = 405
     return res
   # Get all aotd users
-  spotUser = AotdUserData.objects.get(user__discord_id=user_discord_id) if user_discord_id else AotdUserData.objects.get(user__discord_id=(request.session.get('discord_id')))
+  spotUser = AotdUserData.objects.get(user__discord_id=user_discord_id) if user_discord_id else getSessionAotdUser(request)
   # Get user Data
   userData = {}
   two_year_ago = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date() - datetime.timedelta(days=730)
@@ -757,7 +759,7 @@ def isUserAlbumUploader(request: HttpRequest, mbid: str, user_discord_id: str = 
     res.status_code = 405
     return res
   # If a user id is not provided, retrieve from request
-  user = getUserObj(user_discord_id if user_discord_id else request.session['discord_id'])
+  user = getUserObj(user_discord_id) if user_discord_id else getSessionUser(request)
   # Get album using aotd ID
   album = Album.objects.get(mbid=mbid)
   # Get submitter status
@@ -786,7 +788,7 @@ def updateAlbumSubmission(request: HttpRequest):
   except ObjectDoesNotExist:
     return HttpResponse("Album not found", status=404)
   # Only the original submitter or staff may edit
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if album.submitted_by != user and not user.is_staff:
     logger.warning(f"updateAlbumSubmission: User {user.discord_id}/{user.nickname} attempted to edit comment on album {mbid} without permission.", extra={'crid': request.crid})
     return HttpResponse("Forbidden", status=403)

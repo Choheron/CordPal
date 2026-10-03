@@ -12,7 +12,7 @@ from .review_image_utils import (
   MAX_UPLOAD_BYTES,
   ORPHAN_GRACE_HOURS,
 )
-from users.utils import getUserObj
+from users.utils import getSessionUser
 from django.utils import timezone
 
 import logging
@@ -32,7 +32,7 @@ def uploadReviewImage(request: HttpRequest):
     res.status_code = 405
     return res
   # Retrieve the requesting user from the session; no user means no valid session cookie
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   if not user:
     logger.error("uploadReviewImage called by unauthenticated user.", extra={'crid': request.crid})
     return JsonResponse({'success': False, 'error': 'Not authenticated'}, status=401)

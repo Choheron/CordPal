@@ -9,6 +9,7 @@ import json
 
 from .models import Image
 from users.models import User
+from users.utils import getSessionUser
 
 # Declare logging
 logger = logging.getLogger()
@@ -57,7 +58,7 @@ def uploadImage(request: HttpRequest):
       img_creator = User.objects.get(discord_id = img_creator)
     else:
       img_creator = None
-    img_uploader = User.objects.get(discord_id = request.session['discord_id'])
+    img_uploader = getSessionUser(request)
     # Generate list of tagged users (Only populate if not empty)
     img_tagged_users_list = []
     if(img_tagged_users != ""):

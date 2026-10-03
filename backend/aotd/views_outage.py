@@ -10,6 +10,7 @@ import pytz
 
 from .models import UserAlbumOutage as Outages
 from users.models import User
+from users.utils import getSessionUser
 
 # Declare logging
 logger = logging.getLogger()
@@ -35,13 +36,12 @@ def createOutage(request: HttpRequest):
   # Get data from request
   reqBody = json.loads(request.body)
   # Retreive expected items from request body (Also grab objects where needed)
-  userID = reqBody['user_discord_id'] if ('user_discord_id' in reqBody) else request.session['discord_id']
-  user = User.objects.get(discord_id = userID)
+  user = User.objects.get(discord_id = reqBody['user_discord_id']) if ('user_discord_id' in reqBody) else getSessionUser(request)
   start_date = datetime.strptime(reqBody['start_date'], '%Y-%m-%d').date()
   end_date = datetime.strptime(reqBody['end_date'], '%Y-%m-%d').date()
   reason = reqBody['reason']
   admin_enacted = (reqBody['admin_enacted'] if ('admin_enacted' in reqBody) else False)
-  admin_enactor = (User.objects.get(reqBody['admin_discord_id']) if ('admin_discord_id' in reqBody) else None)
+  admin_enactor = (User.objects.get(discord_id = reqBody['admin_discord_id']) if ('admin_discord_id' in reqBody) else None)
   # Ensure that start_date is over three days away from the current date
   earlist_start = datetime.now(pytz.timezone('America/Chicago')).date() + timedelta(days=2)
   if(start_date < earlist_start):
@@ -75,7 +75,7 @@ def deleteOutage(request: HttpRequest):
   reqBody = json.loads(request.body)
   # Retreive expected items from request body (Also grab objects where needed)
   try:
-    deleter = User.objects.get(discord_id=((reqBody['deleter_discord_id']) if ('deleter_discord_id' in reqBody) else (request.session['discord_id'])))
+    deleter = User.objects.get(discord_id=reqBody['deleter_discord_id']) if ('deleter_discord_id' in reqBody) else getSessionUser(request)
     reason = reqBody['reason']
     outage = Outages.objects.get(pk=reqBody['outageId'])
   except User.DoesNotExist as e:
@@ -109,7 +109,7 @@ def getUserOutages(request: HttpRequest, user_discord_id: str = None):
     res.status_code = 405
     return res
   # Get user
-  user = User.objects.get(discord_id=(user_discord_id if user_discord_id else request.session['discord_id']))
+  user = User.objects.get(discord_id=user_discord_id) if user_discord_id else getSessionUser(request)
   # Get outages for user that are upcoming
   outages = Outages.objects.filter(user=user, end_date__gte=timezone.localtime(timezone.now()).date())
   # Return a list of outages, converting each outage to a dict

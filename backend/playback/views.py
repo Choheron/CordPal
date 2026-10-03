@@ -17,7 +17,7 @@ from .models import (
 )
 
 from aotd.utils import (
-  getAotdUserObj
+  getSessionAotdUser
 )
 from .utils import (
   generateGlobalPlayback,
@@ -143,7 +143,7 @@ def getUserPlaybackData(request: HttpRequest, year: int, user_discord_id: str | 
     res.status_code = 405
     return res
   # Parse user id and retrieve data as needed
-  aotd_user = AotdUserData.objects.get(user__discord_id=user_discord_id) if user_discord_id else getAotdUserObj(request.session.get('discord_id'))
+  aotd_user = AotdUserData.objects.get(user__discord_id=user_discord_id) if user_discord_id else getSessionAotdUser(request)
   # Make recalculation checks and act accordingly
   if(recalculate == "TRUE"):
     # Check if user is admin and if so, delete and recalculate data for user playback data

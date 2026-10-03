@@ -4,6 +4,7 @@ from django.contrib.auth import logout as auth_logout
 from users.utils import (
   doesUserExist,
   createUserFromDiscordJSON,
+  getSessionUser,
 )
 from users.models import User
 
@@ -81,11 +82,11 @@ def getDiscordToken(request: HttpRequest):
     return HttpResponse(status=500)
   # Convert response to Json
   discordResJSON.update(discordRes.json())
-  # Store discord ID in session for user data retrieval
-  request.session['discord_id'] = discordResJSON['id']
   # Check if user's data exists as a user in the database
   if(not(doesUserExist(discordResJSON['id']))):
     createUserFromDiscordJSON(discordResJSON)
+  # Store user guid in session for user data retrieval
+  request.session['user_guid'] = User.objects.get(discord_id=discordResJSON['id']).guid
   # Store discord data in database (This takes place after the user is created so we can associate token data with user)
   storeDiscordTokenInDatabase(request, discordResJSON)
   # Write success message
@@ -106,7 +107,7 @@ def getDiscordUserData(request: HttpRequest):
     res.status_code = 405
     return res
   # Get user token data
-  tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get("discord_id"))
+  tokenData = DiscordTokens.objects.get(user = getSessionUser(request))
   # Ensure user is logged in
   if(isDiscordTokenExpired(request)):
     try:
@@ -129,11 +130,11 @@ def getDiscordUserData(request: HttpRequest):
     return HttpResponse(status=500)
   # Convert response to Json
   discordResJSON = discordRes.json()
-  # Store discord ID in session for user data retrieval
-  request.session['discord_id'] = discordResJSON['id']
   # Check if user's data exists as a user in the database
   if(not(doesUserExist(discordResJSON['id']))):
     createUserFromDiscordJSON(discordResJSON)
+  # Store user guid in session for user data retrieval
+  request.session['user_guid'] = User.objects.get(discord_id=discordResJSON['id']).guid
   # Return JsonResponse containing user data
   return JsonResponse(discordResJSON)
 
@@ -152,7 +153,7 @@ def validateServerMember(request: HttpRequest):
   cookie_time_fmt = "%d/%m/%y %H:%M:%S"
   # Retrieve user token data
   try:
-    tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get("discord_id"))
+    tokenData = DiscordTokens.objects.get(user = getSessionUser(request))
   except DiscordTokens.DoesNotExist as e:
     logger.error("Discord token does not exist for this user, will need to revalidate.", extra={'crid': request.crid})
     out = {}
@@ -232,9 +233,9 @@ def checkIfPrevAuth(request: HttpRequest):
     res.status_code = 405
     return res
   # Check if session is still valid
-  discord_id = request.session.get('discord_id')
+  user = getSessionUser(request)
   try:
-    token = DiscordTokens.objects.get(user__discord_id=discord_id) if discord_id else None
+    token = DiscordTokens.objects.get(user=user) if user else None
     validSession = token is not None and token.access_token is not None
   except DiscordTokens.DoesNotExist:
     validSession = False
@@ -268,9 +269,9 @@ def logout(request: HttpRequest):
     res.status_code = 405
     return res
   # Check if id exists in session
-  discord_id = request.session.get('discord_id')
-  if(discord_id == None):
-    logger.error(f"LOGOUT CALLED WITH NO DISCORD ID! RETURNING 500...", extra={'crid': request.crid})
+  user = getSessionUser(request)
+  if(user == None):
+    logger.error(f"LOGOUT CALLED WITH NO SESSION USER! RETURNING 500...", extra={'crid': request.crid})
     return HttpResponse(status=500)
   # Ensure user is logged in
   if(isDiscordTokenExpired(request)):
@@ -280,7 +281,7 @@ def logout(request: HttpRequest):
       logger.error(f"Filed to refresh discord token! Returning redirect call. Error: {e}", extra={'crid': request.crid})
       return HttpResponse("/", status=302)
   # Get token data from session
-  tokenData = DiscordTokens.objects.get(user__discord_id = request.session.get('discord_id'))
+  tokenData = DiscordTokens.objects.get(user = user)
   # Prep request data and headers to discord api
   reqHeaders = { 
     'Content-Type': 'application/x-www-form-urlencoded',

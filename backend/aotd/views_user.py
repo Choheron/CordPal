@@ -1,7 +1,7 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.forms.models import model_to_dict
 
-from users.utils import getUserObj
+from users.utils import getUserObj, getSessionUser
 
 from .models import (
   AotdUserData,
@@ -102,7 +102,7 @@ def getAotdData(request: HttpRequest):
     res.status_code = 405
     return res
   # Retrieve user object
-  userObj = getUserObj(request.session.get('discord_id'))
+  userObj = getSessionUser(request)
   # Ensure user has authenticated with Aotd before
   if(userObj.aotd_enrolled):
     userAOTDObj = AotdUserData.objects.filter(user = userObj).first()
@@ -126,7 +126,7 @@ def getAotdUserSettings(request: HttpRequest):
     res.status_code = 405
     return res
   # Get user data from session
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   # Retrieve the user's AOTD settings (new users have no AotdUserData until they enroll, return defaults instead of 500ing)
   aotd_data = AotdUserData.objects.filter(user=user).first()
   if(aotd_data is None):
@@ -156,7 +156,7 @@ def getHasReviewedToday(request: HttpRequest, user_discord_id: str | None = None
   # Else use the passed in user id.
   if(user_discord_id is None):
     # Get user data from session
-    user = getUserObj(request.session.get('discord_id'))
+    user = getSessionUser(request)
   else:
     user = getUserObj(user_discord_id)
   return JsonResponse({"has_reviewed_today": hasReviewedToday(user)})
@@ -173,7 +173,7 @@ def getSelectionBlockedFlag(request: HttpRequest):
     res.status_code = 405
     return res
   # Get user data from session
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   # Retrieve and return that user's flag status (non-enrolled users have no AotdUserData, treat them as not blocked)
   aotd_data = AotdUserData.objects.filter(user=user).first()
   flag_status = aotd_data.selection_blocked_flag if (aotd_data) else False

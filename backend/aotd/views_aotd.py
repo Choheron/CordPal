@@ -7,6 +7,7 @@ from django.core import management
 from .utils import (
   checkSelectionFlag,
   getAotdUserObj,
+  getSessionAotdUser,
   getAlbumRating,
   generateDayRatingTimeline,
   retrieveAlbumSTD
@@ -320,7 +321,7 @@ def getChanceOfAotdSelect(request: HttpRequest, user_discord_id: str = ""):
     res.status_code = 405
     return res
   # Get current chance object from cache
-  aotdUser: AotdUserData = (getAotdUserObj(user_discord_id) if (user_discord_id != "") else getAotdUserObj(request.session.get("discord_id")))
+  aotdUser: AotdUserData = (getAotdUserObj(user_discord_id) if (user_discord_id != "") else getSessionAotdUser(request))
   # Get user percentage
   out: UserChanceCache = aotdUser.aotd_chance
   # Return object

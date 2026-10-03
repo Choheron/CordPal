@@ -3,6 +3,9 @@ from django.http import HttpRequest, HttpResponseRedirect
 from users.models import (
   User
 )
+from users.utils import (
+  getSessionUser
+)
 
 import logging
 import datetime
@@ -42,9 +45,11 @@ class LastSeenMiddleware:
     # Get session data from request
     try:
       # Get user object 
-      user = User.objects.get(discord_id=request.session['discord_id'])
+      user = getSessionUser(request)
+      if user is None:
+        raise KeyError('user_guid')
       # Log method call (With username)
-      self.logger.debug(f"Incoming Request - User: {user.discord_id}/\"{user.nickname}\"", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
+      self.logger.debug(f"Incoming Request - User: {user.guid}/\"{user.nickname}\"", extra={'crid': request.crid, 'final_dest': request.path, 'client_ip': request.client_ip, 'client_ip_type': request.client_ip_type})
       # Get current timestamp
       time = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
       # Update only heartbeat timestamp if its a heartbeat call, otherwise update last_request_timestamp

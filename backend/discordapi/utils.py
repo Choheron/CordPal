@@ -5,6 +5,9 @@ from django.utils import timezone
 from users.models import (
   User
 )
+from users.utils import (
+  getSessionUser
+)
 from discordapi.models import (
   DiscordTokens
 )
@@ -24,7 +27,7 @@ AVATAR_CHECK_INTERVAL = datetime.timedelta(hours=24)
 
 
 def storeDiscordTokenInDatabase(request: HttpRequest, token_data: json):
-  # Attempt to retreive user from session (discord_id should be the only stored session value)
+  # Attempt to retreive user from the discord token data
   try:
     user = User.objects.get(discord_id = token_data['id'])
     logger.info(f"Storing discord token data in database for user {user.nickname}...", extra={'crid': request.crid})
@@ -59,7 +62,7 @@ def storeDiscordTokenInDatabase(request: HttpRequest, token_data: json):
 
 def isDiscordTokenExpired(request: HttpRequest, token: DiscordTokens = None):
   # Retrieve user from session 
-  user = User.objects.get(discord_id = request.session.get('discord_id'))
+  user = getSessionUser(request)
   logger.debug(f"Checking if {user.nickname}\'s discord token is expired...", extra={'crid': request.crid})
   # Accept a pre-fetched token so callers that already queried DiscordTokens
   # (e.g. checkIfPrevAuth) don't trigger two more DB round-trips here.
@@ -74,7 +77,7 @@ def isDiscordTokenExpired(request: HttpRequest, token: DiscordTokens = None):
 
 def refreshDiscordToken(request: HttpRequest, discord_user_id: str = ""):
   logger.info("Refreshing Discord Token...", extra={'crid': request.crid})
-  userDiscordId = discord_user_id if (discord_user_id != "") else request.session.get("discord_id")
+  userDiscordId = discord_user_id if (discord_user_id != "") else getSessionUser(request).discord_id
   # Get token data
   tokenData = DiscordTokens.objects.get(user__discord_id = userDiscordId)
   # Retrieve session data
@@ -109,7 +112,7 @@ def refreshDiscordProfilePic(request: HttpRequest, user=None, tokenData=None):
     # Accept pre-fetched objects so callers that already queried these (e.g.
     # checkPreviousAuthorization) don't cause redundant DB round-trips.
     if user is None:
-      user = User.objects.get(discord_id=request.session['discord_id'])
+      user = getSessionUser(request)
     if tokenData is None:
       tokenData = DiscordTokens.objects.get(user=user)
   except Exception as e:
@@ -142,7 +145,7 @@ def checkPreviousAuthorization(request: HttpRequest):
   logger.debug("Checking if sessionid exists...", extra={'crid': request.crid})
   try:
     # Get user instance and data
-    user = User.objects.get(discord_id = request.session.get('discord_id'))
+    user = getSessionUser(request)
     tokenData = DiscordTokens.objects.get(user = user)
     if isDiscordTokenExpired(request, token=tokenData):
       refreshDiscordToken(request)

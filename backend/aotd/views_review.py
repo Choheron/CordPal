@@ -2,7 +2,7 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
 
-from users.utils import getUserObj
+from users.utils import getUserObj, getSessionUser
 
 from .models import (
   Album,
@@ -72,7 +72,7 @@ def submitReview(request: HttpRequest):
   # Get data from request
   reqBody = json.loads(request.body)
   # Get user from database
-  userObj = getUserObj(request.session.get('discord_id'))
+  userObj = getSessionUser(request)
   # Get Album from the database
   albumObj = Album.objects.get(mbid=reqBody['album_id'])
   # Log Review Information
@@ -149,7 +149,7 @@ def markReviewViewed(request: HttpRequest, review_pk):
     res.status_code = 405
     return res
   # Retrieve user from session cookie, then grab the AOTD user objct
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   try:
     aotdUserObj = AotdUserData.objects.get(user__guid=user.guid)
   except ObjectDoesNotExist as e:
@@ -188,7 +188,7 @@ def getReviewViewStatus(request: HttpRequest, review_pk):
     res.status_code = 405
     return res
   # Retrieve user from session cookie
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   # Retrieve review using pk
   try:
     review = Review.objects.get(pk=review_pk)
@@ -287,7 +287,7 @@ def getUserReviewForAlbum(request: HttpRequest, mbid: str, date: str = None):
     return JsonResponse(out)
   # Get User from the database
   try: 
-    user = getUserObj(request.session.get('discord_id'))
+    user = getSessionUser(request)
   except ObjectDoesNotExist:
     return JsonResponse({"review": None})
   # Get reivew for album
@@ -339,14 +339,8 @@ def getUserReviewStats(request: HttpRequest, user_discord_id: str = None):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
-  # Get user discord id
-  userId = None
-  if(user_discord_id):
-    userId = user_discord_id
-  else:
-    userId = request.session.get('discord_id')
   # Get user object from DB
-  user = User.objects.get(discord_id=userId)
+  user = User.objects.get(discord_id=user_discord_id) if user_discord_id else getSessionUser(request)
   # Get AotdUser Object
   aotdUser = AotdUserData.objects.get(user=user)
   # If this user has not had their data calculated, calculate it
@@ -407,7 +401,7 @@ def getSimilarReviewsForRatings(request: HttpRequest):
     res.status_code = 405
     return res
   # Retrieve user from session cookie
-  user = getUserObj(request.session.get('discord_id'))
+  user = getSessionUser(request)
   # Iterate through possible ratings and build return object
   out = {}
   score = 0
@@ -439,7 +433,7 @@ def getAllUserReviews(request: HttpRequest, user_discord_id: str = None):
     res.status_code = 405
     return res
   # Retrieve user from session cookie
-  user = getUserObj(request.session.get('discord_id') if (user_discord_id == None) else user_discord_id)
+  user = getSessionUser(request) if (user_discord_id == None) else getUserObj(user_discord_id)
   # Get all reviews
   reviewsObj = user.aotd_reviews.all()
   # Declare outlist and populate
@@ -557,7 +551,7 @@ def submitReviewReaction(request: HttpRequest):
     # Get data from request
     reqBody = json.loads(request.body)
     # Retrieve user from session cookie
-    user = getUserObj(request.session.get('discord_id'))
+    user = getSessionUser(request)
     # Get review from the database
     review = Review.objects.get(pk=reqBody['id'])
     # Get list of emojis in review reactions
@@ -601,7 +595,7 @@ def deleteReviewReaction(request: HttpRequest):
     # Get data from request
     reqBody = json.loads(request.body)
     # Retrieve user from session cookie
-    user = getUserObj(request.session.get('discord_id'))
+    user = getSessionUser(request)
     # Retrieve react PK from request body
     react_id = reqBody['react_id']
     # Get review from the database

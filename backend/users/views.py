@@ -9,6 +9,7 @@ from .models import (
   UserAction
 )
 from discordapi.models import DiscordTokens
+from .utils import getSessionUser
 
 import logging
 import os
@@ -84,7 +85,7 @@ def getUserData(request: HttpRequest, user_discord_id: str = ""):
   if(user_discord_id != ""):
     request_id = user_discord_id
   else:
-    request_id = str(request.session['discord_id'])
+    request_id = getSessionUser(request).discord_id
   # Retrieve user data from database, if its not there create one.
   try:
     logger.debug(f"Attempting to retreive user data for user id: {user_discord_id}...", extra={'crid': request.crid})
@@ -116,7 +117,7 @@ def getUserAvatarURL(request: HttpRequest, user_discord_id: str = ""):
   if(user_discord_id != ""):
     request_id = user_discord_id
   else:
-    request_id = str(request.session['discord_id'])
+    request_id = getSessionUser(request).discord_id
   # Retrieve user data from database
   try:
     userData = User.objects.get(discord_id = request_id)
@@ -144,7 +145,7 @@ def isUserAdmin(request: HttpRequest, user_discord_id: str = ""):
   if(user_discord_id != ""):
     request_id = user_discord_id
   else:
-    request_id = str(request.session['discord_id'])
+    request_id = getSessionUser(request).discord_id
   # Retrieve user data from database, if its not there create one.
   try:
     logger.debug(f"Attempting to retreive user data for user id: {user_discord_id}...", extra={'crid': request.crid})
@@ -175,11 +176,11 @@ def updateUserData(request: HttpRequest):
   # Body data
   reqBody = json.loads(request.body)
   # Update default user fields
+  user = getSessionUser(request)
   if reqBody.get('default'):
-    User.objects.filter(discord_id=request.session['discord_id']).update(**reqBody['default'])
+    User.objects.filter(guid=user.guid).update(**reqBody['default'])
   # Update AOTD user settings
   if reqBody.get('aotd'):
-    user = User.objects.get(discord_id=request.session['discord_id'])
     AotdUserData.objects.filter(user=user).update(**reqBody['aotd'])
   # Return success code
   return HttpResponse(200)
@@ -278,7 +279,7 @@ def heartbeat(request: HttpRequest):
     res.status_code = 405
     return res
   try:
-    user = User.objects.get(discord_id=request.session['discord_id'])
+    user = getSessionUser(request)
     logger.debug(f"Heartbeat received from {user.nickname}...", extra={'crid': request.crid})
   except:
     logger.warning(f"HEARTBEAT RECIEVED FROM UNKNOWN USER!", extra={'crid': request.crid})
@@ -338,7 +339,7 @@ def getLoginMethods(request: HttpRequest, user_discord_id: str = ""):
   if(user_discord_id != ""):
     request_id = user_discord_id
   else:
-    request_id = str(request.session['discord_id'])
+    request_id = getSessionUser(request).discord_id
   # Get User
   user = User.objects.get(discord_id=request_id)
   # Methods list
@@ -460,8 +461,8 @@ def traditionalLogin(request: HttpRequest):
       out['errorType'] = "PASS"
       out["message"] = "Username/Password not found or Incorrect."
       return JsonResponse(out)
-    # If password is correct, attach the discord_id to the session and return success
-    request.session['discord_id'] = user.discord_id
+    # If password is correct, attach the user guid to the session and return success
+    request.session['user_guid'] = user.guid
     request.session.modified = True
     out = {}
     out['success'] = True
