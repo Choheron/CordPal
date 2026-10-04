@@ -11,6 +11,9 @@ const getCookie = async (name: string) => {
   return (await cookies()).get(name)?.value ?? '';
 }
 
+// Album chunk size settings
+const ALBUM_CHUNK_SIZE = 500
+
 // 
 // Determine if a user has Opted into AOtD.
 // - RETURN: Boolen indicating aotd membership
@@ -728,15 +731,33 @@ export async function getLowestHighestAlbumStats() {
 // - RETURN: Json Obejcts
 //
 export async function getAllAlbums() {
-  console.log(`getAllAlbums: Sending request to backend '/aotd/getAllAlbums'`)
-  const allAlbumsResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAllAlbums`, {
+  console.log(`getAllAlbums called...'`)
+  const first_album_chunk = await getAlbumChunk(0)
+  const offsets: any = []
+  for (let o = ALBUM_CHUNK_SIZE; o < first_album_chunk.total; o += ALBUM_CHUNK_SIZE) {
+    offsets.push(o)
+  }
+  const remaining_album_chunks = await Promise.all(offsets.map(getAlbumChunk))
+  return {
+    timestamp: first_album_chunk.timestamp, 
+    albums_list: [first_album_chunk, ...remaining_album_chunks].flatMap(c => c.albums_list)
+  };
+}
+
+//
+// Get all albums within a single paginated chunk
+// - RETURN: Json object of chunk
+//
+async function getAlbumChunk(offset: number) {
+  console.log(`getAlbumChunk: Sending request to backend '/aotd/getAllAlbums?offset=${offset}&limit=${ALBUM_CHUNK_SIZE}'`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getAllAlbums?offset=${offset}&limit=${ALBUM_CHUNK_SIZE}`, {
     method: "GET",
     cache: 'force-cache',
     next: { tags: ['album_submissions', 'AOTD'] },
-  });
-  const allAlbumsJson = await allAlbumsResponse.json()
-  return allAlbumsJson;
+  })
+  return res.json()
 }
+
 
 //
 // Get an Album and its data

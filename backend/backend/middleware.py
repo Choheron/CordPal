@@ -34,7 +34,7 @@ class metadataMiddleware:
         'timestamp': timezone.now().strftime("%d/%m/%Y, %H:%M:%S"),
         'crid': request.crid
       }
-      response.content = json.dumps(data)
+      response.content = json.dumps(data, separators=(',', ':'))
     # Attach a header to show that this was not a cache hit
     response['X-Generated-At'] = timezone.now().strftime("%d/%m/%Y, %H:%M:%S") + " UTC"
     response["Access-Control-Expose-Headers"] = "X-Generated-At"

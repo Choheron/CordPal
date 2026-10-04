@@ -400,6 +400,9 @@ def getAllAlbums(request: HttpRequest):
     res.status_code = 405
     return res
   now = datetime.datetime.now(tz=pytz.timezone('America/Chicago'))
+  # Get pagination params from request
+  offset = int(request.GET.get('offset', 0))
+  limit = request.GET.get('limit')
   # Single DISTINCT ON query: latest DailyAlbum per album — replaced 3 correlated subqueries
   latest_daily = {
     d['album_id']: d
@@ -410,27 +413,29 @@ def getAllAlbums(request: HttpRequest):
       .values('album_id', 'date', 'rating', 'standard_deviation')
   }
   # Add filters to list
-  albums = list(
-    Album.objects
-    .select_related('submitted_by')
-    .defer('raw_data')
-    .annotate(genres=KeyTransform('genres', KeyTransform('release-group', 'raw_data')))
-  )
+  albums_qs = Album.objects \
+    .select_related('submitted_by') \
+    .defer('raw_data') \
+    .annotate(genres=KeyTransform('genres', KeyTransform('release-group', 'raw_data'))) \
+    .order_by('pk')
+  # Apply pagination filters
+  if(limit):
+    albums_qs = albums_qs[offset:(offset + int(limit))]
+  # Convert albums to a list
+  albums = list(albums_qs)
+  # Iterate albums and return result
   albumList = []
   for album in albums:
     user = album.submitted_by
     daily = latest_daily.get(album.pk, {})
-
     raw_rating = daily.get('rating')
     # 11.0 is the sentinel value meaning "day in progress, no stored rating yet"
     effective_rating = None if (raw_rating is None or raw_rating == 11.0) else raw_rating
-
     stddev = daily.get('standard_deviation')
     effective_stddev = stddev if (stddev is not None and stddev != 0.00) else None
-
     # Parse Genre List (Returning only 3 Genres per album)
     genre_list = [genre['name'] for genre in sorted(album.genres, key=lambda genre: genre["count"], reverse=True)[:3]] if album.genres else []
-
+    # Add to album list
     albumList.append({
       'title': album.title,
       'album_id': album.mbid,
@@ -458,7 +463,7 @@ def getAllAlbums(request: HttpRequest):
       'track_list': [trackObj['title'] for trackObj in (album.track_list.get('tracks', []) if isinstance(album.track_list, dict) else (album.track_list or []))]
     })
 
-  return JsonResponse({"timestamp": datetime.datetime.now(), "albums_list": albumList})
+  return JsonResponse({"timestamp": datetime.datetime.now(), "total": Album.objects.count(), "albums_list": albumList})
 
 
 ###
