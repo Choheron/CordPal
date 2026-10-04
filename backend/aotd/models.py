@@ -857,8 +857,6 @@ class AlbumTag(models.Model):
     )
 
   def toJSON(self, user=None, short=False):
-    upvotes = self.votes.filter(vote_type=1).count()
-    downvotes = self.votes.filter(vote_type=-1).count()
     # Build out return dict
     out = {}
     out['id'] = self.pk
@@ -866,6 +864,10 @@ class AlbumTag(models.Model):
     out['tag_text'] = self.tag_text
     out['is_approved'] = self.is_approved
     if(not short):
+      # Get Counts
+      upvotes = self.votes.filter(vote_type=1).count()
+      downvotes = self.votes.filter(vote_type=-1).count()
+      # Fill out return value
       out['submitted_by'] = self.submitted_by.nickname if self.submitted_by else None
       out['submitted_by_id'] = self.submitted_by.guid if self.submitted_by else None
       out['submitted_at'] = self.submitted_at.strftime("%m/%d/%Y, %H:%M:%S")

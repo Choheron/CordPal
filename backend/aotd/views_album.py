@@ -1,5 +1,15 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count, Q, F, Prefetch
+from django.db.models.fields.json import KeyTransform
+
+import logging
+from dotenv import load_dotenv
+import os
+import json
+import datetime
+import pytz
+from datetime import timedelta
 
 from .utils import (
   getAlbumRating,
@@ -15,21 +25,9 @@ from .models import (
   Album,
   AlbumCommentHistory,
   AlbumOwnershipHistory,
-  Review,
+  AlbumTag,
   DailyAlbum
 )
-
-
-import logging
-from dotenv import load_dotenv
-import os
-import json
-import datetime
-import pytz
-import requests
-from datetime import timedelta
-from django.db.models import Count, Q, F
-from django.db.models.fields.json import KeyTransform
 
 # Declare logging
 logger = logging.getLogger()
@@ -403,26 +401,28 @@ def getAllAlbums(request: HttpRequest):
   # Get pagination params from request
   offset = int(request.GET.get('offset', 0))
   limit = request.GET.get('limit')
-  # Single DISTINCT ON query: latest DailyAlbum per album — replaced 3 correlated subqueries
-  latest_daily = {
-    d['album_id']: d
-    for d in DailyAlbum.objects
-      .filter(date__lte=now)
-      .order_by('album_id', '-date')
-      .distinct('album_id')
-      .values('album_id', 'date', 'rating', 'standard_deviation')
-  }
   # Add filters to list
   albums_qs = Album.objects \
-    .select_related('submitted_by') \
+    .select_related('submitted_by', 'submitted_by__aotd_data') \
     .defer('raw_data') \
     .annotate(genres=KeyTransform('genres', KeyTransform('release-group', 'raw_data'))) \
+    .prefetch_related(Prefetch('tags', queryset=AlbumTag.objects.filter(is_approved=True))) \
     .order_by('pk')
   # Apply pagination filters
   if(limit):
     albums_qs = albums_qs[offset:(offset + int(limit))]
   # Convert albums to a list
   albums = list(albums_qs)
+  # Single DISTINCT ON query: latest DailyAlbum per album — replaced 3 correlated subqueries
+  latest_daily = {
+    d['album_id']: d
+    for d in DailyAlbum.objects
+      .filter(date__lte=now)
+      .filter(album_id__in=[a.pk for a in albums])
+      .order_by('album_id', '-date')
+      .distinct('album_id')
+      .values('album_id', 'date', 'rating', 'standard_deviation')
+  }
   # Iterate albums and return result
   albumList = []
   for album in albums:
@@ -447,7 +447,7 @@ def getAllAlbums(request: HttpRequest):
       },
       'submitter': user.guid if user else None,
       'submitter_avatar_url': user.get_avatar_url() if user else None,
-      'submitter_active': AotdUserData.objects.get(user=user).active if user else None,
+      'submitter_active': user.aotd_data.active if user else None,
       'submitter_nickname': user.nickname if user else None,
       'submitter_comment': album.user_comment,
       'submission_date': album.submission_date.strftime("%m/%d/%Y, %H:%M:%S"),
@@ -458,7 +458,7 @@ def getAllAlbums(request: HttpRequest):
       'standard_deviation': effective_stddev,
       'genre_list': genre_list,
       # Get user generated tags for the album
-      'tags': [tag.toJSON(short=True) for tag in album.tags.filter(is_approved=True)],
+      'tags': [tag.toJSON(short=True) for tag in album.tags.all()],
       # Add track list (legacy albums may store a plain list instead of {"tracks": [...]})
       'track_list': [trackObj['title'] for trackObj in (album.track_list.get('tracks', []) if isinstance(album.track_list, dict) else (album.track_list or []))]
     })
