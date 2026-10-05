@@ -91,7 +91,7 @@ export default function ReplaceAlbumModal(props) {
             variant="solid"
             isDisabled={isButtonDisabled}
           >
-            <RiFindReplaceFill className="text-2xl" />
+            <RiFindReplaceFill className="text-lg md:text-2xl" />
           </Button>
         </span>
       </Tooltip>

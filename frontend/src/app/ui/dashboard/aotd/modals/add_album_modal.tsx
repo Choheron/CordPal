@@ -47,6 +47,8 @@ export default function AddAlbumModal(props) {
   const [albumList, setAlbumList] = React.useState([]);
   // Listbox Selection Settings
   const [selectedKey, setSelectedKey]: any = React.useState(new Set([]));
+  // Input sizing
+  const [isDesktop, setIsDesktop] = React.useState(false);
   const selectedValue = React.useMemo(
     () => Array.from(selectedKey).join(", "),
     [selectedKey]
@@ -71,6 +73,15 @@ export default function AddAlbumModal(props) {
     }
     getUserSubmissionValidity()
     checkAdmin()
+  }, [])
+
+  // UseEffect to track whether the screen is desktop width for input sizing
+  React.useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    setIsDesktop(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, [])
 
   // Send a search request and a
@@ -252,18 +263,18 @@ export default function AddAlbumModal(props) {
               <DrawerBody>
               <div className="flex flex-col gap-2 justify-evenly">
                 <Divider />
-                <div className="max-w-[320px] lg:max-w-[650px] px-2 py-2 mt-2 text-xs italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
+                <div className="max-w-full lg:max-w-[650px] px-2 py-2 mt-2 text-[10px] md:text-xs italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
                   <p>
                     NOTE: Please refrain from submitting &quot;best of&quot; albums to the AOtD pool. The purpose of the AOtD is to add albums created by the artist in their originial form &#40;extended editions,
                     deluxes, and the like are allowed&#41;. If any album is in question, ask in the discord.
                   </p>
                 </div>
-                <p className="text-xl">Search for an Album: </p>
+                <p className="md:text-xl">Search for an Album: </p>
                 <Divider />
-                <p className="text-sm">Search via Album name and Artist Name:</p>
+                <p className="text-xs md:text-sm">Search via Album name and Artist Name:</p>
                 <Input 
                   className="w-full"
-                  size="md"
+                  size={isDesktop ? "md" : "sm"}
                   label="Album Title:" 
                   placeholder="Enter an Album title" 
                   value={searchTitle}
@@ -273,17 +284,17 @@ export default function AddAlbumModal(props) {
                 />
                 <Input 
                   className="w-full"
-                  size="md"
+                  size={isDesktop ? "md" : "sm"}
                   label="Artist:" 
                   placeholder="Enter an Artist's name" 
                   value={searchArtist}
                   onValueChange={setSearchArtist}
                   isDisabled={searchMBID != ""}
                 />
-                <p className="text-sm">Or directly retrieve it via MBID:</p>
+                <p className="text-xs md:text-sm">Or directly retrieve it via MBID:</p>
                 <Input 
                   className="w-full"
-                  size="md"
+                  size={isDesktop ? "md" : "sm"}
                   label="Album MBID:" 
                   placeholder="Enter the Album's MBID" 
                   value={searchMBID}
@@ -292,16 +303,18 @@ export default function AddAlbumModal(props) {
                 />
                 <Button 
                   isLoading={isSearchLoading}
-                  color="primary" 
+                  color="primary"
+                  size={isDesktop ? "md" : "sm"}
                   isDisabled={!((searchTitle !== "") || (searchArtist !== "") || (searchMBID !== ""))}
                   onPress={searchPress}
+                  className="text-xs md:text-base"
                 >
                   Search {(searchMBID != "") ? ("via MBID") : ("via Name and Artist")}
                 </Button>
                 <Divider />
                 <p>Search Results:</p>
                 <Conditional showWhen={albumList.length == 0}>
-                  <p className="mx-auto italic">
+                  <p className="text-xs md:text-base mx-auto italic">
                     Albums will appear here once you submit your search!
                   </p>
                 </Conditional>
@@ -332,17 +345,17 @@ export default function AddAlbumModal(props) {
                           </div>
                           <div className="flex flex-col mx-2 w-full">
                             <div className="flex">
-                              <p className="text-lg line-clamp-1">{album['title']}</p>
+                              <p className="text-sm md:text-lg line-clamp-1">{album['title']}</p>
                               <Conditional showWhen={album['disambiguation']}>
                                 <p className="text-sm my-auto ml-1 italic line-clamp-1">&#40;{album['disambiguation']}&#41;</p>
                               </Conditional>
                             </div>
-                            <p className="text-sm italic">{album['artist-credit'][0]['name']}</p>
+                            <p className="text-[10px] md:text-sm italic">{album['artist-credit'][0]['name']}</p>
                             <p className="text-sm italic">{album['date']}</p>
                           </div>
                           <div className="w-1/2">
-                            <p className="text-sm">Type: {album['release-group']['primary-type']}</p>
-                            <p className="text-sm">{album['track-count'] ?? album['media']?.[0]?.['track-count'] ?? '?'} Tracks</p>
+                            <p className="text-xs md:text-sm">Type: {album['release-group']['primary-type']}</p>
+                            <p className="text-xs md:text-sm">{album['track-count'] ?? album['media']?.[0]?.['track-count'] ?? '?'} Tracks</p>
                           </div>
                         </div>
                       </ListboxItem>
@@ -358,32 +371,37 @@ export default function AddAlbumModal(props) {
                         src={`/dashboard/aotd/api/album-cover/${selectedAlbum['id']}`}
                         fallbackSrc="https://placehold.co/150x150?text=Cover+Not+Found"
                         alt={`Album Art for ${selectedAlbum['title']}`}
-                        width={150}
-                        height={150}
+                        width={isDesktop ? 150 : 75}
+                        height={isDesktop ? 150 : 75}
                         className="rounded-xl"
                       />
                       <div className="flex flex-col ml-2">
                         <div className="flex">
-                          <p className="text-2xl">{selectedAlbum['title']}</p>
+                          <p className="text-sm md:text-2xl">{selectedAlbum['title']}</p>
                           <Conditional showWhen={selectedAlbum['disambiguation']}>
-                            <p className="text-sm my-auto ml-1 italic">&#40;{selectedAlbum['disambiguation']}&#41;</p>
+                            <p className="text-xs md:text-sm my-auto ml-1 italic">&#40;{selectedAlbum['disambiguation']}&#41;</p>
                           </Conditional>
                         </div>
-                        <p className="text-base italic">{selectedAlbum['artist-credit'][0]['name']}</p>
-                        <p className="text-base italic">{selectedAlbum['date']}</p>
-                        <p className="text-sm">{selectedAlbum['track-count'] ?? selectedAlbum['media']?.[0]?.['track-count'] ?? '?'} Tracks</p>
-                        <a href={`https://musicbrainz.org/release/${selectedAlbum['id']}`} target="_noreferrer" className="text-lg text-blue-600 hover:underline">
-                          MusicBrainz Link for Verification
-                        </a>
-                      </div>
+                        <p className="text-xs md:text-base italic">{selectedAlbum['artist-credit'][0]['name']}</p>
+                        <p className="text-xs md:text-base italic">{selectedAlbum['date']}</p>
+                        <p className="text-[10px] md:text-sm">{selectedAlbum['track-count'] ?? selectedAlbum['media']?.[0]?.['track-count'] ?? '?'} Tracks</p>
+                      </div>                      
                     </div>
+                    <a 
+                      href={`https://musicbrainz.org/release/${selectedAlbum['id']}`} 
+                      target="_noreferrer" 
+                      className="md:text-lg text-blue-600 hover:underline"
+                    >
+                      MusicBrainz Link for Verification
+                    </a>
                   </>
                 )}
                 <Divider />
                 <Textarea
                   label="Comment"
                   minRows={1}
-                  placeholder="Optional Comment to include next to the Album, Currently not displayed to other users..."
+                  size={isDesktop ? "md" : "sm"}
+                  placeholder="Optional Comment to include with the Album"
                   value={commentValue}
                   onValueChange={setCommentValue}
                 />
@@ -418,7 +436,11 @@ export default function AddAlbumModal(props) {
                 </Conditional>
                 <div className="flex w-full items-center">
                   <Conditional showWhen={isAdmin}>
-                    <Checkbox isSelected={isHidden} onValueChange={setIsHidden}>
+                    <Checkbox 
+                      isSelected={isHidden} 
+                      onValueChange={setIsHidden}
+                      size={isDesktop ? "md" : "sm"}
+                    >
                       Hide This Submission?
                     </Checkbox>
                   </Conditional>

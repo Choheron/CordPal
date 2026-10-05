@@ -10,6 +10,8 @@ import json
 import base64
 import datetime
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 import pytz
 from django.utils.timezone import now
 from datetime import timedelta
@@ -35,6 +37,10 @@ logger = logging.getLogger()
 # Determine runtime enviornment
 APP_ENV = os.getenv('APP_ENV') or 'DEV'
 load_dotenv(".env.production" if APP_ENV=="PROD" else ".env.local")
+
+# Musicbrainz session, retries on rate limiting (503) and gateway errors
+mb_session = requests.Session()
+mb_session.mount("https://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1, status_forcelist=[502, 503, 504])))
 
 
 ###
@@ -434,10 +440,10 @@ def update_user_streak(user: User, date_override: datetime.date | None = None):
 
 
 def get_album_from_mb(mbid: str) -> Album:
-  '''Given and mbid, query musicbrainz and get data about the album. Then return an UNSAVED Album object. 
-     WARNING: submitted_by and user comment need to be populated. 
-     
-     NOTE: ALBUM OBJECT MUST BE SAVED TO GO INTO THE DATABASE
+  '''
+  Given and mbid, query musicbrainz and get data about the album. Then return an UNSAVED Album object. 
+  WARNING: submitted_by and user comment need to be populated.   
+  NOTE: ALBUM OBJECT MUST BE SAVED TO GO INTO THE DATABASE
   '''
   from .views_album import parseReleaseDate
   # Query musicbrainz to get full album data using mbid (to avoid issues with params)
@@ -449,7 +455,8 @@ def get_album_from_mb(mbid: str) -> Album:
   headers = {
     'User-Agent': 'CordPal/0.0.1 ( www.cordpal.app )'
   }
-  response = requests.get(url, params=params, headers=headers)
+  response = mb_session.get(url, params=params, headers=headers, timeout=10)
+  response.raise_for_status()
   data = response.json()
   # Parse full track list
   track_list = []

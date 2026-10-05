@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import os
 import json
 import datetime
+import requests
 import pytz
 from datetime import timedelta
 
@@ -174,7 +175,12 @@ def submitAlbum(request: HttpRequest):
     # Get user from database
     user = getSessionUser(request)
     # Query musicbrainz to get full album data using mbid (to avoid issues with params)
-    newAlbum = get_album_from_mb(reqBody['album']['id'])
+    try:
+      newAlbum = get_album_from_mb(reqBody['album']['id'])
+    except requests.RequestException as e:
+      logger.error(f"submitAlbum: Musicbrainz lookup failed for mbid {reqBody['album']['id']}: {e}", extra={'crid': request.crid})
+      out = {'succesful': False, 'status': 503, 'err_message': 'Unable to reach MusicBrainz, please try again in a moment.'}
+      return JsonResponse(out, status=out['status'])
     # Populate submitter and user comment
     newAlbum.release_group_id = reqBody['album']['release-group']['id']
     newAlbum.submitted_by = user

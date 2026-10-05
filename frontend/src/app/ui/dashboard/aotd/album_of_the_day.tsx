@@ -81,7 +81,9 @@ export default async function AlbumOfTheDayBox(props) {
                 className={`min-w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
                 variant="solid"
               >
-                <b>Yesterday&apos;s Album</b>
+                <p className="text-xs md:text-sm">
+                  <b>Yesterday&apos;s Album</b>
+                </p>
               </Button>
             </Link>
             <Link
@@ -92,7 +94,7 @@ export default async function AlbumOfTheDayBox(props) {
                 className={`min-w-fit hover:underline text-white bg-gradient-to-br from-green-700/80 to-green-800/80`}
                 variant="solid"
               >
-                <RiCalendar2Fill className="text-2xl" />
+                <RiCalendar2Fill className="md:text-2xl" />
               </Button>
             </Link>
           </div>
@@ -136,7 +138,7 @@ export default async function AlbumOfTheDayBox(props) {
               cover_override="h-[125px] w-[125px] md:h-[300px] md:w-[300px] 2xl:size-[410px]"
             />
             <Conditional showWhen={isAdmin}>
-              <div className="absolute bottom-0 right-0">
+              <div className="absolute bottom-0 md:right-0">
                 <ReplaceAlbumModal
                   albumObj={albumOfTheDayObj}
                   isButtonDisabled={!isAdmin}
