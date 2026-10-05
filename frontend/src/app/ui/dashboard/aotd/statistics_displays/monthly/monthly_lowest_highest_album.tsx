@@ -25,23 +25,25 @@ export default async function MonthlyLowestHighestAlbum(props) {
   const highestAlbumObj = (props.highestAlbum) ? props.highestAlbum : null;
   const lowestAlbumObj = (props.lowestAlbum) ? props.lowestAlbum : null;
 
-  // Get data from props
+  // If No review data is in, or no album qualifies for highest/lowest yet, return an empty box with a warning
+  const noReviews = (reviewData['total_reviews'] == 0);
+  if(noReviews || (aotdStats?.['highest_aotd_date'] == null)) {
+    return (
+      <div className="w-full lg:w-[400px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
+        <div className="max-w-full mx-auto px-2 py-2 my-auto text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
+          <p>{(noReviews) ? `No review data for ${monthName} ${year}` : `Highest and lowest album data unavailable for ${monthName} ${year}`}</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Get data from props if stats are available
   const highestAlbumDateArr = aotdStats['highest_aotd_date'].split("-")
   const lowestAlbumDateArr = aotdStats['lowest_aotd_date'].split("-")
 
   const highestAlbumRating = (highestAlbumObj['rating'] != null) ? highestAlbumObj['rating'].toFixed(2) : 0;
   const lowestAlbumRating = (lowestAlbumObj['rating'] != null) ? lowestAlbumObj['rating'].toFixed(2) : 0;
 
-  // If No review data is in, return an empty box with a warning 
-  if(reviewData['total_reviews'] == 0) {
-    return (
-      <div className="w-full lg:w-[400px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">
-        <div className="max-w-full mx-auto px-2 py-2 my-auto text-small text-center italic border border-neutral-800 rounded-2xl bg-zinc-800/30">
-          <p>No review data for {monthName} {year}</p>
-        </div>
-      </div>
-    )
-  }
   // Otherwise do normal data display
   return (
     <div className="w-full lg:w-[400px] flex flex-col backdrop-blur-2xl pl-2 pr-4 py-2 my-2 rounded-2xl bg-zinc-800/30 border border-neutral-800">

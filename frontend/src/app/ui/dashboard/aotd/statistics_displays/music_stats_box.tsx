@@ -31,9 +31,9 @@ export default async function MusicStatsBox(props) {
   const albumLowHighStatsJson = await getAOtDByMonth(year, month);
   const userReviewStatsJson = await getAllUserReviewStats();
   // Parse Album Data
-  const empty_month = (Object.keys(albumLowHighStatsJson).length <= 2) // An empty month will return only two fields
   const highest_date = albumLowHighStatsJson['stats']?.['highest_aotd_date']
   const lowest_date = albumLowHighStatsJson['stats']?.['lowest_aotd_date']
+  const empty_month = (highest_date == null) // No album has qualified for highest/lowest this month
   const single_album = !empty_month && (highest_date === lowest_date)
   const highest_album: Object = (empty_month) ? {"date": "2000-01-01"} : (await getAlbumOfTheDayData(highest_date))
   const highest_album_tags = (empty_month) ? [] : await getTagsForAlbum(highest_album["mbid"]);

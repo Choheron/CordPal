@@ -1,6 +1,6 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.forms.models import model_to_dict
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F
 from django.utils import timezone
 from django.core import management
 
@@ -57,7 +57,11 @@ def getAlbumOfDay(request: HttpRequest, date: str = ""):
     return res
   # Convert String to date
   date_format = '%Y-%m-%d'
-  albumDay = datetime.datetime.strptime(date, date_format).date()
+  try:
+    albumDay = datetime.datetime.strptime(date, date_format).date()
+  except ValueError:
+    logger.warning(f'getAlbumOfDay called with invalid date: {date}', extra={'crid': request.crid})
+    return JsonResponse({'err_message': 'Invalid date'}, status=400)
   # Get Album from the database
   try:
     dailyAlbumObj = DailyAlbum.objects.get(date=albumDay)
@@ -170,26 +174,42 @@ def setAlbumOfDayADMIN(request: HttpRequest, date: str, mbid: str):
     adminMessage = reqBody['admin_message']
   except:
     adminMessage = None
-  # Get current date
-  day = datetime.datetime.strptime(date, "%Y-%m-%d")
+  # Convert String to date
+  try:
+    day = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+  except ValueError:
+    logger.warning(f'setAlbumOfDayADMIN called with invalid date: {date}', extra={'crid': request.crid, 'aotd_date': date, 'mbid': mbid})
+    return HttpResponse('Invalid date', status=400)
   # Define Album Object
   if(mbid == "RAND"):
     albumOfTheDay = Album.objects.order_by('?').first()
   else:
-    albumOfTheDay = Album.objects.get(mbid=mbid)
-    
-  # Create an album of the day object
-  albumOfTheDayObj = DailyAlbum(
-    album=albumOfTheDay,
-    date=day,
-    manual=True,
-    admin_message=adminMessage
-  )
+    albumOfTheDay = Album.objects.filter(mbid=mbid).first()
+  if(albumOfTheDay is None):
+    logger.warning(f'setAlbumOfDayADMIN found no album for mbid: {mbid}', extra={'crid': request.crid, 'aotd_date': date, 'mbid': mbid})
+    return HttpResponse(f'No album found for mbid: {mbid}', status=404)
+  # Get existing album of the day object for this date (date is unique), or create one
+  albumOfTheDayObj = DailyAlbum.objects.filter(date=day).first() or DailyAlbum(date=day)
+  replacedMbid = albumOfTheDayObj.album.mbid if albumOfTheDayObj.pk else None
+  albumOfTheDayObj.album = albumOfTheDay
+  albumOfTheDayObj.manual = True
+  albumOfTheDayObj.admin_message = adminMessage
   # Save object
   albumOfTheDayObj.save()
   # Print success
-  logger.info(f'{request.crid} - Successfully set album of the day for {date}: {albumOfTheDayObj}', extra={'crid': request.crid})
-  return HttpResponse(f'Successfully set album of the day for {date}: {albumOfTheDayObj}')
+  adminMessageStr = f' - Admin Message: "{adminMessage}"' if adminMessage else ''
+  logger.info(
+    f'{request.crid} - Successfully set album of the day: {albumOfTheDayObj}{adminMessageStr}', 
+    extra={
+      'crid': request.crid,
+      'aotd_date': date,
+      'mbid': albumOfTheDay.mbid,
+      'random_selection': mbid == "RAND",
+      'replaced_mbid': replacedMbid,
+      'admin_message': adminMessage
+    }
+  )
+  return HttpResponse(f'Successfully set album of the day: {albumOfTheDayObj}{adminMessageStr}')
 
 
 ###
@@ -340,24 +360,31 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     res = HttpResponse("Method not allowed")
     res.status_code = 405
     return res
+  # Today Date Object
+  today = datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date()
   # Get all AOtD Objects for this year and month
-  month_AOtD = DailyAlbum.objects.filter(date__year=year, date__month=month).filter(date__lte=datetime.datetime.now(tz=pytz.timezone('America/Chicago')).date())
+  month_AOtD = DailyAlbum.objects \
+    .filter(date__year=year, date__month=month) \
+    .filter(date__lte=today) \
+    .annotate(review_count=Count('album__reviews', filter=Q(album__reviews__aotd_date=F('date'))))
   # Create out object
   out = {}
   if(len(month_AOtD) != 0):
     # Track highest and lowest album scores of the month
-    highest_aotd: DailyAlbum = month_AOtD.first()
-    highest_aotd_rating = getAlbumRating(highest_aotd.album.mbid, rounded=False, date=highest_aotd.date)
-    lowest_aotd: DailyAlbum = month_AOtD.first()
-    lowest_aotd_rating = getAlbumRating(lowest_aotd.album.mbid, rounded=False, date=lowest_aotd.date)
+    highest_aotd: DailyAlbum = None
+    highest_aotd_rating = 0
+    lowest_aotd: DailyAlbum = None
+    lowest_aotd_rating = 11
     # Track counts of submitters selected
     selection_counts = {}
     for aotd in month_AOtD:
       albumObj = aotd.album
       # Get album Rating
       rating = getAlbumRating(aotd.album.mbid, rounded=False, date=aotd.date)
-      # Check highest and lowest ratings if rating is not null
-      if(rating):
+      # Get count of reviews for this album
+      review_count = aotd.review_count
+      # Check highest and lowest ratings if rating is not null, album is not todays, and album has 4 reviews
+      if((aotd.date < today) and rating and (review_count >= 4 if (APP_ENV == "PROD") else True)):
         if((highest_aotd_rating == None) or (rating > highest_aotd_rating)):
           highest_aotd = aotd
           highest_aotd_rating = rating
@@ -406,15 +433,13 @@ def getAOtDByMonth(request: HttpRequest, year: str, month: str):
     # Provide Statistics
     out['stats'] = {}
     # Attach lowest and highest album data
-    out['stats']['lowest_aotd_date'] = lowest_aotd.dateToCalString()
-    out['stats']['highest_aotd_date'] = highest_aotd.dateToCalString()
+    out['stats']['lowest_aotd_date'] = lowest_aotd.dateToCalString() if lowest_aotd else None
+    out['stats']['highest_aotd_date'] = highest_aotd.dateToCalString() if highest_aotd else None
     # Attach Submission Numbers
     out['stats']['selection_counts'] = subNumList
     out['stats']['selection_total'] = len(month_AOtD)
     # Attach submission numbers object to out JSON 
     out['stats']['user_stats'] = subNumObj
-    # Attach tag stats to out json
-
   # Return out object with timestamp
   out['timestamp'] = timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
   return JsonResponse(out)
