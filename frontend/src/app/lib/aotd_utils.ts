@@ -126,7 +126,7 @@ export async function getAotdUserCount() {
     }
   });
   const userListJSON = await userListResponse.json()
-  return userListJSON['count'];
+  return userListJSON['active_count'];
 }
 
 

@@ -85,8 +85,9 @@ def getAotdUserCount(request: HttpRequest):
     return res
   # Return user count
   userCount = AotdUserData.objects.count()
+  activeUserCount = AotdUserData.objects.filter(active=True).count()
   # Create response 
-  usersCountData = {"count": str(userCount)}
+  usersCountData = {"count": str(userCount), "active_count": str(activeUserCount)}
   # Return json containing count
   return JsonResponse(usersCountData)
 
