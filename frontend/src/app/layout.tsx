@@ -12,8 +12,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-      template: '%s | Cord-Pal',
-      default: 'Cord-Pal',
+      template: '%s | CordPal',
+      default: 'CordPal',
     },
   description: "Discord Compainion Site allowing users to submit albums, track quotes, upload inside joke images, etc.",
   icons: {
