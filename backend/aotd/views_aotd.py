@@ -106,7 +106,7 @@ def setAlbumOfDay(request: HttpRequest):
     # Attempt to get previous AOtD Object and generate a timeline, as well as store final rating for that album in the AOtD object, also calculate standard deviation
     yesterday_aotd = DailyAlbum.objects.get(date=yesterday)
     generateDayRatingTimeline(yesterday_aotd)
-    yesterday_aotd.rating = getAlbumRating(yesterday_aotd.album.mbid, False, yesterday.strftime("%Y-%m-%d"))
+    yesterday_aotd.rating = getAlbumRating(yesterday_aotd.album.mbid, False, yesterday)
     yesterday_aotd.standard_deviation = retrieveAlbumSTD(yesterday_aotd.album.mbid, yesterday.strftime("%Y-%m-%d"), True)
     yesterday_aotd.save()
   except:
@@ -469,7 +469,7 @@ def getDayTimelineData(request: HttpRequest, aotd_date: str):
   if((day != aotd_date_obj.date()) and (aotd_obj.rating_timeline == {"timeline": []})):
     logger.error(f"ATTENTION: AOTD \"{aotd_obj.album.mbid}\" for date: {aotd_date} DID NOT HAVE A TIMELINE -- ATTEMPTING TO GENERATE ONE NOW", extra={'crid': request.crid})
     generateDayRatingTimeline(aotd_obj)
-    aotd_obj.rating = getAlbumRating(aotd_obj.album.mbid, False, aotd_date)
+    aotd_obj.rating = getAlbumRating(aotd_obj.album.mbid, False, aotd_obj.date)
     aotd_obj.save()
   # Return object data
   return JsonResponse(aotd_obj.rating_timeline)

@@ -411,7 +411,7 @@ class DailyAlbum(models.Model):
   manual = models.BooleanField(default=False)
   admin_message = models.TextField(null=True, blank=True)  # If set by an admin, and the admin provided a message, store that here. [The frontend will not show that an admin set this day unless a description is provided]
   rating_timeline = models.JSONField(default=generateTimelineDict, null=True)
-  rating = models.FloatField(default=11.0, null=False) # Score for this day, will only be populated after the day is over (11 means it was not populated yet, Null means no reviews were made)
+  rating = models.FloatField(default=11.0, null=True) # Score for this day, will only be populated after the day is over (11 means it was not populated yet, Null means no reviews were made)
   standard_deviation = models.FloatField(default=None, null=True)
 
   def getReviewCount(self):
@@ -479,6 +479,9 @@ class Review(models.Model):
     """
     Returns two values if the passed-in user guid is found in the views list: viewed_bool, ReviewView
     """
+    # Special override to mark all reviews pre-September 22nd 2026 as viewed
+    if(self.aotd_date < datetime.date(2026, 9, 22)):
+      return True, ReviewView(review=self, first_viewed=self.last_updated, last_viewed_at=self.last_updated)
     # Retreive view object for non-submitter user
     try:
       viewObj: ReviewView = ReviewView.objects.filter(review__pk=self.pk).get(aotdUser__user__guid=user_guid)
