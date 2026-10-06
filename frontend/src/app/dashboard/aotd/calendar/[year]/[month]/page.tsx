@@ -14,7 +14,22 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { RiArrowLeftCircleLine, RiArrowRightCircleLine, RiThumbDownFill, RiThumbUpFill, RiVipCrownFill } from "react-icons/ri"
 import { monthToWeekArray } from "@/app/lib/calendar_utils"
+import { Metadata } from "next";
 
+
+// Page metadata
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ year: string, month: string }> 
+}): Promise<Metadata> {
+  const { year, month } = (await params)
+  // Get month and day data
+  const monthName = monthToName(month)
+  return {
+    title: `${monthName} ${year} Calendar`
+  }
+}
 
 
 // Page to display historial data for a specific month

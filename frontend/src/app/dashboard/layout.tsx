@@ -7,7 +7,6 @@ import { getUserData, getUserAvatarURL, getUserLoginMethods } from "../lib/user_
 import CordpalPlaybackBanner from "../ui/playback/general/conditional_playback_banner";
 import { getAotdUserSettings, isAotdParticipant } from "../lib/aotd_utils";
 
-
 export default async function Layout({ children }: { children: React.ReactNode }) {
   // Retrieve user data; memberStatus is injected by middleware to avoid a redundant backend call
   const [userData, userLoginMethods, reqHeaders, avatarURL, aotdConnected] = await Promise.all([

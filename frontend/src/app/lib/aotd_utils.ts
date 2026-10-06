@@ -634,6 +634,27 @@ export async function markReviewViewed(review_pk) {
 
 
 //
+// Check the unseen count of a whole day's reviews for a specific user
+// - RETURN: JSON Object unseen review count
+//
+export async function getDateViewStatus(aotd_date) {
+  // Check for sessionid in cookies
+  const sessionCookie = await getCookie('sessionid');
+  // Query the backend for this user's specific review view status state 
+  console.log(`getDateViewStatus: Sending request to backend '/aotd/getDateViewStatus/${aotd_date}'`)
+  const getDateViewStatusRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_BACKEND_URL}/aotd/getDateViewStatus/${aotd_date}`, {
+    method: "GET",
+    cache: 'no-store',
+    headers: {
+      Cookie: `sessionid=${sessionCookie};`
+    },
+  });
+  const getDateViewStatusJson = await getDateViewStatusRes.json()
+  return getDateViewStatusJson;
+}
+
+
+//
 // Get Last X Album Submissions
 // - RETURN: list in JSON
 //

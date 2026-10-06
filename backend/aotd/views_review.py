@@ -163,7 +163,7 @@ def markReviewViewed(request: HttpRequest, review_pk):
     return JsonResponse({'success': False, 'error': f"Review with pk {review_pk} not found"}, status=404)
   # If current user is the creator of the review, spoof a fake response to avoid creating a needless ReviewView object
   if(review.user.guid == user.guid):
-    return JsonResponse({'success': True, 'error': "N/A"}, status=200)
+    return JsonResponse({'success': True, 'aotd_date': review.aotd_date.strftime("%Y-%m-%d"), 'error': "N/A"}, status=200)
   # Mark this user as having reviewed the located review, creating or updating as needed.
   viewObj, created = ReviewView.objects.get_or_create(aotdUser=aotdUserObj, review=review)
   if(not created):
@@ -172,9 +172,17 @@ def markReviewViewed(request: HttpRequest, review_pk):
   logger.info(f"Successfully marked review {review.pk} as viewed by user {user.guid} ({user.nickname})", extra={
     'crid': request.crid,
     "user": user.toJSON(),
-    "review_id": review.pk
+    "review_id": review.pk,
+    "aotd_date": review.aotd_date.strftime("%Y-%m-%d")
   })
-  return JsonResponse({'success': True, 'error': "N/A"}, status=200)
+  return JsonResponse(
+    {
+      'success': True, 
+      'error': "N/A", 
+      "aotd_date": review.aotd_date.strftime("%Y-%m-%d")
+    }, 
+    status=200
+  )
 
 
 ###
@@ -213,6 +221,40 @@ def getReviewViewStatus(request: HttpRequest, review_pk):
     "viewed": viewed,
     "updated": updated if viewed else None
   }, status=200)
+
+
+###
+# Get unseen review count for a specific day (updates count as unseen)
+###
+def getDateViewStatus(request: HttpRequest, aotd_date: str):
+  # Make sure request is a get request
+  if(request.method != "GET"):
+    logger.warning(f"getDateViewStatus called with a non-GET method, returning 405.", extra={'crid': request.crid})
+    res = HttpResponse("Method not allowed")
+    res.status_code = 405
+    return res
+  # Retrieve user from session cookie
+  user = getSessionUser(request)
+  # Parse date string
+  try:
+    date = datetime.datetime.strptime(aotd_date, '%Y-%m-%d').date()
+  except ValueError as e:
+    logger.warning(f"Invalid date {aotd_date} passed to getDateViewStatus", extra={'crid': request.crid, 'user_guid': user.guid, 'aotd_date': aotd_date, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': f"Invalid date {aotd_date}"}, status=400)
+  # Retrieve all reviews for the date, excluding the user's own review
+  reviews = Review.objects.filter(aotd_date=date).exclude(user__guid=user.guid).values_list('pk', 'last_updated')
+  # Retrieve all of the user's views for that day's reviews in one query, keyed by review pk
+  views = dict(
+    ReviewView.objects.filter(review__aotd_date=date, aotdUser__user__guid=user.guid).values_list('review_id', 'last_viewed_at')
+  )
+  # Count reviews never viewed or updated since last seen
+  unseen = 0
+  for review_pk, last_updated in reviews:
+    last_viewed_at = views.get(review_pk)
+    if((last_viewed_at is None) or (last_viewed_at < last_updated)):
+      unseen += 1
+  # Return count of unseen reviews for a day.
+  return JsonResponse({"unseen": unseen}, status=200)
 
 
 ###

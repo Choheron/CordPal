@@ -6,13 +6,28 @@ import { getLastYearInTimezone, isTodayCheck, milliToString, monthToName, rating
 import { Conditional } from "@/app/ui/dashboard/conditional"
 import PageTitle from "@/app/ui/dashboard/page_title"
 import AlbumDisplay from "@/app/ui/dashboard/aotd/album_display"
-import ReviewDisplay from "@/app/ui/dashboard/aotd/review_display"
 import Link from "next/link"
 import AlbumDeleteButton from "@/app/ui/dashboard/aotd/album_delete_button"
 import ReplaceAlbumModal from "@/app/ui/dashboard/aotd/modals/replace_album_modal"
 import EditSubmissionModal from "@/app/ui/dashboard/aotd/modals/edit_submission_modal"
 import AlbumTagsDisplay from "@/app/ui/dashboard/aotd/album_tags"
 import SubmissionHistoryAccordion from "@/app/ui/dashboard/aotd/submission_history_accordion"
+import { Metadata } from "next"
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ albumid: string }>
+}): Promise<Metadata> {
+  // Retrieive prop of albumid from url
+  const albumid = (await params).albumid
+  // Retrieve data about album from backend
+  const albumObj = await getAlbum(albumid)
+
+  return {
+    title: albumObj["title"]
+  }
+}
 
 // Page to display data for a specific album
 export default async function Page({
@@ -46,7 +61,7 @@ export default async function Page({
   // Determine if scores should be hidden (hide-scores-prereview setting)
   const reviewToday = await getHasReviewedToday();
   const hideScore = (await getAotdUserSettings())['hide_scores_prereview'] && !reviewToday;
-  
+
 
   // Box of historical review dates - Generate series of review displays based on dates
   const pastReviewsBox = () => {

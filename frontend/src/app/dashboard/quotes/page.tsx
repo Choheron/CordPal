@@ -4,6 +4,13 @@ import { getAllBotQuotes } from "@/app/lib/discord_bot_utils";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import QuoteCounts from "@/app/ui/dashboard/quotes/quote_counts";
 import QuoteSortBlock from "@/app/ui/dashboard/quotes/quote_sort_block";
+import { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Quotes"
+  }
+}
 
 // TODO: Implement toggle for cursive text in quotes
 export default async function quotes({searchParams}) {

@@ -15,6 +15,21 @@ import { AOtDScoreTimelineLineChart } from "@/app/ui/dashboard/aotd/statistics_d
 import Link from "next/link"
 import { RiArrowLeftCircleLine, RiArrowRightCircleLine, RiCalendar2Fill } from "react-icons/ri"
 import AlbumTagsDisplay from "@/app/ui/dashboard/aotd/album_tags"
+import { Metadata } from "next"
+
+// Page metadata
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ year: string, month: string, day: string }> 
+}): Promise<Metadata> {
+  const { year, month, day } = (await params)
+  // Decalre date string
+  const date = `${year}-${month}-${day}`
+  return {
+    title: `${date} Calendar`
+  }
+}
 
 // Page to display historial data for an specific date
 export default async function Page({

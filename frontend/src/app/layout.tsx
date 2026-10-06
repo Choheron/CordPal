@@ -11,7 +11,10 @@ import { isValentinesDay } from "./lib/utils";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Cord-Pal",
+  title: {
+      template: '%s | Cord-Pal',
+      default: 'Cord-Pal',
+    },
   description: "Discord Compainion Site allowing users to submit albums, track quotes, upload inside joke images, etc.",
   icons: {
     icon: '/svgs/logos/CordPal_Logo_V1.svg',

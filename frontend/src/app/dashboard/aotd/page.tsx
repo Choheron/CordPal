@@ -1,15 +1,25 @@
 import Link from "next/link";
+import { Metadata } from "next";
 
 import PageTitle from "@/app/ui/dashboard/page_title";
 import { Conditional } from "@/app/ui/dashboard/conditional";
 import AotdEnrollBox from "@/app/ui/dashboard/aotd/aotd_enroll_box";
-import { getAlbumOfTheDayData, getLastXSubOrRescueAlbums, isAotdParticipant } from "@/app/lib/aotd_utils";
+import { getAlbumOfTheDayData, getDateViewStatus, getLastXSubOrRescueAlbums, isAotdParticipant } from "@/app/lib/aotd_utils";
 import AlbumOfTheDayBox from "@/app/ui/dashboard/aotd/album_of_the_day";
 import RecentSubmissions from "@/app/ui/dashboard/aotd/recent_submissions";
 import MusicStatsBox from "@/app/ui/dashboard/aotd/statistics_displays/music_stats_box";
 import { Button } from "@heroui/button";
 import { getLastYearInTimezone, getTodayInTimezone, padNumber } from "@/app/lib/utils";
 import MinimalAlbumDisplay from "@/app/ui/dashboard/aotd/minimal_album_display";
+
+export async function generateMetadata(): Promise<Metadata> {
+  // Get count of unread reviews for todays date
+  const today_string = getTodayInTimezone("America/Chicago")
+  const unseen_reviews = (await getDateViewStatus(today_string))["unseen"]
+  return {
+    title: ((unseen_reviews > 0) ? `(${unseen_reviews}) AOTD` : "AOTD")
+  }
+}
 
 export default async function music() {
   const aotd_participant = await isAotdParticipant();

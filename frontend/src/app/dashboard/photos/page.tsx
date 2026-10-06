@@ -4,6 +4,13 @@ import PhotoGallery from "@/app/ui/dashboard/photos/image_gallery";
 import PageTitle from "@/app/ui/dashboard/page_title";
 import UploadPhotoModal from "@/app/ui/dashboard/photos/upload_photo_modal";
 import { Suspense } from "react";
+import { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Photos"
+  }
+}
 
 async function GalleryLoader({uploader, artist, tagged}) {
   const photos = await getPhotoshops(uploader, artist, tagged);

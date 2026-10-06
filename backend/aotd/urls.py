@@ -95,6 +95,7 @@ urlpatterns = [
   ## ==== ReviewView Views
   path("markReviewViewed/<int:review_pk>", views_review.markReviewViewed),
   path("getReviewViewStatus/<int:review_pk>", views_review.getReviewViewStatus),
+  path("getDateViewStatus/<str:aotd_date>", views_review.getDateViewStatus),
   ## ============================================================================================================
   ## Album Of the Day Views
   ## ============================================================================================================

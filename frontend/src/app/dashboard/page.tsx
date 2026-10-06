@@ -11,6 +11,13 @@ import { getAlbumOfTheDayData, getAotdUserSettings } from "../lib/aotd_utils";
 import AllTimezonesBlock from "../ui/dashboard/allTimezonesBlock";
 import UserActionsBlock from "../ui/dashboard/userActionsBlock";
 import EmojiSection from "../ui/dashboard/emojis/EmojiSection";
+import { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Dashboard"
+  }
+}
 
 export default async function Page() {
   const discordUserData = await getDiscordUserData();
@@ -35,7 +42,6 @@ export default async function Page() {
       return ''
     }
   }
-
   
   return (
     <main className="flex flex-col max-w-full items-center px-1 lg:p-24 pt-10 lg:pt-10">
