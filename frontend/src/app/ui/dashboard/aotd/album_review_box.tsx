@@ -69,7 +69,8 @@ export default function AlbumReviewBox(props) {
         "position": cur['position'],
         "title": cur['title'],
         "cordpal_rating": cur['cordpal_rating'],
-        "cordpal_comment": cur['cordpal_comment']
+        "cordpal_comment": cur['cordpal_comment'],
+        "track_disabled": cur['track_disabled']
       }
     }), {})
   )
@@ -138,7 +139,8 @@ export default function AlbumReviewBox(props) {
           score: rating,
           comment: comment,
           first_listen: isFirstListen,
-          last_updated: new Date().toISOString()
+          last_updated: new Date().toISOString(),
+          songReviewObj: songReviewObj
         }))
       }
     } else {
@@ -222,7 +224,7 @@ export default function AlbumReviewBox(props) {
   }
 
   // Handle a track review change for trackdata
-  const handleTrackUpdate = (trackName, trackScore, trackComment) => {
+  const handleTrackUpdate = (trackName, trackScore, trackComment, track_disabled) => {
     setSongReviewObj(
       {
         ...songReviewObj,
@@ -230,7 +232,8 @@ export default function AlbumReviewBox(props) {
           "number": songReviewObj[trackName]['number'],
           "title": trackName,
           "cordpal_rating": trackScore,
-          "cordpal_comment": trackComment
+          "cordpal_comment": trackComment,
+          "track_disabled": track_disabled
         }
       }
     )
@@ -267,36 +270,57 @@ export default function AlbumReviewBox(props) {
                 songList.map((song, index) => (
                   <div 
                     key={index}
-                    className="py-2"
+                    className="px-2 py-2 my-2 rounded-lg bg-black/10 border border-neutral-800/50"
                   >
-                    <p className="text-sm sm:text-lg">{song['number']}. <b>{song['title']}</b></p>
-                    <div className="flex px-1">
-                      <Slider
-                        aria-label={`Rating for ${song['title']}`}
-                        size="sm"
-                        radius="sm"
-                        step={1}
-                        marks={getSongSteps()}
-                        color="warning"
-                        maxValue={4}
-                        minValue={0} 
-                        value={songReviewObj[song['title']]['cordpal_rating']}
-                        onChange={(rating) => handleTrackUpdate(song['title'], rating, songReviewObj[song['title']]['cordpal_comment'])}
-                        renderThumb={(props) => (
-                          <div
-                            {...props}
-                            className={`group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing`}
-                          >
-                            <span className={`transition-transform shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80 ${ratingToTailwindBgColor(songReviewObj[song['title']]['cordpal_rating'] * 2)}`} />
-                          </div>
-                        )}
-                        className="max-w-full px-5 mx-auto" 
-                      />
+                    <div className="flex justify-between">
+                      <p className={`text-sm sm:text-lg`}>{song['number']}. <b className={(songReviewObj[song['title']]['track_disabled']) ? 'line-through' : ''}>{song['title']}</b></p>
+                      <Switch 
+                        isSelected={songReviewObj[song['title']]['track_disabled']} 
+                        onValueChange={(track_disabled) => handleTrackUpdate(song['title'], songReviewObj[song['title']]['cordpal_rating'], songReviewObj[song['title']]['cordpal_comment'], track_disabled)}
+                        color="danger"
+                      >
+                        Disable Track
+                      </Switch>
                     </div>
-                    <ReviewTipTap 
-                      content={songReviewObj[song['title']]['cordpal_comment']}
-                      updateCallback={(comment) => handleTrackUpdate(song['title'], songReviewObj[song['title']]['cordpal_rating'], comment)}
-                    />
+                    {(!songReviewObj[song['title']]['track_disabled']) ?
+                      (
+                        <span>
+                          <div className="flex px-1">
+                            <Slider
+                              aria-label={`Rating for ${song['title']}`}
+                              size="sm"
+                              radius="sm"
+                              step={1}
+                              marks={getSongSteps()}
+                              color="warning"
+                              maxValue={4}
+                              minValue={0} 
+                              value={songReviewObj[song['title']]['cordpal_rating']}
+                              onChange={(rating) => handleTrackUpdate(song['title'], rating, songReviewObj[song['title']]['cordpal_comment'], songReviewObj[song['title']]['track_disabled'])}
+                              renderThumb={(props) => (
+                                <div
+                                  {...props}
+                                  className={`group p-1 top-1/2 bg-background border-small border-default-100 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing`}
+                                >
+                                  <span className={`transition-transform shadow-small from-secondary-100 to-secondary-500 rounded-full w-5 h-5 block group-data-[dragging=true]:scale-80 ${ratingToTailwindBgColor(songReviewObj[song['title']]['cordpal_rating'] * 2)}`} />
+                                </div>
+                              )}
+                              className="max-w-full px-5 mx-auto" 
+                            />
+                          </div>
+                          <ReviewTipTap 
+                            content={songReviewObj[song['title']]['cordpal_comment']}
+                            updateCallback={(comment) => handleTrackUpdate(song['title'], songReviewObj[song['title']]['cordpal_rating'], comment, songReviewObj[song['title']]['track_disabled'])}
+                          />
+                        </span>
+                      ) : (
+                        <div className="pl-4 text-left">
+                          <p className="italic text-xs">
+                            Disabled songs will not appear in your review
+                          </p>
+                        </div>
+                      ) 
+                    }
                   </div> 
                 ))
               }

@@ -156,7 +156,7 @@ export default async function Page({
         <Conditional showWhen={review_data['advanced']}>
           <p className="mt-[6px] text-lg mr-auto ml-0">Track by Track:</p>
           {
-            parsedTrackComments.map(async(songObj: any) => (
+            parsedTrackComments.filter(songObj => songObj['track_disabled'] == false).map(async(songObj: any) => (
               <div 
                 key={songObj['number']}
                 className="text-left w-full"

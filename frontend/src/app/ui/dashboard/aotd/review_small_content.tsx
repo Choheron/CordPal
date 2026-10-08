@@ -98,7 +98,7 @@ export default async function ReviewPopoverContent(props) {
         <p className="mt-[6px] text-lg mr-auto ml-0">Track by Track:</p>
         <div className="max-h-[400px] overflow-x-auto rounded-lg w-full px-2">
           {
-            parsedTrackComments.map(async(songObj: any) => (
+            parsedTrackComments.filter(songObj => songObj['track_disabled'] == false).map(async(songObj: any) => (
               <div 
                 key={songObj['number']}
                 className="text-left w-full py-[2px]"
