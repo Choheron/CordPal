@@ -26,8 +26,8 @@ export default async function ReviewDisplay(props) {
   return (
     <div className="w-[320px] mx-auto my-2 flex flex-col flex-shrink-0 gap-2">
       <div className="flex mx-auto gap-3 text-xs">
-        <p>{`(Active) User Reviews:`}</p>
-        <p>{reviews.length}/{userCount}</p>
+        <p>{`Total Reviews:`}</p>
+        <p>{reviews.length}</p>
       </div>
       <Conditional showWhen={aotdUserData['streak_at_risk'] && (aotdUserData['current_streak'] > 2) && (props.historical != true)}>
         <Alert

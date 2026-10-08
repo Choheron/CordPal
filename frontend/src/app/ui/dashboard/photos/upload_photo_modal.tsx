@@ -22,7 +22,7 @@ import { uploadImageToBackend } from "@/app/lib/photos_utils";
 export default function UploadPhotoModal(props) {
   const [titleValue, setTitleValue] = React.useState("");
   const [descriptionValue, setDescriptionValue] = React.useState("");
-  const [taggedUsers, setTaggedUsers] = React.useState<[string]>([""])
+  const [taggedUsers, setTaggedUsers] = React.useState<Set<string>>(new Set())
   const [creator, setCreator] = React.useState("")
   const fileRef = React.useRef<HTMLInputElement>(null) // Reference image input field
   const [fileChosen, setFileChosen] = React.useState(false);
@@ -43,8 +43,8 @@ export default function UploadPhotoModal(props) {
     // Populate form data
     uploadFormData.append("title", titleValue)
     uploadFormData.append("description", descriptionValue)
-    uploadFormData.append("tagged_users", Object.values(taggedUsers).join(','))
-    uploadFormData.append("creator", Object.values(creator)[0])
+    uploadFormData.append("tagged_users", Array.from(taggedUsers).join(','))
+    uploadFormData.append("creator", Array.from(creator)[0])
     // Check and add image data to form
     if(fileRef.current != null) {
       // Add image data to form
@@ -94,7 +94,7 @@ export default function UploadPhotoModal(props) {
     // Clear all form data 
     setTitleValue("")
     setDescriptionValue("")
-    setTaggedUsers([""])
+    setTaggedUsers(new Set())
     setCreator("")
     setFileChosen(false)
     setFileName("")
